@@ -1,0 +1,45 @@
+<meta>
+	<info name="StuykServer" type="gamemode" author="Stuyk" version="0.1" description="Unassigned" />
+	<script src="Main.cs" type="server" lang="csharp" />
+	<script src="Util/ConnectionHandler.cs" type="server" lang="csharp" />
+	<script src="Util/DatabaseHandler.cs" type="server" lang="csharp" />
+	<script src="Util/SpawnPoints.cs" type="server" lang="csharp" />
+	
+	<script src="Util/BlipMarkerHandler.cs" type="server" lang="csharp" />
+	<script src="Util/LoginHandler.cs" type="server" lang="csharp" />
+	<script src="Jobs/Fishing.cs" type="server" lang="csharp" />
+	<script src="Jobs/PizzaDelivery.cs" type="server" lang="csharp" />
+	<script src="Jobs/JobHandler.cs" type="server" lang="csharp" />
+	
+	<script src="clientside/serversideCamera.js" type="client" lang="javascript" />
+	<script src="clientside/MoneyDisplay.js" type="client" lang="javascript" />
+	<script src="clientside/WaypointHelper.js" type="client" lang="javascript" />
+	  
+	<script src="clientside/Main.js" type="client" lang="javascript" />
+	  
+    <file src="clientside/resources/index.html" type="client" lang="javascript" />
+	<file src="clientside/resources/regsuccess.html" type="client" lang="javascript" />
+	<file src="clientside/resources/js/jquery.js" />
+	<file src="clientside/resources/js/bootstrap.js" />
+	<file src="clientside/resources/js/bootstrap.min.js" />
+	<file src="clientside/resources/js/npm.js" />
+	
+	<file src="clientside/resources/fonts/glyphicons-halflings-regular.eot" />
+	<file src="clientside/resources/fonts/glyphicons-halflings-regular.svg" />
+	<file src="clientside/resources/fonts/glyphicons-halflings-regular.ttf" />
+	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff" />
+	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff2" />
+	
+	<file src="clientside/resources/cover.css" />
+	<file src="clientside/resources/css/bootstrap.min.css" />
+	<file src="clientside/resources/css/bootstrap.min.css.map"/>
+	
+	<file src="clientside/resources/images/logo.png" />
+	<file src="clientside/resources/images/bg.png" />
+	
+	<include resource="database"/>
+	
+	<assembly ref="System.Data.dll"/>
+	<assembly ref="System.Xml.dll"/>
+	<assembly ref="Bcrypt.Net.dll"/>
+</meta>
