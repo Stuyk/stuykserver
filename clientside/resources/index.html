@@ -4,7 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="cover.css" rel="stylesheet">
-	<script src="js/jquery.js"></script>
   </head>
   <body>
     <div class="site-wrapper">
@@ -18,7 +17,7 @@
 				We are currently in a testing phase.
 			</div>
 			<p>Visit our Discord @ https://discord.gg/QFzJweY</p>
-			<form method="post" class="form-horizontal">
+			<form method="post" class="form-horizontal" id="formMain">
 				<div class="form-group">
 					<label class="col-sm-2 control-label">Email</label>
 					<div class="col-sm-10">
@@ -42,19 +41,23 @@
         </div>
       </div>
     </div>
-  <script>
+  <script type="text/javascript">
 	document.getElementById("loginButton").onclick = function ()
 	{
 		var email = document.getElementById("inputEmail").value;
 		var password = document.getElementById("inputPassword").value;
-		resourceCall("loginHandler", email, password);
+		if(email.indexOf('@') >= 0) {
+			resourceCall("loginHandler", email, password);
+		}
 	}
 	
 	document.getElementById("registerButton").onclick = function ()
 	{
 		var email = document.getElementById("inputEmail").value;
 		var password = document.getElementById("inputPassword").value;
-		resourceCall("registerHandler", email, password);
+		if(email.indexOf('@') >= 0) {
+			resourceCall("registerHandler", email, password);
+		}
 	}
   </script>
   </body>

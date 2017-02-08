@@ -34,18 +34,27 @@ namespace stuykserver.Util
                 API.sendNotificationToPlayer(player, "~g~Attempting registration...");
                 cmdRegister(player, arguments[0].ToString(), arguments[1].ToString());
             }
+
+            if (eventName == "localPullName")
+            {
+                API.triggerClientEvent(player, "updateNameVariable", player.name);
+            }
         }
 
         private void API_onResourceStart()
         {
-            API.consoleOutput("Started: BlipMarkerHandler");
+            API.consoleOutput("Started: LoginHandler");
         }
 
         public void cmdLogin(Client player, string email, string password)
         {
+            API.triggerClientEvent(player, "killPanel");
+            API.triggerClientEvent(player, "loadLogin");
+
             if (main.isPlayerLoggedIn(player))
             {
                 API.kickPlayer(player, main.msgPrefix + "You are already logged in.");
+                return;
             }
 
             // Pull Password Information
@@ -61,9 +70,7 @@ namespace stuykserver.Util
             // Check for Password Correctness.
             if (isPasswordCorrect)
             {
-                API.sendChatMessageToPlayer(player, main.msgPrefix + "You are now logged in.");
                 API.call("ConnectionHandler", "SpawnPlayer", player);
-
                 int money = Convert.ToInt32(db.pullDatabase("Players", "Money", "Nametag", player.name));
                 API.triggerClientEvent(player, "update_money_display", money);
                 db.updateDatabase("Players", "LoggedIn", "1", "Nametag", player.name);
@@ -72,7 +79,7 @@ namespace stuykserver.Util
             else
             {
                 API.sendNotificationToPlayer(player, "~r~Wrong password.");
-                API.kickPlayer(player);
+                API.kickPlayer(player, "~r~Incorrect password");
                 return;
             }
         }

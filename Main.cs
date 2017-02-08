@@ -49,38 +49,6 @@ namespace stuykserver
             }
         }
 
-        [Command("skin")] //Purchase Clothing
-        public void cmdSkin(Client player, PedHash model)
-        {
-            if (isPlayerLoggedIn(player))
-            {
-                if (!player.isInVehicle) // If player is not in Vehicle
-                {
-                    foreach (Vector3 clothingShop in spawnPoints.ClothingSpawnPoints)
-                    {
-                        if (player.position.DistanceTo(clothingShop) <= 15)
-                        {
-                            if (db.getPlayerMoney(player) >= 30)
-                            {
-                                API.setPlayerSkin(player, model);
-                                API.sendNativeToPlayer(player, 0x45EEE61580806D63, player.handle);
-                                API.sendChatMessageToPlayer(player, msgPrefix + "Skin has been selected.");
-                                db.updateDatabase("Players", "CurrentSkin", model.ToString(), "Nametag", player.name);
-                                db.setPlayerMoney(player, -30);
-                                return;
-                            }
-                            else
-                            {
-                                API.sendChatMessageToPlayer(player, msgPrefix + "Not enough money.");
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-            return;
-        }
-
         [Command("getpos")] //Temporary
         public void cmdGetPos(Client player)
         {
@@ -144,14 +112,25 @@ namespace stuykserver
             return;
         }
 
+        [Command("inventory")] // Temporary?
+        public void cmdInventory(Client player)
+        {
+            API.triggerClientEvent(player, "openInventory", player.name);
+            return;
+        }
+
         // Used to check if the player is logged in.
         public bool isPlayerLoggedIn(Client player)
         {
-            string loginPull = "SELECT LoggedIn From Players WHERE Nametag='" + player.name + "'";
-            DataTable loginBool = API.exported.database.executeQueryWithResult(loginPull);
-            if ((bool)loginBool.Rows[0][0] == true)
+            string loginPull = db.pullDatabase("Players", "LoggedIn", "Nametag", player.name);
+            bool loginBool = Convert.ToBoolean(loginPull);
+            if (loginBool == true)
             {
                 return true;
+            }
+            else if (loginBool == false)
+            {
+                return false;
             }
             return false;
         }

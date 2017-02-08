@@ -1,0 +1,117 @@
+body {
+    width: 100%;
+    height: 100%;
+	overflow: hidden;
+	margin: 0 auto;
+	padding: 0;
+	background: #333333 url("images/bg.png") repeat;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+	margin: 0 auto;
+	padding: 0;
+}
+
+// Usage as a mixin
+.element {
+  .center-block();
+}
+
+.nav {
+	padding-top: 5px;
+	background-color: #fff;
+	height: auto;
+}
+
+.intro-section {
+    height: 100%;
+    padding-top: 150px;
+    text-align: center;
+    background: #333333 url("images/bg.png") repeat;
+	color: #fff;
+}
+
+.col-center {
+	margin: 0 auto;
+}
+
+.img-skin {
+	display: block;
+	margin: 0 auto;
+	width: 125px;
+	height: 245px;
+}
+
+.img-placeholder {
+	background: #FFF url('images/skins/placeholder.png');
+}
+
+h1 {
+	color: #fff;
+}
+
+.policemale-section {
+    height: 100%;
+    padding-top: 100px;
+    text-align: center;
+    background: #333333 url("images/tweed.png") repeat;
+	color: #333;
+}
+
+.policefemale-section {
+    height: 100%;
+    padding-top: 100px;
+    text-align: center;
+    background: #333333 url("images/dashed.png") repeat;
+	color: #333;
+}
+
+.businessfemale-section {
+    height: 100%;
+    padding-top: 100px;
+    text-align: center;
+    background: #333333 url("images/geo.png") repeat;
+	color: #333;
+}
+
+.businessmale-section {
+    height: 100%;
+    padding-top: 100px;
+    text-align: center;
+    background: #333333 url("images/bg.png") repeat;
+	color: #333;
+}
+
+.industry-section {
+    height: 100%;
+    padding-top: 100px;
+    text-align: center;
+    background: #333333 url("images/geo.png") repeat;
+	color: #333;
+}
+
+.casualmale-section {
+    height: 100%;
+    padding-top: 100px;
+    text-align: center;
+    background: #333333 url("images/tweed.png") repeat;
+	color: #333;
+}
+
+.casualfemale-section {
+    height: 100%;
+    padding-top: 100px;
+    text-align: center;
+    background: #333333 url("images/bg.png") repeat;
+	color: #333;
+}
+
+.gangs-section {
+height: 100%;
+    padding-top: 100px;
+    text-align: center;
+    background: #333333 url("images/tweed.png") repeat;
+	color: #333;
+}

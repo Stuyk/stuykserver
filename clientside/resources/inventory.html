@@ -1,0 +1,50 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="inventory.css" rel="stylesheet">
+  </head>
+  <body>
+	<div class="inventory-blur"></div>
+	<div class="row inventory-header">
+		<div class="row">
+			<div class="col-sm-12">
+				<h2>Inventory</h2>
+			</div>
+		</div>
+	</div>
+	<div class="row inventory-panel">
+		<h3 class="col-sm-12">Vehicles</h3>
+		<div class="row" style="padding: 20px">
+			<div class="col-sm-12">
+				<div class="row">
+					<button id="spawnVehicleSlotA" type="submit" class="btn btn-info col-sm-2 col-sm-offset-1" onclick="resourceCall('killPanel')">Slot A</button>
+					<button id="spawnVehicleSlotB" type="submit" class="btn btn-info col-sm-2 col-sm-offset-2" onclick="resourceCall('killPanel')">Slot B</button>
+					<button id="spawnVehicleSlotC" type="submit" class="btn btn-info col-sm-2 col-sm-offset-2" onclick="resourceCall('killPanel')">Slot C</button>
+				</div>
+				<div class="row">
+					<button id="spawnVehicleSlotD" type="submit" class="btn btn-info col-sm-2 col-sm-offset-1" onclick="resourceCall('killPanel')">Slot D</button>
+					<button id="spawnVehicleSlotE" type="submit" class="btn btn-info col-sm-2 col-sm-offset-2" onclick="resourceCall('killPanel')">Slot E</button>
+					<button id="spawnVehicleSlotF" type="submit" class="btn btn-info col-sm-2 col-sm-offset-2" onclick="resourceCall('killPanel')">Slot F</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row inventory-panel-full">
+	
+	</div>
+	<div class="row inventory-panel">
+		<footer class="footer">
+				<button id="closeButton" type="submit" class="btn btn-danger col-sm-10 col-sm-offset-1" onclick="resourceCall('killPanel')">Close</button>
+		</footer>
+	</div>
+  </body>
+  <script type="text/javascript">
+	function pullMessage() {
+		resourceCall('getPlayerName');
+		return args[0];
+	}
+  </script>
+</html>
+

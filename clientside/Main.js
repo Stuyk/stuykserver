@@ -1,35 +1,49 @@
-var mainLoginPanel = null;
-var regSuccessPanel = null;
-var inventoryPanel = null;
+var pagePanel = null;
 
 var email = "";
+var skinid = "";
 var password = "";
+var page = "";
+var playerName = "";
 
 class CefHelper {
-  constructor (resourcePath) {
+  constructor (resourcePath)
+  {
     this.path = resourcePath;
     this.open = false;
   }
 
   show () {
-    if (this.open === false) {
-      this.open = true
+    if (this.open == false) {
+      this.open = true;
       var resolution = API.getScreenResolution();
       this.browser = API.createCefBrowser(resolution.Width, resolution.Height, true);
       API.waitUntilCefBrowserInit(this.browser);
       API.setCefBrowserPosition(this.browser, 0, 0);
       API.loadPageCefBrowser(this.browser, this.path);
       API.showCursor(true);
-	  API.setCanOpenChat(false);
-	  API.sendNotification("~g~Login panel started, you may now login.");
+      API.setCanOpenChat(false);
     }
   }
-
+  
+  showInv () {
+    if (this.open == false) {
+      this.open = true;
+      var resolution = API.getScreenResolution();
+      this.browser = API.createCefBrowser(resolution.Width, resolution.Height, true);
+      API.waitUntilCefBrowserInit(this.browser);
+      API.setCefBrowserPosition(this.browser, resolution.Width / 2 - 250, 0);
+      API.loadPageCefBrowser(this.browser, this.path);
+      API.showCursor(true);
+      API.setCanOpenChat(false);
+    }
+  }
+  
   destroy () {
     this.open = false;
     API.destroyCefBrowser(this.browser);
     API.showCursor(false);
-	API.setCanOpenChat(true);
+    API.setCanOpenChat(true);
   }
 
   eval (string) {
@@ -38,37 +52,148 @@ class CefHelper {
 }
 
 API.onResourceStart.connect(function() {
-  if (mainLoginPanel == null) {
-	mainLoginPanel = new CefHelper('clientside/resources/index.html');
-	mainLoginPanel.show();
-	API.sendNotification("~g~Login panel started, you may now login.")
+  if (pagePanel == null) {
+    pagePanel = new CefHelper("clientside/resources/index.html");
+    pagePanel.show();
   }
 });
 
 API.onResourceStop.connect(function() {
-	mainLoginPanel.destroy();
+    if (pagePanel != null) {
+		pagePanel.destroy();
+		pagePanel = null;
+	}
 });
 
-API.onServerEventTrigger.connect(function (eventName, args) {
+API.onServerEventTrigger.connect(function(eventName, args) {
     if (eventName=="registerSuccessful") {
-		if (regSuccessPanel == null)
-		{
-			regSuccessPanel = new CefHelper('clientside/resources/regsuccess.html');
-			regSuccessPanel.show();
-		}
+        if (pagePanel == null)
+        {
+            pagePanel = new CefHelper("clientside/resources/regsuccess.html");
+            pagePanel.show();
+        }
+    }
+    
+    if (eventName=="openInventory") {
+        if (pagePanel == null)
+        {
+            pagePanel = new CefHelper("clientside/resources/inventory.html");
+            pagePanel.showInv();
+        }
+    }
+    
+    if (eventName=="openSkinPanel") {
+        if (pagePanel == null)
+        {
+            pagePanel = new CefHelper("clientside/resources/skinselector.html");
+            pagePanel.show();
+        }
+    }
+    
+    if (eventName=="killPanel") {
+        if (pagePanel != null) {
+            pagePanel.destroy();
+			pagePanel = null;
+        }
     }
 	
-	
+	if (eventName=="loadLogin") {
+		if (pagePanel == null) {
+			pagePanel = new CefHelper("clientside/resources/loading.html");
+			pagePanel.show();
+		}
+	}
+	if (eventName=="updateNameVariable") {
+		playerName = args[0];
+		API.sendNotification(playerName);
+	}
 });
 
-function loginHandler(email, password)
-{
-	mainLoginPanel.destroy();
-	API.triggerServerEvent("clientLogin", email, password);
+function killPanel() {
+	if (pagePanel != null) {
+		pagePanel.destroy();
+		pagePanel = null;
+	}
 }
 
-function registerHandler(email, password)
-{
-	mainLoginPanel.destroy();
-	API.triggerServerEvent("clientRegistration", email, password);
+function closeInventory() {
+    pagePanel.destroy();
+    pagePanel = null;
 }
+
+function loginHandler(email, password) {
+    API.triggerServerEvent("clientLogin", email, password);
+}
+
+function registerHandler(email, password) {
+    pagePanel.destroy();
+    pagePanel = null;
+    API.triggerServerEvent("clientRegistration", email, password);
+}
+
+function clientSkin(skinid) {
+    pagePanel.destroy();
+    pagePanel = null;
+    API.triggerServerEvent("clientSkinSelected", skinid);
+}
+
+function loadPageContent(page) {
+    pagePanel.destroy();
+    pagePanel = null;
+    loadNextPage(page);
+}
+
+function loadNextPage(page) {
+    if (pagePanel == null) {
+        if (page == "policemale") {
+            API.sendNotification(page);
+            pagePanel = new CefHelper("clientside/resources/policemale.html");
+            pagePanel.show();
+        }
+        if (page == "policefemale") {
+            API.sendNotification(page);
+            pagePanel = new CefHelper("clientside/resources/policefemale.html");
+            pagePanel.show();
+        }
+        if (page == "businessmale") {
+            API.sendNotification(page);
+            pagePanel = new CefHelper("clientside/resources/businessmale.html");
+            pagePanel.show();
+        }
+        if (page == "businessfemale") {
+            API.sendNotification(page);
+            pagePanel = new CefHelper("clientside/resources/businessfemale.html");
+            pagePanel.show();
+        }
+        if (page == "industryone") {
+            API.sendNotification(page);
+            pagePanel = new CefHelper("clientside/resources/industryone.html");
+            pagePanel.show();
+        }
+        if (page == "industrytwo") {
+            API.sendNotification(page);
+            pagePanel = new CefHelper("clientside/resources/industrytwo.html");
+            pagePanel.show();
+        }
+        if (page == "casualmale") {
+            API.sendNotification(page);
+            pagePanel = new CefHelper("clientside/resources/casualmale.html");
+            pagePanel.show();
+        }
+        if (page == "casualfemale") {
+            API.sendNotification(page);
+            pagePanel = new CefHelper("clientside/resources/casualfemale.html");
+            pagePanel.show();
+        }
+    } else {
+        pagePanel.destroy();
+		pagePanel = null;
+        API.sendNotification("Your menus have been cleared. Try accessing the menu once more.");
+    }
+}
+
+function getPlayerName() {
+	API.triggerServerEvent("localPullName");
+	return playerName;
+}
+

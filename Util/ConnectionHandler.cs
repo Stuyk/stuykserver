@@ -72,17 +72,20 @@ namespace stuykserver.Util
             if (!main.isValidUsername(player.name))
             {
                 API.kickPlayer(player, "Invalid Username Format. Example: John_Doe");
+                return;
             }
         }
 
         private void API_onPlayerDisconnected(Client player, string reason)
         {
+            string loginPull = db.pullDatabase("Players", "LoggedIn", "Nametag", player.name);
+
             if (main.isPlayerLoggedIn(player))
             {
                 db.updateDatabase("Players", "LASTX", player.position.X.ToString(), "Nametag", player.name);
                 db.updateDatabase("Players", "LASTY", player.position.Y.ToString(), "Nametag", player.name);
                 db.updateDatabase("Players", "LASTZ", player.position.Z.ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "LoggedIn", "0", "SocialClub", player.name);
+                db.updateDatabase("Players", "LoggedIn", "0", "Nametag", player.name);
                 db.updateDatabase("Players", "CurrentSkin", ((PedHash)API.getEntityModel(player)).ToString(), "Nametag", player.name);
                 db.updateDatabase("Players", "Health", API.getPlayerHealth(player).ToString(), "Nametag", player.name);
                 db.updateDatabase("Players", "Armor", API.getPlayerArmor(player).ToString(), "Nametag", player.name);
@@ -101,6 +104,11 @@ namespace stuykserver.Util
 
                 db.updateDatabase("Players", "TempJobVehicle", "None", "Nametag", player.name);
             }
+            else
+            {
+                return;
+            }
+            return;
         }
 
         private void API_onPlayerDeath(Client player, NetHandle entityKiller, int weapon)
@@ -129,6 +137,8 @@ namespace stuykserver.Util
             player.freezePosition = false;
             API.setEntityPosition(player, new Vector3(x, y, z));
             API.setPlayerSkin(player, API.pedNameToModel(db.pullDatabase("Players", "CurrentSkin", "Nametag", player.name)));
+
+            API.triggerClientEvent(player, "killPanel");
         }
     }
 }

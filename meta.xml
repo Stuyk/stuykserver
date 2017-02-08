@@ -4,9 +4,10 @@
 	<script src="Util/ConnectionHandler.cs" type="server" lang="csharp" />
 	<script src="Util/DatabaseHandler.cs" type="server" lang="csharp" />
 	<script src="Util/SpawnPoints.cs" type="server" lang="csharp" />
-	
 	<script src="Util/BlipMarkerHandler.cs" type="server" lang="csharp" />
 	<script src="Util/LoginHandler.cs" type="server" lang="csharp" />
+	<script src="Util/SkinHandler.cs" type="server" lang="csharp" />
+	<script src="Util/VehicleHandler.cs" type="server" lang="csharp" />
 	<script src="Jobs/Fishing.cs" type="server" lang="csharp" />
 	<script src="Jobs/PizzaDelivery.cs" type="server" lang="csharp" />
 	<script src="Jobs/JobHandler.cs" type="server" lang="csharp" />
@@ -14,15 +15,26 @@
 	<script src="clientside/serversideCamera.js" type="client" lang="javascript" />
 	<script src="clientside/MoneyDisplay.js" type="client" lang="javascript" />
 	<script src="clientside/WaypointHelper.js" type="client" lang="javascript" />
-	  
 	<script src="clientside/Main.js" type="client" lang="javascript" />
 	  
-    <file src="clientside/resources/index.html" type="client" lang="javascript" />
-	<file src="clientside/resources/regsuccess.html" type="client" lang="javascript" />
-	<file src="clientside/resources/js/jquery.js" />
-	<file src="clientside/resources/js/bootstrap.js" />
-	<file src="clientside/resources/js/bootstrap.min.js" />
-	<file src="clientside/resources/js/npm.js" />
+    <file src="clientside/resources/index.html"/>
+	<file src="clientside/resources/regsuccess.html"/>
+	<file src="clientside/resources/inventory.html"/>
+	<file src="clientside/resources/loading.html"/>
+	<file src="clientside/resources/js/bootstrap.js"/>
+	<file src="clientside/resources/js/bootstrap.min.js"/>
+	<file src="clientside/resources/js/npm.js"/>
+	
+	<file src="clientside/resources/skinselector.html"/>
+	<file src="clientside/resources/policemale.html"/>
+	<file src="clientside/resources/policefemale.html"/>
+	<file src="clientside/resources/businessmale.html"/>
+	<file src="clientside/resources/businessfemale.html"/>
+	<file src="clientside/resources/industryone.html"/>
+	<file src="clientside/resources/industrytwo.html"/>
+	<file src="clientside/resources/casualmale.html"/>
+	<file src="clientside/resources/casualfemale.html"/>
+	
 	
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.eot" />
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.svg" />
@@ -31,15 +43,23 @@
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff2" />
 	
 	<file src="clientside/resources/cover.css" />
+	<file src="clientside/resources/inventory.css" />
+	<file src="clientside/resources/skinselector.css"/>
+	<file src="clientside/resources/css/bootstrap.css" />
 	<file src="clientside/resources/css/bootstrap.min.css" />
 	<file src="clientside/resources/css/bootstrap.min.css.map"/>
-	
+
 	<file src="clientside/resources/images/logo.png" />
 	<file src="clientside/resources/images/bg.png" />
+	<file src="clientside/resources/images/geo.png" />
+	<file src="clientside/resources/images/dashed.png" />
+	<file src="clientside/resources/images/tweed.png" />
 	
 	<include resource="database"/>
 	
 	<assembly ref="System.Data.dll"/>
 	<assembly ref="System.Xml.dll"/>
 	<assembly ref="Bcrypt.Net.dll"/>
+	
+    <file src="clientside/resources/images/skins/placeholder.png" />
 </meta>

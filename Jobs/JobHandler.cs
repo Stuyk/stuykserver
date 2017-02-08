@@ -59,12 +59,6 @@ namespace stuykserver.Jobs
             return isJobStarted;
         }
 
-        [Command("CheckJobStarted")]
-        public void checkJobStarted(Client player)
-        {
-            API.sendNotificationToPlayer(player, isInJob(player).ToString());
-        }
-
         [Command("finishjob")]
         public void finishJob(Client player)
         {
