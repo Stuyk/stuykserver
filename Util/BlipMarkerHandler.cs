@@ -11,7 +11,6 @@ namespace stuykserver.Util
         public BlipMarkerHandler()
         {
             InitializeServerSpawnPoints();
-            InitializeClothingShops();
             InitializeFishingPoints();
             InitializePizzaShops();
 
@@ -31,19 +30,6 @@ namespace stuykserver.Util
                 var marker = API.createMarker(1, new Vector3(spawnPoint.X, spawnPoint.Y, spawnPoint.Z - 4), new Vector3(), new Vector3(), new Vector3(2, 2, 5), 75, 255, 255, 0, 0);
                 var blip = API.createBlip(spawnPoint);
                 API.setBlipSprite(blip, 162);
-            }
-        }
-
-        // Creates Markers and Blips for Clothing Shops
-        public void InitializeClothingShops()
-        {
-            foreach (Vector3 shop in spawnPoints.ClothingSpawnPoints)
-            {
-                API.createMarker(1, new Vector3(shop.X, shop.Y, shop.Z - 4), new Vector3(), new Vector3(), new Vector3(2, 2, 5), 125, 0, 255, 0, 0);
-                API.createTextLabel("~y~Usage: ~w~/skin HASHID", shop, 20, 0.5f);
-                API.createTextLabel("~y~Skins: ~w~www.slice.wikidot.com", new Vector3(shop.X, shop.Y, shop.Z - 0.3), 20, 0.4f);
-                var blip = API.createBlip(shop);
-                API.setBlipSprite(blip, 73);
             }
         }
 

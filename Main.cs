@@ -119,6 +119,19 @@ namespace stuykserver
             return;
         }
 
+        [Command("spectate")] // Temporary
+        public void cmdSpectate(Client player, string target)
+        {
+            API.setPlayerToSpectatePlayer(player, API.getPlayerFromName(target));
+        }
+
+        [Command("stopspectate")]
+        public void cmdStopSpectate(Client player)
+        {
+            API.setPlayerHealth(player, 0);
+        }
+
+
         // Used to check if the player is logged in.
         public bool isPlayerLoggedIn(Client player)
         {
@@ -142,5 +155,6 @@ namespace stuykserver
             bool returnBool = Regex.IsMatch(input, pattern);
             return returnBool;
         }
+
     }
 }

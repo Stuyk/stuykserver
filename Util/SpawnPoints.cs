@@ -47,5 +47,11 @@ namespace stuykserver.Util
         {
             new Vector3(-1350.796, -1273.298, 4.83633)
         };
+
+        // ATM
+        public List<Vector3> ATMPoint = new List<Vector3>
+        {
+            new Vector3(-2072.291, -317.201, 13.31597)
+        };
     }
 }

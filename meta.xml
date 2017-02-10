@@ -4,13 +4,16 @@
 	<script src="Util/ConnectionHandler.cs" type="server" lang="csharp" />
 	<script src="Util/DatabaseHandler.cs" type="server" lang="csharp" />
 	<script src="Util/SpawnPoints.cs" type="server" lang="csharp" />
+	<script src="Util/BankHandler.cs" type="server" lang="csharp" />
 	<script src="Util/BlipMarkerHandler.cs" type="server" lang="csharp" />
 	<script src="Util/LoginHandler.cs" type="server" lang="csharp" />
 	<script src="Util/SkinHandler.cs" type="server" lang="csharp" />
 	<script src="Util/VehicleHandler.cs" type="server" lang="csharp" />
+	<script src="Util/ClothingShopHandler.cs" type="server" lang="csharp" />
 	<script src="Jobs/Fishing.cs" type="server" lang="csharp" />
 	<script src="Jobs/PizzaDelivery.cs" type="server" lang="csharp" />
 	<script src="Jobs/JobHandler.cs" type="server" lang="csharp" />
+	
 	
 	<script src="clientside/serversideCamera.js" type="client" lang="javascript" />
 	<script src="clientside/MoneyDisplay.js" type="client" lang="javascript" />
@@ -21,6 +24,7 @@
 	<file src="clientside/resources/regsuccess.html"/>
 	<file src="clientside/resources/inventory.html"/>
 	<file src="clientside/resources/loading.html"/>
+	<file src="clientside/resources/atmpanel.html"/>
 	<file src="clientside/resources/js/bootstrap.js"/>
 	<file src="clientside/resources/js/bootstrap.min.js"/>
 	<file src="clientside/resources/js/npm.js"/>
@@ -45,6 +49,7 @@
 	<file src="clientside/resources/cover.css" />
 	<file src="clientside/resources/inventory.css" />
 	<file src="clientside/resources/skinselector.css"/>
+	<file src="clientside/resources/atmpanel.css"/>
 	<file src="clientside/resources/css/bootstrap.css" />
 	<file src="clientside/resources/css/bootstrap.min.css" />
 	<file src="clientside/resources/css/bootstrap.min.css.map"/>

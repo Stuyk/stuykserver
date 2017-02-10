@@ -1,0 +1,57 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="atmpanel.css" rel="stylesheet">
+  </head>
+  <body>
+	<div class="row atm-panel">
+		<div class="col-sm-12">
+			<div class="col-sm-12">
+				<h2>ATM</h2>
+				<form method="post" class="form" id="formMain">
+					<div class="form-group">
+						<div class="col-sm-12" style="padding-bottom: 20px">
+							<div class="input-group">
+								<div class="input-group-addon">$</div>
+								<input type="number" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' id="inputAmount" placeholder="Amount">
+								<div class="input-group-addon">.00</div>
+							</div>
+						</div>
+						<div class="col-sm-6" style="padding-bottom: 20px">
+							<button id="withdrawButton" type="submit" class="btn btn-success col-sm-12">Withdraw</button>
+						</div>
+						<div class="col-sm-6" style="padding-bottom: 20px">
+							<button id="depositButton" type="submit" class="btn btn-info col-sm-12">Deposit</button>
+						</div>
+						<div class="col-sm-12">
+							<button id="closeButton" type="submit" class="btn btn-danger col-sm-12" onclick="resourceCall('killPanel')">Close</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+  </body>
+  <script type="text/javascript">
+	document.getElementById("withdrawButton").onclick = function ()
+	{
+		var amount = document.getElementById("inputAmount").value;
+		if(amount.length > 0) {
+			resourceCall("withdrawATM", amount);
+			resourceCall("hideATMCash");
+		}
+	}
+	
+	document.getElementById("depositButton").onclick = function ()
+	{
+		var amount = document.getElementById("inputAmount").value;
+		if(amount.length > 0) {
+			resourceCall("depositATM", amount);
+			resourceCall("hideATMCash");
+		}
+	}
+  </script>
+</html>
+

@@ -1,6 +1,7 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
@@ -20,6 +21,37 @@ namespace stuykserver.Util
         {
             API.consoleOutput("Started: DatabaseHandler");
         }
+
+        // Check if player is an admin.
+        public bool isAdmin(string playerName)
+        {
+            bool result = Convert.ToBoolean(pullDatabase("Players", "Admin", "Nametag", playerName));
+            if (result)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        // Create a Vector3 List of Database Postions
+        public List<Vector3> vectorPositions(string tableName)
+        {
+            List<Vector3> vectorList = new List<Vector3>();
+            DataTable result = API.exported.database.executeQueryWithResult("SELECT * FROM " + tableName);
+
+            foreach (DataRow row in result.Rows)
+            {
+                float x = Convert.ToSingle(row[1]);
+                float y = Convert.ToSingle(row[2]);
+                float z = Convert.ToSingle(row[3]);
+
+                API.sendNotificationToAll(x.ToString() + y.ToString() + z.ToString());
+
+                vectorList.Add(new Vector3(x, y, z));
+            }
+            return vectorList;
+        }
+
 
         // Check if the Nametag already exists.
         public bool usernameExists(string playerName)
@@ -46,8 +78,16 @@ namespace stuykserver.Util
         {
             string query = "SELECT " + databaseColumn + " FROM " + tableName + " WHERE " + where + "='" + what + "'";
             DataTable queryResult = API.exported.database.executeQueryWithResult(query);
-            string returnString = queryResult.Rows[0][0].ToString();
-            return returnString;
+
+            if (queryResult != null)
+            {
+                if (queryResult.Rows.Count > 0)
+                {
+                    string returnString = queryResult.Rows[0][0].ToString();
+                    return returnString;
+                } 
+            }
+            return null;
         }
 
         //Create a piece of the Database
@@ -60,9 +100,7 @@ namespace stuykserver.Util
         //Get player money from Database
         public int getPlayerMoney(Client player)
         {
-            string query = "SELECT Money FROM Players WHERE Nametag='" + player.name + "'";
-            DataTable queryResult = API.exported.database.executeQueryWithResult(query);
-            int returnInt = Convert.ToInt32(queryResult.Rows[0][0]);
+            int returnInt = Convert.ToInt32(pullDatabase("Players", "Money", "Nametag", player.name));
             return returnInt;
         }
 
@@ -84,6 +122,33 @@ namespace stuykserver.Util
             updateDatabase("Players", "Money", newMoney.ToString(), "Nametag", player.name);
 
             API.triggerClientEvent(player, "update_money_display", newMoney);
+            return;
+        }
+
+        //Get player money from Database
+        public int getPlayerAtmMoney(Client player)
+        {
+            int returnInt = Convert.ToInt32(pullDatabase("Players", "Bank", "Nametag", player.name));
+            return returnInt;
+        }
+
+        //Set atm money to Database
+        public void setPlayerAtmMoney(Client player, int value)
+        {
+            if (value > 0)
+            {
+                API.sendNotificationToPlayer(player, msgPrefix + "~y~Bank: ~g~+ $" + value.ToString());
+            }
+            else
+            {
+                API.sendNotificationToPlayer(player, msgPrefix + "~y~Bank: ~r~- $" + value.ToString().Remove(0, 1));
+            }
+
+            int oldMoney = getPlayerAtmMoney(player);
+            int newMoney = oldMoney + value;
+
+            updateDatabase("Players", "Bank", newMoney.ToString(), "Nametag", player.name);
+            API.sendNotificationToPlayer(player, msgPrefix + "~y~Bank Balance: ~g~" + getPlayerAtmMoney(player).ToString());
             return;
         }
     }

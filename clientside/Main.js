@@ -1,4 +1,9 @@
 var pagePanel = null;
+var cashDisplay = null;
+var res = API.getScreenResolution();
+var atmopen = null;
+var currentatmcash = null;
+
 
 var email = "";
 var skinid = "";
@@ -33,6 +38,19 @@ class CefHelper {
       this.browser = API.createCefBrowser(resolution.Width, resolution.Height, true);
       API.waitUntilCefBrowserInit(this.browser);
       API.setCefBrowserPosition(this.browser, resolution.Width / 2 - 250, 0);
+      API.loadPageCefBrowser(this.browser, this.path);
+      API.showCursor(true);
+      API.setCanOpenChat(false);
+    }
+  }
+  
+  showBankPanel () {
+    if (this.open == false) {
+      this.open = true;
+      var resolution = API.getScreenResolution();
+      this.browser = API.createCefBrowser(resolution.Width, resolution.Height, true);
+      API.waitUntilCefBrowserInit(this.browser);
+      API.setCefBrowserPosition(this.browser, resolution.Width / 2 - 250, resolution.Height / 2 - 120);
       API.loadPageCefBrowser(this.browser, this.path);
       API.showCursor(true);
       API.setCanOpenChat(false);
@@ -106,6 +124,14 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	if (eventName=="updateNameVariable") {
 		playerName = args[0];
 		API.sendNotification(playerName);
+	}
+	
+	if (eventName=="loadATM") {
+		if (pagePanel == null) {
+			API.sendNotification("~y~Bank Account: ~g~" + args[0].toString());
+			pagePanel = new CefHelper("clientside/resources/atmpanel.html");
+			pagePanel.showBankPanel();
+		}
 	}
 });
 
@@ -195,5 +221,20 @@ function loadNextPage(page) {
 function getPlayerName() {
 	API.triggerServerEvent("localPullName");
 	return playerName;
+}
+
+function withdrawATM(amount) {
+	API.triggerServerEvent("withdrawATM_Server", amount);
+	return;
+}
+
+function depositATM(amount) {
+	API.triggerServerEvent("depositATM_Server", amount);
+	return;
+}
+
+function hideATMCash() {
+	cashDisplay = null;
+	return;
 }
 
