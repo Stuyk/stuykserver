@@ -14,6 +14,7 @@ namespace stuykserver.Jobs
         DatabaseHandler db = new DatabaseHandler();
         JobHandler jh = new JobHandler();
         SpawnPoints sp = new SpawnPoints();
+        KarmaHandler karmaHandler = new KarmaHandler();
 
         public PizzaDelivery()
         {
@@ -88,6 +89,8 @@ namespace stuykserver.Jobs
                 API.sendNotificationToPlayer(player, main.msgPrefix + "You must exit your vehicle to finish your delivery.");
             }
         }
+
+       
 
 
     }

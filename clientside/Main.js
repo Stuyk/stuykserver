@@ -133,6 +133,10 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			pagePanel.showBankPanel();
 		}
 	}
+	
+	if (eventName=="closeCarDoor") {
+		API.setVehicleDoorState(args[0], args[1], false);
+	}
 });
 
 function killPanel() {

@@ -13,12 +13,17 @@
 	<script src="Jobs/Fishing.cs" type="server" lang="csharp" />
 	<script src="Jobs/PizzaDelivery.cs" type="server" lang="csharp" />
 	<script src="Jobs/JobHandler.cs" type="server" lang="csharp" />
-	
+	<script src="Util/VehicleShopHandler.cs" type="server" lang="csharp" />
+	<script src="Util/ChatHandler.cs" type="server" lang="csharp" />
+	<script src="Util/KarmaHandler.cs" type="server" lang="csharp" />
+	<script src="Util/OrganizationHandler.cs" type="server" lang="csharp" />
+	<script src="Util/ActiveShooter.cs" type="server" lang="csharp" />
 	
 	<script src="clientside/serversideCamera.js" type="client" lang="javascript" />
 	<script src="clientside/MoneyDisplay.js" type="client" lang="javascript" />
 	<script src="clientside/WaypointHelper.js" type="client" lang="javascript" />
 	<script src="clientside/Main.js" type="client" lang="javascript" />
+	<script src="clientside/ActiveShooter.js" type="client" lang="javascript" />
 	  
     <file src="clientside/resources/index.html"/>
 	<file src="clientside/resources/regsuccess.html"/>

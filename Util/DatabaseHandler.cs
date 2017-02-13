@@ -66,6 +66,34 @@ namespace stuykserver.Util
             return false;
         }
 
+        public bool checkIfExists(string what, string where, string compareTo)
+        {
+            string query = "SELECT " + what + " FROM " + where;
+            DataTable result = API.exported.database.executeQueryWithResult(query);
+            bool exists = result.Select().ToList().Exists(row => row["what"].ToString() == compareTo);
+            if (exists)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        // Check if the organization owner has an organization.
+        public bool checkIfOwnerHasOrgnization(string playerName)
+        {
+            string query = "SELECT Owner FROM Organization";
+            DataTable result = API.exported.database.executeQueryWithResult(query);
+            bool exists = result.Select().ToList().Exists(row => row["Owner"].ToString() == playerName);
+            if (exists)
+            {
+                if (pullDatabase("Players", "Organization", "Nametag", playerName) == "none")
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         //Update a piece of the PlayerDatabase
         public void updateDatabase(string tableName, string databaseColumn, string value, string where, string what)
         {
@@ -149,7 +177,40 @@ namespace stuykserver.Util
 
             updateDatabase("Players", "Bank", newMoney.ToString(), "Nametag", player.name);
             API.sendNotificationToPlayer(player, msgPrefix + "~y~Bank Balance: ~g~" + getPlayerAtmMoney(player).ToString());
+            API.playSoundFrontEnd(player, "Menu_Accept", "Phone_SoundSet_Default");
             return;
+        }
+
+        public bool databasePlayCarSlotExists(Client player, int slot)
+        {
+            string vehicle = pullDatabase("PlayerVehicles", "VehicleType" + slot.ToString(), "Garage", player.name);
+            if (vehicle != "" || vehicle != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public NetHandle databaseSpawnPlayerCar(Client player, int slot)
+        {
+            VehicleHash vehicle = API.vehicleNameToModel(pullDatabase("PlayerVehicles", "VehicleType" + slot.ToString(), "Garage", player.name));
+            float x = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "PosX", "Garage", player.name));
+            float y = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "PosY", "Garage", player.name));
+            float z = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "PosZ", "Garage", player.name));
+            Vector3 position = new Vector3(x, y, z);
+            x = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "RotX", "Garage", player.name));
+            y = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "RotY", "Garage", player.name));
+            z = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "RotZ", "Garage", player.name));
+            Vector3 rotation = new Vector3(x, y, z);
+            NetHandle veh = API.createVehicle(vehicle, position, rotation, 0, 0).handle;
+            return veh;
+        }
+
+        public void updateVehiclePosition(Client player, int slot)
+        {
+            updateDatabase("PlayerVehicles", slot.ToString() + "PosX", player.vehicle.position.X.ToString(), "Garage", player.name);
+            updateDatabase("PlayerVehicles", slot.ToString() + "PosY", player.vehicle.position.Y.ToString(), "Garage", player.name);
+            updateDatabase("PlayerVehicles", slot.ToString() + "PosZ", player.vehicle.position.Z.ToString(), "Garage", player.name);
         }
     }
 }

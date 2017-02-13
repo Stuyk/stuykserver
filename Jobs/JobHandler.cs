@@ -13,6 +13,7 @@ namespace stuykserver.Jobs
         Main main = new Main();
         SpawnPoints spawnPoints = new SpawnPoints();
         DatabaseHandler db = new DatabaseHandler();
+        KarmaHandler karma = new KarmaHandler();
 
         public JobHandler()
         {
@@ -47,8 +48,12 @@ namespace stuykserver.Jobs
             {
                 if (player.position.DistanceTo(point) <= 20)
                 {
-                    API.call("PizzaDelivery", "beginDelivery", player);
-                    return;
+                    if (karma.checkKarma(player, 0))
+                    {
+                        API.call("PizzaDelivery", "beginDelivery", player);
+                        return;
+                    }
+                    API.sendNotificationToPlayer(player, "The owner does not trust you.");
                 }
             }
         }
@@ -81,6 +86,7 @@ namespace stuykserver.Jobs
                             API.sendNotificationToPlayer(player, "You have finished your job.");
                             db.setPlayerMoney(player, 30);
                             API.triggerClientEvent(player, "clearMarkers", player);
+                            karma.addKarma(player, 1);
                         }
                     }
                     else

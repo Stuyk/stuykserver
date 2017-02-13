@@ -16,6 +16,8 @@ namespace stuykserver.Util
         SpawnPoints spawnPoints = new SpawnPoints();
         DatabaseHandler db = new DatabaseHandler();
 
+        int dimension;
+
         public ConnectionHandler()
         {
             API.onPlayerDisconnected += API_onPlayerDisconnected;
@@ -64,6 +66,7 @@ namespace stuykserver.Util
         public void API_onPlayerFinishedDownload(Client player)
         {
             API.triggerClientEvent(player, "createCamera", spawnPoints.ServerSpawnPoints[0], spawnPoints.ServerSpawnPoints[0]);
+            API.setEntityDimension(player, ++dimension);
         }
 
         private void API_onPlayerBeginConnect(Client player, CancelEventArgs cancelConnection)
@@ -139,6 +142,9 @@ namespace stuykserver.Util
             API.setPlayerSkin(player, API.pedNameToModel(db.pullDatabase("Players", "CurrentSkin", "Nametag", player.name)));
 
             API.triggerClientEvent(player, "killPanel");
+            API.setEntityDimension(player, 0);
+
+            //API.call("VehicleHandler", "SpawnPlayerCars", player);
         }
     }
 }

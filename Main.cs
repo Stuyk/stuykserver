@@ -61,20 +61,6 @@ namespace stuykserver
             return;
         }
 
-        [Command("spawncar")] //Temporary
-        public void cmdSpawnCar(Client player, VehicleHash model)
-        {
-            if (isPlayerLoggedIn(player))
-            {
-                var rot = API.getEntityRotation(player.handle);
-                var veh = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
-
-                API.setPlayerIntoVehicle(player, veh, -1);
-                return;
-            }
-            return;
-        }
-
         [Command("nametag")] //Temporary
         public void nameTag(Client player, string name)
         {
@@ -87,7 +73,7 @@ namespace stuykserver
                         API.setPlayerNametag(player, name);
                         API.setPlayerName(player, name);
                         db.updateDatabase("Players", "Nametag", name, "Nametag", player.name);
-                        API.sendNotificationToPlayer(player, msgPrefix + "Your name has been changed to: " + name);
+                        sendNotification(player, msgPrefix + "Your name has been changed to:" + name);
                         return;
                     }
                     else
@@ -131,6 +117,11 @@ namespace stuykserver
             API.setPlayerHealth(player, 0);
         }
 
+        [Command("weapon")] // Temporary
+        public void WeaponCommand(Client sender, WeaponHash hash)
+        {
+            API.givePlayerWeapon(sender, hash, 500, true, true);
+        }
 
         // Used to check if the player is logged in.
         public bool isPlayerLoggedIn(Client player)
@@ -154,6 +145,13 @@ namespace stuykserver
             string pattern = "^(([A-Z][a-z]+)(([ _][A-Z][a-z]+)|([ _][A-z]+[ _][A-Z][a-z]+)))$";
             bool returnBool = Regex.IsMatch(input, pattern);
             return returnBool;
+        }
+
+        // Modified send notificaiton with clientside noise.
+        public void sendNotification(Client player, string message)
+        {
+            API.playSoundFrontEnd(player, "Menu_Accept", "Phone_SoundSet_Default");
+            API.sendNotificationToPlayer(player, message);
         }
 
     }
