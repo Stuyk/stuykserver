@@ -10,6 +10,7 @@ namespace stuykserver.Util
     {
         DatabaseHandler db = new DatabaseHandler();
         Main main = new Main();
+        DeathHandler dh = new DeathHandler();
 
         public ChatHandler()
         {
@@ -20,10 +21,14 @@ namespace stuykserver.Util
         {
             if (main.isPlayerLoggedIn(player))
             {
-                sendCloseMessage(player, 15.0f, "~#ffffff~", API.getPlayerName(player) + " says: " + message);
-                e.Cancel = true;
-                return;
+                if (db.pullDatabase("Players", "Dead", "Nametag", player.name) == "0")
+                {
+                    sendCloseMessage(player, 15.0f, "~#ffffff~", API.getPlayerName(player) + " says: " + message);
+                    e.Cancel = true;
+                    return;
+                }
             }
+            e.Cancel = true;
         }
 
         public void sendCloseMessage(Client player, float radius, string sender, string message)

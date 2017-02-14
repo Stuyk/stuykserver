@@ -1,4 +1,6 @@
 started = false;
+var resX = API.getScreenResolutionMantainRatio().Width;
+var resY = API.getScreenResolutionMantainRatio().Height;
 
 API.onUpdate.connect(function() {
     if (API.isPlayerShooting(API.getLocalPlayer())) {
@@ -17,10 +19,8 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 
 function startShooter()
 {
-	API.sendNotification("~r~You are an active shooter.")
 	API.sleep(180000);
 	API.triggerServerEvent("stopActivity");
 	started = false;
-	API.sendNotification("No longer an active shooter.")
 	API.drawText("ActiveShooter", resX - 25, 1050, 1, 50, 211, 82, 255, 4, 2, false, true, 0);
 }

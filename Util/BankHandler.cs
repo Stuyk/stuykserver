@@ -101,7 +101,6 @@ namespace stuykserver.Util
                 {
                     foreach (Vector3 pos in atmsList)
                     {
-                        API.sendNotificationToPlayer(player, "Found" + pos);
                         if (player.position.DistanceTo(pos) <= 10)
                         {
                             API.triggerClientEvent(player, "loadATM", db.getPlayerAtmMoney(player));
@@ -139,7 +138,7 @@ namespace stuykserver.Util
                     db.updateDatabase("Banks", "RotZ", rotZ, "ID", id);
 
                     positionBlips(new Vector3(player.position.X, player.position.Y, player.position.Z), new Vector3(player.rotation.X, player.rotation.Y, player.rotation.Z));
-                    API.sendNotificationToPlayer(player, "~g~A bank has been created.");
+                    API.sendNotificationToPlayer(player, "~g~An atm has been created.");
                     return;
                 }
                 else

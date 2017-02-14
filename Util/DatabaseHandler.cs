@@ -212,5 +212,14 @@ namespace stuykserver.Util
             updateDatabase("PlayerVehicles", slot.ToString() + "PosY", player.vehicle.position.Y.ToString(), "Garage", player.name);
             updateDatabase("PlayerVehicles", slot.ToString() + "PosZ", player.vehicle.position.Z.ToString(), "Garage", player.name);
         }
+
+        public bool isDead(Client player)
+        {
+            if(player.health <= 0)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

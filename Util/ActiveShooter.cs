@@ -23,20 +23,26 @@ namespace stuykserver.Util
             activeShooters.Add("example");
         }
 
+        public bool isActiveShooter(Client player)
+        {
+            if (activeShooters.Contains(player.name))
+            {
+                return true;
+            }
+            return false;
+        }
+
         private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
         {
             if (eventName == "stopActivity")
             {
-                API.consoleOutput("stopActivity called.");
                 activeShooters.Remove(player.name);
             }
 
             if (eventName == "startActivity")
             {
-                API.consoleOutput("I got to here.");
                 if (activeShooters.Contains(player.name) == false)
                 {
-                    API.consoleOutput("startActivity called.");
                     activeShooters.Add(player.name);
                     API.triggerClientEvent(player, "startActiveShooter");
                 }

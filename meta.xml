@@ -18,6 +18,7 @@
 	<script src="Util/KarmaHandler.cs" type="server" lang="csharp" />
 	<script src="Util/OrganizationHandler.cs" type="server" lang="csharp" />
 	<script src="Util/ActiveShooter.cs" type="server" lang="csharp" />
+	<script src="Util/DeathHandler.cs" type="server" lang="csharp" />
 	
 	<script src="clientside/serversideCamera.js" type="client" lang="javascript" />
 	<script src="clientside/MoneyDisplay.js" type="client" lang="javascript" />

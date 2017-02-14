@@ -11,7 +11,6 @@ namespace stuykserver.Util
         public BlipMarkerHandler()
         {
             InitializeServerSpawnPoints();
-            InitializeFishingPoints();
             InitializePizzaShops();
 
             API.onResourceStart += API_onResourceStart;
@@ -30,19 +29,6 @@ namespace stuykserver.Util
                 var marker = API.createMarker(1, new Vector3(spawnPoint.X, spawnPoint.Y, spawnPoint.Z - 4), new Vector3(), new Vector3(), new Vector3(2, 2, 5), 75, 255, 255, 0, 0);
                 var blip = API.createBlip(spawnPoint);
                 API.setBlipSprite(blip, 162);
-            }
-        }
-
-        // Creates Marks and Blips for Fishing Points
-        private void InitializeFishingPoints()
-        {
-            foreach (Vector3 fishingPoint in spawnPoints.FishingSpawnPoints)
-            {
-                var marker = API.createMarker(1, new Vector3(fishingPoint.X, fishingPoint.Y, fishingPoint.Z - 4), new Vector3(), new Vector3(), new Vector3(4, 4, 5), 75, 255, 255, 0, 0);
-                API.createTextLabel("~y~Usage: ~w~/beginjob", fishingPoint, 20, 0.5f);
-                API.createTextLabel("~w~You can fish here.", new Vector3(fishingPoint.X, fishingPoint.Y, fishingPoint.Z - 0.3), 20, 0.4f);
-                var blip = API.createBlip(fishingPoint);
-                API.setBlipSprite(blip, 68);
             }
         }
 

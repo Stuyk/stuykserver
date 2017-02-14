@@ -7,6 +7,7 @@ using GTANetworkShared;
 using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace stuykserver.Util
 {
@@ -23,7 +24,6 @@ namespace stuykserver.Util
             API.onPlayerDisconnected += API_onPlayerDisconnected;
             API.onPlayerBeginConnect += API_onPlayerBeginConnect;
             API.onPlayerFinishedDownload += API_onPlayerFinishedDownload;
-            API.onPlayerDeath += API_onPlayerDeath;
             API.onResourceStop += API_onResourceStop;
 
             API.onResourceStart += API_onResourceStart;
@@ -114,13 +114,6 @@ namespace stuykserver.Util
             return;
         }
 
-        private void API_onPlayerDeath(Client player, NetHandle entityKiller, int weapon)
-        {
-            db.updateDatabase("Players", "Health", "100", "Nametag", player.name);
-            db.updateDatabase("Players", "Armor", "0", "Nametag", player.name);
-            API.sendNotificationToPlayer(player, main.msgPrefix + "You have died, and respawned at a Hospital.");
-        }
-
         public void SpawnPlayer(Client player)
         {
             string s = player.socialClubName;
@@ -145,6 +138,26 @@ namespace stuykserver.Util
             API.setEntityDimension(player, 0);
 
             //API.call("VehicleHandler", "SpawnPlayerCars", player);
+
+            
+
+            if (db.pullDatabase("Players", "Dead", "Nametag", player.name) == "1")
+            {
+                API.sendNotificationToPlayer(player, "~r~You have died.");
+                API.sendChatMessageToPlayer(player, "~g~/service EMS");
+                API.sendChatMessageToPlayer(player, "~r~/tapout");
+                API.playPlayerAnimation(player, (int)(AnimationFlags.StopOnLastFrame), "combat@death@from_writhe", "death_c");
+            }
+        }
+
+        [Flags]
+        public enum AnimationFlags
+        {
+            Loop = 1 << 0,
+            StopOnLastFrame = 1 << 1,
+            OnlyAnimateUpperBody = 1 << 4,
+            AllowPlayerControl = 1 << 5,
+            Cancellable = 1 << 7
         }
     }
 }

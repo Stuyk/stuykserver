@@ -31,7 +31,7 @@ namespace stuykserver.Util
         public void removeKarma(Client player, int amount)
         {
             int currentKarma = Convert.ToInt32(db.pullDatabase("Players", "Karma", "Nametag", player.name));
-            int newKarma = currentKarma - amount;
+            int newKarma = currentKarma + amount;
             db.updateDatabase("Players", "Karma", newKarma.ToString(), "Nametag", player.name);
             API.sendNotificationToPlayer(player, "~r~You have lost some karma.");
         }

@@ -121,6 +121,7 @@ namespace stuykserver.Util
                     db.updateDatabase("Players", "JobType", "None", "Nametag", player.name);
                     db.updateDatabase("Players", "TempJobVehicle", "None", "Nametag", player.name);
                     db.insertDatabase("PlayerVehicles", "Garage", player.name);
+                    db.insertDatabase("PlayerInventory", "Nametag", player.name);
                     // ...  Add More Here
                     API.triggerClientEvent(player, "registerSuccessful");
                     API.sendNotificationToPlayer(player, "~g~Registration complete.");
