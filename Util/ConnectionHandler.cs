@@ -16,6 +16,8 @@ namespace stuykserver.Util
         Main main = new Main();
         SpawnPoints spawnPoints = new SpawnPoints();
         DatabaseHandler db = new DatabaseHandler();
+        SkinHandler skinHandler = new SkinHandler();
+        ClothingHandler clothingHandler = new ClothingHandler();
 
         int dimension;
 
@@ -65,8 +67,12 @@ namespace stuykserver.Util
 
         public void API_onPlayerFinishedDownload(Client player)
         {
-            API.triggerClientEvent(player, "createCamera", spawnPoints.ServerSpawnPoints[0], spawnPoints.ServerSpawnPoints[0]);
-            API.setEntityDimension(player, ++dimension);
+            API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, false);
+            API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, false);
+            API.triggerClientEvent(player, "createCamera", new Vector3(-1605.505, -1089.018, 30), new Vector3(40, 0, 0));
+            API.setEntityDimension(player, dimension);
+            API.setEntityPosition(player, new Vector3(-1605.505, -1089.018, 13.01836));
+            ++dimension;
         }
 
         private void API_onPlayerBeginConnect(Client player, CancelEventArgs cancelConnection)
@@ -116,9 +122,13 @@ namespace stuykserver.Util
 
         public void SpawnPlayer(Client player)
         {
+            API.sendNativeToPlayer(player, Hash.DO_SCREEN_FADE_OUT, 5);
             string s = player.socialClubName;
 
             API.triggerClientEvent(player, "endCamera");
+
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
 
             var x = Convert.ToSingle(db.pullDatabase("Players", "LastX", "Nametag", player.name));
             var y = Convert.ToSingle(db.pullDatabase("Players", "LastY", "Nametag", player.name));
@@ -132,14 +142,23 @@ namespace stuykserver.Util
 
             player.freezePosition = false;
             API.setEntityPosition(player, new Vector3(x, y, z));
-            API.setPlayerSkin(player, API.pedNameToModel(db.pullDatabase("Players", "CurrentSkin", "Nametag", player.name)));
+            skinHandler.loadCurrentFace(player);
+            clothingHandler.updateClothingForPlayer(player);
+
 
             API.triggerClientEvent(player, "killPanel");
             API.setEntityDimension(player, 0);
 
             //API.call("VehicleHandler", "SpawnPlayerCars", player);
+            API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
+            API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
 
             
+            while (stopWatch.Elapsed.Seconds < 3)
+            {
+
+            }
+            API.sendNativeToPlayer(player, Hash.DO_SCREEN_FADE_IN, 10000);
 
             if (db.pullDatabase("Players", "Dead", "Nametag", player.name) == "1")
             {

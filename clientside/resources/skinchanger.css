@@ -1,0 +1,18 @@
+html, body {
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+body {
+  color: #fff;
+  text-align: center;
+}
+
+.optionButton {
+	width: 40px !important;
+	height: auto;
+}
+
+.vertical-align {
+	margin-top: 7px;
+}

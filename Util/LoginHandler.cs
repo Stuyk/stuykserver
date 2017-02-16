@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -25,13 +26,11 @@ namespace stuykserver.Util
         {
             if (eventName == "clientLogin")
             {
-                API.sendNotificationToPlayer(player, "~g~Attempting login...");
                 cmdLogin(player, arguments[0].ToString(), arguments[1].ToString());
             }
 
             if (eventName == "clientRegistration")
             {
-                API.sendNotificationToPlayer(player, "~g~Attempting registration...");
                 cmdRegister(player, arguments[0].ToString(), arguments[1].ToString());
             }
 
@@ -70,6 +69,7 @@ namespace stuykserver.Util
             // Check for Password Correctness.
             if (isPasswordCorrect)
             {
+
                 API.call("ConnectionHandler", "SpawnPlayer", player);
                 int money = Convert.ToInt32(db.pullDatabase("Players", "Money", "Nametag", player.name));
                 API.triggerClientEvent(player, "update_money_display", money);
@@ -122,6 +122,8 @@ namespace stuykserver.Util
                     db.updateDatabase("Players", "TempJobVehicle", "None", "Nametag", player.name);
                     db.insertDatabase("PlayerVehicles", "Garage", player.name);
                     db.insertDatabase("PlayerInventory", "Nametag", player.name);
+                    db.insertDatabase("PlayerSkins", "Nametag", player.name);
+                    db.insertDatabase("PlayerClothing", "Nametag", player.name);
                     // ...  Add More Here
                     API.triggerClientEvent(player, "registerSuccessful");
                     API.sendNotificationToPlayer(player, "~g~Registration complete.");

@@ -14,6 +14,16 @@ namespace stuykserver.Util
         Main main = new Main();
         List<Vector3> atmsList = new List<Vector3>();
 
+        [Flags]
+        public enum AnimationFlags
+        {
+            Loop = 1 << 0,
+            StopOnLastFrame = 1 << 1,
+            OnlyAnimateUpperBody = 1 << 4,
+            AllowPlayerControl = 1 << 5,
+            Cancellable = 1 << 7
+        }
+
         public BankHandler()
         {
             API.onResourceStart += API_onResourceStart;
@@ -22,6 +32,11 @@ namespace stuykserver.Util
 
         private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
         {
+            if (eventName == "stopAnimation")
+            {
+                player.stopAnimation();
+            }
+
             if (eventName == "withdrawATM_Server")
             {
                 int input = Convert.ToInt32(arguments[0]);
@@ -33,6 +48,7 @@ namespace stuykserver.Util
                         db.setPlayerMoney(player, +input);
                         db.setPlayerAtmMoney(player, -input);
                         API.triggerClientEvent(player, "killPanel");
+                        API.stopPlayerAnimation(player);
                     }
                 }
                 else
@@ -52,6 +68,7 @@ namespace stuykserver.Util
                         db.setPlayerMoney(player, -input);
                         db.setPlayerAtmMoney(player, +input);
                         API.triggerClientEvent(player, "killPanel");
+                        API.stopPlayerAnimation(player);
                     }  
                 }
                 else
@@ -92,8 +109,7 @@ namespace stuykserver.Util
             API.consoleOutput("Banks Initialized: " + initializedObjects.ToString());
         }
 
-        [Command("atm")] //Purchase Clothing
-        public void cmdATM(Client player)
+        public void selectATM(Client player)
         {
             if (main.isPlayerLoggedIn(player))
             {
@@ -103,7 +119,10 @@ namespace stuykserver.Util
                     {
                         if (player.position.DistanceTo(pos) <= 10)
                         {
+
                             API.triggerClientEvent(player, "loadATM", db.getPlayerAtmMoney(player));
+                            API.playPlayerAnimation(player, (int)(AnimationFlags.AllowPlayerControl | AnimationFlags.Cancellable), "amb@prop_human_atm@male@enter", "enter");
+                            API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.Cancellable), "amb@prop_human_atm@male@base", "base");
                             return;
                         }
                     }
@@ -156,11 +175,11 @@ namespace stuykserver.Util
         // Positions the objects, blips, and text when initialized or created.
         public void positionBlips(Vector3 position, Vector3 rotation)
         {
-            API.createTextLabel("~y~Usage: ~w~/atm", new Vector3(position.X, position.Y, position.Z + 1), 20, 0.5f);
-            API.createTextLabel("~w~Access your bank account.", new Vector3(position.X, position.Y, position.Z + 0.8), 20, 0.5f);
+            API.createTextLabel("~y~[~w~Keypress: ~g~F~y~]", new Vector3(position.X, position.Y, position.Z + 1.2), 20, 0.5f);
+            API.createTextLabel("~w~Access your bank account.", new Vector3(position.X, position.Y, position.Z + 1.0), 20, 0.5f);
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 108);
-            API.setBlipColor(newBlip, 52);
+            API.setBlipColor(newBlip, 2);
             API.createObject(-870868698, new Vector3(position.X, position.Y, position.Z - 1), new Vector3(rotation.X, rotation.Y, rotation.Z - 180));
 
             atmsList.Add(new Vector3(position.X, position.Y, position.Z));

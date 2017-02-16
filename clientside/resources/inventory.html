@@ -1,4 +1,4 @@
-<html lang="en">
+<!doctype html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,7 @@
 	<div class="row inventory-header">
 		<div class="row">
 			<div class="col-sm-12">
-				<h2>Inventory</h2>
+				<h2 id="playerName">Inventory</h2>
 			</div>
 		</div>
 	</div>
@@ -41,9 +41,8 @@
 	</div>
   </body>
   <script type="text/javascript">
-	function pullMessage() {
-		resourceCall('getPlayerName');
-		return args[0];
+	function variablePass(value) {
+		document.getElementById("playerName").innerHTML = value;
 	}
   </script>
 </html>

@@ -27,7 +27,7 @@ a:hover {
 html,
 body {
   height: 100%;
-  background: #333333 url("images/bg.png") repeat;
+  background: rgba(20,20,20,0.50);
   overflow: hidden;
 }
 body {

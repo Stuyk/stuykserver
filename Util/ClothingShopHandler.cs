@@ -13,6 +13,17 @@ namespace stuykserver.Util
         DatabaseHandler db = new DatabaseHandler();
         Main main = new Main();
         List<Vector3> clothingShops = new List<Vector3>();
+        Dictionary<Client, Vector3> playersInClothingShop = new Dictionary<Client, Vector3>();
+
+        [Flags]
+        public enum AnimationFlags
+        {
+            Loop = 1 << 0,
+            StopOnLastFrame = 1 << 1,
+            OnlyAnimateUpperBody = 1 << 4,
+            AllowPlayerControl = 1 << 5,
+            Cancellable = 1 << 7
+        }
 
         public ClothingShopHandler()
         {
@@ -37,11 +48,8 @@ namespace stuykserver.Util
                     float posX = Convert.ToSingle(db.pullDatabase("ClothingShops", "PosX", "ID", selectedrow));
                     float posY = Convert.ToSingle(db.pullDatabase("ClothingShops", "PosY", "ID", selectedrow));
                     float posZ = Convert.ToSingle(db.pullDatabase("ClothingShops", "PosZ", "ID", selectedrow));
-                    float rotX = Convert.ToSingle(db.pullDatabase("ClothingShops", "RotX", "ID", selectedrow));
-                    float rotY = Convert.ToSingle(db.pullDatabase("ClothingShops", "RotY", "ID", selectedrow));
-                    float rotZ = Convert.ToSingle(db.pullDatabase("ClothingShops", "RotZ", "ID", selectedrow));
 
-                    positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ));
+                    positionBlips(new Vector3(posX, posY, posZ));
 
                     initializedObjects = ++initializedObjects;
                 }
@@ -50,8 +58,7 @@ namespace stuykserver.Util
             API.consoleOutput("Clothing Shops Initialized: " + initializedObjects.ToString());
         }
 
-        [Command("skin")] //Purchase Clothing
-        public void cmdSkin(Client player)
+        public void selectClothing(Client player)
         {
             if (main.isPlayerLoggedIn(player))
             {
@@ -61,9 +68,18 @@ namespace stuykserver.Util
                     {
                         if (player.position.DistanceTo(pos) <= 15)
                         {
-                            if (db.getPlayerMoney(player) >= 30)
+                            if (db.getPlayerMoney(player) >= 60)
                             {
-                                API.triggerClientEvent(player, "openSkinPanel");
+                                playersInClothingShop.Add(player, player.position);
+                                Random rand = new Random();
+                                int dimension = rand.Next(1, 1000);
+                                API.setEntityDimension(player, dimension);
+                                API.consoleOutput(player.name + " is in dimension " + API.getEntityDimension(player).ToString());
+                                API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
+                                API.triggerClientEvent(player, "createCamera", new Vector3(-1190.004, -766.2875, 17.3196), player.position);
+                                API.triggerClientEvent(player, "openClothingPanel");
+                                
+                                API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@female_arms_crossed@base", "base");
                                 return;
                             }
                             else
@@ -90,19 +106,13 @@ namespace stuykserver.Util
                     string posX = player.position.X.ToString();
                     string posY = player.position.Y.ToString();
                     string posZ = player.position.Z.ToString();
-                    string rotX = player.rotation.X.ToString();
-                    string rotY = player.rotation.Y.ToString();
-                    string rotZ = player.rotation.Z.ToString();
 
                     db.insertDatabase("ClothingShops", "ID", id);
                     db.updateDatabase("ClothingShops", "PosX", posX, "ID", id);
                     db.updateDatabase("ClothingShops", "PosY", posY, "ID", id);
                     db.updateDatabase("ClothingShops", "PosZ", posZ, "ID", id);
-                    db.updateDatabase("ClothingShops", "RotX", rotX, "ID", id);
-                    db.updateDatabase("ClothingShops", "RotY", rotY, "ID", id);
-                    db.updateDatabase("ClothingShops", "RotZ", rotZ, "ID", id);
 
-                    positionBlips(new Vector3(player.position.X, player.position.Y, player.position.Z), new Vector3(player.rotation.X, player.rotation.Y, player.rotation.Z));
+                    positionBlips(new Vector3(player.position.X, player.position.Y, player.position.Z));
                     API.sendNotificationToPlayer(player, "~g~A clothing shop has been created.");
                     return;
                 }
@@ -118,17 +128,25 @@ namespace stuykserver.Util
             }
         }
 
-        public void positionBlips(Vector3 position, Vector3 rotation)
+        public void positionBlips(Vector3 position)
         {
-            API.createTextLabel("~y~Usage: ~w~/skin", new Vector3(position.X, position.Y, position.Z), 20, 0.5f);
-            API.createTextLabel("~w~Change your character model.", new Vector3(position.X, position.Y, position.Z - 0.4), 20, 0.5f);
+            API.createTextLabel("~y~[~w~Keypress: ~g~F~y~]", new Vector3(position.X, position.Y, position.Z), 20, 0.5f);
+            API.createTextLabel("~w~Change your clothing.", new Vector3(position.X, position.Y, position.Z - 0.2), 20, 0.5f);
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 73);
-            API.setBlipColor(newBlip, 18);
-            API.createMarker(1, new Vector3(position.X, position.Y, position.Z - 4), new Vector3(), new Vector3(), new Vector3(2, 2, 5), 255, 154, 211, 224, 0);
+            API.setBlipColor(newBlip, 12);
             clothingShops.Add(new Vector3(position.X, position.Y, position.Z));
             int i = 0;
             ++i;
+        }
+
+        public void leaveClothingShop(Client player)
+        {
+            Vector3 leavePosition = playersInClothingShop[player];
+            API.setEntityDimension(player, 0);
+            API.setEntityPosition(player, leavePosition);
+            playersInClothingShop.Remove(player);
+            API.stopPlayerAnimation(player);
         }
     }
 }

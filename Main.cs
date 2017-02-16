@@ -29,6 +29,8 @@ namespace stuykserver
         private void API_onResourceStart()
         {
             API.consoleOutput("Started: Main");
+            int i = API.exported.doormanager.registerDoor(1780022985, new Vector3(-1201.435, -776.8566, 17.99184));
+            API.exported.doormanager.setDoorState(i, true, 1);
         }
 
         private void API_onUpdate()
@@ -55,7 +57,9 @@ namespace stuykserver
             if (isPlayerLoggedIn(player))
             {
                 string xyz = API.getEntityPosition(player).ToString();
-                API.sendNotificationToPlayer(player, msgPrefix + xyz);
+                string rot = API.getEntityRotation(player).ToString();
+                API.sendNotificationToPlayer(player, "POS: " + xyz);
+                API.sendNotificationToPlayer(player, "ROT: " + rot);
                 return;
             }
             return;
@@ -91,36 +95,14 @@ namespace stuykserver
             return;
         }
 
-        [Command("spawn")] //Temporary
-        public void cmdSpawn(Client player)
-        {
-            API.setEntityPosition(player, spawnPoints.ServerSpawnPoints[0]);
-            return;
-        }
-
-        [Command("inventory")] // Temporary?
+        [Command("inventory")]
         public void cmdInventory(Client player)
         {
-            API.triggerClientEvent(player, "openInventory", player.name);
-            return;
-        }
-
-        [Command("spectate")] // Temporary
-        public void cmdSpectate(Client player, string target)
-        {
-            API.setPlayerToSpectatePlayer(player, API.getPlayerFromName(target));
-        }
-
-        [Command("stopspectate")]
-        public void cmdStopSpectate(Client player)
-        {
-            API.setPlayerHealth(player, 0);
-        }
-
-        [Command("weapon")] // Temporary
-        public void WeaponCommand(Client sender, WeaponHash hash)
-        {
-            API.givePlayerWeapon(sender, hash, 500, true, true);
+            if (isPlayerLoggedIn(player))
+            {
+                API.triggerClientEvent(player, "openInventory", player.name);
+                return;
+            }
         }
 
         // Used to check if the player is logged in.

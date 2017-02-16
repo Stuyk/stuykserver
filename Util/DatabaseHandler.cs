@@ -137,11 +137,11 @@ namespace stuykserver.Util
         {
             if (value > 0)
             {
-                API.sendNotificationToPlayer(player, msgPrefix + "~g~+ $" + value.ToString());
+                API.sendNotificationToPlayer(player, "~g~+ $" + value.ToString());
             }
             else
             {
-                API.sendNotificationToPlayer(player, msgPrefix + "~r~- $" + value.ToString().Remove(0, 1));
+                API.sendNotificationToPlayer(player, "~r~- $" + value.ToString().Remove(0, 1));
             }
 
             int oldMoney = getPlayerMoney(player);
@@ -165,19 +165,18 @@ namespace stuykserver.Util
         {
             if (value > 0)
             {
-                API.sendNotificationToPlayer(player, msgPrefix + "~y~Bank: ~g~+ $" + value.ToString());
+                API.sendNotificationToPlayer(player, "~y~Bank: ~g~+$" + value.ToString());
             }
             else
             {
-                API.sendNotificationToPlayer(player, msgPrefix + "~y~Bank: ~r~- $" + value.ToString().Remove(0, 1));
+                API.sendNotificationToPlayer(player, "~y~Bank: ~r~- $" + value.ToString().Remove(0, 1));
             }
 
             int oldMoney = getPlayerAtmMoney(player);
             int newMoney = oldMoney + value;
 
             updateDatabase("Players", "Bank", newMoney.ToString(), "Nametag", player.name);
-            API.sendNotificationToPlayer(player, msgPrefix + "~y~Bank Balance: ~g~" + getPlayerAtmMoney(player).ToString());
-            API.playSoundFrontEnd(player, "Menu_Accept", "Phone_SoundSet_Default");
+            API.sendNotificationToPlayer(player, "~y~Bank Balance: ~g~$" + getPlayerAtmMoney(player).ToString());
             return;
         }
 

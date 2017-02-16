@@ -19,23 +19,32 @@
 	<script src="Util/OrganizationHandler.cs" type="server" lang="csharp" />
 	<script src="Util/ActiveShooter.cs" type="server" lang="csharp" />
 	<script src="Util/DeathHandler.cs" type="server" lang="csharp" />
+	<script src="Util/AdminCommands.cs" type="server" lang="csharp" />
+	<script src="Util/BarberShopHandler.cs" type="server" lang="csharp" />
+	<script src="Util/KeyPressHandler.cs" type="server" lang="csharp" />
+	<script src="Util/ClothingHandler.cs" type="server" lang="csharp" />
 	
-	<script src="clientside/serversideCamera.js" type="client" lang="javascript" />
-	<script src="clientside/MoneyDisplay.js" type="client" lang="javascript" />
-	<script src="clientside/WaypointHelper.js" type="client" lang="javascript" />
-	<script src="clientside/Main.js" type="client" lang="javascript" />
-	<script src="clientside/ActiveShooter.js" type="client" lang="javascript" />
+	
+	<script src="clientside/resources/serversideCamera.js" type="client" lang="javascript" />
+	<script src="clientside/resources/MoneyDisplay.js" type="client" lang="javascript" />
+	<script src="clientside/resources/WaypointHelper.js" type="client" lang="javascript" />
+	<script src="clientside/resources/Main.js" type="client" lang="javascript" />
+	<script src="clientside/resources/ActiveShooter.js" type="client" lang="javascript" />
+	<script src="clientside/resources/SkinHandler.js" type="client" lang="javascript" />
+	<script src="clientside/resources/KeyPressHandler.js" type="client" lang="javascript" />
 	  
     <file src="clientside/resources/index.html"/>
 	<file src="clientside/resources/regsuccess.html"/>
 	<file src="clientside/resources/inventory.html"/>
 	<file src="clientside/resources/loading.html"/>
 	<file src="clientside/resources/atmpanel.html"/>
+	<file src="clientside/resources/clothingpanel.html"/>
 	<file src="clientside/resources/js/bootstrap.js"/>
 	<file src="clientside/resources/js/bootstrap.min.js"/>
 	<file src="clientside/resources/js/npm.js"/>
 	
 	<file src="clientside/resources/skinselector.html"/>
+	<file src="clientside/resources/skinchanger.html"/>
 	<file src="clientside/resources/policemale.html"/>
 	<file src="clientside/resources/policefemale.html"/>
 	<file src="clientside/resources/businessmale.html"/>
@@ -52,6 +61,7 @@
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff" />
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff2" />
 	
+	<file src="clientside/resources/skinchanger.css" />
 	<file src="clientside/resources/cover.css" />
 	<file src="clientside/resources/inventory.css" />
 	<file src="clientside/resources/skinselector.css"/>
@@ -67,6 +77,8 @@
 	<file src="clientside/resources/images/tweed.png" />
 	
 	<include resource="database"/>
+	<include resource="gtaocharacter" />
+	<include resource="doormanager" />
 	
 	<assembly ref="System.Data.dll"/>
 	<assembly ref="System.Xml.dll"/>

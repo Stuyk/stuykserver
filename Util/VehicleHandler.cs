@@ -56,16 +56,19 @@ namespace stuykserver.Util
             
         }
 
-        [Command("spawncar")] //Temporary
+        [Command("spawncar")] // Admin
         public void cmdSpawnCar(Client player, VehicleHash model)
         {
             if (main.isPlayerLoggedIn(player))
             {
-                var rot = API.getEntityRotation(player.handle);
-                var veh = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
-                veh.engineStatus = false;
-                vehicleOwner.Add(veh.handle, player);
-                return;
+                if (db.isAdmin(player.name))
+                {
+                    var rot = API.getEntityRotation(player.handle);
+                    var veh = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
+                    veh.engineStatus = false;
+                    vehicleOwner.Add(veh.handle, player);
+                    return;
+                }
             }
             return;
         }
