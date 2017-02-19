@@ -34,6 +34,7 @@
 	<script src="clientside/resources/SkinHandler.js" type="client" lang="javascript" />
 	<script src="clientside/resources/KeyPressHandler.js" type="client" lang="javascript" />
 	<script src="clientside/resources/PaperBoy.js" type="client" lang="javascript" />
+	<script src="clientside/resources/Fishing.js" type="client" lang="javascript" />
 	  
     <file src="clientside/resources/index.html"/>
 	<file src="clientside/resources/regsuccess.html"/>

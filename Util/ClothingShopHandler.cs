@@ -149,6 +149,7 @@ namespace stuykserver.Util
             API.setEntityPosition(player, leavePosition);
             playersInClothingShop.Remove(player);
             API.stopPlayerAnimation(player);
+            API.stopPedAnimation(player);
         }
     }
 }

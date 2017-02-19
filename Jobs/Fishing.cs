@@ -4,6 +4,7 @@ using stuykserver.Util;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -11,14 +12,48 @@ namespace stuykserver.Jobs
 {
     public class Fishing : Script
     {
-        Main main = new Main();
         SpawnPoints spawnPoints = new SpawnPoints();
         DatabaseHandler db = new DatabaseHandler();
         List<Vector3> fishingPoints = new List<Vector3>();
+        Dictionary<Client,string> playersFishing = new Dictionary<Client, string>();
+        Dictionary<Client, NetHandle> playersFishingRods = new Dictionary<Client, NetHandle>();
 
         public Fishing()
         {
             API.onResourceStart += API_onResourceStart;
+            API.onChatMessage += API_onChatMessage;
+            API.onClientEventTrigger += API_onClientEventTrigger;
+        }
+
+        private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
+        {
+            if(eventName == "fishingFailed")
+            {
+                playerFishingFailed(player);
+            }
+        }
+
+        private void API_onChatMessage(Client player, string message, CancelEventArgs e)
+        {
+            if (playersFishing.ContainsKey(player))
+            {
+                if (message == playersFishing[player])
+                {
+                    API.sendNotificationToPlayer(player, "Correct!");
+                    playersFishing.Remove(player);
+                    API.triggerClientEvent(player, "stopFishing");
+                    API.playSoundFrontEnd(player, "Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
+                    API.deleteEntity(playersFishingRods[player]);
+                    playersFishingRods.Remove(player);
+                    API.stopPlayerAnimation(player);
+                    API.stopPedAnimation(player);
+                    e.Cancel = true;
+                    return;
+                }
+                playerFishingFailed(player);
+                e.Cancel = true;
+                return;
+            }
         }
 
         private void API_onResourceStart()
@@ -68,13 +103,26 @@ namespace stuykserver.Jobs
         [Command("fish")]
         public void cmdFish(Client player)
         {
-            foreach (Vector3 point in fishingPoints)
+            if (!playersFishing.ContainsKey(player))
             {
-                if (player.position.DistanceTo(point) <= 20)
+                foreach (Vector3 point in fishingPoints)
                 {
-                    
-                    return;
+                    if (player.position.DistanceTo(point) <= 20)
+                    {
+                        string word = sendWordToPlayer();
+                        API.triggerClientEvent(player, "startFishing", word);
+                        playersFishing.Add(player, word);
+                        var fishingrod = API.createObject(-1910604593, new Vector3(), new Vector3());
+                        API.attachEntityToEntity(fishingrod, player, "SKEL_L_Hand", new Vector3(0.13f, 0.1f, 0.01f), new Vector3(180f, 90f, 70f));
+                        playersFishingRods.Add(player, fishingrod);
+                        API.playPlayerAnimation(player, 1, "amb@world_human_stand_fishing@idle_a", "idle_c");
+                        return;
+                    }
                 }
+            }
+            else
+            {
+                API.sendNotificationToPlayer(player, "You seem to already be fishing.");
             }
         }
 
@@ -93,6 +141,24 @@ namespace stuykserver.Jobs
             fishingPoints.Add(new Vector3(position.X, position.Y, position.Z));
             int i = 0;
             ++i;
+        }
+
+        public string sendWordToPlayer()
+        {
+            var lines = File.ReadAllLines("resources/stuykserver/Jobs/wordlist.txt");
+            Random random = new Random();
+            string word = lines[random.Next(0, lines.Length)];
+            return word;
+        }
+
+        public void playerFishingFailed(Client player)
+        {
+            API.sendNotificationToPlayer(player, "~r~Failed, the fish got away!");
+            playersFishing.Remove(player);
+            API.triggerClientEvent(player, "stopFishing");
+            API.playSoundFrontEnd(player, "Hack_Failed", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
+            API.deleteEntity(playersFishingRods[player]);
+            playersFishingRods.Remove(player);
         }
     }
 }

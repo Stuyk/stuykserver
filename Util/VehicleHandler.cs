@@ -65,7 +65,7 @@ namespace stuykserver.Util
                     var rot = API.getEntityRotation(player.handle);
                     var veh = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
                     veh.engineStatus = false;
-                    vehicleOwner.Add(veh.handle, player);
+                    // vehicleOwner.Add(veh.handle, player);
                     return;
                 }
             }
@@ -104,6 +104,7 @@ namespace stuykserver.Util
                     else
                     {
                         API.sendNotificationToPlayer(player, "~r~Doesn't appear to be any keys.");
+                        player.vehicle.engineStatus = true;
                     }
                 }
                 if (action == "lights" || action == "headlights")

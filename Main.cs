@@ -11,11 +11,8 @@ namespace stuykserver
     public class Main : Script
     {
         DatabaseHandler db = new DatabaseHandler();
-           
-        // Class Pulls
         SpawnPoints spawnPoints = new SpawnPoints();
 
-        // Prebuilt Messages
         public string msgPrefix = "~y~[~w~STUYK~y~]~w~ ";
 
         public Main()
@@ -134,6 +131,5 @@ namespace stuykserver
             API.playSoundFrontEnd(player, "Menu_Accept", "Phone_SoundSet_Default");
             API.sendNotificationToPlayer(player, message);
         }
-
     }
 }
