@@ -18,8 +18,7 @@ namespace stuykserver.Util
         DatabaseHandler db = new DatabaseHandler();
         SkinHandler skinHandler = new SkinHandler();
         ClothingHandler clothingHandler = new ClothingHandler();
-
-        int dimension;
+        KarmaHandler kh = new KarmaHandler();
 
         public ConnectionHandler()
         {
@@ -42,10 +41,8 @@ namespace stuykserver.Util
 
             foreach (Client player in playerList)
             {
-                db.updateDatabase("Players", "LoggedIn", "0", "Nametag", player.name);
-                db.updateDatabase("Players", "LASTX", player.position.X.ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "LASTY", player.position.Y.ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "LASTZ", player.position.Z.ToString(), "Nametag", player.name);
+                db.setPlayerLoggedOut(player);
+                db.setPlayerPosition(player);
                 db.updateDatabase("Players", "CurrentSkin", ((PedHash)API.getEntityModel(player)).ToString(), "Nametag", player.name);
                 db.updateDatabase("Players", "Health", API.getPlayerHealth(player).ToString(), "Nametag", player.name);
                 db.updateDatabase("Players", "Armor", API.getPlayerArmor(player).ToString(), "Nametag", player.name);
@@ -67,12 +64,12 @@ namespace stuykserver.Util
 
         public void API_onPlayerFinishedDownload(Client player)
         {
-            API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, false);
-            API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, false);
+            db.setPlayerHUD(player, false);
             API.triggerClientEvent(player, "createCamera", new Vector3(-1605.505, -1089.018, 30), new Vector3(40, 0, 0));
-            API.setEntityDimension(player, dimension);
+            Random random = new Random();
+            int r = random.Next(1, 1000);
+            API.setEntityDimension(player, r);
             API.setEntityPosition(player, new Vector3(-1605.505, -1089.018, 13.01836));
-            ++dimension;
         }
 
         private void API_onPlayerBeginConnect(Client player, CancelEventArgs cancelConnection)
@@ -87,14 +84,10 @@ namespace stuykserver.Util
 
         private void API_onPlayerDisconnected(Client player, string reason)
         {
-            string loginPull = db.pullDatabase("Players", "LoggedIn", "Nametag", player.name);
-
-            if (main.isPlayerLoggedIn(player))
+            if (db.isPlayerLoggedIn(player))
             {
-                db.updateDatabase("Players", "LASTX", player.position.X.ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "LASTY", player.position.Y.ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "LASTZ", player.position.Z.ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "LoggedIn", "0", "Nametag", player.name);
+                db.setPlayerPosition(player);
+                db.setPlayerLoggedOut(player);
                 db.updateDatabase("Players", "CurrentSkin", ((PedHash)API.getEntityModel(player)).ToString(), "Nametag", player.name);
                 db.updateDatabase("Players", "Health", API.getPlayerHealth(player).ToString(), "Nametag", player.name);
                 db.updateDatabase("Players", "Armor", API.getPlayerArmor(player).ToString(), "Nametag", player.name);
@@ -104,25 +97,17 @@ namespace stuykserver.Util
                 db.updateDatabase("Players", "JobZ", "0", "Nametag", player.name);
                 db.updateDatabase("Players", "JobType", "None", "Nametag", player.name);
                 API.consoleOutput("[DATABASE] " + player.name.ToString() + " has disconnected.");
-
                 if (db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name) != "None")
                 {
                     NetHandle tempVehicle = new NetHandle(Convert.ToInt32(db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name)));
                     API.deleteEntity(tempVehicle);
                 }
-
                 db.updateDatabase("Players", "TempJobVehicle", "None", "Nametag", player.name);
             }
-            else
-            {
-                return;
-            }
-            return;
         }
 
         public void SpawnPlayer(Client player)
         {
-            API.sendNativeToPlayer(player, Hash.DO_SCREEN_FADE_OUT, 5);
             string s = player.socialClubName;
 
             API.triggerClientEvent(player, "endCamera");
@@ -141,24 +126,20 @@ namespace stuykserver.Util
             db.updateDatabase("Players", "JobType", "None", "Nametag", player.name);
 
             player.freezePosition = false;
+
+            // Set / Load Player Data
             API.setEntityPosition(player, new Vector3(x, y, z));
             skinHandler.loadCurrentFace(player);
             clothingHandler.updateClothingForPlayer(player);
+            kh.updateKarma(player);
 
-
+            // Kill any open panels.
             API.triggerClientEvent(player, "killPanel");
             API.setEntityDimension(player, 0);
 
             //API.call("VehicleHandler", "SpawnPlayerCars", player);
             API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
             API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
-
-            
-            while (stopWatch.Elapsed.Seconds < 3)
-            {
-
-            }
-            API.sendNativeToPlayer(player, Hash.DO_SCREEN_FADE_IN, 10000);
 
             if (db.pullDatabase("Players", "Dead", "Nametag", player.name) == "1")
             {
@@ -167,6 +148,8 @@ namespace stuykserver.Util
                 API.sendChatMessageToPlayer(player, "~r~/tapout");
                 API.playPlayerAnimation(player, (int)(AnimationFlags.StopOnLastFrame), "combat@death@from_writhe", "death_c");
             }
+
+            API.exported.gtaocharacter.updatePlayerFace(player.handle);
         }
 
         [Flags]

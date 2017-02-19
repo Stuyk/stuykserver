@@ -13,6 +13,7 @@
 	<script src="Jobs/Fishing.cs" type="server" lang="csharp" />
 	<script src="Jobs/PizzaDelivery.cs" type="server" lang="csharp" />
 	<script src="Jobs/JobHandler.cs" type="server" lang="csharp" />
+	<script src="Jobs/PaperBoy.cs" type="server" lang="csharp" />
 	<script src="Util/VehicleShopHandler.cs" type="server" lang="csharp" />
 	<script src="Util/ChatHandler.cs" type="server" lang="csharp" />
 	<script src="Util/KarmaHandler.cs" type="server" lang="csharp" />
@@ -32,6 +33,7 @@
 	<script src="clientside/resources/ActiveShooter.js" type="client" lang="javascript" />
 	<script src="clientside/resources/SkinHandler.js" type="client" lang="javascript" />
 	<script src="clientside/resources/KeyPressHandler.js" type="client" lang="javascript" />
+	<script src="clientside/resources/PaperBoy.js" type="client" lang="javascript" />
 	  
     <file src="clientside/resources/index.html"/>
 	<file src="clientside/resources/regsuccess.html"/>
@@ -42,6 +44,7 @@
 	<file src="clientside/resources/js/bootstrap.js"/>
 	<file src="clientside/resources/js/bootstrap.min.js"/>
 	<file src="clientside/resources/js/npm.js"/>
+	<file src="clientside/resources/js/jquery.min.js"/>
 	
 	<file src="clientside/resources/skinselector.html"/>
 	<file src="clientside/resources/skinchanger.html"/>

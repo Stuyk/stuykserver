@@ -11,6 +11,7 @@ namespace stuykserver.Util
     public class BarberShopHandler : Script
     {
         Main main = new Main();
+        SkinHandler skinHandler = new SkinHandler();
         DatabaseHandler db = new DatabaseHandler();
         List<Vector3> barberShops = new List<Vector3>(); // All barbershops from the database are pulled into here.
         Dictionary<Client, Vector3> playersInBarbershop = new Dictionary<Client, Vector3>();
@@ -74,7 +75,7 @@ namespace stuykserver.Util
 
         public void selectBarberShop(Client player)
         {
-            if (main.isPlayerLoggedIn(player))
+            if (db.isPlayerLoggedIn(player))
             {
                 if (!player.isInVehicle) // If player is not in Vehicle
                 {
@@ -94,6 +95,7 @@ namespace stuykserver.Util
                                 API.triggerClientEvent(player, "createCamera", new Vector3(-1281.826, -1118.141, 7.5), player.position);
                                 API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@female_arms_crossed@base", "base");
                                 player.rotation = new Vector3(0, 0, 88.95126);
+                                skinHandler.loadLocalFaceData(player);
                                 return;
                             }
                             else

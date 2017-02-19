@@ -6,141 +6,166 @@
     <link href="skinchanger.css" rel="stylesheet">
   </head>
   <body style="padding: 10px">
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-info optionButton col-sm-3" id="genderMale" onClick="resourceCall('skinGender', 0);">M</button>
-					<label class="col-sm-4 vertical-align">Gender</label>
-					<button type="submit" class="btn btn-info optionButton col-sm-3" id="genderFemale" onClick="resourceCall('skinGender', 1);">F</button>
+	<div class="modal fade" id="genderChange" tabindex="-1" role="dialog" aria-labelledby="genderChangeLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="genderChangeLabel" style="color: black">Are you sure?</h4>
 				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-info optionButton col-sm-3" id="shapeFirstNegative" onClick="resourceCall('skinFaceShapeOne', -1);">-</button>
-					<label class="col-sm-4 vertical-align">Face Shape #1</label>
-					<button type="submit" class="btn btn-info optionButton col-sm-3" id="shapeFirstPositive" onClick="resourceCall('skinFaceShapeOne', 1);">+</button>
+				<div class="modal-body">
+					<span style="color: black">Changing your gender will reset all of your clothing.</span><br />
+					<span style="color: black"><strong>Your clothing will be lost.</strong></span>
 				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-info optionButton col-sm-3" id="shapeSecondNegative" onClick="resourceCall('skinFaceShapeTwo', -1);">-</button>
-					<label class="col-sm-4 vertical-align">Face Shape #2</label>
-					<button type="submit" class="btn btn-info optionButton col-sm-3" id="shapeSecondPositive" onClick="resourceCall('skinFaceShapeTwo', 1);">+</button>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-danger pull-left" id="genderMale" onClick="resourceCall('changeFaceGender', 0);" data-dismiss="modal">Confirm Male</button>
+					<button type="submit" class="btn btn-danger pull-left" id="genderMale" onClick="resourceCall('changeFaceGender', 1);" data-dismiss="modal">Confirm Female</button>
+					<button type="button" class="btn btn-success" id="close" data-dismiss="modal" style="margin-left: 50px">Cancel</button>
 				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinFirstNegative" onClick="resourceCall('skinSkinFirst', -1);">-</button>
-					<label class="col-sm-4 vertical-align">Skin #1</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinFirstPositive" onClick="resourceCall('skinSkinFirst', 1);">+</button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinSecondNegative" onClick="resourceCall('skinSkinSecond', -1);">-</button>
-					<label class="col-sm-4 vertical-align">Skin #2</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinSecondPositive" onClick="resourceCall('skinSkinSecond', 1);">+</button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="shapeMixNegative" onClick="resourceCall('skinShapeMixNegative');">-</button>
-					<label class="col-sm-4 vertical-align">Shape Mix</label>
-					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="shapeMixPositive" onClick="resourceCall('skinShapeMixPositive');">+</button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="skinMixNegative" onClick="resourceCall('skinSkinMixNegative');">-</button>
-					<label class="col-sm-4 vertical-align">Skin Mix</label>
-					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="skinMixPositive" onClick="resourceCall('skinSkinMixPositive');">+</button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairStyleNegative" onClick="resourceCall('skinHairstyle', -1);">-</button>
-					<label class="col-sm-4 vertical-align">Hair Style</label>
-					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairStylePositive" onClick="resourceCall('skinHairstyle', 1);">+</button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairColorNegative" onClick="resourceCall('skinHairstyleColor', -1);">-</button>
-					<label class="col-sm-4 vertical-align">Hair Color</label>
-					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairColorPositive" onClick="resourceCall('skinHairstyleColor', 1);">+</button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairHighlightNegative" onClick="resourceCall('skinHairstyleHighlight', -1);">-</button>
-					<label class="col-sm-4 vertical-align">Hair Highlight Color</label>
-					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairHighlightPositive" onClick="resourceCall('skinHairstyleHighlight', 1);">+</button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-info optionButton col-sm-3" id="hairTextureNegative" onClick="resourceCall('skinHairstyleTexture', -1);">-</button>
-					<label class="col-sm-4 vertical-align">Hair Texture</label>
-					<button type="submit" class="btn btn-info optionButton col-sm-3" id="hairTextureNegative" onClick="resourceCall('skinHairstyleTexture', 1);">+</button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="rotationLeft" onClick="resourceCall('skinRotation', -30);"><</button>
-					<label class="col-sm-4 vertical-align">Rotation</label>
-					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="rotationRight" onClick="resourceCall('skinRotation', 30);">></button>
-				</div>
-			</form>
-			<div class="row">
-				<button id="saveButton" type="submit" class="btn btn-success col-sm-4" style="margin-left: 50px" onclick="resourceCall('skinSave')">Save / Close</button>
 			</div>
 		</div>
 	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="button" class="btn btn-info optionButton col-sm-3" data-toggle="modal" data-target="#genderChange">M</button>
+					<label class="col-sm-4 vertical-align">Gender</label>
+					<button type="button" class="btn btn-info optionButton col-sm-3" id="genderFemale" data-toggle="modal" data-target="#genderChange">F</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-info optionButton col-sm-3" id="shapeFirstNegative" onClick="resourceCall('changeFaceShapeOne', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Face Shape #1</label>
+					<button type="submit" class="btn btn-info optionButton col-sm-3" id="shapeFirstPositive" onClick="resourceCall('changeFaceShapeOne', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-info optionButton col-sm-3" id="shapeSecondNegative" onClick="resourceCall('changeFaceShapeTwo', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Face Shape #2</label>
+					<button type="submit" class="btn btn-info optionButton col-sm-3" id="shapeSecondPositive" onClick="resourceCall('changeFaceShapeTwo', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinFirstNegative" onClick="resourceCall('changeFaceSkinOne', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Skin #1</label>
+					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinFirstPositive" onClick="resourceCall('changeFaceSkinOne', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinSecondNegative" onClick="resourceCall('changeFaceSkinTwo', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Skin #2</label>
+					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinSecondPositive" onClick="resourceCall('changeFaceSkinTwo', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="shapeMixNegative" onClick="resourceCall('changeFaceShapeMix', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Shape Mix</label>
+					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="shapeMixPositive" onClick="resourceCall('changeFaceShapeMix', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="skinMixNegative" onClick="resourceCall('changeFaceSkinMix', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Skin Mix</label>
+					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="skinMixPositive" onClick="resourceCall('changeFaceSkinMix', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairStyleNegative" onClick="resourceCall('changeFaceHairstyle', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Hair Style</label>
+					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairStylePositive" onClick="resourceCall('changeFaceHairstyle', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairColorNegative" onClick="resourceCall('changeFaceHairstyleColor', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Hair Color</label>
+					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairColorPositive" onClick="resourceCall('changeFaceHairstyleColor', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairHighlightNegative" onClick="resourceCall('changeFaceHairstyleHighlight', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Hair Highlight Color</label>
+					<button type="submit" class="btn btn-warning optionButton col-sm-3" id="hairHighlightPositive" onClick="resourceCall('changeFaceHairstyleHighlight', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-info optionButton col-sm-3" id="hairTextureNegative" onClick="resourceCall('changeFaceHairstyleTexture', -1);">-</button>
+					<label class="col-sm-4 vertical-align">Hair Texture</label>
+					<button type="submit" class="btn btn-info optionButton col-sm-3" id="hairTextureNegative" onClick="resourceCall('changeFaceHairstyleTexture', 1);">+</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<form class="form-inline col-sm-12">
+				<div class="row">
+					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="rotationLeft" onClick="resourceCall('changeRotationHandle', -30);"><</button>
+					<label class="col-sm-4 vertical-align">Rotation</label>
+					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="rotationRight" onClick="resourceCall('changeRotationHandle', 30);">></button>
+				</div>
+			</form>
+			<div class="row">
+				<button id="saveButton" type="submit" class="btn btn-success col-sm-4" style="margin-left: 50px" onclick="resourceCall('changeFaceSave')">Save</button>
+			</div>
+		</div>
+	</div>
+	<div class="footer" style="position: absolute; bottom: 0; width: 100%, height: 60px;">
+		<h3>If you want accurate results, align your face shapes to the same number. Results May Always Vary*</h1>
+	</div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js">
+		$('#genderChange').modal('show');
+	</script>
   </body>
 </html>
 

@@ -45,6 +45,46 @@ namespace stuykserver.Util
             }
             return false;
         }
+
+        public void updateKarma(Client player)
+        {
+            int currentKarma = Convert.ToInt32(db.pullDatabase("Players", "Karma", "Nametag", player.name));
+            if (currentKarma > 0 && currentKarma < 25)
+            {
+                string displayText = "Good";
+                API.triggerClientEvent(player, "updateKarma", displayText);
+            }
+
+            if (currentKarma > 25 && currentKarma < 90)
+            {
+                string displayText = "Great";
+                API.triggerClientEvent(player, "updateKarma", displayText);
+            }
+
+            if (currentKarma > 90 && currentKarma < 100)
+            {
+                string displayText = "Perfect";
+                API.triggerClientEvent(player, "updateKarma", displayText);
+            }
+
+            if (currentKarma < 0 && currentKarma > -25)
+            {
+                string displayText = "Scum";
+                API.triggerClientEvent(player, "updateKarma", displayText);
+            }
+
+            if (currentKarma < -25 && currentKarma > -95)
+            {
+                string displayText = "Terrible";
+                API.triggerClientEvent(player, "updateKarma", displayText);
+            }
+
+            if (currentKarma < -90 && currentKarma > -100)
+            {
+                string displayText = "Feared";
+                API.triggerClientEvent(player, "updateKarma", displayText);
+            }
+        }
     }
 }
 

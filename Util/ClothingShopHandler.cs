@@ -10,6 +10,7 @@ namespace stuykserver.Util
 {
     public class ClothingShopHandler : Script
     {
+        ClothingHandler clothingHandler = new ClothingHandler();
         DatabaseHandler db = new DatabaseHandler();
         Main main = new Main();
         List<Vector3> clothingShops = new List<Vector3>();
@@ -60,13 +61,13 @@ namespace stuykserver.Util
 
         public void selectClothing(Client player)
         {
-            if (main.isPlayerLoggedIn(player))
+            if (db.isPlayerLoggedIn(player))
             {
                 if (!player.isInVehicle) // If player is not in Vehicle
                 {
                     foreach (Vector3 pos in clothingShops)
                     {
-                        if (player.position.DistanceTo(pos) <= 15)
+                        if (player.position.DistanceTo(pos) <= 5)
                         {
                             if (db.getPlayerMoney(player) >= 60)
                             {
@@ -80,6 +81,7 @@ namespace stuykserver.Util
                                 API.triggerClientEvent(player, "openClothingPanel");
                                 
                                 API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@female_arms_crossed@base", "base");
+                                clothingHandler.updateLocalClothingVariables(player);
                                 return;
                             }
                             else

@@ -22,6 +22,43 @@ namespace stuykserver.Util
             API.consoleOutput("Started: DatabaseHandler");
         }
 
+        // ########################################
+        //        Login Handling / Setting
+        // ########################################
+        public void setPlayerLoggedIn(Client player)
+        {
+            updateDatabase("Players", "LoggedIn", "1", "Nametag", player.name);
+            API.consoleOutput("{0} has logged in.", player.name);
+        }
+
+        public void setPlayerLoggedOut(Client player)
+        {
+            updateDatabase("Players", "LoggedIn", "0", "Nametag", player.name);
+            API.consoleOutput("{0} has logged out.", player.name);
+        }
+
+        public bool isPlayerLoggedIn(Client player)
+        {
+            return Convert.ToBoolean(pullDatabase("Players", "LoggedIn", "Nametag", player.name));
+        }
+
+        // ########################################
+        //        Player Specific Settings
+        // ########################################
+        public void setPlayerPosition(Client player)
+        {
+            updateDatabase("Players", "LASTX", player.position.X.ToString(), "Nametag", player.name);
+            updateDatabase("Players", "LASTY", player.position.Y.ToString(), "Nametag", player.name);
+            updateDatabase("Players", "LASTZ", player.position.Z.ToString(), "Nametag", player.name);
+        }
+
+        public void setPlayerHUD(Client player, bool setting)
+        {
+            API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, setting);
+            API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, setting);
+        }
+
+
         // Check if player is an admin.
         public bool isAdmin(string playerName)
         {
@@ -116,6 +153,13 @@ namespace stuykserver.Util
                 } 
             }
             return null;
+        }
+
+        public void insertDataPointPosition(string tablename, Client player)
+        {
+            string query = string.Format("INSERT INTO {0} (PosX, PosY, PosZ) VALUES ({1}, {2}, {3})", tablename, player.position.X, player.position.Y, player.position.Z);
+            API.exported.database.executeQueryWithResult(query);
+            API.sendNotificationToPlayer(player, "Created");
         }
 
         //Create a piece of the Database

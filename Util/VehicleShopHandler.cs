@@ -54,7 +54,7 @@ namespace stuykserver.Util
         [Command("browse")]
         public void cmdSkin(Client player)
         {
-            if (main.isPlayerLoggedIn(player))
+            if (db.isPlayerLoggedIn(player))
             {
                 if (!player.isInVehicle)
                 {

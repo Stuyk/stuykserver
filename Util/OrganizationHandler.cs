@@ -28,7 +28,7 @@ namespace stuykserver.Util
             bool doesOrgNameExist = db.checkIfExists("Name", "Organization", nameOfOrganization);
             if (!doesOrgNameExist)
             {
-                if (main.isPlayerLoggedIn(player))
+                if (db.isPlayerLoggedIn(player))
                 {
                     string organization = db.pullDatabase("Players", "Organization", "Nametag", player.name);
                     if (organization == "none")

@@ -10,7 +10,6 @@ namespace stuykserver.Util
     public class VehicleHandler : Script
     {
         ChatHandler ch = new ChatHandler();
-        Main main = new Main();
         Dictionary<NetHandle, Client> vehicleOwner = new Dictionary<NetHandle, Client>();
         DatabaseHandler db = new DatabaseHandler();
 
@@ -35,7 +34,7 @@ namespace stuykserver.Util
                 {
                     API.setVehicleLocked(vehicle, true);
                     API.setVehicleEngineStatus(vehicle, false);
-                    ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " stops the engine, and exits the vehicle.");
+                    //ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " stops the engine, and exits the vehicle.");
 
                     API.sendNotificationToPlayer(player, "~g~You lock the car as you exit the vehicle");
                 }
@@ -47,7 +46,7 @@ namespace stuykserver.Util
             if (API.getVehicleLocked(vehicle))
             {
                 API.warpPlayerOutOfVehicle(player, vehicle);
-                main.sendNotification(player, "~r~That seems to be locked.");
+                //main.sendNotification(player, "~r~That seems to be locked.");
             }
         }
 
@@ -59,7 +58,7 @@ namespace stuykserver.Util
         [Command("spawncar")] // Admin
         public void cmdSpawnCar(Client player, VehicleHash model)
         {
-            if (main.isPlayerLoggedIn(player))
+            if (db.isPlayerLoggedIn(player))
             {
                 if (db.isAdmin(player.name))
                 {
@@ -87,12 +86,12 @@ namespace stuykserver.Util
                             if (player.vehicle.engineStatus == true)
                             {
                                 player.vehicle.engineStatus = false;
-                                ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " stops the engine.");
+                                //ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " stops the engine.");
                             }
                             else
                             {
                                 player.vehicle.engineStatus = true;
-                                ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " starts the engine.");
+                                //ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " starts the engine.");
                             }
                         }
                     }
@@ -120,7 +119,7 @@ namespace stuykserver.Util
                 }
                 if (action == "visor")
                 {
-                    ch.sendCloseMessage(player, 6.0f, "~#C2A2DA~", API.getPlayerName(player) + " adjusts the visor and winks.");
+                    //ch.sendCloseMessage(player, 6.0f, "~#C2A2DA~", API.getPlayerName(player) + " adjusts the visor and winks.");
                 }
                 if (action == "trunk")
                 {
@@ -131,7 +130,7 @@ namespace stuykserver.Util
                     else
                     {
                         API.setVehicleDoorState(player.vehicle, 5, true);
-                        ch.sendCloseMessage(player, 10.0f, "~#C2A2DA~", API.getPlayerName(player) + " opens the trunk.");
+                        //ch.sendCloseMessage(player, 10.0f, "~#C2A2DA~", API.getPlayerName(player) + " opens the trunk.");
                     }
                 }
                 if (action == "hood")
@@ -143,7 +142,7 @@ namespace stuykserver.Util
                     else
                     {
                         API.setVehicleDoorState(player.vehicle, 4, true);
-                        ch.sendCloseMessage(player, 10.0f, "~#C2A2DA~", API.getPlayerName(player) + " pops the hood.");
+                        //ch.sendCloseMessage(player, 10.0f, "~#C2A2DA~", API.getPlayerName(player) + " pops the hood.");
                     }
                 }
             }
@@ -162,12 +161,12 @@ namespace stuykserver.Util
                                 if (API.getVehicleLocked(vehicle))
                                 {
                                     API.setVehicleLocked(vehicle, false);
-                                    ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " unlocks the doors.");
+                                    //ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " unlocks the doors.");
                                 }
                                 else
                                 {
                                     API.setVehicleLocked(vehicle, true);
-                                    ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " locks the doors.");
+                                    //ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " locks the doors.");
                                 }
                             }
                         }
@@ -176,13 +175,13 @@ namespace stuykserver.Util
                             if (API.getVehicleLocked(vehicle))
                             {
                                 API.setVehicleLocked(vehicle, false);
-                                ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " unlocks the doors.");
+                                //ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " unlocks the doors.");
                                 API.sendNotificationToPlayer(player, "~r~This isn't your car, but you unlock the doors anyway.");
                             }
                             else
                             {
                                 API.setVehicleLocked(vehicle, true);
-                                ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " locks the doors.");
+                                //ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " locks the doors.");
                                 API.sendNotificationToPlayer(player, "~r~This isn't your car, but you lock the doors anyway.");
                             }
                         }
@@ -202,7 +201,7 @@ namespace stuykserver.Util
             if (player.isInVehicle)
             {
                 API.setPlayerSeatbelt(player, true);
-                ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " puts on their seatbelt.");
+                //ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " puts on their seatbelt.");
             }
         }
 

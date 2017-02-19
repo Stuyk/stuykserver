@@ -111,13 +111,13 @@ namespace stuykserver.Util
 
         public void selectATM(Client player)
         {
-            if (main.isPlayerLoggedIn(player))
+            if (db.isPlayerLoggedIn(player))
             {
                 if (!player.isInVehicle) // If player is not in Vehicle
                 {
                     foreach (Vector3 pos in atmsList)
                     {
-                        if (player.position.DistanceTo(pos) <= 10)
+                        if (player.position.DistanceTo(pos) <= 5)
                         {
 
                             API.triggerClientEvent(player, "loadATM", db.getPlayerAtmMoney(player));

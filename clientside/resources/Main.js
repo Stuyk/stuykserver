@@ -4,6 +4,10 @@ var res = API.getScreenResolution();
 var currentMoney = null;
 var resX = API.getScreenResolutionMantainRatio().Width;
 var resY = API.getScreenResolutionMantainRatio().Height;
+var currentjob = null;
+
+// Karma Display
+var karmaDisplay = null;
 
 // Clothing Variables (IN ORDER)
 var clothingTopNum = null;
@@ -12,11 +16,24 @@ var clothingUndershirtNum = null;
 var clothingUndershirtColorNum = null;
 var clothingLegsNum = null;
 var clothingLegsColorNum = null;
-var clothingHatNum = null;
-var clothingHatColorNum = null;
 var clothingShoesNum = null;
 var clothingShoesColorNum = null;
 var clothingTorsoNum = null;
+var clothingPanelOpen = null;
+
+// Face Variables (IN ORDER)
+var faceGender = null;
+var faceShapeOne = null;
+var faceShapeTwo = null;
+var faceSkinOne = null;
+var faceSkinTwo = null;
+var faceShapeMix = null;
+var faceSkinMix = null;
+var faceHairstyle = null;
+var faceHairstyleColor = null;
+var faceHairstyleHighlight = null;
+var faceHairstyleTexture = null;
+var facePanelOpen = null;
 
 var email = "";
 var password = "";
@@ -140,12 +157,6 @@ API.onServerEventTrigger.connect(function(eventName, args) {
         }
     }
 	
-	if (eventName=="loadLogin") {
-		if (pagePanel == null) {
-			pagePanel = new CefHelper("clientside/resources/loading.html");
-			pagePanel.show();
-		}
-	}
 	if (eventName=="updateNameVariable") {
 		playerName = args[0];
 		API.sendNotification(playerName);
@@ -164,6 +175,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	}
 	
 	if (eventName=="clothingLocalVariableUpdate") {
+		clothingPanelOpen = true;
 		clothingTorsoNum = args[0];
 		clothingTopNum = args[1];
 		clothingTopColorNum = args[2];
@@ -171,10 +183,118 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		clothingUndershirtColorNum = args[4];
 		clothingLegsNum = args[5];
 		clothingLegsColorNum = args[6];
-		clothingHatNum = args[7];
-		clothingHatColorNum = args[8];
-		clothingShoesNum = args[9];
-		clothingShoesColorNum = args[10];
+		clothingShoesNum = args[7];
+		clothingShoesColorNum = args[8];
+	}
+	
+	if (eventName=="loadFaceData") {
+		facePanelOpen = true;
+		faceShapeOne = args[0];
+		faceShapeTwo = args[1];
+		faceSkinOne = args[2];
+		faceSkinTwo = args[3];
+		faceShapeMix = args[4];
+		faceSkinMix = args[5];
+		faceHairstyle = args[6];
+		faceHairstyleColor = args[7];
+		faceHairstyleHighlight = args[8];
+		faceHairstyleTexture = args[9];
+	}
+	
+	if (eventName=="updateKarma") {
+		karmaDisplay = args[0];
+	}
+});
+
+API.onUpdate.connect(function() {
+    if (currentMoney != null) {
+        API.drawText("$" + currentMoney, resX - 25, 25, 1, 50, 211, 82, 255, 4, 2, false, true, 0);
+    }
+	
+	if (karmaDisplay != null) {
+		API.drawText(karmaDisplay, resX - 25, resY - 100, 1, 244, 244, 66, 255, 4, 2, false, true, 0);
+	}
+	
+	// Clothing Panel Display
+	if (clothingPanelOpen == true) {
+		if (clothingTopNum != null) {
+			API.drawText("Top: " + clothingTopNum, resX - 400, resY / 6 + 150, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (clothingTopColorNum != null) {
+			API.drawText("Top Color: " + clothingTopColorNum, resX - 400, resY / 6 + 225, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (clothingUndershirtNum != null) {
+			API.drawText("Undershirt: " + clothingUndershirtNum, resX - 400, resY / 6 + 300, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+	
+		if (clothingUndershirtColorNum != null) {
+			API.drawText("Undershirt Color: " + clothingUndershirtColorNum, resX - 400, resY / 6 + 375, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+	
+		if (clothingTorsoNum != null) {
+			API.drawText("Torso: " + clothingTorsoNum, resX - 400, resY / 6 + 450, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+	
+		if (clothingLegsNum != null) {
+			API.drawText("Legs: " + clothingLegsNum, resX - 400, resY / 6 + 525, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+	
+		if (clothingLegsColorNum != null) {
+			API.drawText("Legs Color: " + clothingLegsColorNum, resX - 400, resY / 6 + 600, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+	
+	
+		if (clothingShoesNum != null) {
+			API.drawText("Shoes: " + clothingShoesNum, resX - 400, resY / 6 + 675, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+	
+		if (clothingShoesColorNum != null) {
+			API.drawText("Shoe Color: " + clothingShoesColorNum, resX - 400, resY / 6 + 750, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+	}
+	
+	if (facePanelOpen == true) {
+		if (faceShapeOne != null) {
+			API.drawText("Shape One: " + faceShapeOne, resX - 400, resY / 6 + 0, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (faceShapeTwo != null) {
+			API.drawText("Shape Two: " + faceShapeTwo, resX - 400, resY / 6 + 75, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (faceSkinOne != null) {
+			API.drawText("Skin One: " + faceSkinOne, resX - 400, resY / 6 + 150, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (faceSkinTwo != null) {
+			API.drawText("Skin Two: " + faceSkinTwo, resX - 400, resY / 6 + 225, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (faceShapeMix != null) {
+			API.drawText("Shape Mix: " + intToFloat(faceShapeMix, 2), resX - 400, resY / 6 + 300, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (faceSkinMix != null) {
+			API.drawText("Skin Mix: " + intToFloat(faceSkinMix, 2), resX - 400, resY / 6 + 375, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (faceHairstyle != null) {
+			API.drawText("Hairstyle: " + faceHairstyle, resX - 400, resY / 6 + 450, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (faceHairstyleColor != null) {
+			API.drawText("Hairstyle Color: " + faceHairstyleColor, resX - 400, resY / 6 + 525, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+		
+		if (faceHairstyleHighlight != null) {
+			API.drawText("Hairstyle Color: " + faceHairstyleHighlight, resX - 400, resY / 6 + 600, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
+
+		if (faceHairstyleTexture != null) {
+			API.drawText("Hairstyle Texture: " + faceHairstyleTexture, resX - 400, resY / 6 + 675, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
+		}
 	}
 });
 
@@ -193,6 +313,11 @@ function closeInventory() {
 
 function loginHandler(email, password) {
     API.triggerServerEvent("clientLogin", email, password);
+	killPanel();
+	if (pagePanel == null) {
+		pagePanel = new CefHelper("clientside/resources/loading.html");
+		pagePanel.show();
+	}
 }
 
 function registerHandler(email, password) {
@@ -339,52 +464,299 @@ function skinSave() {
 	API.triggerServerEvent("skinSave");
 }
 
-function clothingTorso(amount) {
-	API.triggerServerEvent("clothingTorsoChange", amount);
+// ##########################
+// #### MODEL CHANGER    ####
+// #### WRITTEN BY STUYK ####
+// ##########################
+function intToFloat(num) { // Used to create the float numbers.
+	return num.toFixed(1);
 }
 
-function clothingTopColor(amount) {
-	API.triggerServerEvent("clothingTopColorChange", amount);
+function changeFaceSave() {
+	API.triggerServerEvent("saveFace", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture);
+	faceShapeOne = null;
+	faceShapeTwo = null;
+	faceSkinOne = null;
+	faceSkinTwo = null;
+	faceShapeMix = null;
+	faceSkinMix = null;
+	faceHairstyle = null;
+	faceHairstyleColor = null;
+	faceHairstyleHighlight = null;
+	faceHairstyleTexture = null;
+	facePanelOpen = null;
+	API.stopPlayerAnimation();
 }
 
-function clothingTop(amount) {
-	API.triggerServerEvent("clothingTopChange", amount);
+function changeUpdateFace() {
+	var player = API.getLocalPlayer();
+	API.callNative("SET_PED_HEAD_BLEND_DATA", player, faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, intToFloat(faceShapeMix), intToFloat(faceSkinMix), 0, false);
+	API.callNative("_SET_PED_HAIR_COLOR", player, faceHairstyleColor, faceHairstyleHighlight);
+	API.setPlayerClothes(player, 2, faceHairstyle, faceHairstyleTexture);
 }
 
-function clothingUnderShirt(amount) {
-	API.triggerServerEvent("clothingUndershirtChange", amount);
+function changeFaceGender(amount) {
+	if (amount == 0) { 
+		API.setPlayerSkin(1885233650); // Set to Male
+		faceShapeMix = 0.9;
+		faceSkinMix = 0.9;
+	}
+	
+	if (amount == 1) {
+		API.setPlayerSkin(-1667301416); // Set to Female
+		faceShapeMix = 0.1;
+		faceSkinMix = 0.1;
+	}
 }
 
-function clothingUnderShirtColor(amount) {
-	API.triggerServerEvent("clothingUndershirtColorChange", amount);
+function changeFaceShapeOne(amount) {
+	faceShapeOne = faceShapeOne + amount;
+	
+	if (faceShapeOne <= -1) {
+		faceShapeOne = 0;
+	}
+	
+	changeUpdateFace();
 }
 
-function clothingLegs(amount) {
-	API.triggerServerEvent("clothingLegsChange", amount);
+function changeFaceShapeTwo(amount) {
+	faceShapeTwo = faceShapeTwo + amount;
+	
+	if (faceShapeTwo <= -1) {
+		faceShapeTwo = 0;
+	}
+	
+	changeUpdateFace();
 }
 
-function clothingLegsColor(amount) {
-	API.triggerServerEvent("clothingLegsColorChange", amount);
+function changeFaceSkinOne(amount) {
+	faceSkinOne = faceSkinOne + amount;
+	
+	if (faceSkinOne <= -1) {
+		faceSkinOne = 0;
+	}
+	
+	changeUpdateFace();
 }
 
-function clothingHat(amount) {
-	API.triggerServerEvent("clothingHatChange", amount);
+function changeFaceSkinTwo(amount) {
+	faceSkinTwo = faceSkinTwo + amount;
+	
+	if (faceSkinTwo <= 0) {
+		faceSkinTwo = 0;
+	}
+	
+	changeUpdateFace();
 }
 
-function clothingHatColor(amount) {
-	API.triggerServerEvent("clothingHatColorChange", amount);
+function changeFaceShapeMix(amount) {
+	if (amount == 1) {
+		faceShapeMix += 0.1
+	}
+	
+	if (amount == -1) {
+		faceShapeMix -= 0.1
+	}
+	
+	if (faceShapeMix <= 0.1) {
+		faceShapeMix = 0.1;
+	}
+	
+	if (faceShapeMix >= 0.9) {
+		faceShapeMix = 0.9;
+	}
+	changeUpdateFace();
 }
 
-function clothingShoes(amount) {
-	API.triggerServerEvent("clothingShoesChange", amount);
+function changeFaceSkinMix(amount) {
+	if (amount == 1) {
+		faceSkinMix += 0.1;
+	}
+	
+	if (amount == -1) {
+		faceSkinMix -= 0.1;
+	}
+	
+	if (faceSkinMix <= 0.1) {
+		faceSkinMix = 0.1;
+	}
+	
+	if (faceSkinMix >= 0.9) {
+		faceSkinMix = 0.9;
+	}
+	changeUpdateFace();
 }
 
-function clothingShoesColor(amount) {
-	API.triggerServerEvent("clothingShoesColorChange", amount);
+function changeFaceHairstyle(amount) {
+	faceHairstyle += amount;
+	
+	if (faceHairstyle <= 0) {
+		faceHairstyle = 0;
+	}
+	
+	changeUpdateFace();
 }
 
-function clothingSave() {
-	API.triggerServerEvent("clothingSave");
+function changeFaceHairstyleColor(amount) {
+	faceHairstyleColor += amount;
+	
+	if (faceHairstyleColor <= 0) {
+		faceHairstyleColor = 0;
+	}
+	
+	changeUpdateFace();
+}
+
+function changeFaceHairstyleHighlight(amount) {
+	faceHairstyleHighlight += amount;
+	
+	if (faceHairstyleHighlight <= 0) {
+		faceHairstyleHighlight = 0;
+	}
+	
+	changeUpdateFace();
+}
+
+function changeFaceHairstyleTexture(amount) {
+	faceHairstyleTexture =+ amount;
+	
+	if (faceHairstyleTexture <= 0) {
+		faceHairstyleTexture = 0;
+	}
+	
+	changeUpdateFace();
+}
+// ##########################
+// #### CLOTHING CHANGER ####
+// #### WRITTEN BY STUYK ####
+// ##########################
+function changeClothingTorso(amount) { // Torso Changer
+	if (clothingTorsoNum != null) {
+		clothingTorsoNum = clothingTorsoNum + amount;
+		
+		if (clothingTorsoNum <= -1) {
+			clothingTorsoNum = 0;
+		}
+		
+		API.setPlayerClothes(API.getLocalPlayer(), 3, clothingTorsoNum, 0);
+	}
+}
+
+function changeClothingTop(amount) { // Top Changer
+	if (clothingTopNum != null) {
+		clothingTopNum = clothingTopNum + amount;
+		
+		if (clothingTopNum <= -1) {
+			clothingTopNum = 0;
+		}
+		
+		if (clothingTopNum >= 206) {
+			clothingTopNum = 0;
+		}	
+		
+		API.setPlayerClothes(API.getLocalPlayer(), 11, clothingTopNum, clothingTopColorNum);
+	}
+}
+
+function changeClothingTopColor(amount) { // Top Color Changer
+	if (clothingTopColorNum != null) {
+		clothingTopColorNum = clothingTopColorNum + amount;
+		
+		if (clothingTopColorNum <= -1) {
+			clothingTopColorNum = 0;
+		}
+		
+		API.setPlayerClothes(API.getLocalPlayer(), 11, clothingTopNum, clothingTopColorNum);
+	}
+}
+
+function changeClothingUndershirt(amount) { // Undershirt Changer
+	if (clothingUndershirtNum != null) {
+		clothingUndershirtNum = clothingUndershirtNum + amount;
+		
+		if (clothingUndershirtNum <= -1) {
+			clothingUndershirtNum = 96;
+		}
+		
+		if (clothingUndershirtNum >= 97) {
+			clothingUndershirtNum = 0;
+		}
+		
+		API.setPlayerClothes(API.getLocalPlayer(), 8, clothingUndershirtNum, clothingUndershirtColorNum);
+	}
+}
+
+function changeClothingUndershirtColor(amount) { // Undershirt Color Changer
+	if (clothingUndershirtColorNum != null) {
+		clothingUndershirtColorNum = clothingUndershirtColorNum + amount;
+		
+		if (clothingUndershirtColorNum <= -1) {
+			clothingUndershirtColorNum = 0;
+		}
+		
+		API.setPlayerClothes(API.getLocalPlayer(), 8, clothingUndershirtNum, clothingUndershirtColorNum);
+	}
+}
+
+function changeClothingLegs(amount) { // Legs Changer
+	if (clothingLegsNum != null) {
+		clothingLegsNum = clothingLegsNum + amount;
+		
+		if (clothingLegsNum <= -1) {
+			clothingLegsNum = 0;
+		}
+		
+		API.setPlayerClothes(API.getLocalPlayer(), 4, clothingLegsNum, clothingLegsColorNum);
+	}
+}
+
+function changeClothingLegsColor(amount) { // Legs Color Changer
+	if (clothingLegsColorNum != null) {
+		clothingLegsColorNum = clothingLegsColorNum + amount;
+		
+		if (clothingLegsColorNum <= -1) {
+			clothingLegsColorNum = 0;
+		}
+		
+		API.setPlayerClothes(API.getLocalPlayer(), 4, clothingLegsNum, clothingLegsColorNum);
+	}
+}
+
+function changeClothingShoes(amount) { // Shoes Changer
+	if (clothingShoesNum != null) {
+		clothingShoesNum = clothingShoesNum + amount;
+		
+		if (clothingShoesNum <= -1) {
+			clothingShoesNum = 0;
+		}
+		
+		API.setPlayerClothes(API.getLocalPlayer(), 6, clothingShoesNum, clothingShoesColorNum);
+	}
+}
+
+function changeClothingShoesColor(amount) { // Shoes Color Changer
+	if (clothingShoesColorNum != null) {
+		clothingShoesColorNum = clothingShoesColorNum + amount;
+		
+		if (clothingShoesColorNum <= -1) {
+			clothingShoesColorNum = 0;
+		}
+		
+		API.setPlayerClothes(API.getLocalPlayer(), 6, clothingShoesNum, clothingShoesColorNum);
+	}
+}
+
+function changeRotationHandle(amount) {
+	var player = API.getLocalPlayer();
+	var oldamount = API.getEntityRotation(player);
+	API.setEntityRotation(player, new Vector3(oldamount.X, oldamount.Y, oldamount.Z + amount));
+	API.playPlayerAnimation("amb@world_human_hang_out_street@female_arms_crossed@base", "base", 0, -1);
+}
+
+function changePushClothingChanges() {
+	API.triggerServerEvent("clothingSave", clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum);
+	API.stopPlayerAnimation();
+	clothingPanelOpen = null;
 	clothingTorsoNum = null;
 	clothingTopNum = null;
 	clothingTopColorNum = null;
@@ -398,55 +770,7 @@ function clothingSave() {
 	clothingShoesColorNum = null;
 }
 
-API.onUpdate.connect(function() {
-    if (currentMoney != null) {
-        API.drawText("$" + currentMoney, resX - 25, 25, 1, 50, 211, 82, 255, 4, 2, false, true, 0);
-    }
-	
-	if (clothingHatNum != null) {
-		API.drawText("Hat: " + clothingHatNum, resX - 400, resY / 6, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	if (clothingHatColorNum != null) {
-		API.drawText("Hat Color: " + clothingHatColorNum, resX - 400, resY / 6 + 75, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	if (clothingTopNum != null) {
-		API.drawText("Top: " + clothingTopNum, resX - 400, resY / 6 + 150, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	if (clothingTopColorNum != null) {
-		API.drawText("Top Color: " + clothingTopColorNum, resX - 400, resY / 6 + 225, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	if (clothingUndershirtNum != null) {
-		API.drawText("Undershirt: " + clothingUndershirtNum, resX - 400, resY / 6 + 300, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	if (clothingUndershirtColorNum != null) {
-		API.drawText("Undershirt Color: " + clothingUndershirtColorNum, resX - 400, resY / 6 + 375, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	if (clothingTorsoNum != null) {
-		API.drawText("Torso: " + clothingTorsoNum, resX - 400, resY / 6 + 450, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	if (clothingLegsNum != null) {
-		API.drawText("Legs: " + clothingLegsNum, resX - 400, resY / 6 + 525, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	if (clothingLegsColorNum != null) {
-		API.drawText("Legs Color: " + clothingLegsColorNum, resX - 400, resY / 6 + 600, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	
-	if (clothingShoesNum != null) {
-		API.drawText("Shoes: " + clothingShoesNum, resX - 400, resY / 6 + 675, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	if (clothingShoesColorNum != null) {
-		API.drawText("Shoe Color: " + clothingShoesColorNum, resX - 400, resY / 6 + 750, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-	}
-	
-	
-});
+// ##########################
+// #### Paper Boy 		 ####
+// #### WRITTEN BY STUYK ####
+// ##########################

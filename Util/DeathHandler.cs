@@ -19,10 +19,10 @@ namespace stuykserver.Util
 
         public DeathHandler()
         {
-            API.onPlayerDeath += API_onPlayerDeath;
+            //API.onPlayerDeath += API_onPlayerDeath;
             API.onResourceStart += API_onResourceStart;
             API.onChatCommand += API_onChatCommand;
-            API.onPlayerRespawn += API_onPlayerRespawn;
+            //API.onPlayerRespawn += API_onPlayerRespawn;
         }
 
         private void API_onChatCommand(Client player, string command, CancelEventArgs cancel)
@@ -32,9 +32,10 @@ namespace stuykserver.Util
 
         private void API_onResourceStart()
         {
-            inLimbo.Add(API.getPlayerFromName("Example"));
+            //inLimbo.Add(API.getPlayerFromName("Example"));
         }
 
+        /*
         [Command("killplayer")]
         public void cmdKill(Client player, string name)
         {
@@ -110,6 +111,7 @@ namespace stuykserver.Util
             }
         }
 
+        
         [Command("tapout")]
         public void cmdTapOut(Client player)
         {
@@ -160,5 +162,6 @@ namespace stuykserver.Util
             API.sendNativeToPlayer(player, Hash.SET_PED_GENERATES_DEAD_BODY_EVENTS, player, false);
             lastPositions.Remove(player);
         }
+        */
     }
 }

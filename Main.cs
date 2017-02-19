@@ -44,17 +44,29 @@ namespace stuykserver
 
         public void API_onChatMessage(Client player, string message, CancelEventArgs cancel)
         {
-            if (!isPlayerLoggedIn(player))
+            if (!db.isPlayerLoggedIn(player))
             {
                 cancel.Cancel = true;
                 return;
             }
         }
 
+        [Command("resetdimension")]
+        public void cmdResetDimension(Client player)
+        {
+            player.dimension = 0;
+        }
+
+        [Command("goto")]
+        public void cmdGoTo(Client player, string target)
+        {
+            player.position = API.getPlayerFromName(target).position;
+        }
+
         [Command("getpos")] //Temporary
         public void cmdGetPos(Client player)
         {
-            if (isPlayerLoggedIn(player))
+            if (db.isPlayerLoggedIn(player))
             {
                 string xyz = API.getEntityPosition(player).ToString();
                 string rot = API.getEntityRotation(player).ToString();
@@ -68,7 +80,7 @@ namespace stuykserver
         [Command("nametag")] //Temporary
         public void nameTag(Client player, string name)
         {
-            if (isPlayerLoggedIn(player))
+            if (db.isPlayerLoggedIn(player))
             {
                 if (isValidUsername(name))
                 {
@@ -98,7 +110,7 @@ namespace stuykserver
         [Command("inventory")]
         public void cmdInventory(Client player)
         {
-            if (isPlayerLoggedIn(player))
+            if (db.isPlayerLoggedIn(player))
             {
                 API.triggerClientEvent(player, "openInventory", player.name);
                 return;
@@ -106,20 +118,7 @@ namespace stuykserver
         }
 
         // Used to check if the player is logged in.
-        public bool isPlayerLoggedIn(Client player)
-        {
-            string loginPull = db.pullDatabase("Players", "LoggedIn", "Nametag", player.name);
-            bool loginBool = Convert.ToBoolean(loginPull);
-            if (loginBool == true)
-            {
-                return true;
-            }
-            else if (loginBool == false)
-            {
-                return false;
-            }
-            return false;
-        }
+        
 
         // Used to check if the string is a valid username.
         public bool isValidUsername(string input)
