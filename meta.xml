@@ -80,6 +80,8 @@
 	<file src="clientside/resources/images/dashed.png" />
 	<file src="clientside/resources/images/tweed.png" />
 	
+	<file src="clientside/resources/images/fishing.png" />
+	
 	<include resource="database"/>
 	<include resource="gtaocharacter" />
 	<include resource="doormanager" />
