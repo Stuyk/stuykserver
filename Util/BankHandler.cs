@@ -13,6 +13,8 @@ namespace stuykserver.Util
         DatabaseHandler db = new DatabaseHandler();
         Main main = new Main();
         List<Vector3> atmsList = new List<Vector3>();
+        List<Client> playersInCollisions = new List<Client>();
+        List<ColShape> collisionShapes = new List<ColShape>();
 
         [Flags]
         public enum AnimationFlags
@@ -28,6 +30,41 @@ namespace stuykserver.Util
         {
             API.onResourceStart += API_onResourceStart;
             API.onClientEventTrigger += API_onClientEventTrigger;
+            API.onEntityEnterColShape += API_onEntityEnterColShape;
+            API.onEntityExitColShape += API_onEntityExitColShape;
+        }
+
+        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
+        {
+            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    {
+                        playersInCollisions.Remove(API.getPlayerFromHandle(entity));
+                        Client player = API.getPlayerFromHandle(entity);
+                        API.triggerClientEvent(player, "removeUseFunction");
+                    }
+                }
+            }
+        }
+
+        private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
+        {
+            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (!playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    {
+                        playersInCollisions.Add(API.getPlayerFromHandle(entity));
+                        Client player = API.getPlayerFromHandle(entity);
+                        API.triggerClientEvent(player, "triggerUseFunction");
+                        API.sendNotificationToPlayer(player, "This will let me deposit my cash.");
+                    }
+                }
+            }
         }
 
         private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
@@ -69,6 +106,7 @@ namespace stuykserver.Util
                         db.setPlayerAtmMoney(player, +input);
                         API.triggerClientEvent(player, "killPanel");
                         API.stopPlayerAnimation(player);
+                        API.stopPedAnimation(player);
                     }  
                 }
                 else
@@ -115,16 +153,10 @@ namespace stuykserver.Util
             {
                 if (!player.isInVehicle) // If player is not in Vehicle
                 {
-                    foreach (Vector3 pos in atmsList)
+                    if (playersInCollisions.Contains(player))
                     {
-                        if (player.position.DistanceTo(pos) <= 5)
-                        {
-
-                            API.triggerClientEvent(player, "loadATM", db.getPlayerAtmMoney(player));
-                            API.playPlayerAnimation(player, (int)(AnimationFlags.AllowPlayerControl | AnimationFlags.Cancellable), "amb@prop_human_atm@male@enter", "enter");
-                            API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.Cancellable), "amb@prop_human_atm@male@base", "base");
-                            return;
-                        }
+                        API.triggerClientEvent(player, "loadATM", db.getPlayerAtmMoney(player));
+                        return;
                     }
                 }
             }
@@ -175,13 +207,11 @@ namespace stuykserver.Util
         // Positions the objects, blips, and text when initialized or created.
         public void positionBlips(Vector3 position, Vector3 rotation)
         {
-            API.createTextLabel("~y~[~w~Keypress: ~g~F~y~]", new Vector3(position.X, position.Y, position.Z + 1.2), 20, 0.5f);
-            API.createTextLabel("~w~Access your bank account.", new Vector3(position.X, position.Y, position.Z + 1.0), 20, 0.5f);
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 108);
             API.setBlipColor(newBlip, 2);
             API.createObject(-870868698, new Vector3(position.X, position.Y, position.Z - 1), new Vector3(rotation.X, rotation.Y, rotation.Z - 180));
-
+            collisionShapes.Add(API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 2f, 2f));
             atmsList.Add(new Vector3(position.X, position.Y, position.Z));
         }
     }

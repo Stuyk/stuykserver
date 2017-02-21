@@ -1,5 +1,6 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
+using stuykserver.Jobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,12 @@ namespace stuykserver.Util
         {
             if (eventName == "useController")
             {
+                API.call("Fishing", "startFishing", player);
+                API.call("Fishing", "sellFish", player);
                 API.call("BarberShopHandler", "selectBarberShop", player);
                 API.call("BankHandler", "selectATM", player);
                 API.call("ClothingShopHandler", "selectClothing", player);
+                API.call("VehicleShopHandler", "browseDealership", player);
             }
         }
     }

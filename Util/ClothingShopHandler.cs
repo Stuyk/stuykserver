@@ -15,6 +15,8 @@ namespace stuykserver.Util
         Main main = new Main();
         List<Vector3> clothingShops = new List<Vector3>();
         Dictionary<Client, Vector3> playersInClothingShop = new Dictionary<Client, Vector3>();
+        List<ColShape> collisionShapes = new List<ColShape>();
+        List<Client> playersInCollisions = new List<Client>();
 
         [Flags]
         public enum AnimationFlags
@@ -29,6 +31,39 @@ namespace stuykserver.Util
         public ClothingShopHandler()
         {
             API.onResourceStart += API_onResourceStart;
+            API.onEntityEnterColShape += API_onEntityEnterColShape;
+            API.onEntityExitColShape += API_onEntityExitColShape;
+        }
+
+        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
+        {
+            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    {
+                        playersInCollisions.Remove(API.getPlayerFromHandle(entity));
+                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
+                    }
+                }
+            }   
+        }
+
+        private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
+        {
+            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (!playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    {
+                        playersInCollisions.Add(API.getPlayerFromHandle(entity));
+                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction");
+                        API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "There are a lot of clothes in this store.");
+                    }
+                }
+            }
         }
 
         private void API_onResourceStart()
@@ -65,30 +100,30 @@ namespace stuykserver.Util
             {
                 if (!player.isInVehicle) // If player is not in Vehicle
                 {
-                    foreach (Vector3 pos in clothingShops)
+                    if (playersInCollisions.Contains(player))
                     {
-                        if (player.position.DistanceTo(pos) <= 5)
+                        if (db.getPlayerMoney(player) >= 60)
                         {
-                            if (db.getPlayerMoney(player) >= 60)
+                            playersInClothingShop.Add(player, player.position);
+                            Random rand = new Random();
+                            int dimension = rand.Next(1, 1000);
+                            API.setEntityDimension(player, dimension);
+                            API.consoleOutput(player.name + " is in dimension " + API.getEntityDimension(player).ToString());
+                            API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
+                            API.triggerClientEvent(player, "createCamera", new Vector3(-1190.004, -766.2875, 17.3196), player.position);
+                            API.triggerClientEvent(player, "openClothingPanel");
+                            API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@female_arms_crossed@base", "base");
+                            clothingHandler.updateLocalClothingVariables(player);
+                            if (playersInCollisions.Contains(player))
                             {
-                                playersInClothingShop.Add(player, player.position);
-                                Random rand = new Random();
-                                int dimension = rand.Next(1, 1000);
-                                API.setEntityDimension(player, dimension);
-                                API.consoleOutput(player.name + " is in dimension " + API.getEntityDimension(player).ToString());
-                                API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
-                                API.triggerClientEvent(player, "createCamera", new Vector3(-1190.004, -766.2875, 17.3196), player.position);
-                                API.triggerClientEvent(player, "openClothingPanel");
-                                
-                                API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@female_arms_crossed@base", "base");
-                                clothingHandler.updateLocalClothingVariables(player);
-                                return;
+                                playersInCollisions.Remove(player);
                             }
-                            else
-                            {
-                                API.sendChatMessageToPlayer(player, main.msgPrefix + "Not enough money.");
-                                return;
-                            }
+                            return;
+                        }
+                        else
+                        {
+                            API.sendChatMessageToPlayer(player, main.msgPrefix + "Not enough money.");
+                            return;
                         }
                     }
                 }
@@ -132,11 +167,10 @@ namespace stuykserver.Util
 
         public void positionBlips(Vector3 position)
         {
-            API.createTextLabel("~y~[~w~Keypress: ~g~F~y~]", new Vector3(position.X, position.Y, position.Z), 20, 0.5f);
-            API.createTextLabel("~w~Change your clothing.", new Vector3(position.X, position.Y, position.Z - 0.2), 20, 0.5f);
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 73);
             API.setBlipColor(newBlip, 12);
+            collisionShapes.Add(API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f));
             clothingShops.Add(new Vector3(position.X, position.Y, position.Z));
             int i = 0;
             ++i;

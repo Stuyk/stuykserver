@@ -25,7 +25,6 @@
 	<script src="Util/KeyPressHandler.cs" type="server" lang="csharp" />
 	<script src="Util/ClothingHandler.cs" type="server" lang="csharp" />
 	
-	
 	<script src="clientside/resources/serversideCamera.js" type="client" lang="javascript" />
 	<script src="clientside/resources/MoneyDisplay.js" type="client" lang="javascript" />
 	<script src="clientside/resources/WaypointHelper.js" type="client" lang="javascript" />
@@ -81,6 +80,8 @@
 	<file src="clientside/resources/images/tweed.png" />
 	
 	<file src="clientside/resources/images/fishing.png" />
+	<file src="clientside/resources/images/pressf.png" />
+	<file src="clientside/resources/images/presse.png" />
 	
 	<include resource="database"/>
 	<include resource="gtaocharacter" />

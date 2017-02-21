@@ -15,6 +15,8 @@ namespace stuykserver.Util
         DatabaseHandler db = new DatabaseHandler();
         List<Vector3> barberShops = new List<Vector3>(); // All barbershops from the database are pulled into here.
         Dictionary<Client, Vector3> playersInBarbershop = new Dictionary<Client, Vector3>();
+        List<ColShape> collisionShapes = new List<ColShape>();
+        List<Client> playersInCollisions = new List<Client>();
 
         [Flags]
         public enum AnimationFlags
@@ -29,6 +31,39 @@ namespace stuykserver.Util
         public BarberShopHandler()
         {
             API.onResourceStart += API_onResourceStart;
+            API.onEntityEnterColShape += API_onEntityEnterColShape;
+            API.onEntityExitColShape += API_onEntityExitColShape;
+        }
+
+        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
+        {
+            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    {
+                        playersInCollisions.Remove(API.getPlayerFromHandle(entity));
+                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
+                    }
+                }
+            }
+        }
+
+        private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
+        {
+            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (!playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    {
+                        playersInCollisions.Add(API.getPlayerFromHandle(entity));
+                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction");
+                        API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "A classic looking barbershop.");
+                    }
+                }
+            }
         }
 
         // Pull from Database find positions.
@@ -63,12 +98,11 @@ namespace stuykserver.Util
         // Place blips and text labels for interactions.
         public void positionBlips(Vector3 position)
         {
-            API.createTextLabel("~y~[~w~Keypress: ~g~F~y~]", new Vector3(position.X, position.Y, position.Z), 20, 0.5f);
-            API.createTextLabel("~w~Change your facial features.", new Vector3(position.X, position.Y, position.Z - 0.2), 20, 0.5f);
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 71);
             API.setBlipColor(newBlip, 9);
             barberShops.Add(new Vector3(position.X, position.Y, position.Z));
+            collisionShapes.Add(API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f));
             int i = 0;
             ++i;
         }
@@ -96,6 +130,7 @@ namespace stuykserver.Util
                                 API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@female_arms_crossed@base", "base");
                                 player.rotation = new Vector3(0, 0, 88.95126);
                                 skinHandler.loadLocalFaceData(player);
+                                playersInCollisions.Remove(player);
                                 return;
                             }
                             else

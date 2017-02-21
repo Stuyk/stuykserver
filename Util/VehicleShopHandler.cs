@@ -13,11 +13,46 @@ namespace stuykserver.Util
         DatabaseHandler db = new DatabaseHandler();
         Main main = new Main();
         List<Vector3> vehicleShops = new List<Vector3>();
-
+        List<ColShape> collisionShapes = new List<ColShape>();
+        List<Client> playersInCollisions = new List<Client>();
 
         public VehicleShopHandler()
         {
             API.onResourceStart += API_onResourceStart;
+            API.onEntityEnterColShape += API_onEntityEnterColShape;
+            API.onEntityExitColShape += API_onEntityExitColShape;
+        }
+
+        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
+        {
+            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    {
+                        playersInCollisions.Remove(API.getPlayerFromHandle(entity));
+                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
+                    }
+                }
+            }
+                
+        }
+
+        private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
+        {
+            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (!playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    {
+                        playersInCollisions.Add(API.getPlayerFromHandle(entity));
+                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction");
+                        API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "There seem to be a lot of cars for sale around here.");
+                    }
+                }
+            }
         }
 
         private void API_onResourceStart()
@@ -51,21 +86,17 @@ namespace stuykserver.Util
             API.consoleOutput("Vehicle Shops Initialized: " + initializedObjects.ToString());
         }
 
-        [Command("browse")]
-        public void cmdSkin(Client player)
+        public void browseDealership(Client player)
         {
             if (db.isPlayerLoggedIn(player))
             {
                 if (!player.isInVehicle)
                 {
-                    foreach (Vector3 pos in vehicleShops)
+                    if (playersInCollisions.Contains(player))
                     {
-                        if (player.position.DistanceTo(pos) <= 15)
-                        {
-                            API.sendNotificationToPlayer(player, "Dealership");
-                            main.sendNotification(player, "Dealership");
-                        }
-                    }
+                        API.sendNotificationToPlayer(player, "Dealership");
+                        main.sendNotification(player, "Dealership");
+                    }  
                 }
             }
             return;
@@ -113,13 +144,13 @@ namespace stuykserver.Util
 
         public void positionBlips(Vector3 position, Vector3 rotation)
         {
-            API.createTextLabel("~y~Usage: ~w~/browse", new Vector3(position.X, position.Y, position.Z), 20, 0.5f);
-            API.createTextLabel("~w~Browse available vehicle models.", new Vector3(position.X, position.Y, position.Z - 0.4), 20, 0.5f);
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 225);
             API.setBlipColor(newBlip, 47);
             API.createMarker(1, new Vector3(position.X, position.Y, position.Z - 4), new Vector3(), new Vector3(), new Vector3(2, 2, 5), 255, 214, 151, 64, 0);
             vehicleShops.Add(new Vector3(position.X, position.Y, position.Z));
+            ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 10f, 5f);
+            collisionShapes.Add(shape);
             int i = 0;
             ++i;
         }

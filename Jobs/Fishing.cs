@@ -16,9 +16,15 @@ namespace stuykserver.Jobs
         DatabaseHandler db = new DatabaseHandler();
         List<Vector3> fishingPoints = new List<Vector3>();
         List<Vector3> fishingSalePoints = new List<Vector3>();
+
         Dictionary<Client,string> playersFishing = new Dictionary<Client, string>();
         Dictionary<Client, NetHandle> playersFishingRods = new Dictionary<Client, NetHandle>();
-        Dictionary<Client, NetHandle> playerFishItems = new Dictionary<Client, NetHandle>();
+
+        List<ColShape> collisionShapes = new List<ColShape>();
+        List<NetHandle> playersInCollision = new List<NetHandle>();
+
+        List<ColShape> collisionSaleShapes = new List<ColShape>();
+        List<NetHandle> playersInCollisionSale = new List<NetHandle>();
 
         public Fishing()
         {
@@ -26,60 +32,8 @@ namespace stuykserver.Jobs
             API.onChatMessage += API_onChatMessage;
             API.onClientEventTrigger += API_onClientEventTrigger;
             API.onPlayerDisconnected += API_onPlayerDisconnected;
-        }
-
-        private void API_onPlayerDisconnected(Client player, string reason)
-        {
-            if (playersFishing.ContainsKey(player))
-            {
-                playersFishing.Remove(player);
-            }
-
-            if (playersFishingRods.ContainsKey(player))
-            {
-                API.deleteEntity(playersFishingRods[player]);
-                playersFishingRods.Remove(player);
-            }
-
-            if (playerFishItems.ContainsKey(player))
-            {
-                API.deleteEntity(playerFishItems[player]);
-                playerFishItems.Remove(player);
-            }
-        }
-
-        private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
-        {
-            if(eventName == "fishingFailed")
-            {
-                playerFishingFailed(player);
-                putBucketInLeftHand(player);
-            }
-        }
-
-        private void API_onChatMessage(Client player, string message, CancelEventArgs e)
-        {
-            if (playersFishing.ContainsKey(player))
-            {
-                if (message.ToLower() == playersFishing[player].ToLower())
-                {
-                    API.sendNotificationToPlayer(player, "Correct!");
-                    playersFishing.Remove(player);
-                    API.triggerClientEvent(player, "stopFishing");
-                    API.playSoundFrontEnd(player, "Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
-                    API.deleteEntity(playersFishingRods[player]);
-                    playersFishingRods.Remove(player);
-                    API.stopPlayerAnimation(player);
-                    API.stopPedAnimation(player);
-                    playerAddFish(player);
-                    putBucketInLeftHand(player);
-                    e.Cancel = true;
-                    return;
-                }
-                playerFishingFailed(player);
-                e.Cancel = true;
-                return;
-            }
+            API.onEntityEnterColShape += API_onEntityEnterColShape;
+            API.onEntityExitColShape += API_onEntityExitColShape;
         }
 
         private void API_onResourceStart()
@@ -133,6 +87,118 @@ namespace stuykserver.Jobs
             API.consoleOutput("Fishing Sale Points Intialized: " + initializedObjects.ToString());
         }
 
+        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
+        {
+            var entityType = API.getEntityType(entity);
+            if (Convert.ToInt32(entityType) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (playersInCollision.Contains(entity))
+                    {
+                        Client p = API.getPlayerFromHandle(entity);
+                        playersInCollision.Remove(entity);
+                        API.triggerClientEvent(p, "removeUseFunction");
+                        return;
+                    }
+                }
+                else if (collisionSaleShapes.Contains(colshape)) 
+                {
+                    if (playersInCollisionSale.Contains(entity))
+                    {
+                        Client p = API.getPlayerFromHandle(entity);
+                        playersInCollisionSale.Remove(entity);
+                        API.triggerClientEvent(p, "removeUseFunction");
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
+        {
+            var entityType = API.getEntityType(entity);
+            if (Convert.ToInt32(entityType) == 6)
+            {
+                if (collisionShapes.Contains(colshape))
+                {
+                    if (!playersInCollision.Contains(entity))
+                    {
+                        playersInCollision.Add(entity);
+                        Client p = API.getPlayerFromHandle(entity);
+                        API.triggerClientEvent(p, "triggerUseFunction");
+                        API.sendNotificationToPlayer(p, "~b~There seem to be a lot of fish in this area.");
+                        return;
+                    }
+                }
+                else if (collisionSaleShapes.Contains(colshape))
+                {
+                    if (!playersInCollisionSale.Contains(entity))
+                    {
+                        Client p = API.getPlayerFromHandle(entity);
+                        playersInCollisionSale.Add(entity);
+                        API.triggerClientEvent(p, "triggerUseFunction");
+                        API.sendNotificationToPlayer(p, "~b~The cooks here seem to appreciate fresh fish.");
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        private void API_onPlayerDisconnected(Client player, string reason)
+        {
+            if (playersFishing.ContainsKey(player))
+            {
+                playersFishing.Remove(player);
+            }
+
+            if (playersFishingRods.ContainsKey(player))
+            {
+                API.deleteEntity(playersFishingRods[player]);
+                playersFishingRods.Remove(player);
+            }
+        }
+
+        private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
+        {
+            if(eventName == "fishingFailed")
+            {
+                playerFishingFailed(player);
+            }
+        }
+
+        private void API_onChatMessage(Client player, string message, CancelEventArgs e)
+        {
+            if (playersFishing.ContainsKey(player))
+            {
+                if (message.ToLower() == playersFishing[player].ToLower())
+                {
+                    API.sendNotificationToPlayer(player, "~b~You reel in a fish ~g~flawlessly.");
+                    playersFishing.Remove(player);
+                    API.triggerClientEvent(player, "stopFishing");
+                    API.playSoundFrontEnd(player, "Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
+                    API.deleteEntity(playersFishingRods[player]);
+                    playersFishingRods.Remove(player);
+                    API.stopPlayerAnimation(player);
+                    API.stopPedAnimation(player);
+                    playerAddFish(player);
+                    e.Cancel = true;
+                    return;
+                }
+                playerFishingFailed(player);
+                e.Cancel = true;
+                return;
+            }
+        }
+
         [Command("createfishingpoint")]
         public void cmdCreateFishingPoint(Client player, string id)
         {
@@ -160,80 +226,76 @@ namespace stuykserver.Jobs
             }
         }
 
-        [Command("sellfish")]
-        public void cmdSellFish(Client player)
+        public void sellFish(Client player)
         {
             if (db.isPlayerLoggedIn(player))
             {
-                foreach (Vector3 point in fishingSalePoints)
+                if (playersInCollisionSale.Contains(player))
                 {
-                    if (player.position.DistanceTo(point) <= 5)
+                    int fish = Convert.ToInt32(db.pullDatabase("PlayerInventory", "Fish", "Nametag", player.name));
+
+                    if (fish <= 0)
                     {
-                        int fish = Convert.ToInt32(db.pullDatabase("PlayerInventory", "Fish", "Nametag", player.name));
-
-                        if (fish <= 0)
-                        {
-                            API.sendNotificationToPlayer(player, "~r~You don't seem to have any fish.");
-                            return;
-                        }
-                        else
-                        {
-                            db.setPlayerMoney(player, 7 * fish);
-                            db.updateDatabase("PlayerInventory", "Fish", 0.ToString(), "Nametag", player.name);
-                            int quantity = Convert.ToInt32(db.pullDatabase("FishingSalePoints", "Quantity", "PosX", point.X.ToString()));
-                            quantity += fish;
-                            db.updateDatabase("FishingSalePoints", "Quantity", quantity.ToString(), "PosX", point.X.ToString());
-                            API.sendNotificationToPlayer(player, string.Format("~b~You sold ~g~{0} ~b~fish.", fish));
-
-                            if (playerFishItems.ContainsKey(player))
-                            {
-                                API.deleteEntity(playerFishItems[player]);
-                                playerFishItems.Remove(player);
-                            }
-                            
-                        }
+                        API.sendNotificationToPlayer(player, "~r~You don't seem to have any fish.");
+                        return;
+                    }
+                    else
+                    {
+                        db.setPlayerMoney(player, 7 * fish);
+                        db.updateDatabase("PlayerInventory", "Fish", 0.ToString(), "Nametag", player.name);
+                        API.sendNotificationToPlayer(player, string.Format("~b~You sold ~g~{0} ~b~fish.", fish));
                     }
                 }
             }
         }
 
-        [Command("fish")]
-        public void cmdFish(Client player)
+        public void startFishing(Client player)
         {
-            if (!playersFishing.ContainsKey(player))
+            if (playersInCollision.Contains(player))
             {
-                if (Convert.ToInt32(db.pullDatabase("PlayerInventory", "Fish", "Nametag", player.name)) < 10)
+                if (!playersFishing.ContainsKey(player))
                 {
-                    foreach (Vector3 point in fishingPoints)
+                    if (Convert.ToInt32(db.pullDatabase("PlayerInventory", "Fish", "Nametag", player.name)) < 10)
                     {
-                        if (player.position.DistanceTo(point) <= 20)
+                        string word = sendWordToPlayer();
+                        API.triggerClientEvent(player, "startFishing", word);
+                        playersFishing.Add(player, word);
+                        try
                         {
-                            string word = sendWordToPlayer();
-                            API.triggerClientEvent(player, "startFishing", word);
-                            playersFishing.Add(player, word);
                             var fishingrod = API.createObject(-1910604593, new Vector3(), new Vector3());
                             API.attachEntityToEntity(fishingrod, player, "SKEL_L_Hand", new Vector3(0.13f, 0.1f, 0.01f), new Vector3(180f, 90f, 70f));
                             playersFishingRods.Add(player, fishingrod);
-                            API.playPlayerAnimation(player, 1, "amb@world_human_stand_fishing@idle_a", "idle_c");
-                            putBucketOnGround(player);
-                            return;
                         }
+                        finally
+                        {
+                            //stfu
+                        }
+                        
+                        API.playPlayerAnimation(player, 1, "amb@world_human_stand_fishing@idle_a", "idle_c");
+                        return;
+                    }
+                    else
+                    {
+                        API.sendNotificationToPlayer(player, "~r~You have too many fish.");
+                        return;
                     }
                 }
-            }
-            else
-            {
-                API.sendNotificationToPlayer(player, "You seem to already be fishing.");
+                else
+                {
+                    API.sendNotificationToPlayer(player, "~r~You seem to already be fishing.");
+                    return;
+                }
             }
         }
 
         public void positionSaleBlips(Vector3 position, Vector3 rotation)
         {
-            API.createTextLabel("~y~Usage: ~w~/sellfish", new Vector3(position.X, position.Y, position.Z), 20, 0.5f);
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 88);
             API.setBlipColor(newBlip, 63);
             fishingSalePoints.Add(new Vector3(position.X, position.Y, position.Z));
+            ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 3f, 5f);
+            collisionSaleShapes.Add(shape);
             int i = 0;
             ++i;
         }
@@ -241,11 +303,12 @@ namespace stuykserver.Jobs
 
         public void positionBlips(Vector3 position, Vector3 rotation)
         {
-            API.createTextLabel("~y~Usage: ~w~/fish", new Vector3(position.X, position.Y, position.Z), 20, 0.5f);
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 68);
             API.setBlipColor(newBlip, 63);
             fishingPoints.Add(new Vector3(position.X, position.Y, position.Z));
+            ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 10f, 5f);
+            collisionShapes.Add(shape);
             int i = 0;
             ++i;
         }
@@ -268,7 +331,6 @@ namespace stuykserver.Jobs
             playersFishingRods.Remove(player);
             API.stopPlayerAnimation(player);
             API.stopPedAnimation(player);
-            putBucketInLeftHand(player);
         }
 
         public void playerAddFish(Client player)
@@ -276,40 +338,7 @@ namespace stuykserver.Jobs
             int oldFish = Convert.ToInt32(db.pullDatabase("PlayerInventory", "Fish", "Nametag", player.name));
             oldFish += 1;
             db.updateDatabase("PlayerInventory", "Fish", oldFish.ToString(), "Nametag", player.name);
-            API.sendNotificationToPlayer(player, string.Format("Your bucket contains {0}/10 Fish.", oldFish));
-        }
-
-        public void putBucketInLeftHand(Client player)
-        {
-            if (!playerFishItems.ContainsKey(player))
-            {
-                var bucket = API.createObject(4591557, new Vector3(), new Vector3());
-                API.attachEntityToEntity(bucket, player, "SKEL_L_HAND", new Vector3(0.53f, -0.2f, -0.02f), new Vector3(0, 270f, 0));
-                playerFishItems.Add(player, bucket);
-                return;
-            }
-            else
-            {
-                API.attachEntityToEntity(playerFishItems[player], player, "SKEL_L_HAND", new Vector3(0.53f, -0.2f, -0.02f), new Vector3(0, 270f, 0));
-                return;
-            }
-        }
-
-        public void putBucketOnGround(Client player)
-        {
-            if (!playerFishItems.ContainsKey(player))
-            {
-                var bucket = API.createObject(4591557, new Vector3(player.position.X, player.position.Y - 0.5f, player.position.Z - 1.0f), new Vector3());
-                playerFishItems.Add(player, bucket);
-                return;
-            }
-            else
-            {
-                playerFishItems.Remove(player);
-                var bucket = API.createObject(4591557, new Vector3(player.position.X, player.position.Y - 0.5f, player.position.Z - 1.0f), new Vector3());
-                playerFishItems.Add(player, bucket);
-                return;
-            }
+            API.sendNotificationToPlayer(player, string.Format("~b~Your inventory contains ~g~{0}/10 ~b~Fish.", oldFish));
         }
     }
 }

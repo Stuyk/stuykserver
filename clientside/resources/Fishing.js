@@ -16,8 +16,9 @@ API.onServerEventTrigger.connect(function (eventName, args) {
 	if (eventName == "startFishing") {
 		if (currentword == null) {
 			castTime = 0;
-			API.sendNotification("~g~You cast your line.");
-			API.sendNotification("~y~Type the word that appears.");
+			API.sendNotification("~b~You cast out your line.");
+			API.sendNotification("~b~Wait for the queue to reel in.");
+			API.sendNotification("~b~Then type the given word into the chat box.");
 			API.playPlayerAnimation("amb@world_human_stand_fishing@idle_a", "idle_c", 1, -1);
 			biteTime = Math.floor((Math.random() * 10 * 350) + 1);
 			if (biteTime < 500) {
