@@ -35,28 +35,17 @@
 	<script src="clientside/resources/PaperBoy.js" type="client" lang="javascript" />
 	<script src="clientside/resources/Fishing.js" type="client" lang="javascript" />
 	  
+	<file src="clientside/resources/skinchanger.html"/>
     <file src="clientside/resources/index.html"/>
 	<file src="clientside/resources/regsuccess.html"/>
 	<file src="clientside/resources/inventory.html"/>
 	<file src="clientside/resources/loading.html"/>
-	<file src="clientside/resources/atmpanel.html"/>
+	<file src="clientside/resources/atmpanel2.html"/>
 	<file src="clientside/resources/clothingpanel.html"/>
 	<file src="clientside/resources/js/bootstrap.js"/>
 	<file src="clientside/resources/js/bootstrap.min.js"/>
 	<file src="clientside/resources/js/npm.js"/>
 	<file src="clientside/resources/js/jquery.min.js"/>
-	
-	<file src="clientside/resources/skinselector.html"/>
-	<file src="clientside/resources/skinchanger.html"/>
-	<file src="clientside/resources/policemale.html"/>
-	<file src="clientside/resources/policefemale.html"/>
-	<file src="clientside/resources/businessmale.html"/>
-	<file src="clientside/resources/businessfemale.html"/>
-	<file src="clientside/resources/industryone.html"/>
-	<file src="clientside/resources/industrytwo.html"/>
-	<file src="clientside/resources/casualmale.html"/>
-	<file src="clientside/resources/casualfemale.html"/>
-	
 	
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.eot" />
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.svg" />
@@ -64,6 +53,7 @@
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff" />
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff2" />
 	
+	<file src="clientside/resources/atmpanelnew.css" />
 	<file src="clientside/resources/login.css" />
 	<file src="clientside/resources/skinchanger.css" />
 	<file src="clientside/resources/cover.css" />

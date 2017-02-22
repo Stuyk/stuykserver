@@ -33,6 +33,27 @@ namespace stuykserver.Util
             API.onResourceStart += API_onResourceStart;
             API.onEntityEnterColShape += API_onEntityEnterColShape;
             API.onEntityExitColShape += API_onEntityExitColShape;
+            API.onPlayerDisconnected += API_onPlayerDisconnected;
+            API.onResourceStop += API_onResourceStop;
+        }
+
+        private void API_onResourceStop()
+        {
+            foreach (Client p in playersInBarbershop.Keys)
+            {
+                p.position = playersInBarbershop[p];
+                db.setPlayerPositionByVector(p, playersInBarbershop[p]);
+            }
+        }
+
+        private void API_onPlayerDisconnected(Client player, string reason)
+        {
+            if (playersInBarbershop.ContainsKey(player))
+            {
+                player.position = playersInBarbershop[player];
+                db.setPlayerPositionByVector(player, playersInBarbershop[player]);
+                API.consoleOutput("{0} moved outside of shop due to disconnection.", player.name);
+            }
         }
 
         private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
@@ -127,7 +148,7 @@ namespace stuykserver.Util
                                 API.triggerClientEvent(player, "openSkinPanel", player.position);
                                 API.setEntityPosition(player, new Vector3(-1279.177, -1118.023, 6.990117));
                                 API.triggerClientEvent(player, "createCamera", new Vector3(-1281.826, -1118.141, 7.5), player.position);
-                                API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@female_arms_crossed@base", "base");
+                                API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
                                 player.rotation = new Vector3(0, 0, 88.95126);
                                 skinHandler.loadLocalFaceData(player);
                                 playersInCollisions.Remove(player);

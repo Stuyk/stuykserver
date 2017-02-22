@@ -27,7 +27,7 @@ a:hover {
 html,
 body {
   height: 100%;
-  background: rgba(20,20,20,0.50);
+  background: rgba(0,0,0,0.10);;
   overflow: hidden;
 }
 body {
@@ -63,8 +63,8 @@ body {
 	background-color: rgba(255,255,255,0.25);
 	color: #000;
 	border-radius: 5px;
-	min-height: 271px;
-	width: 600px;
+	height: auto;
+	padding: 10px;
 }
 
 .custom-center {
@@ -76,19 +76,8 @@ body {
 	background-color: rgba(255,255,255,0.25);
 }
 
-.custom-grid-box {
-	background-color: rgba(255,255,255,0.25);
-	min-height: 100px;
-	min-width: 100px;
-}
-
-.custom-grid-box-delete {
-	background-color: rgba(255,0,0,0.25);
-	display: inline-block;
-	width: 100px;
-	height: 100px;
-	margin: 10px;
-	border-radius: 5px;
+.atm-panel-text {
+	color: #FFF;
 }
 
 .site-wrapper {

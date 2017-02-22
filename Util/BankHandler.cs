@@ -84,8 +84,9 @@ namespace stuykserver.Util
                     {
                         db.setPlayerMoney(player, +input);
                         db.setPlayerAtmMoney(player, -input);
-                        API.triggerClientEvent(player, "killPanel");
+                        API.triggerClientEvent(player, "updateATM", db.getPlayerAtmMoney(player), db.getPlayerMoney(player));
                         API.stopPlayerAnimation(player);
+                        API.stopPedAnimation(player);
                     }
                 }
                 else
@@ -104,7 +105,7 @@ namespace stuykserver.Util
                     {
                         db.setPlayerMoney(player, -input);
                         db.setPlayerAtmMoney(player, +input);
-                        API.triggerClientEvent(player, "killPanel");
+                        API.triggerClientEvent(player, "updateATM", db.getPlayerAtmMoney(player), db.getPlayerMoney(player));
                         API.stopPlayerAnimation(player);
                         API.stopPedAnimation(player);
                     }  

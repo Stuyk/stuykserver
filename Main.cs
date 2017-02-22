@@ -26,8 +26,6 @@ namespace stuykserver
         private void API_onResourceStart()
         {
             API.consoleOutput("Started: Main");
-            //int i = API.exported.doormanager.registerDoor(1780022985, new Vector3(-1201.435, -776.8566, 17.99184));
-            //API.exported.doormanager.setDoorState(i, true, 1);
         }
 
         private void API_onUpdate()

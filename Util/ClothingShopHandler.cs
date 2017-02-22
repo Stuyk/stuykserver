@@ -33,6 +33,27 @@ namespace stuykserver.Util
             API.onResourceStart += API_onResourceStart;
             API.onEntityEnterColShape += API_onEntityEnterColShape;
             API.onEntityExitColShape += API_onEntityExitColShape;
+            API.onPlayerDisconnected += API_onPlayerDisconnected;
+            API.onResourceStop += API_onResourceStop;
+        }
+
+        private void API_onResourceStop()
+        {
+            foreach (Client p in playersInClothingShop.Keys)
+            {
+                p.position = playersInClothingShop[p];
+                db.setPlayerPositionByVector(p, playersInClothingShop[p]);
+            }
+        }
+
+        private void API_onPlayerDisconnected(Client player, string reason)
+        {
+            if (playersInClothingShop.ContainsKey(player))
+            {
+                player.position = playersInClothingShop[player];
+                db.setPlayerPositionByVector(player, playersInClothingShop[player]);
+                API.consoleOutput("{0} moved outside of shop due to disconnection.", player.name);
+            }
         }
 
         private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
@@ -112,7 +133,7 @@ namespace stuykserver.Util
                             API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
                             API.triggerClientEvent(player, "createCamera", new Vector3(-1190.004, -766.2875, 17.3196), player.position);
                             API.triggerClientEvent(player, "openClothingPanel");
-                            API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@female_arms_crossed@base", "base");
+                            API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
                             clothingHandler.updateLocalClothingVariables(player);
                             if (playersInCollisions.Contains(player))
                             {

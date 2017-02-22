@@ -35,6 +35,9 @@ var faceHairstyleHighlight = null;
 var faceHairstyleTexture = null;
 var facePanelOpen = null;
 
+// Account Balance
+var playerAccountBalance = null;
+
 var email = "";
 var password = "";
 var page = "";
@@ -186,9 +189,16 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	
 	if (eventName=="loadATM") {
 		if (pagePanel == null) {
-			API.sendNotification("~y~Bank Account: ~g~" + args[0].toString());
-			pagePanel = new CefHelper("clientside/resources/atmpanel.html");
-			pagePanel.showBankPanel();
+			pagePanel = new CefHelper("clientside/resources/atmpanel2.html");
+			pagePanel.show();
+			playerAccountBalance = args[0].toString();
+		}
+	}
+	
+	if (eventName=="updateATM") {
+		if (pagePanel != null) {
+			playerAccountBalance = args[0].toString();
+			pagePanel.browser.call("displayAccountBalance", playerAccountBalance.toString());
 		}
 	}
 	
@@ -340,6 +350,10 @@ function loginHandler(email, password) {
 	//	pagePanel = new CefHelper("clientside/resources/loading.html");
 	//	pagePanel.show();
 	//}
+}
+
+function requestAccountBalance() {
+	pagePanel.browser.call("displayAccountBalance", playerAccountBalance, currentMoney);
 }
 
 function registerHandler(email, password) {
@@ -791,7 +805,7 @@ function changeRotationHandle(amount) {
 	var player = API.getLocalPlayer();
 	var oldamount = API.getEntityRotation(player);
 	API.setEntityRotation(player, new Vector3(oldamount.X, oldamount.Y, oldamount.Z + amount));
-	API.playPlayerAnimation("amb@world_human_hang_out_street@female_arms_crossed@base", "base", 0, -1);
+	API.playPlayerAnimation("amb@world_human_hang_out_street@male_b@base", "base", 0, -1);
 }
 
 function changePushClothingChanges() {

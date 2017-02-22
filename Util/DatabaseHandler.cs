@@ -52,6 +52,13 @@ namespace stuykserver.Util
             updateDatabase("Players", "LASTZ", player.position.Z.ToString(), "Nametag", player.name);
         }
 
+        public void setPlayerPositionByVector(Client player, Vector3 vector3)
+        {
+            updateDatabase("Players", "LASTX", vector3.X.ToString(), "Nametag", player.name);
+            updateDatabase("Players", "LASTY", vector3.Y.ToString(), "Nametag", player.name);
+            updateDatabase("Players", "LASTZ", vector3.Z.ToString(), "Nametag", player.name);
+        }
+
         public void setPlayerHUD(Client player, bool setting)
         {
             API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, setting);
@@ -179,15 +186,6 @@ namespace stuykserver.Util
         //Set player money to Database
         public void setPlayerMoney(Client player, int value)
         {
-            if (value > 0)
-            {
-                API.sendNotificationToPlayer(player, "~g~+ $" + value.ToString());
-            }
-            else
-            {
-                API.sendNotificationToPlayer(player, "~r~- $" + value.ToString().Remove(0, 1));
-            }
-
             int oldMoney = getPlayerMoney(player);
             int newMoney = oldMoney + value;
 
@@ -207,20 +205,10 @@ namespace stuykserver.Util
         //Set atm money to Database
         public void setPlayerAtmMoney(Client player, int value)
         {
-            if (value > 0)
-            {
-                API.sendNotificationToPlayer(player, "~y~Bank: ~g~+$" + value.ToString());
-            }
-            else
-            {
-                API.sendNotificationToPlayer(player, "~y~Bank: ~r~- $" + value.ToString().Remove(0, 1));
-            }
-
             int oldMoney = getPlayerAtmMoney(player);
             int newMoney = oldMoney + value;
 
             updateDatabase("Players", "Bank", newMoney.ToString(), "Nametag", player.name);
-            API.sendNotificationToPlayer(player, "~y~Bank Balance: ~g~$" + getPlayerAtmMoney(player).ToString());
             return;
         }
 
