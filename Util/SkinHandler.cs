@@ -56,6 +56,8 @@ namespace stuykserver.Util
                 API.call("BarberShopHandler", "leaveBarberShop", player);
                 pullCurrentFace(player);
                 API.exported.gtaocharacter.updatePlayerFace(player.handle);
+                API.stopPlayerAnimation(player);
+                API.stopPedAnimation(player);
             }
         }
 

@@ -64,6 +64,7 @@
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff" />
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff2" />
 	
+	<file src="clientside/resources/login.css" />
 	<file src="clientside/resources/skinchanger.css" />
 	<file src="clientside/resources/cover.css" />
 	<file src="clientside/resources/inventory.css" />

@@ -110,8 +110,6 @@ namespace stuykserver.Util
         {
             string s = player.socialClubName;
 
-            API.triggerClientEvent(player, "endCamera");
-
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
@@ -138,8 +136,6 @@ namespace stuykserver.Util
             API.setEntityDimension(player, 0);
 
             //API.call("VehicleHandler", "SpawnPlayerCars", player);
-            API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
-            API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
 
             if (db.pullDatabase("Players", "Dead", "Nametag", player.name) == "1")
             {
@@ -150,6 +146,10 @@ namespace stuykserver.Util
             }
 
             API.exported.gtaocharacter.updatePlayerFace(player.handle);
+
+            API.triggerClientEvent(player, "endCamera");
+            API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
+            API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
         }
 
         [Flags]

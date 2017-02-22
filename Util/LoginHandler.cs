@@ -46,31 +46,35 @@ namespace stuykserver.Util
 
         public void cmdLogin(Client player, string email, string password)
         {
-            string passwordHash = db.pullDatabase("Players", "Password", "Nametag", player.name);
+            string passwordHash = db.pullDatabase("Players", "Password", "Email", email);
 
-            if (passwordHash != null)
+            if (player.name == db.pullDatabase("Players", "Nametag", "Email", email))
             {
-                if (BCr.BCrypt.Verify(password, passwordHash))
+                if (passwordHash != null)
                 {
-                    if (!db.isPlayerLoggedIn(player))
+                    if (BCr.BCrypt.Verify(password, passwordHash))
                     {
-                        API.call("ConnectionHandler", "SpawnPlayer", player);
-                        int money = Convert.ToInt32(db.pullDatabase("Players", "Money", "Nametag", player.name));
-                        API.triggerClientEvent(player, "update_money_display", money);
-                        db.setPlayerLoggedIn(player);
+                        if (!db.isPlayerLoggedIn(player))
+                        {
+                            API.call("ConnectionHandler", "SpawnPlayer", player);
+                            int money = Convert.ToInt32(db.pullDatabase("Players", "Money", "Nametag", player.name));
+                            API.triggerClientEvent(player, "update_money_display", money);
+                            db.setPlayerLoggedIn(player);
+                            return;
+                        }
+                        API.kickPlayer(player, "You are already logged in.");
                         return;
                     }
-                    API.kickPlayer(player, "You are already logged in.");
-                    return;
+                    else
+                    {
+                        API.triggerClientEvent(player, "passwordDoesNotMatch");
+                        return;
+                    }
                 }
-                else
-                {
-                    API.sendNotificationToPlayer(player, "~r~Wrong password.");
-                    API.kickPlayer(player, "~r~Incorrect password");
-                    return;
-                }
+                API.triggerClientEvent(player, "passwordDoesNotMatch");
+                return;
             }
-            API.sendNotificationToPlayer(player, "That account does not exist.");
+            API.triggerClientEvent(player, "doesNotMatchAccount");
             return;
         }
 

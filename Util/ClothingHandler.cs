@@ -74,6 +74,8 @@ namespace stuykserver.Util
 
                 API.call("ClothingShopHandler", "leaveClothingShop", player);
                 updateClothingForPlayer(player);
+                API.stopPedAnimation(player);
+                API.stopPlayerAnimation(player);
             }
         }
     }

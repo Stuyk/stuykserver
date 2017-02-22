@@ -45,13 +45,14 @@ API.onServerEventTrigger.connect(function (eventName, args) {
 
 API.onKeyDown.connect(function(player, e) {
 	if (casting != null) {
-		if (!API.isChatOpen() && e.KeyCode == Keys.Space && queuetask != null) {
+		if (castTime > 140) {
+			if (!API.isChatOpen() && e.KeyCode == Keys.Space && queuetask != null) {
 			currentword = storedword;
-		}
-		else if (!API.isChatOpen() && e.KeyCode == Keys.Space) {
+		} else if (!API.isChatOpen() && e.KeyCode == Keys.Space) {
 			fishingTimeout();
 		}
 	}
+}
 	
 
 });

@@ -3,63 +3,155 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="cover.css" rel="stylesheet">
+    <link href="login.css" rel="stylesheet">
   </head>
   <body>
     <div class="site-wrapper">
       <div class="site-wrapper-inner">
         <div class="cover-container">
           <div class="inner cover">
-			<img src="images/logo.png" />
-            <h1 class="cover-heading">Welcome</h1>
-			<div class="alert alert-warning" role="alert">
-				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-				This server is constantly being restarted. Don't expect much right now.
+			<div class="col-sm-8 col-sm-offset-2 custom-form">
+				<img src="images/logo.png" class="custom-logo-spacer col-sm-10" />
+				<ul class="nav nav-pills nav-justified">
+				  <li class="active col-sm-6"><a data-toggle="tab" id="existingUser" href="#login" class="custom-link">Existing User</a></li>
+				  <li class="col-sm-6"><a data-toggle="tab" href="#register" class="custom-link">New User</a></li>
+				</ul>
+				<div class="tab-content">
+					<div id="login" class="tab-pane fade in active">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="alert alert-danger" id="doesNotMatch" role="alert" hidden>Email or password does not match.</div>
+								<div class="alert alert-danger" id="doesNotExist" role="alert" hidden>This account does not exist.</div>
+								<div class="alert alert-danger" id="doesNotMatchAccount" role="alert" hidden>Username does not match account.</div>
+								<div class="row">
+									<input type="email" class="form-control" id="inputEmail" placeholder="Email" />
+								</div>
+								<br />
+								<div class="row">
+									<input type="password" class="form-control" id="inputPassword" placeholder="Password" />
+								</div>
+								<br />
+								<div class="row">
+									<button id="loginButton" type="submit" class="btn btn-info col-sm-12 col-sm-offset-0">Login</button>
+								</div>
+								<div class="progress" style="height: 35px" id="pushingLogin" hidden>
+									<div class="progress-bar progress-bar-striped progress-bar-success active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Please Wait</h5></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="register" class="tab-pane fade">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="alert alert-danger" id="passWordMismatch" role="alert" hidden>Oops! Your passwords don't match.</div>
+								<div class="alert alert-warning" id="invalidEmail" role="alert" hidden>Oops! That's not a valid email.</div>
+								<div class="alert alert-success" id="registrationSuccess" role="alert" hidden>Success! You may now log in.</div>
+								<div class="row" id="regEmail">
+									<input type="email" class="form-control" id="registerEmail" placeholder="Email" />
+								</div>
+								<br />
+								<div class="row" id="regPass">
+									<input type="password" class="form-control" id="registerPassword" placeholder="Password" />
+								</div>
+								<br />
+								<div class="row" id="regPassTwo">
+									<input type="password" class="form-control" id="registerPasswordAgain" placeholder="Password Match" />
+								</div>
+								<br />
+								<div class="row" id="regButton">
+									<button id="registerButton" type="submit" class="btn btn-info col-sm-12 col-sm-offset-0">Register</button>
+								</div>
+								<div class="progress" style="height: 35px" id="pushingRegistration" hidden>
+									<div class="progress-bar progress-bar-striped progress-bar-success active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Please Wait</h5></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-			<p>Visit our Discord @ https://discord.gg/QFzJweY</p>
-			<form method="post" class="form-horizontal" id="formMain">
-				<div class="form-group">
-					<label class="col-sm-2 control-label">Email</label>
-					<div class="col-sm-10">
-						<input type="email" class="form-control" id="inputEmail" placeholder="Email">
-					</div>
-				</div>
-				<div class="form-group">
-					<label class="col-sm-2 control-label">Password</label>
-					<div class="col-sm-10">
-						<input type="password" class="form-control" id="inputPassword" placeholder="Password">
-					</div>
-				</div>
-				<div class="form-group">
-						<button id="loginButton" type="submit" class="btn btn-success col-sm-12">Login</button>
-				</div>
-				<div class="form-group">
-						<button type="register" type="submit" id="registerButton" class="btn btn-danger col-sm-12">Register</button>
-				</div>
-			</form>
           </div>
         </div>
       </div>
     </div>
-  <script type="text/javascript">
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script type="text/javascript">
 	document.getElementById("loginButton").onclick = function ()
 	{
 		var email = document.getElementById("inputEmail").value;
 		var password = document.getElementById("inputPassword").value;
 		if(email.indexOf('@') >= 0) {
 			resourceCall("loginHandler", email, password);
+			$('#inputEmail').hide();
+			$('#inputPassword').hide();
+			$('#loginButton').hide();
+			$('#pushingLogin').show();
+			$('#doesNotExist').hide();
+			$('#doesNotMatch').hide();
+			$('#doesNotMatchAccount').hide();
+		}
+	}
+
+	document.getElementById("registerButton").onclick = function ()
+	{
+		var email = document.getElementById("registerEmail").value;
+		var password = document.getElementById("registerPassword").value;
+		var passwordtwo = document.getElementById("registerPasswordAgain").value;
+		if(email.indexOf('@') >= 0) {
+			if (password === passwordtwo) {
+				$('#pushingRegistration').show();
+				$('#passWordMismatch').hide();
+				$('#invalidEmail').hide();
+				$('#regPass').hide();
+				$('#regPassTwo').hide();
+				$('#regButton').hide();
+				$('#regEmail').hide();
+				resourceCall("registerHandler", email, password, passwordtwo);
+			} else {
+				$('#passWordMismatch').show();
+				$('#invalidEmail').hide();
+			}
+		} else {
+			$('#passWordMismatch').hide();
+			$('#invalidEmail').show();
 		}
 	}
 	
-	document.getElementById("registerButton").onclick = function ()
-	{
-		var email = document.getElementById("inputEmail").value;
-		var password = document.getElementById("inputPassword").value;
-		if(email.indexOf('@') >= 0) {
-			resourceCall("registerHandler", email, password);
-		}
+	function showLogin() {
+		$('#pushingRegistration').hide();
+		$('#registrationSuccess').show();
 	}
-  </script>
-  </body>
+	
+	function doesNotMatch() {
+		$('#doesNotMatch').show();
+		$('#doesNotExist').hide();
+		$('#doesNotMatchAccount').hide();
+		$('#inputEmail').show();
+		$('#inputPassword').show();
+		$('#loginButton').show();
+		$('#pushingLogin').hide();
+	}
+	
+	function doesNotExist() {
+		$('#doesNotExist').show();
+		$('#doesNotMatch').hide();
+		$('#doesNotMatchAccount').hide();
+		$('#inputEmail').show();
+		$('#inputPassword').show();
+		$('#loginButton').show();
+		$('#pushingLogin').hide();
+	}
+	
+	function doesNotMatchAccount() {
+		$('#doesNotMatchAccount').show();
+		$('#doesNotMatch').hide();
+		$('#doesNotExist').hide();
+		$('#inputEmail').show();
+		$('#inputPassword').show();
+		$('#loginButton').show();
+		$('#pushingLogin').hide();
+	}
+	</script>
+	</body>
 </html>
 
