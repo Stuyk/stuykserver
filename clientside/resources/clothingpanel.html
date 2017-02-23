@@ -6,119 +6,155 @@
     <link href="skinchanger.css" rel="stylesheet">
   </head>
   <body style="padding: 10px">
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="shapeFirstNegative" onClick="resourceCall('changeClothingTop', -1);"><</button>
-					<label class="col-sm-4 vertical-align">Top</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="shapeFirstPositive" onClick="resourceCall('changeClothingTop', 1);">></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="shapeSecondNegative" onClick="resourceCall('changeClothingTopColor', -1);"><</button>
-					<label class="col-sm-4 vertical-align">Top Color</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="shapeSecondPositive" onClick="resourceCall('changeClothingTopColor', 1);">></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="shapeFirstNegative" onClick="resourceCall('changeClothingUndershirt', -1);"><</button>
-					<label class="col-sm-4 vertical-align">Undershirt</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="shapeFirstPositive" onClick="resourceCall('changeClothingUndershirt', 1);">></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinFirstNegative" onClick="resourceCall('changeClothingUndershirtColor', -1);"><</button>
-					<label class="col-sm-4 vertical-align">Undershirt Color</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinFirstPositive" onClick="resourceCall('changeClothingUndershirtColor', 1);">></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinSecondNegative" onClick="resourceCall('changeClothingTorso', -1);"><</button>
-					<label class="col-sm-4 vertical-align">Torso</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinSecondPositive" onClick="resourceCall('changeClothingTorso', 1);">></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="shapeMixNegative" onClick="resourceCall('changeClothingLegs', -1);"><</button>
-					<label class="col-sm-4 vertical-align">Legs</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="shapeMixPositive" onClick="resourceCall('changeClothingLegs', 1);">></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinMixNegative" onClick="resourceCall('changeClothingLegsColor', -1);"><</button>
-					<label class="col-sm-4 vertical-align">Legs Color</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="skinMixPositive" onClick="resourceCall('changeClothingLegsColor', 1);">></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="hairStyleNegative" onClick="resourceCall('changeClothingShoes', -1);"><</button>
-					<label class="col-sm-4 vertical-align">Shoes</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="hairStylePositive" onClick="resourceCall('changeClothingShoes', 1);">></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="hairColorNegative" onClick="resourceCall('changeClothingShoesColor', -1);"><</button>
-					<label class="col-sm-4 vertical-align">Shoes Color</label>
-					<button type="submit" class="btn btn-success optionButton col-sm-3" id="hairColorPositive" onClick="resourceCall('changeClothingShoesColor', 1);">></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-			<form class="form-inline col-sm-12">
-				<div class="row">
-					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="rotationLeft" onClick="resourceCall('changeRotationHandle', -30);"><</button>
-					<label class="col-sm-4 vertical-align">Rotation</label>
-					<button type="submit" class="btn btn-danger optionButton col-sm-3" id="rotationRight" onClick="resourceCall('changeRotationHandle', 30);">></button>
-				</div>
-			</form>
-			<div class="row">
-				<button id="saveButton" type="submit" class="btn btn-success col-sm-4" style="margin-left: 50px" onclick="resourceCall('changePushClothingChanges')">Save / Close</button>
+	<div class="col-md-4" id="leftColumn">
+		<div id="leftColumnContent">
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn  optionButton col-sm-3" id="shapeFirstNegative" onClick="resourceCall('changeClothingTop', -1);"><</button>
+						<label class="col-sm-4 vertical-align">(<span id="clothingTopNum">0</span>) Top</label>
+						<button type="submit" class="btn  optionButton col-sm-3" id="shapeFirstPositive" onClick="resourceCall('changeClothingTop', 1);">></button>
+					</div>
+				</form>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn  optionButton col-sm-3" id="shapeSecondNegative" onClick="resourceCall('changeClothingTopColor', -1);"><</button>
+						<label class="col-sm-4 vertical-align">(<span id="clothingTopColorNum">0</span>) Top Color</label>
+						<button type="submit" class="btn  optionButton col-sm-3" id="shapeSecondPositive" onClick="resourceCall('changeClothingTopColor', 1);">></button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn  optionButton col-sm-3" id="shapeFirstNegative" onClick="resourceCall('changeClothingUndershirt', -1);"><</button>
+						<label class="col-sm-4 vertical-align">(<span id="clothingUndershirtNum">0</span>) Undershirt</label>
+						<button type="submit" class="btn  optionButton col-sm-3" id="shapeFirstPositive" onClick="resourceCall('changeClothingUndershirt', 1);">></button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn  optionButton col-sm-3" id="skinFirstNegative" onClick="resourceCall('changeClothingUndershirtColor', -1);"><</button>
+						<label class="col-sm-4 vertical-align">(<span id="clothingUndershirtColorNum">0</span>) Undershirt Color</label>
+						<button type="submit" class="btn  optionButton col-sm-3" id="skinFirstPositive" onClick="resourceCall('changeClothingUndershirtColor', 1);">></button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn  optionButton col-sm-3" id="skinSecondNegative" onClick="resourceCall('changeClothingTorso', -1);"><</button>
+						<label class="col-sm-4 vertical-align">(<span id="clothingTorsoNum">0</span>) Torso</label>
+						<button type="submit" class="btn  optionButton col-sm-3" id="skinSecondPositive" onClick="resourceCall('changeClothingTorso', 1);">></button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn  optionButton col-sm-3" id="shapeMixNegative" onClick="resourceCall('changeClothingLegs', -1);"><</button>
+						<label class="col-sm-4 vertical-align">(<span id="clothingLegsNum">0</span>) Legs</label>
+						<button type="submit" class="btn  optionButton col-sm-3" id="shapeMixPositive" onClick="resourceCall('changeClothingLegs', 1);">></button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn  optionButton col-sm-3" id="skinMixNegative" onClick="resourceCall('changeClothingLegsColor', -1);"><</button>
+						<label class="col-sm-4 vertical-align">(<span id="clothingLegsColorNum">0</span>) Legs Color</label>
+						<button type="submit" class="btn  optionButton col-sm-3" id="skinMixPositive" onClick="resourceCall('changeClothingLegsColor', 1);">></button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn  optionButton col-sm-3" id="hairStyleNegative" onClick="resourceCall('changeClothingShoes', -1);"><</button>
+						<label class="col-sm-4 vertical-align">(<span id="clothingShoesNum">0</span>) Shoes</label>
+						<button type="submit" class="btn  optionButton col-sm-3" id="hairStylePositive" onClick="resourceCall('changeClothingShoes', 1);">></button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn  optionButton col-sm-3" id="hairColorNegative" onClick="resourceCall('changeClothingShoesColor', -1);"><</button>
+						<label class="col-sm-4 vertical-align">(<span id="clothingShoesColorNum">0</span>) Shoes Color</label>
+						<button type="submit" class="btn  optionButton col-sm-3" id="hairColorPositive" onClick="resourceCall('changeClothingShoesColor', 1);">></button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="form-inline col-sm-12">
+					<div class="row">
+						<button type="submit" class="btn optionButton col-sm-3" id="rotationLeft" onClick="resourceCall('changeRotationHandle', -30);"><</button>
+						<label class="col-sm-4 vertical-align">Rotation</label>
+						<button type="submit" class="btn optionButton col-sm-3" id="rotationRight" onClick="resourceCall('changeRotationHandle', 30);">></button>
+					</div>
+				</form>
+				<div class="row">
+					<button id="saveButton" type="submit" class="btn col-sm-4 optionButtonModified" style="margin-left: 50px">Save / Close</button>
+				</div>
+			</div>
+		</div>
+		</div>
 	</div>
+	<div class="col-md-4" id="middleColumn">
+		<div class="progress" id="progressBarSave" style="height: 35px; margin-top: 65%" hidden>
+			<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Updating Information</h5></div>
+		</div>
+	</div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			resourceCall("updateClothingProperties");
+		});
+	
+		document.getElementById("saveButton").onclick = function ()
+		{
+			$('#leftColumnContent').hide();
+			$('#progressBarSave').show();
+			resourceCall("changePushClothingChanges");
+		}
+	
+		function updateClothingProperties (clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum) {
+			$('#clothingTopNum').html(clothingTopNum);
+			$('#clothingTopColorNum').html(clothingTopColorNum);
+			$('#clothingUndershirtNum').html(clothingUndershirtNum);
+			$('#clothingUndershirtColorNum').html(clothingUndershirtColorNum);
+			$('#clothingTorsoNum').html(clothingTorsoNum);
+			$('#clothingLegsNum').html(clothingLegsNum);
+			$('#clothingLegsColorNum').html(clothingLegsColorNum);
+			$('#clothingShoesNum').html(clothingShoesNum);
+			$('#clothingShoesColorNum').html(clothingShoesColorNum);
+			return;
+		}
+	</script>
   </body>
 </html>
 

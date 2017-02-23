@@ -163,6 +163,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
         {
             pagePanel = new CefHelper("clientside/resources/skinchanger.html");
             pagePanel.show();
+			updateFaceProperties();
         }
     }
 	
@@ -171,6 +172,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
         {
             pagePanel = new CefHelper("clientside/resources/clothingpanel.html");
             pagePanel.show();
+			updateClothingProperties();
         }
     }
     
@@ -198,7 +200,8 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	if (eventName=="updateATM") {
 		if (pagePanel != null) {
 			playerAccountBalance = args[0].toString();
-			pagePanel.browser.call("displayAccountBalance", playerAccountBalance.toString());
+			playerCashOnHand = args[1].toString();
+			pagePanel.browser.call("displayAccountBalance", playerAccountBalance.toString(), playerCashOnHand.toString());
 		}
 	}
 	
@@ -287,7 +290,7 @@ API.onUpdate.connect(function() {
 		}
 	}
 	
-	if (facePanelOpen == true) {
+	/*if (facePanelOpen == true) {
 		if (faceShapeOne != null) {
 			API.drawText("Shape One: " + faceShapeOne, resX - 400, resY / 6 + 0, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
 		}
@@ -327,7 +330,7 @@ API.onUpdate.connect(function() {
 		if (faceHairstyleTexture != null) {
 			API.drawText("Hairstyle Texture: " + faceHairstyleTexture, resX - 400, resY / 6 + 675, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
 		}
-	}
+	}*/
 });
 
 function killPanel() {
@@ -345,11 +348,6 @@ function closeInventory() {
 
 function loginHandler(email, password) {
     API.triggerServerEvent("clientLogin", email, password);
-	//killPanel();
-	//if (pagePanel == null) {
-	//	pagePanel = new CefHelper("clientside/resources/loading.html");
-	//	pagePanel.show();
-	//}
 }
 
 function requestAccountBalance() {
@@ -358,67 +356,6 @@ function requestAccountBalance() {
 
 function registerHandler(email, password) {
     API.triggerServerEvent("clientRegistration", email, password);
-}
-
-function clientSkin(skinid) {
-    pagePanel.destroy();
-    pagePanel = null;
-    API.triggerServerEvent("clientSkinSelected", skinid);
-}
-
-function loadPageContent(page) {
-    pagePanel.destroy();
-    pagePanel = null;
-    loadNextPage(page);
-}
-
-function loadNextPage(page) {
-    if (pagePanel == null) {
-        if (page == "policemale") {
-            API.sendNotification(page);
-            pagePanel = new CefHelper("clientside/resources/policemale.html");
-            pagePanel.show();
-        }
-        if (page == "policefemale") {
-            API.sendNotification(page);
-            pagePanel = new CefHelper("clientside/resources/policefemale.html");
-            pagePanel.show();
-        }
-        if (page == "businessmale") {
-            API.sendNotification(page);
-            pagePanel = new CefHelper("clientside/resources/businessmale.html");
-            pagePanel.show();
-        }
-        if (page == "businessfemale") {
-            API.sendNotification(page);
-            pagePanel = new CefHelper("clientside/resources/businessfemale.html");
-            pagePanel.show();
-        }
-        if (page == "industryone") {
-            API.sendNotification(page);
-            pagePanel = new CefHelper("clientside/resources/industryone.html");
-            pagePanel.show();
-        }
-        if (page == "industrytwo") {
-            API.sendNotification(page);
-            pagePanel = new CefHelper("clientside/resources/industrytwo.html");
-            pagePanel.show();
-        }
-        if (page == "casualmale") {
-            API.sendNotification(page);
-            pagePanel = new CefHelper("clientside/resources/casualmale.html");
-            pagePanel.show();
-        }
-        if (page == "casualfemale") {
-            API.sendNotification(page);
-            pagePanel = new CefHelper("clientside/resources/casualfemale.html");
-            pagePanel.show();
-        }
-    } else {
-        pagePanel.destroy();
-		pagePanel = null;
-        API.sendNotification("Your menus have been cleared. Try accessing the menu once more.");
-    }
 }
 
 function getPlayerName() {
@@ -438,66 +375,6 @@ function hideATMCash() {
 	cashDisplay = null;
 }
 
-function skinGender(gender) {
-	API.triggerServerEvent("skinGenderServer", gender);
-}
-
-function skinFaceShapeOne(amount) {
-	API.triggerServerEvent("skinFaceShapeOneServer", amount);
-}
-
-function skinFaceShapeTwo(amount) {
-	API.triggerServerEvent("skinFaceShapeTwoServer", amount);
-}
-
-function skinSkinFirst(amount) {
-	API.triggerServerEvent("skinSkinFirst", amount);
-}
-
-function skinSkinSecond(amount) {
-	API.triggerServerEvent("skinSkinSecond", amount);
-}
-
-function skinShapeMixPositive() {
-	API.triggerServerEvent("skinShapeMixPositive");
-}
-
-function skinShapeMixNegative() {
-	API.triggerServerEvent("skinShapeMixNegative");
-}
-
-function skinSkinMixPositive() {
-	API.triggerServerEvent("skinSkinMixPositive");
-}
-
-function skinSkinMixNegative() {
-	API.triggerServerEvent("skinSkinMixNegative");
-}
-
-function skinHairstyle(amount) {
-	API.triggerServerEvent("skinHairstyle", amount);
-}
-
-function skinHairstyleColor(amount) {
-	API.triggerServerEvent("skinHairstyleColor", amount);
-}
-
-function skinHairstyleHighlight(amount) {
-	API.triggerServerEvent("skinHairstyleHighlight", amount);
-}
-
-function skinHairstyleTexture(amount) {
-	API.triggerServerEvent("skinHairstyleTexture", amount);
-}
-
-function skinRotation(amount) {
-	API.triggerServerEvent("skinRotation", amount);
-}
-
-function skinSave() {
-	API.triggerServerEvent("skinSave");
-}
-
 // ##########################
 // #### MODEL CHANGER    ####
 // #### WRITTEN BY STUYK ####
@@ -506,8 +383,11 @@ function intToFloat(num) { // Used to create the float numbers.
 	return num.toFixed(1);
 }
 
+function updateFaceProperties() {
+	pagePanel.browser.call("updateProperties", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture);
+}
+
 function changeFaceSave() {
-	API.sleep(2000);
 	API.triggerServerEvent("saveFace", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture);
 	faceShapeOne = null;
 	faceShapeTwo = null;
@@ -525,6 +405,7 @@ function changeFaceSave() {
 
 function changeUpdateFace() {
 	var player = API.getLocalPlayer();
+	updateFaceProperties();
 	API.callNative("SET_PED_HEAD_BLEND_DATA", player, faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, intToFloat(faceShapeMix), intToFloat(faceSkinMix), 0, false);
 	API.callNative("_SET_PED_HAIR_COLOR", player, faceHairstyleColor, faceHairstyleHighlight);
 	API.setPlayerClothes(player, 2, faceHairstyle, faceHairstyleTexture);
@@ -685,6 +566,7 @@ function changeFaceHairstyleTexture(amount) {
 // #### CLOTHING CHANGER ####
 // #### WRITTEN BY STUYK ####
 // ##########################
+
 function changeClothingTorso(amount) { // Torso Changer
 	if (clothingTorsoNum != null) {
 		clothingTorsoNum = clothingTorsoNum + amount;
@@ -694,6 +576,7 @@ function changeClothingTorso(amount) { // Torso Changer
 		}
 		
 		API.setPlayerClothes(API.getLocalPlayer(), 3, clothingTorsoNum, 0);
+		updateClothingProperties();
 	}
 }
 
@@ -710,6 +593,7 @@ function changeClothingTop(amount) { // Top Changer
 		}	
 		
 		API.setPlayerClothes(API.getLocalPlayer(), 11, clothingTopNum, clothingTopColorNum);
+		updateClothingProperties();
 	}
 }
 
@@ -722,6 +606,7 @@ function changeClothingTopColor(amount) { // Top Color Changer
 		}
 		
 		API.setPlayerClothes(API.getLocalPlayer(), 11, clothingTopNum, clothingTopColorNum);
+		updateClothingProperties();
 	}
 }
 
@@ -738,6 +623,7 @@ function changeClothingUndershirt(amount) { // Undershirt Changer
 		}
 		
 		API.setPlayerClothes(API.getLocalPlayer(), 8, clothingUndershirtNum, clothingUndershirtColorNum);
+		updateClothingProperties();
 	}
 }
 
@@ -750,6 +636,7 @@ function changeClothingUndershirtColor(amount) { // Undershirt Color Changer
 		}
 		
 		API.setPlayerClothes(API.getLocalPlayer(), 8, clothingUndershirtNum, clothingUndershirtColorNum);
+		updateClothingProperties();
 	}
 }
 
@@ -762,6 +649,7 @@ function changeClothingLegs(amount) { // Legs Changer
 		}
 		
 		API.setPlayerClothes(API.getLocalPlayer(), 4, clothingLegsNum, clothingLegsColorNum);
+		updateClothingProperties();
 	}
 }
 
@@ -774,6 +662,7 @@ function changeClothingLegsColor(amount) { // Legs Color Changer
 		}
 		
 		API.setPlayerClothes(API.getLocalPlayer(), 4, clothingLegsNum, clothingLegsColorNum);
+		updateClothingProperties();
 	}
 }
 
@@ -786,6 +675,7 @@ function changeClothingShoes(amount) { // Shoes Changer
 		}
 		
 		API.setPlayerClothes(API.getLocalPlayer(), 6, clothingShoesNum, clothingShoesColorNum);
+		updateClothingProperties();
 	}
 }
 
@@ -798,6 +688,7 @@ function changeClothingShoesColor(amount) { // Shoes Color Changer
 		}
 		
 		API.setPlayerClothes(API.getLocalPlayer(), 6, clothingShoesNum, clothingShoesColorNum);
+		updateClothingProperties();
 	}
 }
 
@@ -808,8 +699,11 @@ function changeRotationHandle(amount) {
 	API.playPlayerAnimation("amb@world_human_hang_out_street@male_b@base", "base", 0, -1);
 }
 
+function updateClothingProperties() {
+	pagePanel.browser.call("updateClothingProperties", clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum);
+}
+
 function changePushClothingChanges() {
-	API.sleep(2000);
 	API.triggerServerEvent("clothingSave", clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum);
 	API.stopPlayerAnimation();
 	clothingPanelOpen = null;

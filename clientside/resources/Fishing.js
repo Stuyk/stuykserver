@@ -46,15 +46,26 @@ API.onServerEventTrigger.connect(function (eventName, args) {
 API.onKeyDown.connect(function(player, e) {
 	if (casting != null) {
 		if (castTime > 140) {
-			if (!API.isChatOpen() && e.KeyCode == Keys.Space && queuetask != null) {
-			currentword = storedword;
-		} else if (!API.isChatOpen() && e.KeyCode == Keys.Space) {
-			fishingTimeout();
+			if (!API.isChatOpen() && e.KeyCode == Keys.Space) {
+				if (queuetask == true) {
+					currentword = storedword;
+					return;
+				}
+				else
+				{
+					fishingTimeout();
+					return;
+				}
+			} 
+			else if (!API.isChatOpen() && e.KeyCode == Keys.Space) 
+			{
+				fishingTimeout();
+				return;
+			}
+		return;
 		}
+	return;
 	}
-}
-	
-
 });
 
 API.onUpdate.connect(function() { //700 HZ is about 10 Seconds, 350HZ is about 5 seconds, 70HZ is about 1 Second.

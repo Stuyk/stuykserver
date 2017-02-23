@@ -73,6 +73,7 @@
 	<file src="clientside/resources/images/fishing.png" />
 	<file src="clientside/resources/images/pressf.png" />
 	<file src="clientside/resources/images/presse.png" />
+	<file src="clientside/resources/images/pressevehicle.png" />
 	
 	<include resource="database"/>
 	<include resource="gtaocharacter" />

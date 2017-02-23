@@ -21,12 +21,24 @@ namespace stuykserver.Util
         {
             if (eventName == "useController")
             {
-                API.call("Fishing", "startFishing", player);
-                API.call("Fishing", "sellFish", player);
-                API.call("BarberShopHandler", "selectBarberShop", player);
-                API.call("BankHandler", "selectATM", player);
-                API.call("ClothingShopHandler", "selectClothing", player);
-                API.call("VehicleShopHandler", "browseDealership", player);
+                if (!player.isInVehicle)
+                {
+                    API.call("Fishing", "startFishing", player);
+                    API.call("Fishing", "sellFish", player);
+                    API.call("BarberShopHandler", "selectBarberShop", player);
+                    API.call("BankHandler", "selectATM", player);
+                    API.call("ClothingShopHandler", "selectClothing", player);
+                    API.call("VehicleShopHandler", "browseDealership", player);
+                    API.call("VehicleHandler", "actionLockCar", player);
+                }
+            }
+
+            if (eventName == "vehicleController")
+            {
+                if (player.isInVehicle)
+                {
+                    API.call("VehicleHandler", "actionVehicleEngine", player);
+                }
             }
         }
     }

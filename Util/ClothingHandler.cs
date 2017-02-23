@@ -58,9 +58,6 @@ namespace stuykserver.Util
         {
             if (eventName == "clothingSave")
             {
-                API.stopPlayerAnimation(player);
-                API.triggerClientEvent(player, "killPanel");
-                API.triggerClientEvent(player, "endCamera");
 
                 db.updateDatabase("PlayerClothing", "clothingTop", args[0].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerClothing", "clothingTopColor", args[1].ToString(), "Nametag", player.name);
@@ -71,11 +68,13 @@ namespace stuykserver.Util
                 db.updateDatabase("PlayerClothing", "clothingLegsColor", args[6].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerClothing", "clothingShoes", args[7].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerClothing", "clothingShoesColor", args[8].ToString(), "Nametag", player.name);
-
-                API.call("ClothingShopHandler", "leaveClothingShop", player);
                 updateClothingForPlayer(player);
                 API.stopPedAnimation(player);
                 API.stopPlayerAnimation(player);
+
+                API.call("ClothingShopHandler", "leaveClothingShop", player);
+                API.triggerClientEvent(player, "killPanel");
+                API.triggerClientEvent(player, "endCamera");
             }
         }
     }

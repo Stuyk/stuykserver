@@ -41,8 +41,6 @@ namespace stuykserver.Util
         {
             if (eventName == "saveFace")
             {
-                API.triggerClientEvent(player, "killPanel");
-                API.triggerClientEvent(player, "endCamera");
                 db.updateDatabase("PlayerSkins", "skinShapeFirst", args[0].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerSkins", "skinShapeSecond", args[1].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerSkins", "skinSkinFirst", args[2].ToString(), "Nametag", player.name);
@@ -53,11 +51,13 @@ namespace stuykserver.Util
                 db.updateDatabase("PlayerSkins", "skinHairstyleColor", args[7].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerSkins", "skinHairstyleHighlight", args[8].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerSkins", "skinHairstyleTexture", args[9].ToString(), "Nametag", player.name);
-                API.call("BarberShopHandler", "leaveBarberShop", player);
                 pullCurrentFace(player);
                 API.exported.gtaocharacter.updatePlayerFace(player.handle);
                 API.stopPlayerAnimation(player);
                 API.stopPedAnimation(player);
+                API.call("BarberShopHandler", "leaveBarberShop", player);
+                API.triggerClientEvent(player, "killPanel");
+                API.triggerClientEvent(player, "endCamera");
             }
         }
 

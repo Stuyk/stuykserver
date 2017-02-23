@@ -6,11 +6,59 @@ html, body {
 body {
   color: #fff;
   text-align: center;
+  background-color: rgba(0,0,0,0.00);
+}
+
+label {
+	text-align: left;
+}
+
+.leftColumn {
+	background-color: rgba(255,255,255,0.70);
+}
+
+.labelHeight {
+	margin-top: 2px;
+	height: 46px;
 }
 
 .optionButton {
 	width: 40px !important;
 	height: auto;
+	background-color: rgba(255,255,255,0.70);
+	border: 0px;
+	color: #FFF;
+}
+
+.optionButtonModified {
+	background-color: rgba(255,255,255,0.70);
+	border: 0px;
+	color: #FFF;
+}
+
+.optionButtonModified:hover {
+	background-color: rgba(129,213,230,0.70);
+	color: #FFF;
+}
+
+.optionButton:hover {
+	background-color: rgba(129,213,230,0.70);
+	color: #FFF;
+}
+
+.optionButton:active {
+	background-color: rgba(129,213,230,0.70);
+	color: #FFF;
+}
+
+.optionButton:link {
+	background-color: rgba(129,213,230,0.70);
+	color: #FFF;
+}
+
+.optionButton:visited {
+	background-color: rgba(129,213,230,0.70);
+	color: #FFF;
 }
 
 .vertical-align {
