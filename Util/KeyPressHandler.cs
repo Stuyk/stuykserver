@@ -19,35 +19,45 @@ namespace stuykserver.Util
 
         private void API_onClientEventTrigger(Client player, string eventName, params object[] args)
         {
-            if (eventName == "useController")
+            if (eventName == "useFunction")
             {
-                if (!player.isInVehicle)
+                switch(args[0].ToString())
                 {
-                    API.call("Fishing", "startFishing", player);
-                    API.call("Fishing", "sellFish", player);
-                    API.call("BarberShopHandler", "selectBarberShop", player);
-                    API.call("BankHandler", "selectATM", player);
-                    API.call("ClothingShopHandler", "selectClothing", player);
-                    API.call("VehicleShopHandler", "browseDealership", player);
-                    API.call("VehicleHandler", "actionLockCar", player);
-                }
-            }
+                    case "VehicleModificationShop":
+                        API.call("VehicleModificationHandler", "actionEnterShop", player);
+                        break;
 
-            if (eventName == "vehicleController")
-            {
-                if (player.isInVehicle)
-                {
-                    if (args[0].ToString() == "hood")
-                    {
-                        API.call("VehicleHandler", "actionVehicleHood", player);
-                        return;
-                    }
+                    case "FishingSpot":
+                        API.call("Fishing", "startFishing", player);
+                        break;
 
-                    if (args[0].ToString() == "engine")
-                    {
+                    case "FishingSaleSpot":
+                        API.call("Fishing", "sellFish", player);
+                        break;
+
+                    case "BarberShop":
+                        API.call("BarberShopHandler", "selectBarberShop", player);
+                        break;
+
+                    case "Bank":
+                        API.call("BankHandler", "selectATM", player);
+                        break;
+
+                    case "Clothing":
+                        API.call("ClothingShopHandler", "selectClothing", player);
+                        break;
+
+                    case "Dealership":
+                        API.call("VehicleShopHandler", "browseDealership", player);
+                        break;
+
+                    case "VehicleEngine":
                         API.call("VehicleHandler", "actionVehicleEngine", player);
-                        return;
-                    }
+                        break;
+
+                    case "VehicleLock":
+                        API.call("VehicleHandler", "actionLockCar", player);
+                        break;
                 }
             }
         }

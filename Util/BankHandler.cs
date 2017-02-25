@@ -60,7 +60,7 @@ namespace stuykserver.Util
                     {
                         playersInCollisions.Add(API.getPlayerFromHandle(entity));
                         Client player = API.getPlayerFromHandle(entity);
-                        API.triggerClientEvent(player, "triggerUseFunction");
+                        API.triggerClientEvent(player, "triggerUseFunction", "Bank");
                         API.sendNotificationToPlayer(player, "This will let me deposit my cash.");
                     }
                 }

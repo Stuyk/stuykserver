@@ -130,7 +130,7 @@ namespace stuykserver.Jobs
                     {
                         playersInCollision.Add(entity);
                         Client p = API.getPlayerFromHandle(entity);
-                        API.triggerClientEvent(p, "triggerUseFunction");
+                        API.triggerClientEvent(p, "triggerUseFunction", "FishingSpot");
                         API.sendNotificationToPlayer(p, "~b~There seem to be a lot of fish in this area.");
                         return;
                     }
@@ -141,7 +141,7 @@ namespace stuykserver.Jobs
                     {
                         Client p = API.getPlayerFromHandle(entity);
                         playersInCollisionSale.Add(entity);
-                        API.triggerClientEvent(p, "triggerUseFunction");
+                        API.triggerClientEvent(p, "triggerUseFunction", "FishingSaleSpot");
                         API.sendNotificationToPlayer(p, "~b~The cooks here seem to appreciate fresh fish.");
                         return;
                     }

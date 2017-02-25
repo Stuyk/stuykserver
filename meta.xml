@@ -24,6 +24,7 @@
 	<script src="Util/BarberShopHandler.cs" type="server" lang="csharp" />
 	<script src="Util/KeyPressHandler.cs" type="server" lang="csharp" />
 	<script src="Util/ClothingHandler.cs" type="server" lang="csharp" />
+	<script src="Util/VehicleModificationHandler.cs" type="server" lang="csharp" />
 	
 	<script src="clientside/resources/serversideCamera.js" type="client" lang="javascript" />
 	<script src="clientside/resources/MoneyDisplay.js" type="client" lang="javascript" />

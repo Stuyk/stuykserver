@@ -80,7 +80,7 @@ namespace stuykserver.Util
                     if (!playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
                     {
                         playersInCollisions.Add(API.getPlayerFromHandle(entity));
-                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction");
+                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "Clothing");
                         API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "There are a lot of clothes in this store.");
                     }
                 }

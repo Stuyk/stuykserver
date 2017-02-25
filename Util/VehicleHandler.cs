@@ -60,7 +60,7 @@ namespace stuykserver.Util
                     {
                         if (API.getPlayerFromHandle(entity).position.DistanceTo(API.getEntityPosition(vehicle)) <= 5)
                         {
-                            API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction");
+                            API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "VehicleLock");
                             break;
                         }
                     }
@@ -110,7 +110,7 @@ namespace stuykserver.Util
                 if (API.getPlayerVehicleSeat(player) == -1)
                 {
                     playersInVehicles.Add(player);
-                    API.triggerClientEvent(player, "triggerUseFunction");
+                    API.triggerClientEvent(player, "triggerUseFunction", "VehicleEngine");
                 }
                 else
                 {
@@ -161,7 +161,7 @@ namespace stuykserver.Util
             vehicleKeys.Add(vehicle.handle, player);
             vehicleHandles.Add(vehicle.handle);
             vehiclePositions.Add(vehicle.handle, API.getEntityPosition(vehicle.handle));
-            vehicleCollisions.Add(vehicle.handle, API.createCylinderColShape(vehiclePositions[vehicle.handle], 3f, 3f));
+            vehicleCollisions.Add(vehicle.handle, API.createCylinderColShape(vehiclePositions[vehicle.handle], 2f, 2f));
             API.setVehicleLocked(vehicle, true);
             vehicle.engineStatus = false;
         }
@@ -235,31 +235,35 @@ namespace stuykserver.Util
                 {
                     foreach (NetHandle vehicle in vehicleHandles)
                     {
-                        if (player.position.DistanceTo(API.getEntityPosition(vehicle)) <= 5)
+                        if (player.position.DistanceTo(API.getEntityPosition(vehicle)) <= 3)
                         {
                             if (vehicleKeys[vehicle] == player)
                             {
                                 if (API.isVehicleDoorBroken(vehicle, 0))
                                 {
                                     API.sendNotificationToPlayer(player, "Can't lock a car with a broken door.");
+                                    API.setVehicleLocked(vehicle, false);
                                     break;
                                 }
 
                                 if (API.isVehicleDoorBroken(vehicle, 1))
                                 {
                                     API.sendNotificationToPlayer(player, "Can't lock a car with a broken door.");
+                                    API.setVehicleLocked(vehicle, false);
                                     break;
                                 }
 
                                 if (API.isVehicleDoorBroken(vehicle, 2))
                                 {
                                     API.sendNotificationToPlayer(player, "Can't lock a car with a broken door.");
+                                    API.setVehicleLocked(vehicle, false);
                                     break;
                                 }
 
                                 if (API.isVehicleDoorBroken(vehicle, 3))
                                 {
                                     API.sendNotificationToPlayer(player, "Can't lock a car with a broken door.");
+                                    API.setVehicleLocked(vehicle, false);
                                     break;
                                 }
 

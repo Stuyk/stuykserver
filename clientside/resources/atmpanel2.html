@@ -30,10 +30,11 @@
 								<div class="row" style="margin-bottom: 20px">
 									<button id="closeButton" type="submit" class="btn btn-danger col-sm-12 col-sm-offset-0">Close</button>
 								</div>
-								<div class="alert alert-success" id="withdrawAlert" role="alert" hidden>You have withdrawn: $<span id="amountWithdrawn"></span></div>
+								<div class="alert alert-success" id="maximumLimit" role="alert" hidden>You cannot withdraw or deposit more than $10000</div>
+								<div class="alert alert-success" id="withdrawAlert" role="alert" hidden>You have withdrawn: $<span id="amountWithdrawn">&nbsp;</span></div>
 								<div class="alert alert-danger" id="withdrawError" role="alert" hidden>You must specify an amount to withdraw.</div>
 								<div class="alert alert-danger" id="withdrawLimit" role="alert" hidden>You don't have that much money to withdraw.</div>
-								<div class="alert alert-success" id="depositAlert" role="alert" hidden>You have deposited: $<span id="amountDeposited"></span></div>
+								<div class="alert alert-success" id="depositAlert" role="alert" hidden>You have deposited: $<span id="amountDeposited">&nbsp;</span></div>
 								<div class="alert alert-danger" id="depositError" role="alert" hidden>You must specify an amount to deposit.</div>
 								<div class="alert alert-danger" id="depositLimit" role="alert" hidden>You don't have that much money to deposit.</div>
 							</div>
@@ -63,15 +64,17 @@
 			resourceCall("requestAccountBalance");
 			var amount = document.getElementById("inputAmount").value;
 			if (amount >= 1) {
-				if (currentMoney <= amount) {
+				if (amount <= currentMoney && amount <= 10000) {
+					resourceCall("requestAccountBalance");
 					$('#withdrawAlert').hide();
 					$('#withdrawError').hide();
 					$('#depositError').hide();
 					$('#depositLimit').hide();
 					$('#withdrawLimit').hide();
 					$('#amountDeposited').html(amount);
-					resourceCall("depositATM", amount);
 					$('#depositAlert').show();
+					$('#maximumLimit').hide();
+					resourceCall("depositATM", amount);
 					return;
 				}
 				$('#depositLimit').show();
@@ -80,6 +83,7 @@
 				$('#depositError').hide();
 				$('#depositAlert').hide();
 				$('#withdrawLimit').hide();
+				$('#maximumLimit').hide();
 				return;
 			}
 			$('#depositLimit').hide();
@@ -88,6 +92,7 @@
 			$('#depositAlert').hide();
 			$('#depositError').show();
 			$('#withdrawLimit').hide();
+			$('#maximumLimit').hide();
 			return;
 		}
 	
@@ -96,15 +101,17 @@
 			resourceCall("requestAccountBalance");
 			var amount = document.getElementById("inputAmount").value;
 			if (amount >= 1) {
-				if (amount <= accountMoney) {
+				if (amount <= accountMoney && amount <= 10000) {
+					resourceCall("requestAccountBalance");
 					$('#withdrawError').hide();
 					$('#withdrawLimit').hide();
 					$('#depositAlert').hide();
 					$('#depositError').hide();
 					$('#depositLimit').hide();
 					$('#amountWithdrawn').html(amount);
-					resourceCall("withdrawATM", amount);
 					$('#withdrawAlert').show();
+					$('#maximumLimit').hide();
+					resourceCall("withdrawATM", amount);
 					return;
 				}
 				$('#withdrawLimit').show();
@@ -113,6 +120,7 @@
 				$('#depositError').hide();
 				$('#withdrawError').hide();
 				$('#depositLimit').hide();
+				$('#maximumLimit').hide();
 				return;
 			}
 			$('#depositLimit').hide();
@@ -121,6 +129,7 @@
 			$('#depositError').hide();
 			$('#withdrawError').show();
 			$('#withdrawLimit').hide();
+			$('#maximumLimit').hide();
 			return;
 		}
 	

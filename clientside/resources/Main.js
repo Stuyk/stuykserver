@@ -276,6 +276,7 @@ function loginHandler(email, password) {
 }
 
 function requestAccountBalance() {
+	API.sleep(2000);
 	pagePanel.browser.call("displayAccountBalance", playerAccountBalance, currentMoney);
 }
 
@@ -649,12 +650,48 @@ function changePushClothingChanges() {
 // #### Vehicle  CHANGER ####
 // #### WRITTEN BY STUYK ####
 // ##########################
+var bodyColorOneR = 0;
+var bodyColorOneG = 0;
+var bodyColorOneB = 0;
+var bodyColorTwoR = 0;
+var bodyColorTwoG = 0;
+var bodyColorTwoB = 0;
+var modA = 0; // Spoilers
+var modB = 0; // Front bumper
+var modC = 0; // Rear Bumper
+var modD = 0; // Side Skirt
+var modE = 0; // Exhaust
+var modF = 0; // Grille
+var modG = 0; // Hood
+var modH = 0; // Fender
+var modI = 0; // Right Fender
+var modJ = 0; // Roof
+var modK = 0; // Front Wheels
+var modL = 0; // Back Wheels
+var modM = 0; // Window Tint
+var modN = 0;
+var modO = 0;
+
+function leaveVehicleShop() {
+	API.triggerServerEvent("leaveVehicleShop");
+	killPanel();
+}
+
+function pushVehicleChanges() {
+	API.triggerServerEvent("leaveVehicleShop");
+	API.triggerServerEvent("pushVehicleChanges", bodyColorOneR, bodyColorOneG, bodyColorOneB, bodyColorTwoR, bodyColorTwoG, bodyColorTwoB, modA, modB, modC, modD, modE, modF, modG, modH, modI, modJ, modK, modL, modM, modN, modO);
+	killPanel();
+}
+
 function updateVehicleMainColor(value) {
 	var playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
 	var temp = value.replace('rgb(', '');
 	var temptwo = temp.replace(')', '');
 	var colorOne = temptwo.split(',');
 	API.setVehicleCustomPrimaryColor(playerVehicle, parseInt(colorOne[0]), parseInt(colorOne[1]), parseInt(colorOne[2]));
+	bodyColorOneR = colorOne[0];
+	bodyColorOneG = colorOne[1];
+	bodyColorOneB = colorOne[2];
 }
 
 function updateVehicleSecondaryColor(value) {
@@ -663,6 +700,9 @@ function updateVehicleSecondaryColor(value) {
 	var temptwo = temp.replace(')', '');
 	var colorOne = temptwo.split(',');
 	API.setVehicleCustomSecondaryColor(playerVehicle, parseInt(colorOne[0]), parseInt(colorOne[1]), parseInt(colorOne[2]));
+	bodyColorTwoR = colorOne[0];
+	bodyColorTwoG = colorOne[1];
+	bodyColorTwoB = colorOne[2];
 }
 
 function updateVehicleRotation(value) {
@@ -671,6 +711,74 @@ function updateVehicleRotation(value) {
 	API.setEntityRotation(playerVehicle, new Vector3(vehicleRotation.X, vehicleRotation.Y, value));
 }
 
+function updateVehicleMod(modtype, value) {
+	var playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
+	
+	if (modtype == 0) { // Spoilers
+		API.setVehicleMod(playerVehicle, 0, value);
+		modA = value;
+	}
+	
+	if (modtype == 1) { // Front Bumper
+		API.setVehicleMod(playerVehicle, 1, value);
+		modB = value;
+	}
+	
+	if (modtype == 2) { // Rear Bumper
+		API.setVehicleMod(playerVehicle, 2, value);
+		modC = value;
+	}
+	
+	if (modtype == 3) { // Side Skirt
+		API.setVehicleMod(playerVehicle, 3, value);
+		modD = value;
+	}
+	
+	if (modtype == 4) { // Exhaust
+		API.setVehicleMod(playerVehicle, 4, value);
+		modE = value;
+	}
+	
+	if (modtype == 6) { // Grille
+		API.setVehicleMod(playerVehicle, 6, value);
+		modF = value;
+	}
+	
+	if (modtype == 7) { // Hood
+		API.setVehicleMod(playerVehicle, 7, value);
+		modG = value;
+	}
+	
+	if (modtype == 8) { // Fender
+		API.setVehicleMod(playerVehicle, 8, value);
+		modH = value;
+	}
+	
+	if (modtype == 9) { // Right Fender
+		API.setVehicleMod(playerVehicle, 9, value);
+		modI = value;
+	}
+	
+	if (modtype == 10) { // Roof
+		API.setVehicleMod(playerVehicle, 10, value);
+		modJ = value;
+	}
+	
+	if (modtype == 23) { // Front Wheels
+		API.setVehicleMod(playerVehicle, 23, value);
+		modK = value;
+	}
+	
+	if (modtype == 24) { // Back Wheels
+		API.setVehicleMod(playerVehicle, 24, value);
+		modL = value;
+	}
+	
+	if (modtype == 69) { // Window Tint
+		API.setVehicleMod(playerVehicle, 69, value);
+		modM = value;
+	}
+}
 
 
 
