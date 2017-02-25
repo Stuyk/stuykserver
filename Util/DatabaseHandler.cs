@@ -222,7 +222,7 @@ namespace stuykserver.Util
             return false;
         }
 
-        public NetHandle databaseSpawnPlayerCar(Client player, int slot)
+        public Vehicle databaseSpawnPlayerCar(Client player, int slot)
         {
             VehicleHash vehicle = API.vehicleNameToModel(pullDatabase("PlayerVehicles", "VehicleType" + slot.ToString(), "Garage", player.name));
             float x = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "PosX", "Garage", player.name));
@@ -233,7 +233,7 @@ namespace stuykserver.Util
             y = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "RotY", "Garage", player.name));
             z = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "RotZ", "Garage", player.name));
             Vector3 rotation = new Vector3(x, y, z);
-            NetHandle veh = API.createVehicle(vehicle, position, rotation, 0, 0).handle;
+            Vehicle veh = API.createVehicle(vehicle, position, rotation, 0, 0);
             return veh;
         }
 

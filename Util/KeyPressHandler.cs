@@ -37,7 +37,17 @@ namespace stuykserver.Util
             {
                 if (player.isInVehicle)
                 {
-                    API.call("VehicleHandler", "actionVehicleEngine", player);
+                    if (args[0].ToString() == "hood")
+                    {
+                        API.call("VehicleHandler", "actionVehicleHood", player);
+                        return;
+                    }
+
+                    if (args[0].ToString() == "engine")
+                    {
+                        API.call("VehicleHandler", "actionVehicleEngine", player);
+                        return;
+                    }
                 }
             }
         }

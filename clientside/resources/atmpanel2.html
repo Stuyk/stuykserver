@@ -60,9 +60,10 @@
 	
 		document.getElementById("depositButton").onclick = function ()
 		{
+			resourceCall("requestAccountBalance");
 			var amount = document.getElementById("inputAmount").value;
 			if (amount >= 1) {
-				if (amount <= currentMoney) {
+				if (currentMoney <= amount) {
 					$('#withdrawAlert').hide();
 					$('#withdrawError').hide();
 					$('#depositError').hide();
@@ -92,6 +93,7 @@
 	
 		document.getElementById("withdrawButton").onclick = function ()
 		{
+			resourceCall("requestAccountBalance");
 			var amount = document.getElementById("inputAmount").value;
 			if (amount >= 1) {
 				if (amount <= accountMoney) {

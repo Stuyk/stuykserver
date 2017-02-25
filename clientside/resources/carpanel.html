@@ -1,0 +1,165 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="carpanel.css" rel="stylesheet" />
+	<link rel="stylesheet" href="css/spectrum.css" />
+	<link rel="stylesheet" href="css/slider.css" />
+  </head>
+  <body>
+	<!-- Left Column -->
+	<div class="col-md-2 column-special" id="leftColumn" class="column-special">
+		<div id="leftColumnContent">
+			<ul class="nav nav-pills nav-stacked col-sm-12">
+				<li class="active"><a data-toggle="tab" id="existingUser" role="tab" href="#main" class="custom-link">Main Body</a></li>
+				<li><a data-toggle="tab" role="tab" href="#spoilers" class="custom-link optionButton">Spoilers</a></li>
+				<li><a data-toggle="tab" role="tab" href="#frontBumper" class="custom-link optionButton">Front Bumper</a></li>
+				<li><a data-toggle="tab" role="tab" href="#rearBumper" class="custom-link optionButton">Rear Bumper</a></li>
+				<li><a data-toggle="tab" role="tab" href="#sideSkirts" class="custom-link optionButton">Side Skirts</a></li>
+				<li><a data-toggle="tab" role="tab" href="#exhaust" class="custom-link optionButton">Exhaust</a></li>
+				<li><a data-toggle="tab" role="tab" href="#grille" class="custom-link optionButton">Grille</a></li>
+				<li><a data-toggle="tab" role="tab" href="#hoods" class="custom-link optionButton">Hood</a></li>
+				<li><a data-toggle="tab" role="tab" href="#fender" class="custom-link optionButton">Fender</a></li>
+				<li><a data-toggle="tab" role="tab" href="#roof" class="custom-link optionButton">Roof</a></li>
+				<li><a data-toggle="tab" role="tab" href="#frontWheels" class="custom-link optionButton">Front Wheels</a></li>
+				<li><a data-toggle="tab" role="tab" href="#backWheels" class="custom-link optionButton">Back Wheels</a></li>
+				<li><a data-toggle="tab" role="tab" href="#windows" class="custom-link optionButton">Windows</a></li>
+				<li><a data-toggle="tab" role="tab" href="#misc" class="custom-link optionButton">Misc</a></li>
+				<li><a type="submit" class="custom-link optionButton" id="exitPanel">Exit</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	<!-- Middle Column -->
+	<div class="col-md-8" id="middleColumn">
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3 column-header"><h1>Vehicle Modifications</h1></div>
+		</div>
+		
+		<!-- Progress Bar for Saving Purposes -->
+		<div class="progress" id="progressBarSave" style="height: 35px; margin-top: 65%" hidden>
+			<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Updating Information</h5></div>
+		</div>
+	</div>
+	
+	<!-- Right Column -->
+	<div class="col-md-2 column-special" id="rightColumn" >
+		<div class="row col-sm-12 pull-right"> 
+			<div class="tab-content">
+				<!-- Tab Content -->
+				<div role="tabpanel" class="tab-pane active" id="main">
+					<div class="column-header"><h2>Main Body</h2></div>
+					<form class="form-inline">
+						<div class="row space-row">
+							<div class="btn-group" data-toggle="buttons">
+								<label class="btn btn-primary active custom-link optionButton">
+									<input type="radio" name="colorProperties" id="mainColor" autocomplete="off" checked> Main Color
+								</label>
+								<label class="btn btn-primary custom-link optionButton">
+									<input type="radio" name="colorProperties" id="secondaryColor" autocomplete="off" checked> Secondary Color
+								</label>
+							</div>
+						</div>
+						<div class="row space-row">
+							<input type="text" id="mainRGB" />
+						</div>
+					</form>
+				</div>
+				<!-- Spoilers -->
+				<div role="tabpanel" class="tab-pane" id="spoilers">
+					<div class="column-header"><h2>Spoilers</h2></div>
+				</div>
+				<!-- Front Bumper -->
+				<div role="tabpanel" class="tab-pane" id="frontBumper">
+					<div class="column-header"><h2>Front Bumper</h2></div>
+				</div>
+				<!-- Rear Bumper -->
+				<div role="tabpanel" class="tab-pane" id="rearBumper">
+					<div class="column-header"><h2>Rear Bumper</h2></div>
+				</div>
+				<!-- Side Skirts -->
+				<div role="tabpanel" class="tab-pane" id="sideSkirts">
+					<div class="column-header"><h2>Side Skirts</h2></div>
+				</div>
+				<!-- Exhaust -->
+				<div role="tabpanel" class="tab-pane" id="exhaust">
+					<div class="column-header"><h2>Exhaust</h2></div>
+				</div>
+				<!-- Grille -->
+				<div role="tabpanel" class="tab-pane" id="grille">
+					<div class="column-header"><h2>Grille</h2></div>
+				</div>
+				<!-- Hoods -->
+				<div role="tabpanel" class="tab-pane" id="hoods">
+					<div class="column-header"><h2>Hoods</h2></div>
+				</div>
+				<!-- Fender -->
+				<div role="tabpanel" class="tab-pane" id="fender">
+					<div class="column-header"><h2>Fender</h2></div>
+				</div>
+				<!-- Roof -->
+				<div role="tabpanel" class="tab-pane" id="roof">
+					<div class="column-header"><h2>Roof</h2></div>
+				</div>
+				<!-- Front Wheels -->
+				<div role="tabpanel" class="tab-pane" id="frontWheels">
+					<div class="column-header"><h2>Front Wheels</h2></div>
+				</div>
+				<!-- Back Wheels -->
+				<div role="tabpanel" class="tab-pane" id="backWheels">
+					<div class="column-header"><h2>Back Wheels</h2></div>
+				</div>
+				<!-- Windows -->
+				<div role="tabpanel" class="tab-pane" id="windows">
+					<div class="column-header"><h2>Windows</h2></div>
+				</div>
+				<!-- Misc -->
+				<div role="tabpanel" class="tab-pane" id="misc">
+					<div class="column-header"><h2>Miscellaneous</h2></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--- FOOTER -->
+		<footer class="footer">
+			<div class="container">
+				<input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="359" data-slider-step="1" data-slider-value="0"/>
+			</div>
+		</footer>
+	<!--- Javascript / JQuery -->
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/spectrum.js"></script>
+	<script src="js/bootstrap-slider.js"></script>
+	<script>
+		$('#ex1').slider().on('slide', function(e) {
+			resourceCall("updateVehicleRotation", e.value);
+		});
+
+		document.getElementById("exitPanel").onclick = function ()
+		{
+			resourceCall("killPanel");
+		}
+	
+		
+		$("#mainRGB").spectrum ({
+			move: function(color) 
+			{ 
+				if($('#mainColor').is(':checked'))
+				{
+					resourceCall("updateVehicleMainColor", color.toRgbString())
+				}
+				
+				if($('#secondaryColor').is(':checked')) {
+					resourceCall("updateVehicleSecondaryColor", color.toRgbString());
+				}
+			},
+			preferredFormat: "rgb",
+			flat: true
+		});
+
+	</script>
+  </body>
+</html>
+

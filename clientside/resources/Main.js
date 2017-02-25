@@ -175,6 +175,13 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			updateClothingProperties();
         }
     }
+	
+	if (eventName=="openCarPanel") {
+		if (pagePanel == null) {
+			pagePanel = new CefHelper("clientside/resources/carpanel.html");
+			pagePanel.show();
+		}
+	}
     
     if (eventName=="killPanel") {
         if (pagePanel != null) {
@@ -249,88 +256,6 @@ API.onUpdate.connect(function() {
 	if (karmaDisplay != null) {
 		API.drawText(karmaDisplay, resX - 25, resY - 100, 1, 244, 244, 66, 255, 4, 2, false, true, 0);
 	}
-	
-	// Clothing Panel Display
-	if (clothingPanelOpen == true) {
-		if (clothingTopNum != null) {
-			API.drawText("Top: " + clothingTopNum, resX - 400, resY / 6 + 150, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (clothingTopColorNum != null) {
-			API.drawText("Top Color: " + clothingTopColorNum, resX - 400, resY / 6 + 225, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (clothingUndershirtNum != null) {
-			API.drawText("Undershirt: " + clothingUndershirtNum, resX - 400, resY / 6 + 300, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-	
-		if (clothingUndershirtColorNum != null) {
-			API.drawText("Undershirt Color: " + clothingUndershirtColorNum, resX - 400, resY / 6 + 375, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-	
-		if (clothingTorsoNum != null) {
-			API.drawText("Torso: " + clothingTorsoNum, resX - 400, resY / 6 + 450, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-	
-		if (clothingLegsNum != null) {
-			API.drawText("Legs: " + clothingLegsNum, resX - 400, resY / 6 + 525, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-	
-		if (clothingLegsColorNum != null) {
-			API.drawText("Legs Color: " + clothingLegsColorNum, resX - 400, resY / 6 + 600, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-	
-	
-		if (clothingShoesNum != null) {
-			API.drawText("Shoes: " + clothingShoesNum, resX - 400, resY / 6 + 675, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-	
-		if (clothingShoesColorNum != null) {
-			API.drawText("Shoe Color: " + clothingShoesColorNum, resX - 400, resY / 6 + 750, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-	}
-	
-	/*if (facePanelOpen == true) {
-		if (faceShapeOne != null) {
-			API.drawText("Shape One: " + faceShapeOne, resX - 400, resY / 6 + 0, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (faceShapeTwo != null) {
-			API.drawText("Shape Two: " + faceShapeTwo, resX - 400, resY / 6 + 75, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (faceSkinOne != null) {
-			API.drawText("Skin One: " + faceSkinOne, resX - 400, resY / 6 + 150, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (faceSkinTwo != null) {
-			API.drawText("Skin Two: " + faceSkinTwo, resX - 400, resY / 6 + 225, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (faceShapeMix != null) {
-			API.drawText("Shape Mix: " + intToFloat(faceShapeMix, 2), resX - 400, resY / 6 + 300, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (faceSkinMix != null) {
-			API.drawText("Skin Mix: " + intToFloat(faceSkinMix, 2), resX - 400, resY / 6 + 375, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (faceHairstyle != null) {
-			API.drawText("Hairstyle: " + faceHairstyle, resX - 400, resY / 6 + 450, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (faceHairstyleColor != null) {
-			API.drawText("Hairstyle Color: " + faceHairstyleColor, resX - 400, resY / 6 + 525, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-		
-		if (faceHairstyleHighlight != null) {
-			API.drawText("Hairstyle Highlight: " + faceHairstyleHighlight, resX - 400, resY / 6 + 600, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-
-		if (faceHairstyleTexture != null) {
-			API.drawText("Hairstyle Texture: " + faceHairstyleTexture, resX - 400, resY / 6 + 675, 1, 255, 255, 255, 255, 4, 2, false, true, 0);
-		}
-	}*/
 });
 
 function killPanel() {
@@ -721,6 +646,41 @@ function changePushClothingChanges() {
 }
 
 // ##########################
-// #### Paper Boy 		 ####
+// #### Vehicle  CHANGER ####
 // #### WRITTEN BY STUYK ####
 // ##########################
+function updateVehicleMainColor(value) {
+	var playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
+	var temp = value.replace('rgb(', '');
+	var temptwo = temp.replace(')', '');
+	var colorOne = temptwo.split(',');
+	API.setVehicleCustomPrimaryColor(playerVehicle, parseInt(colorOne[0]), parseInt(colorOne[1]), parseInt(colorOne[2]));
+}
+
+function updateVehicleSecondaryColor(value) {
+	var playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
+	var temp = value.replace('rgb(', '');
+	var temptwo = temp.replace(')', '');
+	var colorOne = temptwo.split(',');
+	API.setVehicleCustomSecondaryColor(playerVehicle, parseInt(colorOne[0]), parseInt(colorOne[1]), parseInt(colorOne[2]));
+}
+
+function updateVehicleRotation(value) {
+	var playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
+	var vehicleRotation = API.getEntityRotation(playerVehicle);
+	API.setEntityRotation(playerVehicle, new Vector3(vehicleRotation.X, vehicleRotation.Y, value));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

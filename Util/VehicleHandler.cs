@@ -10,7 +10,6 @@ namespace stuykserver.Util
     public class VehicleHandler : Script
     {
         ChatHandler ch = new ChatHandler();
-        Dictionary<NetHandle, Client> vehicleOwner = new Dictionary<NetHandle, Client>();
         DatabaseHandler db = new DatabaseHandler();
         List<Client> playersInVehicles = new List<Client>();
         List<NetHandle> vehicleHandles = new List<NetHandle>();
@@ -89,24 +88,7 @@ namespace stuykserver.Util
                 if (!vehicleCollisions.ContainsKey(vehicle))
                 {
                     vehicleCollisions.Add(vehicle, API.createCylinderColShape(vehiclePositions[vehicle], 3f, 3f));
-                    
-                }
-            }
-        }
-
-        public void vehicleSpawnIn(NetHandle vehicle, Client player)
-        {
-            if (!vehicleHandles.Contains(vehicle))
-            {
-                vehicleHandles.Add(vehicle);
-            }
-
-            if (!vehiclePositions.ContainsKey(vehicle))
-            {
-                vehiclePositions.Add(vehicle, API.getEntityPosition(vehicle));
-                if (!vehicleCollisions.ContainsKey(vehicle))
-                {
-                    vehicleCollisions.Add(vehicle, API.createCylinderColShape(vehiclePositions[vehicle], 3f, 3f));
+                    API.setVehicleEngineStatus(vehicle, false);
                 }
             }
         }
@@ -155,20 +137,33 @@ namespace stuykserver.Util
             }
         }
 
+        [Command("editCar")]
+        public void editCar(Client player)
+        {
+            API.triggerClientEvent(player, "openCarPanel");
+        }
+
         [Command("spawncar")] // Admin
         public void cmdSpawnCar(Client player, VehicleHash model)
         {
             if (db.isPlayerLoggedIn(player))
             {
                 var rot = API.getEntityRotation(player.handle);
-                var veh = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
-                veh.engineStatus = false;
-                API.setVehicleLocked(veh, true);
-                vehicleSpawnIn(veh, player);
-                vehicleKeys.Add(veh, player);
+                var vehicle = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
+                handleVehicleSpawn(player, vehicle);
                 return;
             }
             return;
+        }
+
+        public void handleVehicleSpawn(Client player, Vehicle vehicle)
+        {
+            vehicleKeys.Add(vehicle.handle, player);
+            vehicleHandles.Add(vehicle.handle);
+            vehiclePositions.Add(vehicle.handle, API.getEntityPosition(vehicle.handle));
+            vehicleCollisions.Add(vehicle.handle, API.createCylinderColShape(vehiclePositions[vehicle.handle], 3f, 3f));
+            API.setVehicleLocked(vehicle, true);
+            vehicle.engineStatus = false;
         }
 
         public void actionVehicleEngine(Client player)
@@ -204,6 +199,30 @@ namespace stuykserver.Util
                             API.sendNotificationToPlayer(player, "~r~You don't have keys for this.");
                         }
                     } 
+                }
+            }
+        }
+
+        public void actionVehicleHood(Client player)
+        {
+            if (db.isPlayerLoggedIn(player))
+            {
+                if (player.isInVehicle)
+                {
+                    if (API.getPlayerVehicleSeat(player) == -1)
+                    {
+                        if (vehicleKeys[player.vehicle] == player)
+                        {
+                            if (API.getVehicleDoorState(player.vehicle, 4))
+                            {
+                                API.setVehicleDoorState(player.vehicle, 4, false);
+                            }
+                            else
+                            {
+                                API.setVehicleDoorState(player.vehicle, 4, true);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -272,45 +291,13 @@ namespace stuykserver.Util
             }
         }
 
-        [Command("seatbelt")]
-        public void cmdSeatBelt(Client player)
-        {
-            if (player.isInVehicle)
-            {
-                API.setPlayerSeatbelt(player, true);
-                //ch.sendCloseMessage(player, 15.0f, "~#C2A2DA~", API.getPlayerName(player) + " puts on their seatbelt.");
-            }
-        }
-
-        [Command("park")] // temp
-        public void cmdPark(Client player)
-        {
-            if (player.isInVehicle)
-            {
-                API.consoleOutput("In vehicle");
-                if (vehicleOwner.ContainsKey(player.vehicle.handle))
-                {
-                    API.consoleOutput("Contains Key");
-                    if (vehicleOwner[player.vehicle.handle] == player)
-                    {
-                        VehicleHash carPull = API.vehicleNameToModel(db.pullDatabase("PlayerVehicles", "VehicleType0", "Garage", player.name));
-                        var vehicle = player.vehicle;
-                        API.consoleOutput(carPull.ToString());
-                        if (vehicle.model == Convert.ToInt32(carPull))
-                        {
-                            db.updateVehiclePosition(player, 0);
-                            API.sendNotificationToPlayer(player, "Updated");
-                        }
-                    }
-                }
-            }
-        }
-
         public void SpawnPlayerCars(Client player)
         {
             if(db.databasePlayCarSlotExists(player, 0))
             {
-                vehicleOwner.Add(db.databaseSpawnPlayerCar(player, 0), player);
+                Vehicle slotZero = db.databaseSpawnPlayerCar(player, 0);
+                handleVehicleSpawn(player, slotZero);
+                return;
             }
         }
     }

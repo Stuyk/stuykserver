@@ -21,13 +21,7 @@ namespace stuykserver.Util
         {
             //API.onPlayerDeath += API_onPlayerDeath;
             API.onResourceStart += API_onResourceStart;
-            API.onChatCommand += API_onChatCommand;
             //API.onPlayerRespawn += API_onPlayerRespawn;
-        }
-
-        private void API_onChatCommand(Client player, string command, CancelEventArgs cancel)
-        {
-            
         }
 
         private void API_onResourceStart()

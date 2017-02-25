@@ -135,7 +135,7 @@ namespace stuykserver.Util
             API.triggerClientEvent(player, "killPanel");
             API.setEntityDimension(player, 0);
 
-            //API.call("VehicleHandler", "SpawnPlayerCars", player);
+            API.call("VehicleHandler", "SpawnPlayerCars", player);
 
             if (db.pullDatabase("Players", "Dead", "Nametag", player.name) == "1")
             {

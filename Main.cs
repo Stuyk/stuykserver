@@ -17,7 +17,6 @@ namespace stuykserver
 
         public Main()
         {
-            API.onChatMessage += API_onChatMessage;
             API.onPlayerHealthChange += API_onPlayerHealthChange;
             API.onUpdate += API_onUpdate;
             API.onResourceStart += API_onResourceStart;
@@ -37,14 +36,6 @@ namespace stuykserver
             db.updateDatabase("Players", "Health", player.health.ToString(), "Nametag", player.name);
         }
 
-        public void API_onChatMessage(Client player, string message, CancelEventArgs cancel)
-        {
-            if (!db.isPlayerLoggedIn(player))
-            {
-                cancel.Cancel = true;
-                return;
-            }
-        }
 
         [Command("resetdimension")]
         public void cmdResetDimension(Client player)
