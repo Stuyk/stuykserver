@@ -58,6 +58,12 @@ namespace stuykserver.Util
                     case "VehicleLock":
                         API.call("VehicleHandler", "actionLockCar", player);
                         break;
+                    case "ActionVehicleHood":
+                        API.call("VehicleHandler", "actionVehicleHood", player);
+                        break;
+                    case "ActionVehicleTrunk":
+                        API.call("VehicleHandler", "actionVehicleTrunk", player);
+                        break;
                 }
             }
         }

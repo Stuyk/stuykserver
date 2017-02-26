@@ -6,6 +6,15 @@ var keys = [];
 var currentCollisionType = null;
 
 API.onKeyDown.connect(function(player, e) {
+	if (!API.isChatOpen() && e.KeyCode == Keys.B && e.Shift) {
+		if (currentCollisionType == "VehicleLock") {
+			resource.Main.showRadialMenu();
+			useFunction = null;
+			vehicleSpecialFunction = null;
+			return;
+		}
+	}
+	
 	if (!API.isChatOpen() && e.KeyCode == Keys.B) {
 		switch (currentCollisionType) {
 			case "VehicleModificationShop":
@@ -73,6 +82,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			break;
 		
 		case "removeUseFunction":
+			currentCollisionType = null;
 			vehicleSpecialFunction = null;
 			useFunction = null;
 			break;

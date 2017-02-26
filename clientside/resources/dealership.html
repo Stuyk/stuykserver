@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/menu.css" rel="stylesheet">
+	<link rel="stylesheet" href="css/slider.css" />
+  </head>
+  <body>
+    <div class="site-wrapper responsive">
+		<div class="col-md-12">
+			<div class="col-md-1 col-md-offset-2" id="leftMostColumn">
+				<button class="special-button-offmost" type="submit"  id="browseLeft">
+					<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+				</button>
+			</div>
+			<div class="col-md-2" id="leftColumn">
+			</div>
+			<div class="col-md-2" id="centerColumn">
+				<div class="row">
+					<div class="col-md-12 special-column">
+						<h1 class="dealership-text">Dealership</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12 special-column">
+						<span class="dealership-text-small" id="vehicleName">Vehicle Name</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-2" id="rightColumn">
+			
+			</div>
+			<div class="col-md-1" id="rightMostColumn">
+				<button class="special-button-offmost" type="submit" id="browseRight">
+					<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+				</button>
+			</div>
+		</div>
+    </div>
+	<footer class="footer">
+			<div class="container">
+				<input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="359" data-slider-step="1" data-slider-value="0"/>
+			</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-slider.js"></script>
+	<script type="text/javascript">
+		$('#ex1').slider().on('slide', function(e) {
+			resourceCall("dealershipVehicleRotation", e.value);
+		});
+	
+		$(document).keypress(function(e) {
+			if(e.which == 66 || e.which == 27 || e.which == 32) {
+				resourceCall("killPanel");
+				return;
+			}
+		});
+	
+		$('#browseLeft').click(function() {
+			resourceCall("dealershipBrowseLeft");
+			return;
+		});
+		
+		$('#browseRight').click(function() {
+			resourceCall("dealershipBrowseRight");
+			return;
+		});
+		
+		function updateVehicle(value) {
+			$('#vehicleName').html(value);
+		}
+	</script>
+	</body>
+</html>
+

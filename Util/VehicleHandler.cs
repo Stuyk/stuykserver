@@ -207,22 +207,53 @@ namespace stuykserver.Util
         {
             if (db.isPlayerLoggedIn(player))
             {
-                if (player.isInVehicle)
+                if (!player.isInVehicle)
                 {
-                    if (API.getPlayerVehicleSeat(player) == -1)
+                    foreach (NetHandle vehicle in vehicleHandles)
                     {
-                        if (vehicleKeys[player.vehicle] == player)
+                        if (player.position.DistanceTo(API.getEntityPosition(vehicle)) <= 3)
                         {
-                            if (API.getVehicleDoorState(player.vehicle, 4))
+                            if (vehicleKeys[vehicle] == player)
                             {
-                                API.setVehicleDoorState(player.vehicle, 4, false);
+                                if (API.getVehicleDoorState(vehicle, 4))
+                                {
+                                    API.setVehicleDoorState(vehicle, 4, false);
+                                }
+                                else
+                                {
+                                    API.setVehicleDoorState(vehicle, 4, true);
+                                }
                             }
-                            else
-                            {
-                                API.setVehicleDoorState(player.vehicle, 4, true);
-                            }
+
                         }
                     }
+                }
+            }
+        }
+
+        public void actionVehicleTrunk(Client player)
+        {
+            if (db.isPlayerLoggedIn(player))
+            {
+                if (!player.isInVehicle)
+                {
+                    foreach (NetHandle vehicle in vehicleHandles)
+                    {
+                        if (player.position.DistanceTo(API.getEntityPosition(vehicle)) <= 3)
+                        {
+                            if (vehicleKeys[vehicle] == player)
+                            {
+                                if (API.getVehicleDoorState(vehicle, 5))
+                                {
+                                    API.setVehicleDoorState(vehicle, 5, false);
+                                }
+                                else
+                                {
+                                    API.setVehicleDoorState(vehicle, 5, true);
+                                }
+                            }
+                        }
+                    } 
                 }
             }
         }

@@ -12,3 +12,9 @@
 		API.setActiveCamera(null);
 	}
 });
+
+function createCamera(pos, target) {
+	var newCam = API.createCamera(pos, new Vector3());
+	API.pointCameraAtPosition(newCam, target);
+	API.setActiveCamera(newCam);
+}

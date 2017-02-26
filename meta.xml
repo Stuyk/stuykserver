@@ -35,7 +35,8 @@
 	<script src="clientside/resources/KeyPressHandler.js" type="client" lang="javascript" />
 	<script src="clientside/resources/PaperBoy.js" type="client" lang="javascript" />
 	<script src="clientside/resources/Fishing.js" type="client" lang="javascript" />
-	  
+
+	<file src="clientside/resources/dealership.html"/>
 	<file src="clientside/resources/skinchanger.html"/>
     <file src="clientside/resources/index.html"/>
 	<file src="clientside/resources/regsuccess.html"/>
@@ -44,12 +45,17 @@
 	<file src="clientside/resources/atmpanel2.html"/>
 	<file src="clientside/resources/clothingpanel.html"/>
 	<file src="clientside/resources/carpanel.html"/>
+	<file src="clientside/resources/menu_vehiclecontrols.html"/>
+	
 	<file src="clientside/resources/js/bootstrap.js"/>
 	<file src="clientside/resources/js/bootstrap.min.js"/>
 	<file src="clientside/resources/js/npm.js"/>
 	<file src="clientside/resources/js/jquery.min.js"/>
 	<file src="clientside/resources/js/spectrum.js"/>
 	<file src="clientside/resources/js/bootstrap-slider.js" />
+	<file src="clientside/resources/js/raphael.min.js" />
+	<file src="clientside/resources/js/raphael.icons.min.js" />
+	<file src="clientside/resources/js/wheelnav.min.js" />
 	
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.eot" />
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.svg" />
@@ -58,19 +64,21 @@
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff2" />
 	<file src="clientside/resources/fonts/Lobster-Regular.ttf" />
 	
-	<file src="clientside/resources/atmpanelnew.css" />
-	<file src="clientside/resources/login.css" />
-	<file src="clientside/resources/skinchanger.css" />
-	<file src="clientside/resources/cover.css" />
-	<file src="clientside/resources/inventory.css" />
-	<file src="clientside/resources/skinselector.css"/>
-	<file src="clientside/resources/atmpanel.css"/>
-	<file src="clientside/resources/carpanel.css"/>
+	<file src="clientside/resources/css/atmpanelnew.css" />
+	<file src="clientside/resources/css/radialmenu.css" />
+	<file src="clientside/resources/css/login.css" />
+	<file src="clientside/resources/css/skinchanger.css" />
+	<file src="clientside/resources/css/cover.css" />
+	<file src="clientside/resources/css/inventory.css" />
+	<file src="clientside/resources/css/skinselector.css"/>
+	<file src="clientside/resources/css/atmpanel.css"/>
+	<file src="clientside/resources/css/carpanel.css"/>
 	<file src="clientside/resources/css/spectrum.css"/>
 	<file src="clientside/resources/css/bootstrap.css" />
 	<file src="clientside/resources/css/bootstrap.min.css" />
 	<file src="clientside/resources/css/bootstrap.min.css.map"/>
 	<file src="clientside/resources/css/slider.css" />
+	<file src="clientside/resources/css/menu.css" />
 
 	<file src="clientside/resources/images/logo.png" />
 	<file src="clientside/resources/images/bg.png" />

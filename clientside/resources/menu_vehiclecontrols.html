@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/menu.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="site-wrapper responsive">
+		<div class="col-md-12">
+			<div class="col-md-1 col-md-offset-2" id="leftMostColumn">
+				<button class="special-button-offmost" type="submit" style="display: none">
+					<h4>unused</h4>
+				</button>
+			</div>
+			<div class="col-md-2" id="leftColumn">
+				<button class="special-button-offset" type="submit" id="btnHood">
+					<h3>hood</h3>
+				</button>
+			</div>
+			<div class="col-md-2" id="centerColumn">
+				<button class="special-button" type="submit" id="btnExit">
+					<h2>exit</h2>
+				</button>
+			</div>
+			<div class="col-md-2" id="rightColumn">
+				<button class="special-button-offset" type="submit" id="btnTrunk">
+					<h3>trunk</h3>
+				</button>
+			</div>
+			<div class="col-md-1" id="rightMostColumn">
+				<button class="special-button-offmost" type="submit" style="display: none">
+					<h4>unused</h4>
+				</button>
+			</div>
+		</div>
+    </div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(document).keypress(function(e) {
+			if(e.which == 66 || e.which == 27 || e.which == 32) {
+				resourceCall("killPanel");
+				return;
+			}
+		});
+	
+		$('#btnExit').click(function() {
+			resourceCall("killPanel");
+			return;
+		});
+	
+		$('#btnTrunk').click(function() {
+			resourceCall("vehicleOpenTrunk");
+			return;
+		});
+		
+		$('#btnHood').click(function() {
+			resourceCall("vehicleOpenHood");
+			return;
+		});
+	</script>
+	</body>
+</html>
+

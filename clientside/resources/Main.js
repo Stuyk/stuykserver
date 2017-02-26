@@ -249,14 +249,31 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 });
 
 API.onUpdate.connect(function() {
-    if (currentMoney != null) {
-        API.drawText("$" + currentMoney, resX - 25, 25, 1, 50, 211, 82, 255, 4, 2, false, true, 0);
-    }
+    if (pagePanel == null) {
+		if (currentMoney != null) {
+			API.drawText("$" + currentMoney, resX - 25, 25, 1, 50, 211, 82, 255, 4, 2, false, true, 0);
+		}
 	
-	if (karmaDisplay != null) {
-		API.drawText(karmaDisplay, resX - 25, resY - 100, 1, 244, 244, 66, 255, 4, 2, false, true, 0);
+		if (karmaDisplay != null) {
+			API.drawText(karmaDisplay, resX - 25, resY - 100, 1, 244, 244, 66, 255, 4, 2, false, true, 0);
+		}
 	}
+	
 });
+
+function showRadialMenu() {
+	if (pagePanel == null) {
+			pagePanel = new CefHelper("clientside/resources/menu_vehiclecontrols.html");
+			pagePanel.show();
+	}
+}
+
+function showDealership() {
+	if (pagePanel == null) {
+		pagePanel = new CefHelper("clientside/resources/dealership.html");
+		pagePanel.show();
+	}
+}
 
 function killPanel() {
 	if (pagePanel != null) {
@@ -299,6 +316,15 @@ function depositATM(amount) {
 
 function hideATMCash() {
 	cashDisplay = null;
+}
+
+// Vehicle Controls
+function vehicleOpenHood() {
+	API.triggerServerEvent("useFunction", "ActionVehicleHood");
+}
+
+function vehicleOpenTrunk() {
+	API.triggerServerEvent("useFunction", "ActionVehicleTrunk");
 }
 
 // ##########################
@@ -780,10 +806,261 @@ function updateVehicleMod(modtype, value) {
 	}
 }
 
+// ##########################
+// #### DEALERSHIP BROWSE ###
+// #### WRITTEN BY STUYK ####
+// ##########################
 
+var vehicles = [
+	"adder",
+	"akuma",
+	"alpha",
+	"asea",
+	"asterope",
+	"bagger",
+	"baller",
+	"banshee",
+	"bati",
+	"bati2",
+	"bfinjection",
+	"bifta",
+	"bison",
+	"bison2",
+	"bison3",
+	"bjxl",
+	"blade",
+	"blazer",
+	"blazer2",
+	"blista",
+	"bobcatxl",
+	"bodhi2",
+	"btype",
+	"btype2",
+	"btype3",
+	"buccaneer",
+	"buccaneer2",
+	"buffalo",
+	"bullet",
+	"burrito3",
+	"camper",
+	"carbonizzare",
+	"carbonrs",
+	"casco",
+	"cavalcade",
+	"cavalcade2",
+	"cheetah",
+	"chino",
+	"chino2",
+	"cog55",
+	"cog552",
+	"cogcabrio",
+	"cognoscenti",
+	"cognoscenti2",
+	"comet2",
+	"coquette",
+	"daemon",
+	"dilettante",
+	"dloader",
+	"dominator",
+	"double",
+	"dubsta",
+	"dubsta2",
+	"dukes",
+	"elegy2",
+	"emperor",
+	"emperor2",
+	"enduro",
+	"entityxf",
+	"exemplar",
+	"f620",
+	"faction",
+	"faggio2",
+	"felon",
+	"felon2",
+	"fq2",
+	"fugitive",
+	"furoregt",
+	"fusilade",
+	"futo",
+	"gauntlet",
+	"glendale",
+	"granger",
+	"gresley",
+	"habanero",
+	"hakuchou",
+	"hexer",
+	"hotknife",
+	"huntley",
+	"infernus",
+	"ingot",
+	"intruder",
+	"issi2",
+	"jackal",
+	"jester",
+	"journey",
+	"kalahari",
+	"khamelion",
+	"kuruma",
+	"landstalker",
+	"lectro",
+	"lurcher",
+	"mamba",
+	"manana",
+	"massacro",
+	"mesa",
+	"mesa3",
+	"minivan",
+	"monroe",
+	"moonbeam",
+	"nemesis",
+	"nightshade",
+	"ninef",
+	"oracle",
+	"oracle2",
+	"osiris",
+	"panto",
+	"paradise",
+	"patriot",
+	"pcj",
+	"penumbra",
+	"peyote",
+	"phoenix",
+	"picador",
+	"pigalle",
+	"prairie",
+	"premier",
+	"primo",
+	"primo2",
+	"radi",
+	"rancherxl",
+	"rapidgt",
+	"rapidgt2",
+	"raptor",
+	"ratloader",
+	"ratloader2",
+	"rebel",
+	"rebel2",
+	"regina",
+	"rhapsody",
+	"rocoto",
+	"romero",
+	"ruffian",
+	"ruiner",
+	"sabregt",
+	"sadler",
+	"sanchez",
+	"sandking",
+	"schafter2",
+	"schwarzer",
+	"seminole",
+	"sentinel",
+	"serrano",
+	"slamvan",
+	"sovereign",
+	"speedo",
+	"stalion",
+	"stanier",
+	"stinger",
+	"stingergt",
+	"stratum",
+	"stretch",
+	"sultan",
+	"sultanrs",
+	"superd",
+	"surano",
+	"surfer",
+	"surfer2",
+	"surge",
+	"t20",
+	"tailgater",
+	"tampa",
+	"thrust",
+	"tornado",
+	"tornado2",
+	"tornado3",
+	"tornado4",
+	"tornado5",
+	"turismor",
+	"vacca",
+	"vader",
+	"verlierer2",
+	"vigero",
+	"vindicator",
+	"virgo",
+	"virgo2",
+	"virgo3",
+	"voltic",
+	"voodoo",
+	"voodoo2",
+	"warrener",
+	"washington",
+	"windsor",
+	"youga",
+	"zentorno",
+	"zion",
+	"zion2"
+	];
 
+var currentVehicleIndex = 6;
+var centerVehicle = null;
 
+API.onServerEventTrigger.connect(function(eventName, args) {
+	if (eventName == "startBrowsing") {
+		startBrowsing();
+	}
+});
 
+function randomInteger(min, max) {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function startBrowsing() {
+	dealershipSetupVehicles();
+	API.setPlayerIntoVehicle(centerVehicle, -1);
+	showDealership();
+}
+
+function dealershipSetupVehicles() {
+	if (centerVehicle != null) {
+		API.deleteEntity(centerVehicle);
+	}
+	
+	if (currentVehicleIndex == -1) {
+		currentVehicleIndex = vehicles.length - 1;
+	}
+	else if (currentVehicleIndex == vehicles.length) {
+		currentVehicleIndex = 0;
+	}
+		
+	centerVehicle = API.createVehicle(API.vehicleNameToModel(vehicles[currentVehicleIndex]), new Vector3(225.6238, -990, -98.99996), 0);
+	API.setVehiclePrimaryColor(centerVehicle, randomInteger(0, 159));
+	
+	if (pagePanel != null) {
+		pagePanel.browser.call("updateVehicle", vehicles[currentVehicleIndex]);
+	}
+}
+
+function dealershipBrowseLeft() {
+	currentVehicleIndex -= 1;
+	
+	dealershipSetupVehicles();
+	
+	API.setPlayerIntoVehicle(centerVehicle, -1);
+}
+
+function dealershipBrowseRight() {
+	currentVehicleIndex += 1;
+
+	dealershipSetupVehicles();
+	
+	API.setPlayerIntoVehicle(centerVehicle, -1);
+}
+
+function dealershipVehicleRotation(value) {
+	var playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
+	var vehicleRotation = API.getEntityRotation(playerVehicle);
+	API.setEntityRotation(playerVehicle, new Vector3(vehicleRotation.X, vehicleRotation.Y, value));
+}
 
 
 

@@ -155,5 +155,13 @@ namespace stuykserver.Util
             ++i;
         }
 
+        [Command("startbrowsing")]
+        public void cmdStartBrowsing(Client player)
+        {
+            db.setPlayerHUD(player, false);
+            API.triggerClientEvent(player, "startBrowsing");
+            API.triggerClientEvent(player, "createCamera", new Vector3(230.8, -990.1201, -98.5), player.position);
+        }
+
     }
 }

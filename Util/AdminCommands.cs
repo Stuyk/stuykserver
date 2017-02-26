@@ -88,6 +88,22 @@ namespace stuykserver.Util
             }
         }
 
-        
+        [Command("mx")]
+        public void cmdMX(Client player)
+        {
+            if (db.isAdmin(player.name))
+            {
+                API.setEntityPosition(player, new Vector3(player.position.X + 5, player.position.Y, player.position.Z));
+            }
+        }
+
+        [Command("my")]
+        public void cmdMY(Client player)
+        {
+            if (db.isAdmin(player.name))
+            {
+                API.setEntityPosition(player, new Vector3(player.position.X, player.position.Y + 5, player.position.Z));
+            }
+        }
     }
 }
