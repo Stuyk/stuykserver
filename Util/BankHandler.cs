@@ -84,15 +84,19 @@ namespace stuykserver.Util
                     {
                         db.setPlayerMoney(player, +input);
                         db.setPlayerAtmMoney(player, -input);
-                        API.triggerClientEvent(player, "updateATM", db.getPlayerAtmMoney(player), db.getPlayerMoney(player));
-                        API.stopPlayerAnimation(player);
-                        API.stopPedAnimation(player);
+                        updateATMDisplay(player);
+                        API.triggerClientEvent(player, "displayWithdrawSuccess");
+                    }
+                    else
+                    {
+                        API.triggerClientEvent(player, "displayNotThatMuch");
                     }
                 }
-                else
-                {
-                    API.sendNotificationToPlayer(player, "~r~Invalid number.");
-                }
+            }
+
+            if (eventName == "balanceNotDisplayed")
+            {
+                updateATMDisplay(player);
             }
 
             if (eventName == "depositATM_Server")
@@ -105,14 +109,13 @@ namespace stuykserver.Util
                     {
                         db.setPlayerMoney(player, -input);
                         db.setPlayerAtmMoney(player, +input);
-                        API.triggerClientEvent(player, "updateATM", db.getPlayerAtmMoney(player), db.getPlayerMoney(player));
-                        API.stopPlayerAnimation(player);
-                        API.stopPedAnimation(player);
-                    }  
-                }
-                else
-                {
-                    API.sendNotificationToPlayer(player, "~r~Invalid number.");
+                        updateATMDisplay(player);
+                        API.triggerClientEvent(player, "depositAlertSuccess");
+                    }
+                    else
+                    {
+                        API.triggerClientEvent(player, "displayNotThatMuch");
+                    }
                 }
             }
         }
@@ -146,6 +149,14 @@ namespace stuykserver.Util
             }
 
             API.consoleOutput("Banks Initialized: " + initializedObjects.ToString());
+        }
+
+        public void updateATMDisplay(Client player)
+        {
+            int atmMoney = db.getPlayerAtmMoney(player);
+            int playerMoney = db.getPlayerMoney(player);
+
+            API.triggerClientEvent(player, "refreshATM", atmMoney, playerMoney);
         }
 
         public void selectATM(Client player)

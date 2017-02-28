@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/fishing.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="site-wrapper">
+      <div class="site-wrapper-inner">
+        <div class="cover-container">
+          <div class="inner cover">
+			<div class="col-sm-8 col-sm-offset-2 custom-form">
+				<h1 class="header-text">Fishing</h1>
+				<h4 class="header-text">Input the displayed word.</h4>
+				<div class="row">
+					<input id="inputForm" tabindex="0"></input>
+					<div class="progress col-sm-offset-3" style="height: 35px; width: 50%" id="parseBar" hidden>
+						<div class="progress-bar progress-bar-striped progress-bar-success active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Comparing Word</h5></div>
+					</div>
+				</div>
+				<div class="row" style="padding: 10" id="wordDisplayRow">
+					<span class="display-text">Your word is: <span id="wordDisplay">test123</span></span>
+				</div>
+				<div class="row">
+					<button class="btn btn-info col-sm-6 col-sm-offset-3" id="submit" tabindex="1" type="submit">Submit</button>
+				</div>
+			</div>
+          </div>
+        </div>
+      </div>
+    </div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			getWord();
+			$('#inputForm').focus();
+		});
+		
+		$('#inputForm').keydown(function(e) {
+			if (e.which == 13) {
+				pushWord();
+			}
+		});
+		
+		$('#submit').click(function() {
+			pushWord();
+		});
+		
+		function pushWord() {
+			var input = $('#inputForm').val();
+			
+			if (input.length > 1) {
+				$('#submit').hide();
+				$('#wordDisplay').hide();
+				$('#inputForm').hide();
+				$('#wordDisplayRow').hide();
+				$('#parseBar').show();
+				resourceCall("fishingPushWord", input);
+			}
+		}
+		
+		function displayWord(value) {
+			$('#wordDisplay').html(value);
+			$('#wordDisplay').show();
+		}
+		
+		function getWord() {
+			resourceCall("fishingGetWord");
+		}
+		
+		
+	</script>
+	</body>
+</html>
+

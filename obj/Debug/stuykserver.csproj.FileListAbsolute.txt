@@ -1,0 +1,9 @@
+A:\GTANetwork\resources\stuykserver\stuykserver.dll.config
+A:\GTANetwork\resources\stuykserver\obj\Debug\stuykserver.dll
+A:\GTANetwork\resources\stuykserver\obj\Debug\stuykserver.pdb
+A:\GTANetwork\resources\stuykserver\stuykserver.dll
+A:\GTANetwork\resources\stuykserver\stuykserver.pdb
+A:\GTANetwork\resources\stuykserver\BCrypt.Net.dll
+A:\GTANetwork\resources\stuykserver\GTANetworkServer.exe
+A:\GTANetwork\resources\stuykserver\GTANetworkShared.dll
+A:\GTANetwork\resources\stuykserver\BCrypt.Net.xml

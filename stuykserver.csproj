@@ -7,21 +7,23 @@
     <ProjectGuid>{76DB75C7-F41A-46F9-9673-56687752C012}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClassLibrary1</RootNamespace>
-    <AssemblyName>ClassLibrary1</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>stuykserver</RootNamespace>
+    <AssemblyName>stuykserver</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>.\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BCrypt.Net, Version=0.1.4141.31969, Culture=neutral, PublicKeyToken=f3bc8f8c31beeb49, processorArchitecture=MSIL">
@@ -47,6 +50,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -54,19 +58,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Jobs\JobHandler.cs" />
-    <Compile Include="Jobs\PizzaDelivery.cs" />
+    <Compile Include="Jobs\PaperBoy.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Jobs\Fishing.cs" />
+    <Compile Include="Util\ActiveShooter.cs" />
+    <Compile Include="Util\AdminCommands.cs" />
+    <Compile Include="Util\BankHandler.cs" />
+    <Compile Include="Util\BarberShopHandler.cs" />
     <Compile Include="Util\BlipMarkerHandler.cs" />
+    <Compile Include="Util\ChatHandler.cs" />
+    <Compile Include="Util\ClothingHandler.cs" />
+    <Compile Include="Util\ClothingShopHandler.cs" />
     <Compile Include="Util\ConnectionHandler.cs" />
     <Compile Include="Util\DatabaseHandler.cs" />
+    <Compile Include="Util\DeathHandler.cs" />
+    <Compile Include="Util\KarmaHandler.cs" />
+    <Compile Include="Util\KeyPressHandler.cs" />
     <Compile Include="Util\LoginHandler.cs" />
+    <Compile Include="Util\OrganizationHandler.cs" />
+    <Compile Include="Util\SkinHandler.cs" />
     <Compile Include="Util\SpawnPoints.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\VehicleHandler.cs" />
+    <Compile Include="Util\VehicleModificationHandler.cs" />
+    <Compile Include="Util\VehicleShopHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="clientside\resources\css\bootstrap.min.css.map" />
+    <None Include="clientside\resources\fonts\glyphicons-halflings-regular.eot" />
+    <None Include="clientside\resources\fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="clientside\resources\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="clientside\resources\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="packages.config" />
     <None Include="tsconfig.json" />
   </ItemGroup>
@@ -81,6 +104,44 @@
     <TypeScriptCompile Include="types-gtanetwork\System.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\System.Drawing.dll.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Xilium.CefGlue.dll.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="clientside\ActiveShooter.js" />
+    <Content Include="clientside\Main.js" />
+    <Content Include="clientside\MoneyDisplay.js" />
+    <Content Include="clientside\resources\atmpanel.css" />
+    <Content Include="clientside\resources\atmpanel.html" />
+    <Content Include="clientside\resources\businessfemale.html" />
+    <Content Include="clientside\resources\businessmale.html" />
+    <Content Include="clientside\resources\casualfemale.html" />
+    <Content Include="clientside\resources\casualmale.html" />
+    <Content Include="clientside\resources\cover.css" />
+    <Content Include="clientside\resources\css\bootstrap.css" />
+    <Content Include="clientside\resources\css\bootstrap.min.css" />
+    <Content Include="clientside\resources\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="clientside\resources\images\ajax-loader.gif" />
+    <Content Include="clientside\resources\images\bg.png" />
+    <Content Include="clientside\resources\images\dashed.png" />
+    <Content Include="clientside\resources\images\geo.png" />
+    <Content Include="clientside\resources\images\logo.png" />
+    <Content Include="clientside\resources\images\skins\placeholder.png" />
+    <Content Include="clientside\resources\images\tweed.png" />
+    <Content Include="clientside\resources\index.html" />
+    <Content Include="clientside\resources\industryone.html" />
+    <Content Include="clientside\resources\industrytwo.html" />
+    <Content Include="clientside\resources\inventory.css" />
+    <Content Include="clientside\resources\inventory.html" />
+    <Content Include="clientside\resources\js\bootstrap.js" />
+    <Content Include="clientside\resources\js\bootstrap.min.js" />
+    <Content Include="clientside\resources\js\npm.js" />
+    <Content Include="clientside\resources\loading.html" />
+    <Content Include="clientside\resources\policefemale.html" />
+    <Content Include="clientside\resources\policemale.html" />
+    <Content Include="clientside\resources\regsuccess.html" />
+    <Content Include="clientside\resources\skinselector.css" />
+    <Content Include="clientside\resources\skinselector.html" />
+    <Content Include="clientside\serversideCamera.js" />
+    <Content Include="clientside\WaypointHelper.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

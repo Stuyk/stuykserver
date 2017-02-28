@@ -1,48 +1,20 @@
-var pagePanel = null;
+var pagePanel = null; // CEF
 var cashDisplay = null;
 var res = API.getScreenResolution();
-var currentMoney = null;
+var currentMoney = null; // Cash Display
 var resX = API.getScreenResolutionMantainRatio().Width;
 var resY = API.getScreenResolutionMantainRatio().Height;
 var currentjob = null;
+var karmaDisplay = null; // Karma Display
+var playerAccountBalance = null; // Player Account Balance
+var email = ""; // Registration System
+var password = ""; // Registration System
+var page = ""; // CEF? Probably unused.
+var useFunction = null; // KEYPRESS USE BUTTON System
+var vehicleSpecialFunction = null; // KEYPRESS USE BUTTON System
+var currentCollisionType = null; // KEYPRESS USE BUTTON System
 
-// Karma Display
-var karmaDisplay = null;
-
-// Clothing Variables (IN ORDER)
-var clothingTopNum = null;
-var clothingTopColorNum = null;
-var clothingUndershirtNum = null;
-var clothingUndershirtColorNum = null;
-var clothingLegsNum = null;
-var clothingLegsColorNum = null;
-var clothingShoesNum = null;
-var clothingShoesColorNum = null;
-var clothingTorsoNum = null;
-var clothingPanelOpen = null;
-
-// Face Variables (IN ORDER)
-var faceGender = null;
-var faceShapeOne = null;
-var faceShapeTwo = null;
-var faceSkinOne = null;
-var faceSkinTwo = null;
-var faceShapeMix = null;
-var faceSkinMix = null;
-var faceHairstyle = null;
-var faceHairstyleColor = null;
-var faceHairstyleHighlight = null;
-var faceHairstyleTexture = null;
-var facePanelOpen = null;
-
-// Account Balance
-var playerAccountBalance = null;
-
-var email = "";
-var password = "";
-var page = "";
-var playerName = "";
-
+// CEF Boilerplate
 class CefHelper {
   constructor (resourcePath)
   {
@@ -63,32 +35,6 @@ class CefHelper {
     }
   }
   
-  showInv (value) {
-    if (this.open == false) {
-      this.open = true;
-      var resolution = API.getScreenResolution();
-      this.browser = API.createCefBrowser(resolution.Width, resolution.Height, true);
-      API.waitUntilCefBrowserInit(this.browser);
-      API.setCefBrowserPosition(this.browser, resolution.Width / 2 - 250, 0);
-      API.loadPageCefBrowser(this.browser, this.path);
-      API.showCursor(true);
-      API.setCanOpenChat(false);
-    }
-  }
-  
-  showBankPanel () {
-    if (this.open == false) {
-      this.open = true;
-      var resolution = API.getScreenResolution();
-      this.browser = API.createCefBrowser(resolution.Width, resolution.Height, true);
-      API.waitUntilCefBrowserInit(this.browser);
-      API.setCefBrowserPosition(this.browser, resolution.Width / 2 - 250, resolution.Height / 2 - 120);
-      API.loadPageCefBrowser(this.browser, this.path);
-      API.showCursor(true);
-      API.setCanOpenChat(false);
-    }
-  }
-  
   destroy () {
     this.open = false;
     API.destroyCefBrowser(this.browser);
@@ -101,6 +47,16 @@ class CefHelper {
   }
 }
 
+// KILL CEF PANEL, WITH FIRE. FUCK YEAH!
+function killPanel() {
+	if (pagePanel != null) {
+		pagePanel.destroy();
+		pagePanel = null;
+		API.triggerServerEvent("stopAnimation");
+	}
+}
+
+// PARSE LOGIN SCREEN: GO! GO! GO!
 API.onResourceStart.connect(function() {
   if (pagePanel == null) {
     pagePanel = new CefHelper("clientside/resources/index.html");
@@ -108,6 +64,7 @@ API.onResourceStart.connect(function() {
   }
 });
 
+// DISCONNECTED? BETTER STOP THE CEF SHIT.
 API.onResourceStop.connect(function() {
     if (pagePanel != null) {
 		pagePanel.destroy();
@@ -115,108 +72,205 @@ API.onResourceStop.connect(function() {
 	}
 });
 
+API.onKeyDown.connect(function(player, e) {
+	// SHIFT + B - KEYPRESS HELPER
+	if (!API.isChatOpen() && e.KeyCode == Keys.B && e.Shift) {
+		if (currentCollisionType == "VehicleLock") {
+			resource.Main.showRadialMenu();
+			useFunction = null;
+			vehicleSpecialFunction = null;
+			return;
+		}
+	}
+	
+	// B - KEYPRESS HELPER
+	if (!API.isChatOpen() && e.KeyCode == Keys.B) {
+		switch (currentCollisionType) {
+			case "VehicleModificationShop":
+				API.triggerServerEvent("useFunction", "VehicleModificationShop");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
+				
+			case "Bank":
+				API.triggerServerEvent("useFunction", "Bank");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
+				
+			case "FishingSpot":
+				API.triggerServerEvent("useFunction", "FishingSpot");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
+				
+			case "FishingSaleSpot":
+				API.triggerServerEvent("useFunction", "FishingSaleSpot");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
+				
+			case "BarberShop":
+				API.triggerServerEvent("useFunction", "BarberShop");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
+				
+			case "Clothing":
+				API.triggerServerEvent("useFunction", "Clothing");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
+				
+			case "Dealership":
+				API.triggerServerEvent("useFunction", "Dealership");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
+				
+			case "VehicleEngine":
+				API.triggerServerEvent("useFunction", "VehicleEngine");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
+				
+			case "VehicleLock":
+				API.triggerServerEvent("useFunction", "VehicleLock");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
+		}	
+	}
+});
+
 API.onServerEventTrigger.connect(function(eventName, args) {
-    if (eventName=="registerSuccessful") {
-        if (pagePanel == null)
-        {
-            pagePanel = new CefHelper("clientside/resources/index.html");
-            pagePanel.show();
-        }
+	// KEYPRESS EVENTS
+	switch (eventName) {
+		case "triggerUseFunction":
+		{
+			useFunction = true;
+			currentCollisionType = args[0];
+			break;
+		}
+		case "removeUseFunction":
+		{
+			currentCollisionType = null;
+			vehicleSpecialFunction = null;
+			useFunction = null;
+			break;
+		}
+	}
+	
+	// CEF REQUEST PANEL EVENTS
+	if (pagePanel == null) {
+		switch(eventName) {
+			case "openInventory":
+			{
+				showInventory();
+				break;
+			}
+			case "openSkinPanel":
+			{
+				showModelMenu();
+				break;
+			}
+			case "openClothingPanel":
+			{
+				showClothingPanel();
+				break;
+			}
+			case "openCarPanel":
+			{
+				showVehiclePanel();
+				break;
+			}
+			case "loadATM":
+			{
+				showATM();
+				break;
+			}
+			case "loadFishing":
+			{
+				showFishing();
+				break;
+			}
+		}
+	}
+	
+	// CEF REQUEST CALL EVENTS
+	if (pagePanel != null) {
+		switch(eventName) {
+			case "refreshATM":
+			{
+				pagePanel.browser.call("displayAccountBalance", args[0], args[1]);
+				break;
+			}
+			case "depositAlertSuccess":
+			{
+				pagePanel.browser.call("displayDepositSuccess");
+				break;
+			}
+			case "displayWithdrawSuccess":
+			{
+				pagePanel.browser.call("displayWithdrawSuccess");
+				break;
+			}
+			case "displayNotThatMuch":
+			{
+				pagePanel.browser.call("displayNotThatMuch");
+				break;
+			}
+			case "registerSuccessful":
+			{
+				pagePanel.browser.call("showLogin");
+				break;
+			}
+			case "passwordDoesNotMatch":
+			{
+				pagePanel.browser.call("doesNotMatch");
+				break;
+			}
+			case "accountDoesNotExist":
+			{
+				pagePanel.browser.call("doesNotExist");
+				break;
+			}
+			case "doesNotMatchAccount":
+			{
+				pagePanel.browser.call("doesNotMatchAccount");
+				break;
+			}
+			case "fishingPushWord":
+			{
+				pagePanel.browser.call("displayWord", args[0]);
+				break;
+			}
+		}
 		
-		if (pagePanel != null) {
-			pagePanel.browser.call("showLogin");
-		}
-    }
+	}
 	
-	if (eventName=="passwordDoesNotMatch") {
+	// EVENT NAMES THAT CAN'T GO ANYWHERE
+	
+	if (eventName == "killPanel") {
 		if (pagePanel != null) {
-			pagePanel.browser.call("doesNotMatch");
+			pagePanel.destroy();
+			pagePanel = null;
+			API.triggerServerEvent("stopAnimation");
 		}
 	}
 	
-	if (eventName=="accountDoesNotExist") {
-		if (pagePanel != null) {
-			pagePanel.browser.call("doesNotExist");
-		}
-	}
-	
-	if (eventName=="doesNotMatchAccount") {
-		if (pagePanel != null) {
-			pagePanel.browser.call("doesNotMatchAccount");
-		}
-	}
-	
+	// LOADSAMONEY Proble
 	if (eventName === "update_money_display") {
         currentMoney = args[0];
     }
-    
-    if (eventName=="openInventory") {
-        if (pagePanel == null)
-        {
-			var value = API.getLocalPlayer();
-            pagePanel = new CefHelper("clientside/resources/inventory.html");
-        }
-    }
-    
-    if (eventName=="openSkinPanel") {
-        if (pagePanel == null)
-        {
-            pagePanel = new CefHelper("clientside/resources/skinchanger.html");
-            pagePanel.show();
-			updateFaceProperties();
-        }
-    }
 	
-	if (eventName=="openClothingPanel") {
-        if (pagePanel == null)
-        {
-            pagePanel = new CefHelper("clientside/resources/clothingpanel.html");
-            pagePanel.show();
-			updateClothingProperties();
-        }
-    }
-	
-	if (eventName=="openCarPanel") {
-		if (pagePanel == null) {
-			pagePanel = new CefHelper("clientside/resources/carpanel.html");
-			pagePanel.show();
-		}
-	}
-    
-    if (eventName=="killPanel") {
-        if (pagePanel != null) {
-            pagePanel.destroy();
-            pagePanel = null;
-            API.triggerServerEvent("stopAnimation");
-        }
-    }
-	
-	if (eventName=="updateNameVariable") {
-		playerName = args[0];
-		API.sendNotification(playerName);
-	}
-	
-	if (eventName=="loadATM") { // ATM Functions
-		if (pagePanel == null) {
-			pagePanel = new CefHelper("clientside/resources/atmpanel.html");
-			pagePanel.show();
-			playerAccountBalance = args[0].toString();
-		}
-	}
-	
-	if (eventName=="updateATM") { // ATM Functions
-		if (pagePanel != null) {
-			playerAccountBalance = args[0].toString();
-			playerCashOnHand = args[1].toString();
-			pagePanel.browser.call("displayAccountBalance", playerAccountBalance.toString(), playerCashOnHand.toString());
-		}
-	}
-	
-	if (eventName=="closeCarDoor") { // Vehicle Functions
+	// VEHICLE FUNCTIONS - CLOSE THE DOOR
+	if (eventName=="closeCarDoor") {
 		API.setVehicleDoorState(args[0], args[1], false);
 	}
 	
-	if (eventName=="clothingLocalVariableUpdate") { // Clothing Changer
+	// CLOTHING CHANGER VARIABLES
+	if (eventName=="clothingLocalVariableUpdate") {
 		clothingPanelOpen = true;
 		clothingTorsoNum = args[0];
 		clothingTopNum = args[1];
@@ -229,7 +283,8 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		clothingShoesColorNum = args[8];
 	}
 	
-	if (eventName=="loadFaceData") { // Model Changer
+	// MODEL CHANGER VARIABLES
+	if (eventName=="loadFaceData") {
 		facePanelOpen = true;
 		faceShapeOne = args[0];
 		faceShapeTwo = args[1];
@@ -250,9 +305,26 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	if (eventName == "startBrowsing") { // Dealership
 		startBrowsing(args[0]);
 	}
+	
+	// SERVERSIDE CAMERA FUNCTIONS
+	// Create a camera.
+	if (eventName == "createCamera") {
+		var pos = args[0];
+		var target = args[1];
+		
+		var camera = API.createCamera(pos, new Vector3());
+		API.pointCameraAtPosition(camera, target);
+		API.setActiveCamera(camera);
+	}
+	
+	// Destroy a camera.
+	if (eventName == "endCamera") {
+		API.setActiveCamera(null);
+	}
 });
 
 API.onUpdate.connect(function() {
+	// SCREEN OVERLAYS
     if (pagePanel == null) {
 		if (currentMoney != null) {
 			API.drawText("$" + currentMoney, resX - 25, 25, 1, 50, 211, 82, 255, 4, 2, false, true, 0);
@@ -262,51 +334,85 @@ API.onUpdate.connect(function() {
 			API.drawText(karmaDisplay, resX - 25, resY - 100, 1, 244, 244, 66, 255, 4, 2, false, true, 0);
 		}
 	}
+	
+	// USE FUNCTION DISPLAYS
+	if (useFunction != null) {
+		switch (currentCollisionType) {
+		case "VehicleModificationShop":
+			API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+			
+		case "Bank":
+			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+			
+		case "FishingSpot":
+			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+			
+		case "FishingSaleSpot":
+			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+			
+		case "BarberShop":
+			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+			
+		case "Clothing":
+			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+			
+		case "Dealership":
+			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+			
+		case "VehicleEngine":
+			API.dxDrawTexture("clientside/resources/images/pressbalt.png", new Point(resX / 2 - 25, resY / 2 - 75), new Size(200, 125), 1);
+			break;
+			
+		case "VehicleLock":
+			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+		}
+	}
 });
 
-function showRadialMenu() {
-	if (pagePanel == null) {
-			pagePanel = new CefHelper("clientside/resources/menu_vehiclecontrols.html");
-			pagePanel.show();
-	}
+// ##########################
+// # FISHING   FUNCTIONS ####
+// #### WRITTEN BY STUYK ####
+// ##########################
+function showFishing() {
+	pagePanel = new CefHelper("clientside/resources/fishing.html");
+	pagePanel.show();
 }
 
-function showDealership() {
-	if (pagePanel == null) {
-		pagePanel = new CefHelper("clientside/resources/dealership.html");
-		pagePanel.show();
-	}
+function fishingGetWord() {
+	API.triggerServerEvent("pushWordToPanel");
 }
 
-function killPanel() {
-	if (pagePanel != null) {
-		pagePanel.destroy();
-		pagePanel = null;
-		API.triggerServerEvent("stopAnimation");
-	}
+function fishingPushWord(value) {
+	API.triggerServerEvent("submitWord", value);
 }
 
-function closeInventory() {
-    pagePanel.destroy();
-    pagePanel = null;
+// ##########################
+// # REGISTRATION FUNCTIONS #
+// #### WRITTEN BY STUYK ####
+// ##########################
+function registerHandler(email, password) {
+    API.triggerServerEvent("clientRegistration", email, password);
 }
 
 function loginHandler(email, password) {
     API.triggerServerEvent("clientLogin", email, password);
 }
 
-function requestAccountBalance() {
-	API.sleep(2000);
-	pagePanel.browser.call("displayAccountBalance", playerAccountBalance, currentMoney);
-}
-
-function registerHandler(email, password) {
-    API.triggerServerEvent("clientRegistration", email, password);
-}
-
-function getPlayerName() {
-	API.triggerServerEvent("localPullName");
-	return playerName;
+// ##########################
+// ### ATM       FUNCTIONS ##
+// #### WRITTEN BY STUYK ####
+// ##########################
+function showATM() {
+	pagePanel = new CefHelper("clientside/resources/atmpanel.html");
+	pagePanel.show();
 }
 
 function withdrawATM(amount) {
@@ -321,7 +427,29 @@ function hideATMCash() {
 	cashDisplay = null;
 }
 
-// Vehicle Controls
+function requestAccountBalance() {
+	API.triggerServerEvent("balanceNotDisplayed");
+}
+
+// ##########################
+// ### INVENTORY FUNCTIONS ##
+// #### WRITTEN BY STUYK ####
+// ##########################
+function showInventory() {
+	pagePanel = new CefHelper("clientside/resources/inventory.html");
+	pagePanel.show();
+}
+
+// ##########################
+// #### VEHICLE FUNCTIONS ###
+// #### WRITTEN BY STUYK ####
+// ##########################
+
+function showVehiclePanel() {
+	pagePanel = new CefHelper("clientside/resources/carpanel.html");
+	pagePanel.show();
+}
+
 function vehicleOpenHood() {
 	API.triggerServerEvent("useFunction", "ActionVehicleHood");
 }
@@ -330,10 +458,37 @@ function vehicleOpenTrunk() {
 	API.triggerServerEvent("useFunction", "ActionVehicleTrunk");
 }
 
+function showRadialMenu() {
+	if (pagePanel == null) {
+			pagePanel = new CefHelper("clientside/resources/menu_vehiclecontrols.html");
+			pagePanel.show();
+	}
+}
+
 // ##########################
 // #### MODEL CHANGER    ####
 // #### WRITTEN BY STUYK ####
 // ##########################
+
+var faceGender = null;
+var faceShapeOne = null;
+var faceShapeTwo = null;
+var faceSkinOne = null;
+var faceSkinTwo = null;
+var faceShapeMix = null;
+var faceSkinMix = null;
+var faceHairstyle = null;
+var faceHairstyleColor = null;
+var faceHairstyleHighlight = null;
+var faceHairstyleTexture = null;
+var facePanelOpen = null;
+
+function showModelMenu() {
+	pagePanel = new CefHelper("clientside/resources/skinchanger.html");
+	pagePanel.show();
+	updateFaceProperties();
+}
+
 function intToFloat(num) { // Used to create the float numbers.
 	return num.toFixed(1);
 }
@@ -521,6 +676,22 @@ function changeFaceHairstyleTexture(amount) {
 // #### CLOTHING CHANGER ####
 // #### WRITTEN BY STUYK ####
 // ##########################
+var clothingTopNum = null;
+var clothingTopColorNum = null;
+var clothingUndershirtNum = null;
+var clothingUndershirtColorNum = null;
+var clothingLegsNum = null;
+var clothingLegsColorNum = null;
+var clothingShoesNum = null;
+var clothingShoesColorNum = null;
+var clothingTorsoNum = null;
+var clothingPanelOpen = null;
+
+function showClothingPanel() {
+	pagePanel = new CefHelper("clientside/resources/clothingpanel.html");
+	pagePanel.show();
+	updateClothingProperties();
+}
 
 function changeClothingTorso(amount) { // Torso Changer
 	if (clothingTorsoNum != null) {
@@ -1186,10 +1357,17 @@ var vehiclesVans = [
 	"Taco",
 	"Youga"
 	];
-	
+
 var currentVehicleIndex = 6;
 var centerVehicle = null;
 var vehicleSelectionType = null;
+
+function showDealership() {
+	if (pagePanel == null) {
+		pagePanel = new CefHelper("clientside/resources/dealership.html");
+		pagePanel.show();
+	}
+}
 
 function randomInteger(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;

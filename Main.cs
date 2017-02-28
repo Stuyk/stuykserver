@@ -103,9 +103,6 @@ namespace stuykserver
             }
         }
 
-        // Used to check if the player is logged in.
-        
-
         // Used to check if the string is a valid username.
         public bool isValidUsername(string input)
         {

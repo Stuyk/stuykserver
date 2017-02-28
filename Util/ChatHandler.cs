@@ -23,19 +23,22 @@ namespace stuykserver.Util
 
         public void API_onChatMessage(Client player, string message, CancelEventArgs e)
         {
-            sendProximityMessage(player, message);
-            e.Cancel = true;
-            return;
+            if (db.isPlayerLoggedIn(player))
+            {
+                sendProximityMessage(player, message);
+                e.Cancel = true;
+                return;
+            }
         }
 
         public void sendProximityMessage(Client player, string message)
         {
-            List<Client> players = API.getPlayersInRadiusOfPlayer(10, player);
-            for (int i = 0; i < players.Count; i++)
+            var players = API.getPlayersInRadiusOfPlayer(10, player);
+            foreach (Client p in players)
             {
-                if (players[i].position.DistanceTo(player.position) <= 10)
+                if(p.position.DistanceTo(player.position) <= 10)
                 {
-                    API.sendChatMessageToPlayer(players[i], "~#49A1F4~", replaceUnderscore(player.name) + " says: ~w~" + message);
+                    API.sendChatMessageToPlayer(p, "~#49A1F4~", replaceUnderscore(player.name) + " says: ~w~" + message);
                 }
             }
         }
