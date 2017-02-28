@@ -252,5 +252,17 @@ namespace stuykserver.Util
             }
             return false;
         }
+
+        public Vector3 convertStringToVector3(string pass)
+        {
+            string xpos = pass.Replace("X:", string.Empty);
+            xpos = xpos.Replace("Y:", string.Empty);
+            xpos = xpos.Replace("Z:", string.Empty);
+            string[] coords = xpos.Split(' ');
+            API.consoleOutput(coords[1] + coords[3] + coords[5]);
+
+            Vector3 finalVector = new Vector3(Convert.ToSingle(coords[1]), Convert.ToSingle(coords[3]), Convert.ToSingle(coords[5]));
+            return finalVector;
+        }
     }
 }

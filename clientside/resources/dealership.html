@@ -27,6 +27,11 @@
 						<span class="dealership-text-small" id="vehicleName">Vehicle Name</span>
 					</div>
 				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<button class="btn btn-info" type="submit" id="purchaseVehicle">Purchase</button>
+					</div>
+				</div>
 			</div>
 			<div class="col-md-2" id="rightColumn">
 			
@@ -56,6 +61,11 @@
 				resourceCall("killPanel");
 				return;
 			}
+		});
+		
+		$('#purchaseVehicle').click(function() {
+			resourceCall("dealershipPurchaseVehicle");
+			return;
 		});
 	
 		$('#browseLeft').click(function() {

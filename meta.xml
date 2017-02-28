@@ -42,7 +42,7 @@
 	<file src="clientside/resources/regsuccess.html"/>
 	<file src="clientside/resources/inventory.html"/>
 	<file src="clientside/resources/loading.html"/>
-	<file src="clientside/resources/atmpanel2.html"/>
+	<file src="clientside/resources/atmpanel.html"/>
 	<file src="clientside/resources/clothingpanel.html"/>
 	<file src="clientside/resources/carpanel.html"/>
 	<file src="clientside/resources/menu_vehiclecontrols.html"/>

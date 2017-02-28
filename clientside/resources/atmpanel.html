@@ -1,57 +1,145 @@
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/atmpanel.css" rel="stylesheet">
+    <link href="css/atmpanelnew.css" rel="stylesheet">
   </head>
   <body>
-	<div class="row atm-panel">
-		<div class="col-sm-12">
-			<div class="col-sm-12">
-				<h2>ATM</h2>
-				<form method="post" class="form" id="formMain">
-					<div class="form-group">
-						<div class="col-sm-12" style="padding-bottom: 20px">
-							<div class="input-group">
-								<div class="input-group-addon">$</div>
-								<input type="number" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' id="inputAmount" placeholder="Amount">
-								<div class="input-group-addon">.00</div>
+    <div class="site-wrapper">
+      <div class="site-wrapper-inner">
+        <div class="cover-container">
+          <div class="inner cover">
+			<div class="col-sm-8 col-sm-offset-2 custom-form">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="row" style="margin-bottom: 20px">
+									<h3 class="atm-panel-text" id="accountToggle">Balance: $<span id="accountBalance"></span></h3>
+								</div>
+								<div class="row" style="margin-bottom: 20px">
+									<div class="input-group">
+										<div class="input-group-addon">$</div>
+										<input type="number" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' id="inputAmount" placeholder="Amount">
+										<div class="input-group-addon">.00</div>
+									</div>
+								</div>
+								<div class="row" style="margin-bottom: 20px">
+									<button id="withdrawButton" type="submit" class="btn btn-info col-sm-5 col-sm-offset-0">Withdraw</button>
+									<button id="depositButton" type="submit" class="btn btn-info col-sm-5 col-sm-offset-2">Deposit</button>
+								</div>
+								<div class="row" style="margin-bottom: 20px">
+									<button id="closeButton" type="submit" class="btn btn-danger col-sm-12 col-sm-offset-0">Close</button>
+								</div>
+								<div class="alert alert-success" id="maximumLimit" role="alert" hidden>You cannot withdraw or deposit more than $10000</div>
+								<div class="alert alert-success" id="withdrawAlert" role="alert" hidden>You have withdrawn: $<span id="amountWithdrawn">&nbsp;</span></div>
+								<div class="alert alert-danger" id="withdrawError" role="alert" hidden>You must specify an amount to withdraw.</div>
+								<div class="alert alert-danger" id="withdrawLimit" role="alert" hidden>You don't have that much money to withdraw.</div>
+								<div class="alert alert-success" id="depositAlert" role="alert" hidden>You have deposited: $<span id="amountDeposited">&nbsp;</span></div>
+								<div class="alert alert-danger" id="depositError" role="alert" hidden>You must specify an amount to deposit.</div>
+								<div class="alert alert-danger" id="depositLimit" role="alert" hidden>You don't have that much money to deposit.</div>
 							</div>
 						</div>
-						<div class="col-sm-6" style="padding-bottom: 20px">
-							<button id="withdrawButton" type="submit" class="btn btn-success col-sm-12">Withdraw</button>
-						</div>
-						<div class="col-sm-6" style="padding-bottom: 20px">
-							<button id="depositButton" type="submit" class="btn btn-info col-sm-12">Deposit</button>
-						</div>
-						<div class="col-sm-12">
-							<button id="closeButton" type="submit" class="btn btn-danger col-sm-12" onclick="resourceCall('killPanel')">Close</button>
-						</div>
-					</div>
-				</form>
 			</div>
-		</div>
-	</div>
-  </body>
-  <script type="text/javascript">
-	document.getElementById("withdrawButton").onclick = function ()
-	{
-		var amount = document.getElementById("inputAmount").value;
-		if(amount.length > 0) {
-			resourceCall("withdrawATM", amount);
-			resourceCall("hideATMCash");
-		}
-	}
+          </div>
+        </div>
+      </div>
+    </div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			resourceCall("requestAccountBalance");
+		});
 	
-	document.getElementById("depositButton").onclick = function ()
-	{
-		var amount = document.getElementById("inputAmount").value;
-		if(amount.length > 0) {
-			resourceCall("depositATM", amount);
-			resourceCall("hideATMCash");
+		var currentMoney = null;
+		var accountMoney = null;
+	
+		document.getElementById("closeButton").onclick = function ()
+		{
+			resourceCall("killPanel");
 		}
-	}
-  </script>
+	
+		document.getElementById("depositButton").onclick = function ()
+		{
+			resourceCall("requestAccountBalance");
+			var amount = document.getElementById("inputAmount").value;
+			if (amount >= 1) {
+				if (amount <= currentMoney && amount <= 10000) {
+					resourceCall("requestAccountBalance");
+					$('#withdrawAlert').hide();
+					$('#withdrawError').hide();
+					$('#depositError').hide();
+					$('#depositLimit').hide();
+					$('#withdrawLimit').hide();
+					$('#amountDeposited').html(amount);
+					$('#depositAlert').show();
+					$('#maximumLimit').hide();
+					resourceCall("depositATM", amount);
+					return;
+				}
+				$('#depositLimit').show();
+				$('#withdrawAlert').hide();
+				$('#withdrawError').hide();
+				$('#depositError').hide();
+				$('#depositAlert').hide();
+				$('#withdrawLimit').hide();
+				$('#maximumLimit').hide();
+				return;
+			}
+			$('#depositLimit').hide();
+			$('#withdrawAlert').hide();
+			$('#withdrawError').hide();
+			$('#depositAlert').hide();
+			$('#depositError').show();
+			$('#withdrawLimit').hide();
+			$('#maximumLimit').hide();
+			return;
+		}
+	
+		document.getElementById("withdrawButton").onclick = function ()
+		{
+			resourceCall("requestAccountBalance");
+			var amount = document.getElementById("inputAmount").value;
+			if (amount >= 1) {
+				if (amount <= accountMoney && amount <= 10000) {
+					resourceCall("requestAccountBalance");
+					$('#withdrawError').hide();
+					$('#withdrawLimit').hide();
+					$('#depositAlert').hide();
+					$('#depositError').hide();
+					$('#depositLimit').hide();
+					$('#amountWithdrawn').html(amount);
+					$('#withdrawAlert').show();
+					$('#maximumLimit').hide();
+					resourceCall("withdrawATM", amount);
+					return;
+				}
+				$('#withdrawLimit').show();
+				$('#withdrawAlert').hide();
+				$('#depositAlert').hide();
+				$('#depositError').hide();
+				$('#withdrawError').hide();
+				$('#depositLimit').hide();
+				$('#maximumLimit').hide();
+				return;
+			}
+			$('#depositLimit').hide();
+			$('#withdrawAlert').hide();
+			$('#depositAlert').hide();
+			$('#depositError').hide();
+			$('#withdrawError').show();
+			$('#withdrawLimit').hide();
+			$('#maximumLimit').hide();
+			return;
+		}
+	
+		function displayAccountBalance(amount, currmoney) {
+			$('#accountBalance').html(amount);
+			currentMoney = currmoney;
+			accountMoney = amount;
+			return;
+		}
+	</script>
+	</body>
 </html>
 

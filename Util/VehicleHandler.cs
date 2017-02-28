@@ -156,6 +156,13 @@ namespace stuykserver.Util
             return;
         }
 
+        public Vehicle actionSetupPurchasedCar(Vector3 position, VehicleHash model, Client player)
+        {
+            Vehicle vehicle = API.createVehicle(model, position, new Vector3(), 0, 0);
+            handleVehicleSpawn(player, vehicle);
+            return vehicle;
+        }
+
         public void handleVehicleSpawn(Client player, Vehicle vehicle)
         {
             vehicleKeys.Add(vehicle.handle, player);

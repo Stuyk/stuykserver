@@ -196,15 +196,15 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		API.sendNotification(playerName);
 	}
 	
-	if (eventName=="loadATM") {
+	if (eventName=="loadATM") { // ATM Functions
 		if (pagePanel == null) {
-			pagePanel = new CefHelper("clientside/resources/atmpanel2.html");
+			pagePanel = new CefHelper("clientside/resources/atmpanel.html");
 			pagePanel.show();
 			playerAccountBalance = args[0].toString();
 		}
 	}
 	
-	if (eventName=="updateATM") {
+	if (eventName=="updateATM") { // ATM Functions
 		if (pagePanel != null) {
 			playerAccountBalance = args[0].toString();
 			playerCashOnHand = args[1].toString();
@@ -212,11 +212,11 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		}
 	}
 	
-	if (eventName=="closeCarDoor") {
+	if (eventName=="closeCarDoor") { // Vehicle Functions
 		API.setVehicleDoorState(args[0], args[1], false);
 	}
 	
-	if (eventName=="clothingLocalVariableUpdate") {
+	if (eventName=="clothingLocalVariableUpdate") { // Clothing Changer
 		clothingPanelOpen = true;
 		clothingTorsoNum = args[0];
 		clothingTopNum = args[1];
@@ -229,7 +229,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		clothingShoesColorNum = args[8];
 	}
 	
-	if (eventName=="loadFaceData") {
+	if (eventName=="loadFaceData") { // Model Changer
 		facePanelOpen = true;
 		faceShapeOne = args[0];
 		faceShapeTwo = args[1];
@@ -243,8 +243,12 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		faceHairstyleTexture = args[9];
 	}
 	
-	if (eventName=="updateKarma") {
+	if (eventName=="updateKarma") { // Karma
 		karmaDisplay = args[0];
+	}
+	
+	if (eventName == "startBrowsing") { // Dealership
+		startBrowsing(args[0]);
 	}
 });
 
@@ -258,7 +262,6 @@ API.onUpdate.connect(function() {
 			API.drawText(karmaDisplay, resX - 25, resY - 100, 1, 244, 244, 66, 255, 4, 2, false, true, 0);
 		}
 	}
-	
 });
 
 function showRadialMenu() {
@@ -811,212 +814,450 @@ function updateVehicleMod(modtype, value) {
 // #### WRITTEN BY STUYK ####
 // ##########################
 
-var vehicles = [
-	"adder",
-	"akuma",
-	"alpha",
-	"asea",
-	"asterope",
-	"bagger",
-	"baller",
-	"banshee",
-	"bati",
-	"bati2",
-	"bfinjection",
-	"bifta",
-	"bison",
-	"bison2",
-	"bison3",
-	"bjxl",
-	"blade",
-	"blazer",
-	"blazer2",
-	"blista",
-	"bobcatxl",
-	"bodhi2",
-	"btype",
-	"btype2",
-	"btype3",
-	"buccaneer",
-	"buccaneer2",
-	"buffalo",
-	"bullet",
-	"burrito3",
-	"camper",
-	"carbonizzare",
-	"carbonrs",
-	"casco",
-	"cavalcade",
-	"cavalcade2",
-	"cheetah",
-	"chino",
-	"chino2",
-	"cog55",
-	"cog552",
-	"cogcabrio",
-	"cognoscenti",
-	"cognoscenti2",
-	"comet2",
-	"coquette",
-	"daemon",
-	"dilettante",
-	"dloader",
-	"dominator",
-	"double",
-	"dubsta",
-	"dubsta2",
-	"dukes",
-	"elegy2",
-	"emperor",
-	"emperor2",
-	"enduro",
-	"entityxf",
-	"exemplar",
-	"f620",
-	"faction",
-	"faggio2",
-	"felon",
-	"felon2",
-	"fq2",
-	"fugitive",
-	"furoregt",
-	"fusilade",
-	"futo",
-	"gauntlet",
-	"glendale",
-	"granger",
-	"gresley",
-	"habanero",
-	"hakuchou",
-	"hexer",
-	"hotknife",
-	"huntley",
-	"infernus",
-	"ingot",
-	"intruder",
-	"issi2",
-	"jackal",
-	"jester",
-	"journey",
-	"kalahari",
-	"khamelion",
-	"kuruma",
-	"landstalker",
-	"lectro",
-	"lurcher",
-	"mamba",
-	"manana",
-	"massacro",
-	"mesa",
-	"mesa3",
-	"minivan",
-	"monroe",
-	"moonbeam",
-	"nemesis",
-	"nightshade",
-	"ninef",
-	"oracle",
-	"oracle2",
-	"osiris",
-	"panto",
-	"paradise",
-	"patriot",
-	"pcj",
-	"penumbra",
-	"peyote",
-	"phoenix",
-	"picador",
-	"pigalle",
-	"prairie",
-	"premier",
-	"primo",
-	"primo2",
-	"radi",
-	"rancherxl",
-	"rapidgt",
-	"rapidgt2",
-	"raptor",
-	"ratloader",
-	"ratloader2",
-	"rebel",
-	"rebel2",
-	"regina",
-	"rhapsody",
-	"rocoto",
-	"romero",
-	"ruffian",
-	"ruiner",
-	"sabregt",
-	"sadler",
-	"sanchez",
-	"sandking",
-	"schafter2",
-	"schwarzer",
-	"seminole",
-	"sentinel",
-	"serrano",
-	"slamvan",
-	"sovereign",
-	"speedo",
-	"stalion",
-	"stanier",
-	"stinger",
-	"stingergt",
-	"stratum",
-	"stretch",
-	"sultan",
-	"sultanrs",
-	"superd",
-	"surano",
-	"surfer",
-	"surfer2",
-	"surge",
-	"t20",
-	"tailgater",
-	"tampa",
-	"thrust",
-	"tornado",
-	"tornado2",
-	"tornado3",
-	"tornado4",
-	"tornado5",
-	"turismor",
-	"vacca",
-	"vader",
-	"verlierer2",
-	"vigero",
-	"vindicator",
-	"virgo",
-	"virgo2",
-	"virgo3",
-	"voltic",
-	"voodoo",
-	"voodoo2",
-	"warrener",
-	"washington",
-	"windsor",
-	"youga",
-	"zentorno",
-	"zion",
-	"zion2"
+var vehiclesBoats = [
+	"Dinghy",
+	"Jetmax",
+	"Marquis",
+	"Seashark",
+	"Speeder",
+	"Squalo",
+	"Suntrap",
+	"Toro",
+	"Tropic"
+	];
+	
+var vehiclesCommercial = [
+	"Benson",
+	"Biff",
+	"Hauler",
+	"Mule",
+	"Packer",
+	"Phantom",
+	"Pounder"
 	];
 
+var vehiclesCompacts = [
+	"Blista",
+	"Brioso",
+	"Dilettante",
+	"Issi2",
+	"Panto",
+	"Prairie",
+	"Rhapsody"
+	];
+
+var vehiclesCoupes = [
+	"CogCabrio",
+	"Exemplar",
+	"F620",
+	"Felon",
+	"Jackal",
+	"Oracle",
+	"Sentinel",
+	"Windsor",
+	"Zion"
+	];
+
+var vehiclesBicycles = [
+	"Bmx",
+	"Cruiser",
+	"Fixter",
+	"Scorcher",
+	"TriBike"
+	];
+	
+var vehiclesPolice = [
+	"FBI",
+	"FireTruck",
+	"Police",
+	"Police2",
+	"Police3",
+	"Police4",
+	"PoliceT",
+	"Policeb",
+	"Pranger",
+	"Riot",
+	"Sheriff",
+	"Sheriff2"
+	];
+
+var vehiclesHelicopters = [
+	"Buzzard",
+	"Frogger",
+	"Maverick",
+	"Supervolito",
+	"Swift2",
+	"Volatus"
+	];
+	
+var vehiclesIndustrial = [
+	"Flatbed",
+	"Guardian",
+	"Mixer",
+	"Mixer2",
+	"Rubble",
+	"TipTruck",
+	"TipTruck2"
+	];
+	
+var vehiclesMotorcycles = [
+	"Akuma",
+	"Avarus",
+	"Bagger",
+	"Bati",
+	"BF400",
+	"Blazer4",
+	"CarbonRS",
+	"Chimera",
+	"Cliffhanger",
+	"Daemon",
+	"Double",
+	"Enduro",
+	"Esskey",
+	"Faggio",
+	"FCR",
+	"Gargoyle",
+	"Hakuchou",
+	"Hexer",
+	"Lectro",
+	"Nemesis",
+	"Nightblade",
+	"PCJ",
+	"Ratbike",
+	"Ruffian",
+	"Sanchez",
+	"Sanctus",
+	"Shotaro",
+	"Sovereign",
+	"Thrust",
+	"Vader",
+	"Vindicator",
+	"Vortex",
+	"Wolfsbane",
+	"ZombieA",
+	"ZombieB"
+	];
+	
+ var vehiclesMuscle = [
+	"Blade",
+	"Buccaneer",
+	"Chino",
+	"Dominator",
+	"Dukes",
+	"Faction",
+	"Gauntlet",
+	"Hotknife",
+	"Lurcher",
+	"Moonbeam",
+	"Nightshade",
+	"Phoenix",
+	"Picador",
+	"RatLoader",
+	"RatLoader2",
+	"Ruiner",
+	"SabreGT",
+	"SlamVan",
+	"SlamVan2",
+	"SlamVan3",
+	"Stalion",
+	"Tampa",
+	"Vigero",
+	"Virgo",
+	"Virgo2",
+	"Virgo3",
+	"Voodoo",
+	"Voodoo2"
+	];
+	
+var vehiclesOffRoad = [
+	"BfInjection",
+	"Bifta",
+	"Blazer",
+	"Blazer2",
+	"Blazer5",
+	"Bodhi2",
+	"Brawler",
+	"DLoader",
+	"Dune",
+	"Kalahari",
+	"Mesa",
+	"RancherXL",
+	"Rebel",
+	"Rebel2",
+	"Sandking",
+	"TrophyTruck"	
+	];
+	
+var vehiclesPlanes = [
+	"Besra",
+	"CargoPlane",
+	"Cuban800",
+	"Dodo",
+	"Duster",
+	"Jet",
+	"Luxor",
+	"Mammatus",
+	"Miljet",
+	"Nimbus",
+	"Shamal",
+	"Stunt",
+	"Velum",
+	"Vestra"
+	];
+	
+var vehiclesSUVS = [ 
+	"BJXL",
+	"Baller",
+	"Baller2",
+	"Cavalcade",
+	"Cavalcade2",
+	"Contender",
+	"Dubsta",
+	"Dubsta2",
+	"FQ2",
+	"Granger",
+	"Gresley",
+	"Habanero",
+	"Huntley",
+	"Landstalker",
+	"Patriot",
+	"Radi",
+	"Rocoto",
+	"Seminole",
+	"Serrano",
+	"XLS"
+	];
+	
+var vehiclesSedans = [
+	"Asea",
+	"Asterope",
+	"Cog55",
+	"Cognoscenti",
+	"Emperor",
+	"Emperor2",
+	"Fugitive",
+	"Glendale",
+	"Ingot",
+	"Intruder",
+	"Premier",
+	"Primo",
+	"Regina",
+	"Romero",
+	"Stanier",
+	"Stratum",
+	"Stretch",
+	"Tailgater",
+	"Warrener",
+	"Washington"
+	];
+	
+var vehiclesService = [
+	"Airbus",
+	"Brickade",
+	"Bus",
+	"Coach",
+	"Rallytruck",
+	"RentalBus",
+	"Taxi",
+	"Tourbus",
+	"Trash",
+	"Trash2"
+	];
+	
+var vehiclesSports = [
+	"Alpha",
+	"Banshee",
+	"Buffalo",
+	"Carbonizzare",
+	"Comet2",
+	"Coquette",
+	"Elegy",
+	"Elegy2",
+	"Feltzer2",
+	"Furoregt",
+	"Fusilade",
+	"Futo",
+	"Jester",
+	"Khamelion",
+	"Kuruma",
+	"Lynx",
+	"Massacro",
+	"Ninef",
+	"Omnis",
+	"Penumbra",
+	"RapidGT",
+	"Schafter2",
+	"Schwarzer",
+	"Seven70",
+	"Specter",
+	"Sultan",
+	"Surano",
+	"Tampa2",
+	"Tropos",
+	"Verlierer2"
+	];
+	
+var vehiclesClassic = [
+	"BType",
+	"BType2",
+	"BType3",
+	"Casco",
+	"Coquette2",
+	"Coquette3",
+	"Mamba",
+	"Manana",
+	"Monroe",
+	"Peyote",
+	"Pigalle",
+	"Stinger",
+	"StingerGT",
+	"Tornado",
+	"Tornado2",
+	"Tornado3",
+	"Tornado4",
+	"Tornado5",
+	"Tornado6"
+	];
+	
+var vehiclesSuper = [
+	"Adder",
+	"Bullet",
+	"Cheetah",
+	"EntityXF",
+	"FMJ",
+	"Infernus",
+	"LE7B",
+	"Nero",
+	"Osiris",
+	"Penetrator",
+	"Pfister811",
+	"Prototipo",
+	"Reaper",
+	"Sheava",
+	"SultanRS",
+	"Superd",
+	"T20",
+	"Tempesta",
+	"Turismor",
+	"Tyrus",
+	"Vacca",
+	"Voltic",
+	"Zentorno",
+	"Italigtb"
+	];
+
+var vehiclesUtility = [
+	"Airtug",
+	"Caddy",
+	"Caddy2",
+	"Docktug",
+	"Forklift",
+	"Mower",
+	"Ripley",
+	"Sadler",
+	"Scrap",
+	"TowTruck",
+	"TowTruck2",
+	"Tractor",
+	"Tractor2",
+	"UtilityTruck",
+	"UtilityTruck3",
+	"UtilliTruck2"
+	];
+	
+var vehiclesVans = [ 
+	"Bison",
+	"Bison2",
+	"Bison3",
+	"BobcatXL",
+	"Boxville",
+	"Burrito",
+	"Camper",
+	"Gburrito",
+	"GBurrito2",
+	"Journey",
+	"Minivan",
+	"Paradise",
+	"Pony",
+	"Rumpo",
+	"Speedo",
+	"Surfer",
+	"Surfer2",
+	"Taco",
+	"Youga"
+	];
+	
 var currentVehicleIndex = 6;
 var centerVehicle = null;
-
-API.onServerEventTrigger.connect(function(eventName, args) {
-	if (eventName == "startBrowsing") {
-		startBrowsing();
-	}
-});
+var vehicleSelectionType = null;
 
 function randomInteger(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function startBrowsing() {
+function startBrowsing(type) {
+	switch (type) {
+		case "Boats":
+			vehicleSelectionType = vehiclesBoats;
+			break;
+		case "Commercial":
+			vehicleSelectionType = vehiclesCommercial;
+			break;
+		case "Compacts":
+			vehicleSelectionType = vehiclesCompacts;
+			break;
+		case "Coupes":
+			vehicleSelectionType = vehiclesCoupes;
+			break;
+		case "Bicycles":
+			vehicleSelectionType = vehiclesBicycles;
+			break;
+		case "Police":
+			vehicleSelectionType = vehiclesPolice;
+			break;
+		case "Helicopters":
+			vehicleSelectionType = vehiclesHelicopters;
+			break;
+		case "Industrial":
+			vehicleSelectionType = vehiclesIndustrial;
+			break;
+		case "Motorcycles":
+			vehicleSelectionType = vehiclesMotorcycles;
+			break;
+		case "Muscle":
+			vehicleSelectionType = vehiclesMuscle;
+			break;
+		case "OffRoad":
+			vehicleSelectionType = vehiclesOffRoad;
+			break;
+		case "Planes":
+			vehicleSelectionType = vehiclesPlanes;
+			break;
+		case "SUVS":
+			vehicleSelectionType = vehiclesSUVS;
+			break;
+		case "Sedans":
+			vehicleSelectionType = vehiclesSedans;
+			break;
+		case "Sports":
+			vehicleSelectionType = vehiclesSports;
+			break;
+		case "Classic":
+			vehicleSelectionType = vehiclesClassic;
+			break;
+		case "Super":
+			vehicleSelectionType = vehiclesSuper;
+			break;
+		case "Utility":
+			vehicleSelectionType = vehiclesUtility;
+			break;
+		case "Vans":
+			vehicleSelectionType = vehiclesVans;
+			break;
+	}
 	dealershipSetupVehicles();
 	API.setPlayerIntoVehicle(centerVehicle, -1);
+	API.triggerServerEvent("dealershipReady");
 	showDealership();
 }
 
@@ -1026,17 +1267,17 @@ function dealershipSetupVehicles() {
 	}
 	
 	if (currentVehicleIndex == -1) {
-		currentVehicleIndex = vehicles.length - 1;
+		currentVehicleIndex = vehicleSelectionType.length - 1;
 	}
-	else if (currentVehicleIndex == vehicles.length) {
+	else if (currentVehicleIndex == vehicleSelectionType.length) {
 		currentVehicleIndex = 0;
 	}
 		
-	centerVehicle = API.createVehicle(API.vehicleNameToModel(vehicles[currentVehicleIndex]), new Vector3(225.6238, -990, -98.99996), 0);
+	centerVehicle = API.createVehicle(API.vehicleNameToModel(vehicleSelectionType[currentVehicleIndex]), new Vector3(225.6238, -990, -98.99996), 0);
 	API.setVehiclePrimaryColor(centerVehicle, randomInteger(0, 159));
 	
 	if (pagePanel != null) {
-		pagePanel.browser.call("updateVehicle", vehicles[currentVehicleIndex]);
+		pagePanel.browser.call("updateVehicle", vehicleSelectionType[currentVehicleIndex]);
 	}
 }
 
@@ -1062,6 +1303,10 @@ function dealershipVehicleRotation(value) {
 	API.setEntityRotation(playerVehicle, new Vector3(vehicleRotation.X, vehicleRotation.Y, value));
 }
 
+function dealershipPurchaseVehicle() {
+	API.triggerServerEvent("purchaseVehicle", vehicleSelectionType[currentVehicleIndex]);
+	killPanel();
+}
 
 
 
