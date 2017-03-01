@@ -7,3 +7,4 @@ A:\GTANetwork\resources\stuykserver\BCrypt.Net.dll
 A:\GTANetwork\resources\stuykserver\GTANetworkServer.exe
 A:\GTANetwork\resources\stuykserver\GTANetworkShared.dll
 A:\GTANetwork\resources\stuykserver\BCrypt.Net.xml
+A:\GTANetwork\resources\stuykserver\obj\Debug\stuykserver.csprojResolveAssemblyReference.cache

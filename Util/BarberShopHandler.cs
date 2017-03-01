@@ -10,13 +10,10 @@ namespace stuykserver.Util
 {
     public class BarberShopHandler : Script
     {
-        Main main = new Main();
         SkinHandler skinHandler = new SkinHandler();
         DatabaseHandler db = new DatabaseHandler();
-        List<Vector3> barberShops = new List<Vector3>(); // All barbershops from the database are pulled into here.
-        Dictionary<Client, Vector3> playersInBarbershop = new Dictionary<Client, Vector3>();
-        List<ColShape> collisionShapes = new List<ColShape>();
-        List<Client> playersInCollisions = new List<Client>();
+
+        Dictionary<ColShape, ShopInformation> shopInformation = new Dictionary<ColShape, ShopInformation>();
 
         [Flags]
         public enum AnimationFlags
@@ -28,31 +25,106 @@ namespace stuykserver.Util
             Cancellable = 1 << 7
         }
 
+        class ShopInformation
+        {
+            ColShape collisionShape;
+            int collisionID;
+            Vector3 collisionPosition;
+            Blip collisionBlip;
+            List<Client> collisionPlayers; // When a player is in the collision.
+            List<Client> containedPlayers; // When a player enters a shop.
+
+            public void setupPoint(ColShape collision, int id, Vector3 position, Blip blip)
+            {
+                collisionShape = collision;
+                collisionID = id;
+                collisionPosition = position;
+                collisionBlip = blip;
+                containedPlayers = new List<Client>();
+                collisionPlayers = new List<Client>();
+            }
+
+            public void collisionPlayersAdd(Client player)
+            {
+                if (!collisionPlayers.Contains(player))
+                {
+                    collisionPlayers.Add(player);
+                }
+            }
+
+            public void collisionPlayersRemove(Client player)
+            {
+                if (collisionPlayers.Contains(player))
+                {
+                    collisionPlayers.Remove(player);
+                }
+            }
+
+            public void containedPlayersAdd(Client player)
+            {
+                if (!containedPlayers.Contains(player))
+                {
+                    containedPlayers.Add(player);
+                }
+            }
+
+            public void containedPlayersRemove(Client player)
+            {
+                if (containedPlayers.Contains(player))
+                {
+                    containedPlayers.Remove(player);
+                }
+            }
+
+            public List<Client> returnCollisionPlayers()
+            {
+                return collisionPlayers;
+            }
+
+            public List<Client> returnContainedPlayers()
+            {
+                return containedPlayers;
+            }
+
+            public int returnID()
+            {
+                return collisionID;
+            }
+
+            public ColShape returnCollision()
+            {
+                return collisionShape;
+            }
+
+            public Vector3 returnPosition()
+            {
+                return collisionPosition;
+            }
+
+            public Blip returnBlip()
+            {
+                return collisionBlip;
+            }
+        }
+
+
+
         public BarberShopHandler()
         {
             API.onResourceStart += API_onResourceStart;
             API.onEntityEnterColShape += API_onEntityEnterColShape;
             API.onEntityExitColShape += API_onEntityExitColShape;
             API.onPlayerDisconnected += API_onPlayerDisconnected;
-            API.onResourceStop += API_onResourceStop;
-        }
-
-        private void API_onResourceStop()
-        {
-            foreach (Client p in playersInBarbershop.Keys)
-            {
-                p.position = playersInBarbershop[p];
-                db.setPlayerPositionByVector(p, playersInBarbershop[p]);
-            }
         }
 
         private void API_onPlayerDisconnected(Client player, string reason)
         {
-            if (playersInBarbershop.ContainsKey(player))
+            foreach (ColShape collision in shopInformation.Keys)
             {
-                player.position = playersInBarbershop[player];
-                db.setPlayerPositionByVector(player, playersInBarbershop[player]);
-                API.consoleOutput("{0} moved outside of shop due to disconnection.", player.name);
+                if (shopInformation[collision].returnContainedPlayers().Contains(player))
+                {
+                    db.setPlayerPositionByVector(player, shopInformation[collision].returnPosition());
+                }
             }
         }
 
@@ -60,13 +132,11 @@ namespace stuykserver.Util
         {
             if (Convert.ToInt32(API.getEntityType(entity)) == 6)
             {
-                if (collisionShapes.Contains(colshape))
+                Client player = API.getPlayerFromHandle(entity);
+                if (shopInformation.ContainsKey(colshape))
                 {
-                    if (playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
-                    {
-                        playersInCollisions.Remove(API.getPlayerFromHandle(entity));
-                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
-                    }
+                    shopInformation[colshape].collisionPlayersRemove(player);
+                    API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
                 }
             }
         }
@@ -75,14 +145,12 @@ namespace stuykserver.Util
         {
             if (Convert.ToInt32(API.getEntityType(entity)) == 6)
             {
-                if (collisionShapes.Contains(colshape))
+                Client player = API.getPlayerFromHandle(entity);
+                if (shopInformation.ContainsKey(colshape) && !player.isInVehicle)
                 {
-                    if (!playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
-                    {
-                        playersInCollisions.Add(API.getPlayerFromHandle(entity));
-                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "BarberShop");
-                        API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "A classic looking barbershop.");
-                    }
+                    shopInformation[colshape].collisionPlayersAdd(player);
+                    API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "BarberShop");
+                    API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "A classic looking barbershop.");
                 }
             }
         }
@@ -106,8 +174,9 @@ namespace stuykserver.Util
                     float posX = Convert.ToSingle(db.pullDatabase("BarberShops", "PosX", "ID", selectedrow));
                     float posY = Convert.ToSingle(db.pullDatabase("BarberShops", "PosY", "ID", selectedrow));
                     float posZ = Convert.ToSingle(db.pullDatabase("BarberShops", "PosZ", "ID", selectedrow));
+                    int id = Convert.ToInt32(row[column]);
 
-                    positionBlips(new Vector3(posX, posY, posZ));
+                    positionBlips(new Vector3(posX, posY, posZ), id);
 
                     initializedObjects = ++initializedObjects;
                 }
@@ -117,63 +186,50 @@ namespace stuykserver.Util
         }
 
         // Place blips and text labels for interactions.
-        public void positionBlips(Vector3 position)
+        public void positionBlips(Vector3 position, int id)
         {
+            ShopInformation newShop = new ShopInformation();
+            ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f);
+
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
-            API.setBlipSprite(newBlip, 71);
+            API.setBlipSprite(newBlip, 480);
             API.setBlipColor(newBlip, 9);
-            barberShops.Add(new Vector3(position.X, position.Y, position.Z));
-            collisionShapes.Add(API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f));
-            int i = 0;
-            ++i;
+
+            newShop.setupPoint(shape, id, new Vector3(position.X, position.Y, position.Z), newBlip);
+            shopInformation.Add(shape, newShop);
         }
 
         public void selectBarberShop(Client player)
         {
-            if (db.isPlayerLoggedIn(player))
+            foreach (ColShape collision in shopInformation.Keys)
             {
-                if (!player.isInVehicle) // If player is not in Vehicle
+                if (shopInformation[collision].returnCollisionPlayers().Contains(player) && !player.isInVehicle)
                 {
-                    foreach (Vector3 pos in barberShops)
-                    {
-                        if (player.position.DistanceTo(pos) <= 5)
-                        {
-                            if (db.getPlayerMoney(player) >= 30)
-                            {
-                                playersInBarbershop.Add(player, player.position);
-                                Random rand = new Random();
-                                int dimension = rand.Next(1, 1000);
-                                API.setEntityDimension(player, dimension);
-                                API.consoleOutput(player.name + " is in dimension " + API.getEntityDimension(player).ToString());
-                                API.triggerClientEvent(player, "openSkinPanel", player.position);
-                                API.setEntityPosition(player, new Vector3(-1279.177, -1118.023, 6.990117));
-                                API.triggerClientEvent(player, "createCamera", new Vector3(-1281.826, -1118.141, 7.5), player.position);
-                                API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
-                                player.rotation = new Vector3(0, 0, 88.95126);
-                                skinHandler.loadLocalFaceData(player);
-                                playersInCollisions.Remove(player);
-                                return;
-                            }
-                            else
-                            {
-                                API.sendChatMessageToPlayer(player, main.msgPrefix + "Not enough money.");
-                                return;
-                            }
-                        }
-                    }
+                    shopInformation[collision].containedPlayersAdd(player);
+                    API.setEntityDimension(player, new Random().Next(1, 1000));
+                    API.triggerClientEvent(player, "openSkinPanel", player.position);
+                    API.setEntityPosition(player, new Vector3(-1279.177, -1118.023, 6.990117));
+                    API.triggerClientEvent(player, "createCamera", new Vector3(-1281.826, -1118.141, 7.5), player.position);
+                    API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
+                    player.rotation = new Vector3(0, 0, 88.95126);
+                    skinHandler.loadLocalFaceData(player);
                 }
             }
-            return;
         }
 
         public void leaveBarberShop(Client player)
         {
-            Vector3 leavePosition = playersInBarbershop[player];
-            API.setEntityDimension(player, 0);
-            API.setEntityPosition(player, leavePosition);
-            playersInBarbershop.Remove(player);
-            API.stopPlayerAnimation(player);
-            API.stopPedAnimation(player);
+            foreach (ColShape collision in shopInformation.Keys)
+            {
+                if (shopInformation[collision].returnContainedPlayers().Contains(player))
+                {
+                    API.setEntityDimension(player, 0);
+                    API.setEntityPosition(player, shopInformation[collision].returnPosition());
+                    shopInformation[collision].containedPlayersRemove(player);
+                    API.stopPlayerAnimation(player);
+                    API.stopPedAnimation(player);
+                }
+            }
         }
     }
 }

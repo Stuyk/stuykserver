@@ -11,11 +11,96 @@ namespace stuykserver.Util
     {
         ChatHandler ch = new ChatHandler();
         DatabaseHandler db = new DatabaseHandler();
-        List<Client> playersInVehicles = new List<Client>();
-        List<NetHandle> vehicleHandles = new List<NetHandle>();
-        Dictionary<NetHandle, Vector3> vehiclePositions = new Dictionary<NetHandle, Vector3>();
-        Dictionary<NetHandle, ColShape> vehicleCollisions = new Dictionary<NetHandle, ColShape>();
-        Dictionary<NetHandle, Client> vehicleKeys = new Dictionary<NetHandle, Client>();
+
+        Dictionary<NetHandle, VehicleInformation> vehicleInformation = new Dictionary<NetHandle, VehicleInformation>();
+
+        class VehicleInformation
+        {
+            NetHandle vehicleID;
+            ColShape vehicleCollision;
+            Vector3 vehiclePosition;
+            List<Client> vehicleKeys;
+            Client vehicleOwner;
+            List<Client> playersInVehicle;
+
+            public void setupVehicle(NetHandle id, ColShape collision, Vector3 collisionPosition, Client owner)
+            {
+                vehicleID = id;
+                vehicleCollision = collision;
+                vehiclePosition = collisionPosition;
+                vehicleOwner = owner;
+                vehicleKeys = new List<Client>();
+                playersInVehicle = new List<Client>();
+            }
+
+            public void setVehiclePosition(ColShape collision, Vector3 position)
+            {
+                vehicleCollision = collision;
+                vehiclePosition = position;
+            }
+
+            public void vehicleKeysAdd(Client player)
+            {
+                if (!vehicleKeys.Contains(player))
+                {
+                    vehicleKeys.Add(player);
+                }
+            }
+
+            public void vehicleKeysRemove(Client player)
+            {
+                if (vehicleKeys.Contains(player))
+                {
+                    vehicleKeys.Remove(player);
+                }
+            }
+
+            public void playersInVehicleAdd(Client player)
+            {
+                if (!playersInVehicle.Contains(player))
+                {
+                    playersInVehicle.Add(player);
+                }
+            }
+
+            public void playersInVehicleRemove(Client player)
+            {
+                if (playersInVehicle.Contains(player))
+                {
+                    playersInVehicle.Remove(player);
+                }
+            }
+
+            public Vector3 returnPosition()
+            {
+                return vehiclePosition;
+            }
+
+            public ColShape returnCollision()
+            {
+                return vehicleCollision;
+            }
+
+            public List<Client> returnVehicleKeys()
+            {
+                return vehicleKeys;
+            }
+
+            public List<Client> returnPlayersInVehicle()
+            {
+                return playersInVehicle;
+            }
+
+            public Client returnOwner()
+            {
+                return vehicleOwner;
+            }
+
+            public NetHandle returnVehicleID()
+            {
+                return vehicleID;
+            }
+        }
 
         public VehicleHandler()
         {
@@ -27,24 +112,25 @@ namespace stuykserver.Util
 
         private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
         {
+
+            // Force Vehicle to stay in position after locking.
             if (Convert.ToInt32(API.getEntityType(entity)) == 1)
             {
-                if (vehiclePositions.ContainsKey(entity))
+                if (vehicleInformation.ContainsKey(entity))
                 {
-                    if (vehicleCollisions.ContainsKey(entity))
+                    if (vehicleInformation[entity].returnPosition() != null)
                     {
-                        API.setEntityPosition(entity, vehiclePositions[entity]);
-                        return;
+                        API.setEntityPosition(entity, vehicleInformation[entity].returnPosition());
                     }
                 }
             }
 
             if (Convert.ToInt32(API.getEntityType(entity)) == 6)
             {
-                if (!API.isPlayerInAnyVehicle(API.getPlayerFromHandle(entity)))
+                Client player = API.getPlayerFromHandle(entity);
+                if (!API.isPlayerInAnyVehicle(player))
                 {
                     API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
-                    return;
                 }
             }
         }
@@ -55,8 +141,7 @@ namespace stuykserver.Util
             {
                 if (!API.isPlayerInAnyVehicle(API.getPlayerFromHandle(entity)))
                 {
-                    List<NetHandle> vehicles = API.getAllVehicles();
-                    foreach (NetHandle vehicle in vehicles)
+                    foreach (NetHandle vehicle in vehicleInformation.Keys)
                     {
                         if (API.getPlayerFromHandle(entity).position.DistanceTo(API.getEntityPosition(vehicle)) <= 5)
                         {
@@ -71,24 +156,17 @@ namespace stuykserver.Util
 
         private void API_onPlayerExitVehicle(Client player, NetHandle vehicle)
         {
-            if (playersInVehicles.Contains(player))
+            if (vehicleInformation.ContainsKey(vehicle))
             {
-                playersInVehicles.Remove(player);
-                API.triggerClientEvent(player, "removeUseFunction");
-            }
-
-            if (!vehicleHandles.Contains(vehicle))
-            {
-                vehicleHandles.Add(vehicle);
-            }
-
-            if (!vehiclePositions.ContainsKey(vehicle))
-            {
-                vehiclePositions.Add(vehicle, API.getEntityPosition(vehicle));
-                if (!vehicleCollisions.ContainsKey(vehicle))
+                if (vehicleInformation[vehicle].returnOwner() == player || vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
                 {
-                    vehicleCollisions.Add(vehicle, API.createCylinderColShape(vehiclePositions[vehicle], 3f, 3f));
+                    vehicleInformation[vehicle].setVehiclePosition(API.createCylinderColShape(player.position, 3f, 3f), player.position);
                     API.setVehicleEngineStatus(vehicle, false);
+                }
+
+                if (vehicleInformation[vehicle].returnPlayersInVehicle().Contains(player))
+                {
+                    vehicleInformation[vehicle].playersInVehicleRemove(player);
                 }
             }
         }
@@ -103,44 +181,30 @@ namespace stuykserver.Util
                 API.setVehicleDoorState(vehicle, 2, false);
                 API.setVehicleDoorState(vehicle, 3, false);
                 API.sendNotificationToPlayer(player, "~r~That appears to be locked.");
+                return;
             }
 
-            if (!playersInVehicles.Contains(player))
+            if (vehicleInformation.ContainsKey(vehicle))
             {
-                if (API.getPlayerVehicleSeat(player) == -1)
+                if (!vehicleInformation[vehicle].returnPlayersInVehicle().Contains(player))
                 {
-                    playersInVehicles.Add(player);
-                    API.triggerClientEvent(player, "triggerUseFunction", "VehicleEngine");
-                }
-                else
-                {
-                    API.setVehicleDoorState(vehicle, API.getPlayerVehicleSeat(player) - 1, false);
-                    API.triggerClientEvent(player, "removeUseFunction");
-                }
-            }
-
-            if (vehiclePositions.ContainsKey(vehicle))
-            {
-                if (API.getPlayerVehicleSeat(player) == -1)
-                {
-                    vehiclePositions.Remove(vehicle);
-                    if (vehicleCollisions.ContainsKey(vehicle))
+                    vehicleInformation[vehicle].playersInVehicleAdd(player);
+                    if (API.getPlayerVehicleSeat(player) == -1)
                     {
-                        vehicleCollisions.Remove(vehicle);
+                        API.triggerClientEvent(player, "triggerUseFunction", "VehicleEngine");
+                        if (vehicleInformation[vehicle].returnOwner() == player || vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
+                        {
+                            vehicleInformation[vehicle].setVehiclePosition(null, null);
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        API.triggerClientEvent(player, "removeUseFunction");
+                        return;
                     }
                 }
             }
-
-            if (!vehicleHandles.Contains(vehicle))
-            {
-                vehicleHandles.Add(vehicle);
-            }
-        }
-
-        [Command("editCar")]
-        public void editCar(Client player)
-        {
-            API.triggerClientEvent(player, "openCarPanel");
         }
 
         [Command("spawncar")] // Admin
@@ -150,7 +214,7 @@ namespace stuykserver.Util
             {
                 var rot = API.getEntityRotation(player.handle);
                 var vehicle = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
-                handleVehicleSpawn(player, vehicle);
+                handleVehicleSpawn(player, vehicle, player.position);
                 return;
             }
             return;
@@ -159,79 +223,64 @@ namespace stuykserver.Util
         public Vehicle actionSetupPurchasedCar(Vector3 position, VehicleHash model, Client player)
         {
             Vehicle vehicle = API.createVehicle(model, position, new Vector3(), 0, 0);
-            handleVehicleSpawn(player, vehicle);
+            handleVehicleSpawn(player, vehicle, position);
             return vehicle;
         }
 
-        public void handleVehicleSpawn(Client player, Vehicle vehicle)
+        public void handleVehicleSpawn(Client player, Vehicle vehicle, Vector3 where)
         {
-            vehicleKeys.Add(vehicle.handle, player);
-            vehicleHandles.Add(vehicle.handle);
-            vehiclePositions.Add(vehicle.handle, API.getEntityPosition(vehicle.handle));
-            vehicleCollisions.Add(vehicle.handle, API.createCylinderColShape(vehiclePositions[vehicle.handle], 2f, 2f));
+            VehicleInformation newVehicle = new VehicleInformation();
+            ColShape collision = API.createCylinderColShape(where, 2f, 2f);
             API.setVehicleLocked(vehicle, true);
             vehicle.engineStatus = false;
+            newVehicle.setupVehicle(vehicle, collision, where, player);
+            vehicleInformation.Add(vehicle, newVehicle);
         }
 
         public void actionVehicleEngine(Client player)
         {
-            if (db.isPlayerLoggedIn(player))
+            if (vehicleInformation[player.vehicle].returnOwner() == player && API.getPlayerVehicleSeat(player) == -1 || vehicleInformation[player.vehicle].returnVehicleKeys().Contains(player) && API.getPlayerVehicleSeat(player) == -1)
             {
                 if (player.isInVehicle)
                 {
-                    if (API.getPlayerVehicleSeat(player) == -1)
+                    if (player.vehicle.engineStatus == true)
                     {
-                        if (vehicleKeys[player.vehicle] == player)
-                        {
-                            if (player.vehicle.engineStatus == true)
-                            {
-                                player.vehicle.engineStatus = false;
-                                API.sendNotificationToPlayer(player, "You stop the engine.");
-                                return;
-                            }
-                            else
-                            {
-                                player.vehicle.engineStatus = true;
-                                player.seatbelt = true;
-                                API.setVehicleDoorState(player.vehicle, 0, false);
-                                API.setVehicleDoorState(player.vehicle, 1, false);
-                                API.setVehicleDoorState(player.vehicle, 2, false);
-                                API.setVehicleDoorState(player.vehicle, 3, false);
-                                API.sendNotificationToPlayer(player, "You start the engine, and put on your seatbelt.");
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            API.sendNotificationToPlayer(player, "~r~You don't have keys for this.");
-                        }
-                    } 
+                        player.vehicle.engineStatus = false;
+                        API.sendNotificationToPlayer(player, "You stop the engine.");
+                        return;
+                    }
+                    else
+                    {
+                        player.vehicle.engineStatus = true;
+                        player.seatbelt = true;
+                        API.setVehicleDoorState(player.vehicle, 0, false);
+                        API.setVehicleDoorState(player.vehicle, 1, false);
+                        API.setVehicleDoorState(player.vehicle, 2, false);
+                        API.setVehicleDoorState(player.vehicle, 3, false);
+                        API.sendNotificationToPlayer(player, "You start the engine.");
+                        return;
+                    }
                 }
             }
         }
 
         public void actionVehicleHood(Client player)
         {
-            if (db.isPlayerLoggedIn(player))
+            foreach (NetHandle vehicle in vehicleInformation.Keys)
             {
-                if (!player.isInVehicle)
+                if (player.position.DistanceTo(vehicleInformation[vehicle].returnPosition()) <= 3 && !player.isInVehicle)
                 {
-                    foreach (NetHandle vehicle in vehicleHandles)
+                    if (vehicleInformation[vehicle].returnOwner() == player || vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
                     {
-                        if (player.position.DistanceTo(API.getEntityPosition(vehicle)) <= 3)
+                        if (API.getVehicleDoorState(vehicle, 4))
                         {
-                            if (vehicleKeys[vehicle] == player)
-                            {
-                                if (API.getVehicleDoorState(vehicle, 4))
-                                {
-                                    API.setVehicleDoorState(vehicle, 4, false);
-                                }
-                                else
-                                {
-                                    API.setVehicleDoorState(vehicle, 4, true);
-                                }
-                            }
-
+                            API.setVehicleDoorState(vehicle, 4, false);
+                            break;
+                        }
+                        else
+                        {
+                            API.setVehicleDoorState(vehicle, 4, true);
+                            break;
                         }
                     }
                 }
@@ -240,107 +289,67 @@ namespace stuykserver.Util
 
         public void actionVehicleTrunk(Client player)
         {
-            if (db.isPlayerLoggedIn(player))
+            foreach (NetHandle vehicle in vehicleInformation.Keys)
             {
-                if (!player.isInVehicle)
+                if (player.position.DistanceTo(vehicleInformation[vehicle].returnPosition()) <= 3 && !player.isInVehicle)
                 {
-                    foreach (NetHandle vehicle in vehicleHandles)
+                    if (vehicleInformation[vehicle].returnOwner() == player || vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
                     {
-                        if (player.position.DistanceTo(API.getEntityPosition(vehicle)) <= 3)
+                        if (API.getVehicleDoorState(vehicle, 5))
                         {
-                            if (vehicleKeys[vehicle] == player)
-                            {
-                                if (API.getVehicleDoorState(vehicle, 5))
-                                {
-                                    API.setVehicleDoorState(vehicle, 5, false);
-                                }
-                                else
-                                {
-                                    API.setVehicleDoorState(vehicle, 5, true);
-                                }
-                            }
+                            API.setVehicleDoorState(vehicle, 5, false);
+                            break;
                         }
-                    } 
-                }
-            }
-        }
-
-        public void actionLockCar(Client player)
-        {
-            if (db.isPlayerLoggedIn(player))
-            {
-                if (!player.isInVehicle)
-                {
-                    foreach (NetHandle vehicle in vehicleHandles)
-                    {
-                        if (player.position.DistanceTo(API.getEntityPosition(vehicle)) <= 3)
+                        else
                         {
-                            if (vehicleKeys[vehicle] == player)
-                            {
-                                if (API.isVehicleDoorBroken(vehicle, 0))
-                                {
-                                    API.sendNotificationToPlayer(player, "Can't lock a car with a broken door.");
-                                    API.setVehicleLocked(vehicle, false);
-                                    break;
-                                }
-
-                                if (API.isVehicleDoorBroken(vehicle, 1))
-                                {
-                                    API.sendNotificationToPlayer(player, "Can't lock a car with a broken door.");
-                                    API.setVehicleLocked(vehicle, false);
-                                    break;
-                                }
-
-                                if (API.isVehicleDoorBroken(vehicle, 2))
-                                {
-                                    API.sendNotificationToPlayer(player, "Can't lock a car with a broken door.");
-                                    API.setVehicleLocked(vehicle, false);
-                                    break;
-                                }
-
-                                if (API.isVehicleDoorBroken(vehicle, 3))
-                                {
-                                    API.sendNotificationToPlayer(player, "Can't lock a car with a broken door.");
-                                    API.setVehicleLocked(vehicle, false);
-                                    break;
-                                }
-
-                                if (API.getVehicleLocked(vehicle))
-                                {
-                                    API.setVehicleLocked(vehicle, false);
-                                    API.setVehicleDoorState(vehicle, 0, true);
-                                    API.sendNotificationToPlayer(player, "You unlocked the vehicle.");
-                                    break;
-                                }
-                                else
-                                {
-                                    API.setVehicleLocked(vehicle, true);
-                                    API.setVehicleDoorState(vehicle, 0, false);
-                                    API.setVehicleDoorState(vehicle, 1, false);
-                                    API.setVehicleDoorState(vehicle, 2, false);
-                                    API.setVehicleDoorState(vehicle, 3, false);
-                                    API.sendNotificationToPlayer(player, "You locked the vehicle.");
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                API.sendNotificationToPlayer(player, "~r~You don't have keys for this.");
-                            }
+                            API.setVehicleDoorState(vehicle, 5, true);
+                            break;
                         }
                     }
                 }
             }
         }
 
-        public void SpawnPlayerCars(Client player)
+        public void actionLockCar(Client player)
+        {
+            foreach (NetHandle vehicle in vehicleInformation.Keys)
+            {
+                if (player.position.DistanceTo(vehicleInformation[vehicle].returnPosition()) <= 3 && !player.isInVehicle)
+                {
+                    if (vehicleInformation[vehicle].returnOwner() == player || vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
+                    {
+                        if (API.getVehicleLocked(vehicle))
+                        {
+                            API.setVehicleLocked(vehicle, false);
+                            API.setVehicleDoorState(vehicle, 0, true);
+                            API.sendNativeToPlayersInRange(API.getEntityPosition(vehicle), 10f, (ulong)Hash.START_VEHICLE_HORN, vehicle, true);
+                            API.sendNativeToPlayersInRange(API.getEntityPosition(vehicle), 10f, (ulong)Hash.START_VEHICLE_HORN, vehicle, false);
+                            break;
+                        }
+                        else
+                        {
+                            API.setVehicleLocked(vehicle, true);
+                            API.setVehicleDoorState(vehicle, 0, false);
+                            API.setVehicleDoorState(vehicle, 1, false);
+                            API.setVehicleDoorState(vehicle, 2, false);
+                            API.setVehicleDoorState(vehicle, 3, false);
+                            API.sendNativeToPlayersInRange(API.getEntityPosition(vehicle), 10f, (ulong)Hash.START_VEHICLE_HORN, vehicle, true);
+                            API.sendNativeToPlayersInRange(API.getEntityPosition(vehicle), 10f, (ulong)Hash.START_VEHICLE_HORN, vehicle, false);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        /*public void SpawnPlayerCars(Client player)
         {
             if(db.databasePlayCarSlotExists(player, 0))
             {
                 Vehicle slotZero = db.databaseSpawnPlayerCar(player, 0);
-                handleVehicleSpawn(player, slotZero);
+                //handleVehicleSpawn(player, slotZero);
                 return;
             }
-        }
+        }*/
     }
 }

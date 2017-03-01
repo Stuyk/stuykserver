@@ -12,9 +12,8 @@ namespace stuykserver.Util
     {
         DatabaseHandler db = new DatabaseHandler();
         Main main = new Main();
-        List<Vector3> atmsList = new List<Vector3>();
-        List<Client> playersInCollisions = new List<Client>();
-        List<ColShape> collisionShapes = new List<ColShape>();
+
+        Dictionary<ColShape, ShopInformation> shopInformation = new Dictionary<ColShape, ShopInformation>();
 
         [Flags]
         public enum AnimationFlags
@@ -24,6 +23,67 @@ namespace stuykserver.Util
             OnlyAnimateUpperBody = 1 << 4,
             AllowPlayerControl = 1 << 5,
             Cancellable = 1 << 7
+        }
+
+        class ShopInformation
+        {
+            ColShape collisionShape;
+            int collisionID;
+            Vector3 collisionPosition;
+            Blip collisionBlip;
+            GTANetworkServer.Object attachedATM;
+            List<Client> collisionPlayers;
+
+            public void setupPoint(ColShape collision, int id, Vector3 position, Blip blip, GTANetworkServer.Object atm)
+            {
+                collisionShape = collision;
+                collisionID = id;
+                collisionPosition = position;
+                collisionBlip = blip;
+                collisionPlayers = new List<Client>();
+                attachedATM = atm;
+            }
+
+            public void collisionPlayersAdd(Client player)
+            {
+                if (!collisionPlayers.Contains(player))
+                {
+                    collisionPlayers.Add(player);
+                }
+            }
+
+            public void collisionPlayersRemove(Client player)
+            {
+                if (collisionPlayers.Contains(player))
+                {
+                    collisionPlayers.Remove(player);
+                }
+            }
+
+            public List<Client> returnCollisionPlayers()
+            {
+                return collisionPlayers;
+            }
+
+            public int returnID()
+            {
+                return collisionID;
+            }
+
+            public ColShape returnCollision()
+            {
+                return collisionShape;
+            }
+
+            public Vector3 returnPosition()
+            {
+                return collisionPosition;
+            }
+
+            public Blip returnBlip()
+            {
+                return collisionBlip;
+            }
         }
 
         public BankHandler()
@@ -38,12 +98,12 @@ namespace stuykserver.Util
         {
             if (Convert.ToInt32(API.getEntityType(entity)) == 6)
             {
-                if (collisionShapes.Contains(colshape))
+                Client player = API.getPlayerFromHandle(entity);
+                if (shopInformation.ContainsKey(colshape))
                 {
-                    if (playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    if (shopInformation[colshape].returnCollisionPlayers().Contains(player))
                     {
-                        playersInCollisions.Remove(API.getPlayerFromHandle(entity));
-                        Client player = API.getPlayerFromHandle(entity);
+                        shopInformation[colshape].collisionPlayersRemove(player);
                         API.triggerClientEvent(player, "removeUseFunction");
                     }
                 }
@@ -54,12 +114,12 @@ namespace stuykserver.Util
         {
             if (Convert.ToInt32(API.getEntityType(entity)) == 6)
             {
-                if (collisionShapes.Contains(colshape))
+                Client player = API.getPlayerFromHandle(entity);
+                if (shopInformation.ContainsKey(colshape))
                 {
-                    if (!playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    if (!shopInformation[colshape].returnCollisionPlayers().Contains(player))
                     {
-                        playersInCollisions.Add(API.getPlayerFromHandle(entity));
-                        Client player = API.getPlayerFromHandle(entity);
+                        shopInformation[colshape].collisionPlayersAdd(player);
                         API.triggerClientEvent(player, "triggerUseFunction", "Bank");
                         API.sendNotificationToPlayer(player, "This will let me deposit my cash.");
                     }
@@ -141,8 +201,9 @@ namespace stuykserver.Util
                     float rotX = Convert.ToSingle(db.pullDatabase("Banks", "RotX", "ID", selectedrow));
                     float rotY = Convert.ToSingle(db.pullDatabase("Banks", "RotY", "ID", selectedrow));
                     float rotZ = Convert.ToSingle(db.pullDatabase("Banks", "RotZ", "ID", selectedrow));
+                    int id = Convert.ToInt32(row[column]);
 
-                    positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ));
+                    positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ), id);
 
                     initializedObjects = ++initializedObjects;
                 }
@@ -161,70 +222,30 @@ namespace stuykserver.Util
 
         public void selectATM(Client player)
         {
-            if (db.isPlayerLoggedIn(player))
+            foreach (ColShape collision in shopInformation.Keys)
             {
-                if (!player.isInVehicle) // If player is not in Vehicle
+                if (shopInformation[collision].returnCollisionPlayers().Contains(player) && !player.isInVehicle)
                 {
-                    if (playersInCollisions.Contains(player))
-                    {
-                        API.triggerClientEvent(player, "loadATM", db.getPlayerAtmMoney(player));
-                        return;
-                    }
+                    API.triggerClientEvent(player, "loadATM", db.getPlayerAtmMoney(player));
+                    break;
                 }
-            }
-            return;
-        }
-
-        // Spawns an ATM at the player. Must face away from wall.
-        [Command("createatm")]
-        public void cmdCreateBank(Client player, string id)
-        {
-            if(db.isAdmin(player.name))
-            {
-                string checkID = db.pullDatabase("Banks", "ID", "ID", id);
-
-                if (checkID == null)
-                {
-                    string posX = player.position.X.ToString();
-                    string posY = player.position.Y.ToString();
-                    string posZ = player.position.Z.ToString();
-                    string rotX = player.rotation.X.ToString();
-                    string rotY = player.rotation.Y.ToString();
-                    string rotZ = player.rotation.Z.ToString();
-
-                    db.insertDatabase("Banks", "ID", id);
-                    db.updateDatabase("Banks", "PosX", posX, "ID", id);
-                    db.updateDatabase("Banks", "PosY", posY, "ID", id);
-                    db.updateDatabase("Banks", "PosZ", posZ, "ID", id);
-                    db.updateDatabase("Banks", "RotX", rotX, "ID", id);
-                    db.updateDatabase("Banks", "RotY", rotY, "ID", id);
-                    db.updateDatabase("Banks", "RotZ", rotZ, "ID", id);
-
-                    positionBlips(new Vector3(player.position.X, player.position.Y, player.position.Z), new Vector3(player.rotation.X, player.rotation.Y, player.rotation.Z));
-                    API.sendNotificationToPlayer(player, "~g~An atm has been created.");
-                    return;
-                }
-                else
-                {
-                    API.sendNotificationToPlayer(player, "~r~This ID already exists.");
-                    return;
-                }
-            }
-            else
-            {
-                API.sendNotificationToPlayer(player, "You are not an administrator.");
             }
         }
 
         // Positions the objects, blips, and text when initialized or created.
-        public void positionBlips(Vector3 position, Vector3 rotation)
+        public void positionBlips(Vector3 position, Vector3 rotation, int id)
         {
+            ShopInformation newShop = new ShopInformation();
+            ColShape collision = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 2f, 2f);
+
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 108);
             API.setBlipColor(newBlip, 2);
-            API.createObject(-870868698, new Vector3(position.X, position.Y, position.Z - 1), new Vector3(rotation.X, rotation.Y, rotation.Z - 180));
-            collisionShapes.Add(API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 2f, 2f));
-            atmsList.Add(new Vector3(position.X, position.Y, position.Z));
+
+            GTANetworkServer.Object atmObject = API.createObject(-870868698, new Vector3(position.X, position.Y, position.Z - 1), new Vector3(rotation.X, rotation.Y, rotation.Z - 180));
+
+            newShop.setupPoint(collision, id, new Vector3(position.X, position.Y, position.Z), newBlip, atmObject);
+            shopInformation.Add(collision, newShop);
         }
     }
 }

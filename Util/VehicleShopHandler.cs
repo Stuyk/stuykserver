@@ -198,7 +198,7 @@ namespace stuykserver.Util
                 Client player = API.getPlayerFromHandle(entity);
                 if (shopInformation.ContainsKey(colshape))
                 {
-                    if (!shopInformation[colshape].returnCollisionPlayers().Contains(player) && !API.isPlayerInAnyVehicle(player))
+                    if (!shopInformation[colshape].returnCollisionPlayers().Contains(player) && !player.isInVehicle)
                     {
                         shopInformation[colshape].collisionPlayersAdd(player);
                         API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "Dealership");
@@ -343,6 +343,7 @@ namespace stuykserver.Util
                     shopInformation[collision].containedPlayersRemove(player);
                     API.stopPlayerAnimation(player);
                     API.stopPedAnimation(player);
+                    break;
                 }
             }
         }
@@ -478,6 +479,9 @@ namespace stuykserver.Util
                     break;
                 case PointType.Vans:
                     API.setBlipSprite(newBlip, 67);
+                    break;
+                case PointType.Bicycles:
+                    API.setBlipSprite(newBlip, 348);
                     break;
                 default:
                     API.setBlipSprite(newBlip, 225);

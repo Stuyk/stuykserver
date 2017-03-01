@@ -58,7 +58,6 @@ namespace stuykserver.Util
         {
             if (eventName == "clothingSave")
             {
-
                 db.updateDatabase("PlayerClothing", "clothingTop", args[0].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerClothing", "clothingTopColor", args[1].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerClothing", "clothingUndershirt", args[2].ToString(), "Nametag", player.name);

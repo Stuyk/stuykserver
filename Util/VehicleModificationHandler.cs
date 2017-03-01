@@ -12,10 +12,89 @@ namespace stuykserver.Util
     {
         DatabaseHandler db = new DatabaseHandler();
 
-        List<Vector3> shopLocations = new List<Vector3>(); // Shop Locations
-        List<ColShape> shopCollisions = new List<ColShape>(); // Shop Collisions for Use Functions
-        List<Client> playersInCollisions = new List<Client>(); // Players in the Collisions.
-        Dictionary<Client, Vector3> playersInShop = new Dictionary<Client, Vector3>();
+        Dictionary<ColShape, ShopInformation> shopInformation = new Dictionary<ColShape, ShopInformation>();
+
+        class ShopInformation
+        {
+            ColShape collisionShape;
+            int collisionID;
+            Vector3 collisionPosition;
+            Blip collisionBlip;
+            List<Client> collisionPlayers; // When a player is in the collision.
+            Dictionary<Client, NetHandle> containedPlayers; // When a player enters a shop.
+
+            public void setupPoint(ColShape collision, int id, Vector3 position, Blip blip)
+            {
+                collisionShape = collision;
+                collisionID = id;
+                collisionPosition = position;
+                collisionBlip = blip;
+                containedPlayers = new Dictionary<Client, NetHandle>();
+                collisionPlayers = new List<Client>();
+            }
+
+            public void collisionPlayersAdd(Client player)
+            {
+                if (!collisionPlayers.Contains(player))
+                {
+                    collisionPlayers.Add(player);
+                }
+            }
+
+            public void collisionPlayersRemove(Client player)
+            {
+                if (collisionPlayers.Contains(player))
+                {
+                    collisionPlayers.Remove(player);
+                }
+            }
+
+            public void containedPlayersAdd(Client player, NetHandle vehicle)
+            {
+                if (!containedPlayers.ContainsKey(player))
+                {
+                    containedPlayers.Add(player, vehicle);
+                }
+            }
+
+            public void containedPlayersRemove(Client player)
+            {
+                if (containedPlayers.ContainsKey(player))
+                {
+                    containedPlayers.Remove(player);
+                }
+            }
+
+            public List<Client> returnCollisionPlayers()
+            {
+                return collisionPlayers;
+            }
+
+            public Dictionary<Client, NetHandle> returnContainedPlayers()
+            {
+                return containedPlayers;
+            }
+
+            public int returnID()
+            {
+                return collisionID;
+            }
+
+            public ColShape returnCollision()
+            {
+                return collisionShape;
+            }
+
+            public Vector3 returnPosition()
+            {
+                return collisionPosition;
+            }
+
+            public Blip returnBlip()
+            {
+                return collisionBlip;
+            }
+        }
 
         public VehicleModificationHandler()
         {
@@ -24,25 +103,16 @@ namespace stuykserver.Util
             API.onEntityExitColShape += API_onEntityExitColShape;
             API.onClientEventTrigger += API_onClientEventTrigger;
             API.onPlayerDisconnected += API_onPlayerDisconnected;
-            API.onResourceStop += API_onResourceStop;
-        }
-
-        private void API_onResourceStop()
-        {
-            foreach (Client p in playersInShop.Keys)
-            {
-                p.position = playersInShop[p];
-                db.setPlayerPositionByVector(p, playersInShop[p]);
-            }
         }
 
         private void API_onPlayerDisconnected(Client player, string reason)
         {
-            if (playersInShop.ContainsKey(player))
+            foreach (ColShape collision in shopInformation.Keys)
             {
-                player.position = playersInShop[player];
-                db.setPlayerPositionByVector(player, playersInShop[player]);
-                API.consoleOutput("{0} moved outside of shop due to disconnection.", player.name);
+                if (shopInformation[collision].returnContainedPlayers().ContainsKey(player))
+                {
+                    db.setPlayerPositionByVector(player, shopInformation[collision].returnPosition());
+                }
             }
         }
 
@@ -68,8 +138,6 @@ namespace stuykserver.Util
                 API.setVehicleMod(playerVehicle, 69, Convert.ToInt32(args[18]));
             }
 
-
-
             if (eventName == "leaveVehicleShop")
             {
                 actionExitShop(player);
@@ -80,11 +148,12 @@ namespace stuykserver.Util
         {
             if (Convert.ToInt32(API.getEntityType(entity)) == 6)
             {
-                if (shopCollisions.Contains(colshape))
+                Client player = API.getPlayerFromHandle(entity);
+                if (shopInformation.ContainsKey(colshape))
                 {
-                    if (playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    if (shopInformation[colshape].returnCollisionPlayers().Contains(player))
                     {
-                        playersInCollisions.Remove(API.getPlayerFromHandle(entity));
+                        shopInformation[colshape].collisionPlayersRemove(player);
                         API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
                     }
                 }
@@ -95,17 +164,14 @@ namespace stuykserver.Util
         {
             if (Convert.ToInt32(API.getEntityType(entity)) == 6)
             {
-                if (shopCollisions.Contains(colshape))
+                Client player = API.getPlayerFromHandle(entity);
+                if (shopInformation.ContainsKey(colshape))
                 {
-                    if (!playersInCollisions.Contains(API.getPlayerFromHandle(entity)))
+                    if (!shopInformation[colshape].returnCollisionPlayers().Contains(player) && player.isInVehicle)
                     {
-                        if (API.isPlayerInAnyVehicle(API.getPlayerFromHandle(entity)))
-                        {
-                            playersInCollisions.Add(API.getPlayerFromHandle(entity));
-                            API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "VehicleModificationShop");
-                            API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "This place seems to have a lot of car parts.");
-                        }
-                        
+                        shopInformation[colshape].collisionPlayersAdd(player);
+                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "VehicleModificationShop");
+                        API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "This place seems to have a lot of car parts.");
                     }
                 }
             }
@@ -129,8 +195,8 @@ namespace stuykserver.Util
                     float posX = Convert.ToSingle(db.pullDatabase("VehicleModificationShops", "PosX", "ID", selectedrow));
                     float posY = Convert.ToSingle(db.pullDatabase("VehicleModificationShops", "PosY", "ID", selectedrow));
                     float posZ = Convert.ToSingle(db.pullDatabase("VehicleModificationShops", "PosZ", "ID", selectedrow));
-
-                    positionBlips(new Vector3(posX, posY, posZ));
+                    int id = Convert.ToInt32(row[column]);
+                    positionBlips(new Vector3(posX, posY, posZ), id);
 
                     initializedObjects = ++initializedObjects;
                 }
@@ -139,50 +205,49 @@ namespace stuykserver.Util
             API.consoleOutput("Vehicle Mod Shops Initialized: " + initializedObjects.ToString());
         }
 
-        public void positionBlips(Vector3 position)
+        public void positionBlips(Vector3 position, int id)
         {
-            var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
-            API.setBlipSprite(newBlip, 446);
-            API.setBlipColor(newBlip, 63);
-            shopLocations.Add(new Vector3(position.X, position.Y, position.Z));
+            ShopInformation newShop = new ShopInformation();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f);
-            shopCollisions.Add(shape);
+
+            var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
+            API.setBlipSprite(newBlip, 402);
+            API.setBlipColor(newBlip, 59);
+
+            newShop.setupPoint(shape, id, new Vector3(position.X, position.Y, position.Z), newBlip);
+            shopInformation.Add(shape, newShop);
         }
 
         public void actionEnterShop(Client player)
         {
-            if (db.isPlayerLoggedIn(player))
+            foreach (ColShape collision in shopInformation.Keys)
             {
-                if (player.isInVehicle)
+                if (shopInformation[collision].returnContainedPlayers().ContainsKey(player) && player.isInVehicle)
                 {
-                    if (!playersInShop.ContainsKey(player))
-                    {
-                        if (playersInCollisions.Contains(player))
-                        {
-                            db.setPlayerHUD(player, false);
-                            playersInShop.Add(player, player.position);
-                            Random rand = new Random();
-                            int dimension = rand.Next(1, 1000);
-                            NetHandle playerVehicle = API.getPlayerVehicle(player);
-                            API.setEntityPosition(playerVehicle, new Vector3(-1156.071, -2005.241, 13.18026));
-                            API.setEntityDimension(playerVehicle, dimension);
-                            API.setEntityDimension(player, dimension);
-                            API.setPlayerIntoVehicle(player, playerVehicle, -1);
-                            player.vehicle.engineStatus = false;
-                            API.triggerClientEvent(player, "createCamera", new Vector3(-1149.901, -2006.942, 14.14681), player.vehicle.position);
-                            API.triggerClientEvent(player, "openCarPanel");
-                        }
-                    }
-                    else
-                    {
-                        API.sendNotificationToPlayer(player, "~r~You already seem to be in the shop.");
-                    }
+                    int dimension = new Random().Next(1, 1000);
+                    shopInformation[collision].containedPlayersAdd(player, player.vehicle);
+                    db.setPlayerHUD(player, false);
+                    API.setEntityPosition(player.vehicle, new Vector3(-1156.071, -2005.241, 13.18026));
+                    API.setEntityDimension(player.vehicle, dimension);
+                    API.setEntityDimension(player, dimension);
+                    API.setPlayerIntoVehicle(player, shopInformation[collision].returnContainedPlayers()[player], -1);
+                    player.vehicle.engineStatus = false;
+                    API.triggerClientEvent(player, "createCamera", new Vector3(-1149.901, -2006.942, 14.14681), player.vehicle.position);
+                    API.triggerClientEvent(player, "openCarPanel");
                 }
             }
         }
 
         public void actionExitShop(Client player)
         {
+            foreach (ColShape collision in shopInformation.Keys)
+            {
+                if (shopInformation[collision].returnContainedPlayers().ContainsKey(player))
+                {
+                    API.setEntityPosition(player.vehicle, shopInformation[collision].returnPosition());
+                    API.setPlayerIntoVehicle(player, shopInformation[collision].returnContainedPlayers()[player], -1);
+                }
+            }
             API.setEntityDimension(player.vehicle, 0);
             API.setEntityDimension(player, 0);
             API.setEntityPosition(player.vehicle, playersInShop[player]);
