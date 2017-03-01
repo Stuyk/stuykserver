@@ -11,7 +11,6 @@ namespace stuykserver
     public class Main : Script
     {
         DatabaseHandler db = new DatabaseHandler();
-        SpawnPoints spawnPoints = new SpawnPoints();
 
         public string msgPrefix = "~y~[~w~STUYK~y~]~w~ ";
 

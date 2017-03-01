@@ -222,7 +222,7 @@ namespace stuykserver.Util
         {
             foreach (ColShape collision in shopInformation.Keys)
             {
-                if (shopInformation[collision].returnContainedPlayers().ContainsKey(player) && player.isInVehicle)
+                if (shopInformation[collision].returnCollisionPlayers().Contains(player) && player.isInVehicle)
                 {
                     int dimension = new Random().Next(1, 1000);
                     shopInformation[collision].containedPlayersAdd(player, player.vehicle);
@@ -246,16 +246,14 @@ namespace stuykserver.Util
                 {
                     API.setEntityPosition(player.vehicle, shopInformation[collision].returnPosition());
                     API.setPlayerIntoVehicle(player, shopInformation[collision].returnContainedPlayers()[player], -1);
+                    API.setEntityDimension(player.vehicle, 0);
+                    API.setEntityDimension(player, 0);
+                    shopInformation[collision].containedPlayersRemove(player);
+                    player.vehicle.engineStatus = true;
+                    API.triggerClientEvent(player, "endCamera");
+                    db.setPlayerHUD(player, true);
                 }
             }
-            API.setEntityDimension(player.vehicle, 0);
-            API.setEntityDimension(player, 0);
-            API.setEntityPosition(player.vehicle, playersInShop[player]);
-            API.setEntityRotation(player.vehicle, new Vector3(player.rotation.X, player.rotation.Y, player.rotation.Z + 180));
-            playersInShop.Remove(player);
-            player.vehicle.engineStatus = true;
-            API.triggerClientEvent(player, "endCamera");
-            db.setPlayerHUD(player, true);
         }
 
         [Command("createvehiclemodshop")]
@@ -264,15 +262,6 @@ namespace stuykserver.Util
             if (db.isAdmin(player.name))
             {
                 db.insertDataPointPosition("VehicleModificationShops", player);
-            }
-        }
-
-        [Command("gotoVehiclemodShop")]
-        public void cmdGoToVehicleModShop(Client player)
-        {
-            if (db.isAdmin(player.name))
-            {
-                API.setEntityPosition(player, shopLocations[0]);
             }
         }
     }

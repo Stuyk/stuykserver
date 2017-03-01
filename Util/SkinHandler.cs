@@ -12,7 +12,6 @@ namespace stuykserver.Util
     {
         DatabaseHandler db = new DatabaseHandler();
         Main main = new Main();
-        SpawnPoints sp = new SpawnPoints();
 
         [Flags]
         public enum AnimationFlags
@@ -24,18 +23,11 @@ namespace stuykserver.Util
             Cancellable = 1 << 7
         }
 
-        int skinFaceShapeOne;
-
         public SkinHandler()
         {
             API.onClientEventTrigger += API_onClientEventTrigger;
-            API.onResourceStart += API_onResourceStart;
         }
 
-        private void API_onResourceStart()
-        {
-            skinFaceShapeOne = 0;
-        }
 
         public void API_onClientEventTrigger(Client player, string eventName, params object[] args)
         {

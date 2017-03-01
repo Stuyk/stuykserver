@@ -14,7 +14,6 @@ namespace stuykserver.Util
     public class ConnectionHandler : Script
     {
         Main main = new Main();
-        SpawnPoints spawnPoints = new SpawnPoints();
         DatabaseHandler db = new DatabaseHandler();
         SkinHandler skinHandler = new SkinHandler();
         ClothingHandler clothingHandler = new ClothingHandler();

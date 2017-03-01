@@ -48,8 +48,11 @@ namespace stuykserver.Util
             PointType collisionType; // The type of point. Van, Sedan, ETC.
             List<Client> collisionPlayers; // When a player is in the collision.
             List<Client> containedPlayers; // When a player enters a shop.
+            Vector3 shopCenterPoint; // Used to determine where the player is positioned.
+            Vector3 shopCameraPoint; // Used to determine where the camera is positioned.
+            Vector3 shopExitPoint; // Used as an area to spawn vehicles.
             
-            public void setupPoint(ColShape collision, int id, Vector3 position, Blip blip, PointType type)
+            public void setupPoint(ColShape collision, int id, Vector3 position, Blip blip, PointType type, Vector3 centerPoint, Vector3 cameraPoint, Vector3 exitPoint)
             {
                 collisionShape = collision;
                 collisionID = id;
@@ -58,6 +61,39 @@ namespace stuykserver.Util
                 collisionType = type;
                 containedPlayers = new List<Client>();
                 collisionPlayers = new List<Client>();
+                shopCenterPoint = centerPoint;
+                shopCameraPoint = cameraPoint;
+                shopExitPoint = exitPoint;
+            }
+
+            public Vector3 returnShopCenterPoint()
+            {
+                return shopCenterPoint;
+            }
+
+            public Vector3 returnShopCameraPoint()
+            {
+                return shopCameraPoint;
+            }
+
+            public Vector3 returnShopExitPoint()
+            {
+                return shopExitPoint;
+            }
+
+            public void setShopCenterPoint(Vector3 position)
+            {
+                shopCenterPoint = position;
+            }
+
+            public void setShopCameraPoint(Vector3 position)
+            {
+                shopCameraPoint = position;
+            }
+
+            public void setShopExitPoint(Vector3 position)
+            {
+                shopExitPoint = position;
             }
 
             public void collisionPlayersAdd(Client player)
@@ -137,6 +173,78 @@ namespace stuykserver.Util
             API.onPlayerDisconnected += API_onPlayerDisconnected;
         }
 
+        [Command("dealership")]
+        public void cmdDealership(Client player, string action, string type)
+        {
+            if (db.isAdmin(player.name))
+            {
+                if (action == "create")
+                {
+                    db.insertDataPointPosition("VehicleShops", player);
+                    API.sendNotificationToPlayer(player, "~g~Created a dealership.");
+                }
+
+                if (action == "get")
+                {
+                    foreach (ColShape collision in shopInformation.Keys)
+                    {
+                        if (shopInformation[collision].returnPosition().DistanceTo(player.position) <= 30)
+                        {
+                            API.sendChatMessageToPlayer(player, string.Format("~y~Dealership ID: ~w~{0}", shopInformation[collision].returnID().ToString()));
+                        }
+                    }
+                }
+
+                if (action == "setexit")
+                {
+                    foreach (ColShape collision in shopInformation.Keys)
+                    {
+                        if (shopInformation[collision].returnPosition().DistanceTo(player.position) <= 30)
+                        {
+                            db.updateDatabase("VehicleShops", "ExitPoint", player.position.ToString(), "ID", shopInformation[collision].returnID().ToString());
+                            API.sendNotificationToPlayer(player, "~g~Updated Exit Point.");
+                        }
+                    }
+                }
+
+                if (action == "setfocus")
+                {
+                    foreach (ColShape collision in shopInformation.Keys)
+                    {
+                        if (shopInformation[collision].returnPosition().DistanceTo(player.position) <= 30)
+                        {
+                            db.updateDatabase("VehicleShops", "CenterPoint", player.position.ToString(), "ID", shopInformation[collision].returnID().ToString());
+                            API.sendNotificationToPlayer(player, "~g~Updated Focus Point.");
+                        }
+                    }
+                }
+
+                if (action == "setcamera")
+                {
+                    foreach (ColShape collision in shopInformation.Keys)
+                    {
+                        if (shopInformation[collision].returnPosition().DistanceTo(player.position) <= 30)
+                        {
+                            db.updateDatabase("VehicleShops", "CameraPoint", player.position.ToString(), "ID", shopInformation[collision].returnID().ToString());
+                            API.sendNotificationToPlayer(player, "~g~Updated Camera Point.");
+                        }
+                    }
+                }
+
+                if (action == "type")
+                {
+                    foreach (ColShape collision in shopInformation.Keys)
+                    {
+                        if (shopInformation[collision].returnPosition().DistanceTo(player.position) <= 30)
+                        {
+                            db.updateDatabase("VehicleShops", "Type", type.ToString(), "ID", shopInformation[collision].returnID().ToString());
+                            API.sendNotificationToPlayer(player, "~g~Updated Type to: " + type);
+                        }
+                    }
+                }
+            }
+        }
+
         private void API_onPlayerDisconnected(Client player, string reason)
         {
             foreach (ColShape collision in shopInformation.Keys)
@@ -158,7 +266,14 @@ namespace stuykserver.Util
         {
             if (eventName == "dealershipReady")
             {
-                API.triggerClientEvent(player, "createCamera", new Vector3(230.8, -990.1201, -99), player.position);
+                foreach (ColShape collision in shopInformation.Keys)
+                {
+                    if (shopInformation[collision].returnContainedPlayers().Contains(player))
+                    {
+                        API.triggerClientEvent(player, "createCamera", shopInformation[collision].returnShopCameraPoint(), shopInformation[collision].returnShopCenterPoint());
+                        API.setEntityDimension(player, 0);
+                    }
+                }
             }
 
             if (eventName == "leaveDealership")
@@ -232,9 +347,12 @@ namespace stuykserver.Util
                     float rotY = Convert.ToSingle(db.pullDatabase("VehicleShops", "RotY", "ID", selectedrow));
                     float rotZ = Convert.ToSingle(db.pullDatabase("VehicleShops", "RotZ", "ID", selectedrow));
                     PointType type = convertToPointType(db.pullDatabase("VehicleShops", "Type", "ID", selectedrow));
+                    Vector3 centerPoint = db.convertStringToVector3(db.pullDatabase("VehicleShops", "CenterPoint", "ID", selectedrow));
+                    Vector3 cameraPoint = db.convertStringToVector3(db.pullDatabase("VehicleShops", "CameraPoint", "ID", selectedrow));
+                    Vector3 exitPoint = db.convertStringToVector3(db.pullDatabase("VehicleShops", "ExitPoint", "ID", selectedrow));
                     int id = Convert.ToInt32(row[column]);
 
-                    positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ), id, type);
+                    positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ), id, type, centerPoint, cameraPoint, exitPoint);
 
                     initializedObjects = ++initializedObjects;
                 }
@@ -303,10 +421,10 @@ namespace stuykserver.Util
                 if (shopInformation[collision].returnCollisionPlayers().Contains(player))
                 {
                     shopInformation[collision].containedPlayersAdd(player);
+                    API.setEntityPosition(player, shopInformation[collision].returnShopCenterPoint());
                     API.setEntityDimension(player, new Random().Next(1, 1000));
                     db.setPlayerHUD(player, false);
                     API.triggerClientEvent(player, "startBrowsing", shopInformation[collision].returnType().ToString());
-                    API.setEntityPosition(player, new Vector3(225.6238, -990, -98.99996));
                     break;
                 }
             }
@@ -348,103 +466,7 @@ namespace stuykserver.Util
             }
         }
 
-        [Command("setupdealership")] // Set a dealership type.
-        public void cmdSetDealership(Client player, string type)
-        {
-            if (db.isAdmin(player.name))
-            {
-                db.insertDataPointPosition("VehicleShops", player);
-
-                string query = "SELECT ID FROM VehicleShops";
-                DataTable result = API.exported.database.executeQueryWithResult(query);
-                string id = result.Rows.Count.ToString();
-
-                API.sendNotificationToPlayer(player, string.Format("The current ID is: {0}", id));
-                switch (type)
-                {
-                    case "Boats":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Commercial":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Compacts":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Coupes":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Bicycles":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Police":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Helicopters":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Industrial":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Motorcycles":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Muscle":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "OffRoad":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Planes":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "SUVS":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Sedans":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Sports":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Classic":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Super":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Utility":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    case "Vans":
-                        actionSetupDealershipType(id, type);
-                        break;
-                    default:
-                        API.sendNotificationToPlayer(player, "Not a valid type. Removed");
-                        query = string.Format("DELETE FROM VehicleShops WHERE ID={0}", id);
-                        API.exported.database.executeQueryWithResult(query);
-                        break;
-                }
-
-            }
-        }
-
-        public void actionSetupDealershipType(string id, string type)
-        {
-            db.updateDatabase("VehicleShops", "Type", type, "ID", id);
-        }
-
-        [Command("setdealershipexit")] // Set a dealership exit point.
-        public void cmdSetDealershipExit(Client player, string id)
-        {
-            if (db.isAdmin(player.name))
-            {
-                db.updateDatabase("VehicleShops", "ExitPoint", player.position.ToString(), "ID", id);
-                API.sendNotificationToPlayer(player, string.Format("Exit point set to: {0}", player.position));
-            }
-        }
-
-        public void positionBlips(Vector3 position, Vector3 rotation, int id, PointType type)
+        public void positionBlips(Vector3 position, Vector3 rotation, int id, PointType type, Vector3 centerPoint, Vector3 cameraPoint, Vector3 exitPoint)
         {
             VehicleShopInformation newShop = new VehicleShopInformation();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 3f, 5f);
@@ -490,7 +512,7 @@ namespace stuykserver.Util
 
             API.setBlipColor(newBlip, 73); // Yellow
 
-            newShop.setupPoint(shape, id, position, newBlip, type);
+            newShop.setupPoint(shape, id, position, newBlip, type, centerPoint, cameraPoint, exitPoint);
             shopInformation.Add(shape, newShop);
         }
     }

@@ -120,7 +120,7 @@ namespace stuykserver.Util
                 {
                     if (vehicleInformation[entity].returnPosition() != null)
                     {
-                        API.setEntityPosition(entity, vehicleInformation[entity].returnPosition());
+                        // API.setEntityPosition(entity, vehicleInformation[entity].returnPosition());
                     }
                 }
             }
