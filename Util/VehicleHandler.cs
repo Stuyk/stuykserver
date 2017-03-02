@@ -18,8 +18,6 @@ namespace stuykserver.Util
 
         public class VehicleInformation : IDisposable
         {
-            bool disposed = false;
-
             NetHandle vehicleID;
             ColShape vehicleCollision;
             Vector3 vehiclePosition;
@@ -114,7 +112,6 @@ namespace stuykserver.Util
 
             public void Dispose()
             {
-                disposed = true;
                 GC.SuppressFinalize(this);
             }
         }
