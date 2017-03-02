@@ -123,6 +123,9 @@ namespace stuykserver.Util
                 Vehicle playerVehicle = player.vehicle;
                 API.setVehicleCustomPrimaryColor(playerVehicle, Convert.ToInt32(args[0]), Convert.ToInt32(args[1]), Convert.ToInt32(args[2]));
                 API.setVehicleCustomSecondaryColor(playerVehicle, Convert.ToInt32(args[3]), Convert.ToInt32(args[4]), Convert.ToInt32(args[5]));
+                string query = string.Format("UPDATE PlayerVehicles SET Red='{0}', Green='{1}', Blue='{2}', sRed='{3}', sGreen='{4}', sBlue='{5}' WHERE Garage='{6}' AND VehicleType='{7}'", args[0], args[1], args[2], args[3], args[4], args[5], player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
+                API.exported.database.executeQueryWithResult(query);
+
                 API.setVehicleMod(playerVehicle, 0, Convert.ToInt32(args[6]));
                 API.setVehicleMod(playerVehicle, 1, Convert.ToInt32(args[7]));
                 API.setVehicleMod(playerVehicle, 2, Convert.ToInt32(args[8]));
@@ -181,25 +184,20 @@ namespace stuykserver.Util
         {
             API.consoleOutput("Started: Vehicle Modification Handler");
 
-            string query = "SELECT ID FROM VehicleModificationShops";
+            string query = "SELECT * FROM VehicleModificationShops";
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
             int initializedObjects = 0;
 
             foreach (DataRow row in result.Rows)
             {
-                foreach (DataColumn column in result.Columns)
-                {
-                    string selectedrow = row[column].ToString();
+                float posX = Convert.ToSingle(row["PosX"]);
+                float posY = Convert.ToSingle(row["PosY"]);
+                float posZ = Convert.ToSingle(row["PosZ"]);
+                int id = Convert.ToInt32(row["ID"]);
+                positionBlips(new Vector3(posX, posY, posZ), id);
 
-                    float posX = Convert.ToSingle(db.pullDatabase("VehicleModificationShops", "PosX", "ID", selectedrow));
-                    float posY = Convert.ToSingle(db.pullDatabase("VehicleModificationShops", "PosY", "ID", selectedrow));
-                    float posZ = Convert.ToSingle(db.pullDatabase("VehicleModificationShops", "PosZ", "ID", selectedrow));
-                    int id = Convert.ToInt32(row[column]);
-                    positionBlips(new Vector3(posX, posY, posZ), id);
-
-                    initializedObjects = ++initializedObjects;
-                }
+                ++initializedObjects;
             }
 
             API.consoleOutput("Vehicle Mod Shops Initialized: " + initializedObjects.ToString());

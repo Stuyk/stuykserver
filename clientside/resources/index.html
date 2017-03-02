@@ -77,8 +77,35 @@
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script type="text/javascript">
+	$('#login').keydown(function(e) {
+		if (e.which == 13) {
+			var inputEmail = $('#inputEmail').val();
+			if (inputEmail.length > 1) {
+				parseLogin();
+			}
+		}
+	});
+	
+	$('#register').keydown(function(e) {
+		if (e.which == 13) {
+			var registerEmail = $('#registerEmail').val();
+			if (registerEmail.length > 1) {
+				parseRegistration();
+			}
+		}
+	});
+
 	document.getElementById("loginButton").onclick = function ()
 	{
+		parseLogin();
+	}
+
+	document.getElementById("registerButton").onclick = function ()
+	{
+		parseRegistration();
+	}
+	
+	function parseLogin() {
 		var email = document.getElementById("inputEmail").value;
 		var password = document.getElementById("inputPassword").value;
 		if(email.indexOf('@') >= 0) {
@@ -92,9 +119,8 @@
 			$('#doesNotMatchAccount').hide();
 		}
 	}
-
-	document.getElementById("registerButton").onclick = function ()
-	{
+	
+	function parseRegistration() {
 		var email = document.getElementById("registerEmail").value;
 		var password = document.getElementById("registerPassword").value;
 		var passwordtwo = document.getElementById("registerPasswordAgain").value;
@@ -117,6 +143,7 @@
 			$('#invalidEmail').show();
 		}
 	}
+	
 	
 	function showLogin() {
 		$('#pushingRegistration').hide();

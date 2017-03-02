@@ -25,7 +25,6 @@ namespace stuykserver.Util
             API.onPlayerBeginConnect += API_onPlayerBeginConnect;
             API.onPlayerFinishedDownload += API_onPlayerFinishedDownload;
             API.onResourceStop += API_onResourceStop;
-
             API.onResourceStart += API_onResourceStart;
         }
 
@@ -102,6 +101,8 @@ namespace stuykserver.Util
                     API.deleteEntity(tempVehicle);
                 }
                 db.updateDatabase("Players", "TempJobVehicle", "None", "Nametag", player.name);
+
+                API.call("VehicleHandler", "removeDisconnectedVehicles", player);
             }
         }
 

@@ -104,7 +104,7 @@ namespace stuykserver.Jobs
         {
             API.consoleOutput("Started: Fishing Handler");
 
-            string query = "SELECT ID FROM Fishing";
+            string query = "SELECT * FROM Fishing";
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
             int initializedObjects = 0;
@@ -112,24 +112,19 @@ namespace stuykserver.Jobs
             // Setup Fishing Points
             foreach (DataRow row in result.Rows)
             {
-                foreach (DataColumn column in result.Columns)
-                {
-                    string selectedrow = row[column].ToString();
+                float posX = Convert.ToSingle(row["PosX"]);
+                float posY = Convert.ToSingle(row["PosY"]);
+                float posZ = Convert.ToSingle(row["PosZ"]);
+                int id = Convert.ToInt32(row["ID"]);
 
-                    float posX = Convert.ToSingle(db.pullDatabase("Fishing", "PosX", "ID", selectedrow));
-                    float posY = Convert.ToSingle(db.pullDatabase("Fishing", "PosY", "ID", selectedrow));
-                    float posZ = Convert.ToSingle(db.pullDatabase("Fishing", "PosZ", "ID", selectedrow));
-                    int id = Convert.ToInt32(row[column]);
+                positionBlips(new Vector3(posX, posY, posZ), id, PointType.Fishing);
 
-                    positionBlips(new Vector3(posX, posY, posZ), new Vector3(), id, PointType.Fishing);
-
-                    initializedObjects = ++initializedObjects;
-                }
+                ++initializedObjects;
             }
 
             API.consoleOutput("Fishing Points Intialized: " + initializedObjects.ToString());
 
-            query = "SELECT ID FROM FishingSalePoints";
+            query = "SELECT * FROM FishingSalePoints";
             result = API.exported.database.executeQueryWithResult(query);
 
             initializedObjects = 0;
@@ -137,19 +132,13 @@ namespace stuykserver.Jobs
             // Setup Fishing Sale Points
             foreach (DataRow row in result.Rows)
             {
-                foreach (DataColumn column in result.Columns)
-                {
-                    string selectedrow = row[column].ToString();
+                float posX = Convert.ToSingle(row["PosX"]);
+                float posY = Convert.ToSingle(row["PosY"]);
+                float posZ = Convert.ToSingle(row["PosZ"]);
+                int id = Convert.ToInt32(row["ID"]);
 
-                    float posX = Convert.ToSingle(db.pullDatabase("FishingSalePoints", "PosX", "ID", selectedrow));
-                    float posY = Convert.ToSingle(db.pullDatabase("FishingSalePoints", "PosY", "ID", selectedrow));
-                    float posZ = Convert.ToSingle(db.pullDatabase("FishingSalePoints", "PosZ", "ID", selectedrow));
-                    int id = Convert.ToInt32(row[column]);
-
-                    positionBlips(new Vector3(posX, posY, posZ), new Vector3(), id, PointType.Sale);
-
-                    initializedObjects = ++initializedObjects;
-                }
+                positionBlips(new Vector3(posX, posY, posZ), id, PointType.Sale);
+                ++initializedObjects;
             }
 
             API.consoleOutput("Fishing Sale Points Intialized: " + initializedObjects.ToString());
@@ -349,7 +338,7 @@ namespace stuykserver.Jobs
             }
         }
 
-        public void positionBlips(Vector3 position, Vector3 rotation, int id, PointType point)
+        public void positionBlips(Vector3 position, int id, PointType point)
         {
             FishingPointInformation newPoint = new FishingPointInformation();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 10f, 5f);

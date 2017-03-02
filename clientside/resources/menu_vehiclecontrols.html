@@ -6,7 +6,7 @@
     <link href="css/menu.css" rel="stylesheet">
   </head>
   <body>
-    <div class="site-wrapper responsive">
+    <div class="site-wrapper responsive" id="documentFocus">
 		<div class="col-md-12">
 			<div class="col-md-1 col-md-offset-2" id="leftMostColumn">
 				<button class="special-button-offmost" type="submit" style="display: none">
@@ -38,10 +38,17 @@
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script type="text/javascript">
-		$(document).keypress(function(e) {
-			if(e.which == 66 || e.which == 27 || e.which == 32) {
-				resourceCall("killPanel");
-				return;
+		$(document).keydown(function(e) {
+			switch (e.keyCode) {
+				case 66:
+					resourceCall("killPanel");
+					break;
+				case 65:
+					openHood();
+					break;
+				case 68:
+					openTrunk();
+					break;
 			}
 		});
 	
@@ -51,14 +58,26 @@
 		});
 	
 		$('#btnTrunk').click(function() {
-			resourceCall("vehicleOpenTrunk");
+			openTrunk();
 			return;
 		});
 		
 		$('#btnHood').click(function() {
-			resourceCall("vehicleOpenHood");
+			openHood();
 			return;
 		});
+		
+		function openTrunk() {
+			resourceCall("vehicleOpenTrunk");
+			resourceCall("killPanel");
+			return;
+		}
+		
+		function openHood() {
+			resourceCall("vehicleOpenHood");
+			resourceCall("killPanel");
+			return;
+		}
 	</script>
 	</body>
 </html>

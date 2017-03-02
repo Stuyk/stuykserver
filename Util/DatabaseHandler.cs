@@ -222,21 +222,6 @@ namespace stuykserver.Util
             return false;
         }
 
-        public Vehicle databaseSpawnPlayerCar(Client player, int slot)
-        {
-            VehicleHash vehicle = API.vehicleNameToModel(pullDatabase("PlayerVehicles", "VehicleType" + slot.ToString(), "Garage", player.name));
-            float x = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "PosX", "Garage", player.name));
-            float y = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "PosY", "Garage", player.name));
-            float z = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "PosZ", "Garage", player.name));
-            Vector3 position = new Vector3(x, y, z);
-            x = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "RotX", "Garage", player.name));
-            y = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "RotY", "Garage", player.name));
-            z = Convert.ToSingle(pullDatabase("PlayerVehicles", slot.ToString() + "RotZ", "Garage", player.name));
-            Vector3 rotation = new Vector3(x, y, z);
-            Vehicle veh = API.createVehicle(vehicle, position, rotation, 0, 0);
-            return veh;
-        }
-
         public void updateVehiclePosition(Client player, int slot)
         {
             updateDatabase("PlayerVehicles", slot.ToString() + "PosX", player.vehicle.position.X.ToString(), "Garage", player.name);
@@ -261,6 +246,14 @@ namespace stuykserver.Util
             string[] coords = xpos.Split(' ');
             Vector3 finalVector = new Vector3(Convert.ToSingle(coords[1]), Convert.ToSingle(coords[3]), Convert.ToSingle(coords[5]));
             return finalVector;
+        }
+
+        public void insertPurchasedVehicle(Client player, Vehicle vehicle, VehicleHash vehicletype)
+        {
+            Vector3 pos = API.getEntityPosition(vehicle);
+            Vector3 rot = API.getEntityRotation(vehicle);
+            string query = string.Format("INSERT INTO PlayerVehicles (Garage, PosX, PosY, PosZ, RotX, RotY, RotZ, VehicleType) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')", player.name, pos.X, pos.Y, pos.Z, rot.X, rot.Y, rot.Z, API.getVehicleDisplayName(vehicletype));
+            API.exported.database.executeQueryWithResult(query);
         }
     }
 }

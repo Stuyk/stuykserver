@@ -328,7 +328,7 @@ namespace stuykserver.Util
         {
             API.consoleOutput("Started: Vehicle Shop Handler");
 
-            string query = "SELECT ID FROM VehicleShops";
+            string query = "SELECT * FROM VehicleShops";
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
             int initializedObjects = 0;
@@ -336,26 +336,20 @@ namespace stuykserver.Util
             // Setup Shops
             foreach (DataRow row in result.Rows)
             {
-                foreach (DataColumn column in result.Columns)
-                {
-                    string selectedrow = row[column].ToString();
+                float posX = Convert.ToSingle(row["PosX"]);
+                float posY = Convert.ToSingle(row["PosY"]);
+                float posZ = Convert.ToSingle(row["PosZ"]);
+                float rotX = Convert.ToSingle(row["RotX"]);
+                float rotY = Convert.ToSingle(row["RotY"]);
+                float rotZ = Convert.ToSingle(row["RotZ"]);
+                int id = Convert.ToInt32(row["ID"]);
+                PointType type = convertToPointType(row["Type"].ToString());
+                Vector3 centerPoint = db.convertStringToVector3(row["CenterPoint"].ToString());
+                Vector3 cameraPoint = db.convertStringToVector3(row["CameraPoint"].ToString());
+                Vector3 exitPoint = db.convertStringToVector3(row["ExitPoint"].ToString());
 
-                    float posX = Convert.ToSingle(db.pullDatabase("VehicleShops", "PosX", "ID", selectedrow));
-                    float posY = Convert.ToSingle(db.pullDatabase("VehicleShops", "PosY", "ID", selectedrow));
-                    float posZ = Convert.ToSingle(db.pullDatabase("VehicleShops", "PosZ", "ID", selectedrow));
-                    float rotX = Convert.ToSingle(db.pullDatabase("VehicleShops", "RotX", "ID", selectedrow));
-                    float rotY = Convert.ToSingle(db.pullDatabase("VehicleShops", "RotY", "ID", selectedrow));
-                    float rotZ = Convert.ToSingle(db.pullDatabase("VehicleShops", "RotZ", "ID", selectedrow));
-                    PointType type = convertToPointType(db.pullDatabase("VehicleShops", "Type", "ID", selectedrow));
-                    Vector3 centerPoint = db.convertStringToVector3(db.pullDatabase("VehicleShops", "CenterPoint", "ID", selectedrow));
-                    Vector3 cameraPoint = db.convertStringToVector3(db.pullDatabase("VehicleShops", "CameraPoint", "ID", selectedrow));
-                    Vector3 exitPoint = db.convertStringToVector3(db.pullDatabase("VehicleShops", "ExitPoint", "ID", selectedrow));
-                    int id = Convert.ToInt32(row[column]);
-
-                    positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ), id, type, centerPoint, cameraPoint, exitPoint);
-
-                    initializedObjects = ++initializedObjects;
-                }
+                positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ), id, type, centerPoint, cameraPoint, exitPoint);
+                ++initializedObjects;
             }
 
             API.consoleOutput("Vehicle Shops Initialized: " + initializedObjects.ToString());

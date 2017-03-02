@@ -160,26 +160,20 @@ namespace stuykserver.Util
         {
             API.consoleOutput("Started: BarberShop Handler");
 
-            string query = "SELECT ID FROM BarberShops";
+            string query = "SELECT * FROM BarberShops";
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
             int initializedObjects = 0;
 
             foreach (DataRow row in result.Rows)
             {
-                foreach (DataColumn column in result.Columns)
-                {
-                    string selectedrow = row[column].ToString();
+                float posX = Convert.ToSingle(row["PosX"]);
+                float posY = Convert.ToSingle(row["PosY"]);
+                float posZ = Convert.ToSingle(row["PosZ"]);
+                int id = Convert.ToInt32(row["ID"]);
 
-                    float posX = Convert.ToSingle(db.pullDatabase("BarberShops", "PosX", "ID", selectedrow));
-                    float posY = Convert.ToSingle(db.pullDatabase("BarberShops", "PosY", "ID", selectedrow));
-                    float posZ = Convert.ToSingle(db.pullDatabase("BarberShops", "PosZ", "ID", selectedrow));
-                    int id = Convert.ToInt32(row[column]);
-
-                    positionBlips(new Vector3(posX, posY, posZ), id);
-
-                    initializedObjects = ++initializedObjects;
-                }
+                positionBlips(new Vector3(posX, posY, posZ), id);
+                ++initializedObjects;
             }
 
             API.consoleOutput("BarberShops Initialized: " + initializedObjects.ToString());

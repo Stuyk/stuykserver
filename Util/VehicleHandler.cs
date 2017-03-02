@@ -2,7 +2,9 @@
 using GTANetworkShared;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace stuykserver.Util
@@ -14,23 +16,32 @@ namespace stuykserver.Util
 
         Dictionary<NetHandle, VehicleInformation> vehicleInformation = new Dictionary<NetHandle, VehicleInformation>();
 
-        class VehicleInformation
+        public class VehicleInformation : IDisposable
         {
+            bool disposed = false;
+
             NetHandle vehicleID;
             ColShape vehicleCollision;
             Vector3 vehiclePosition;
             List<Client> vehicleKeys;
             Client vehicleOwner;
             List<Client> playersInVehicle;
+            string vehicleType;
 
-            public void setupVehicle(NetHandle id, ColShape collision, Vector3 collisionPosition, Client owner)
+            public void setupVehicle(NetHandle id, ColShape collision, Vector3 collisionPosition, Client owner, string type)
             {
                 vehicleID = id;
                 vehicleCollision = collision;
                 vehiclePosition = collisionPosition;
                 vehicleOwner = owner;
+                vehicleType = type;
                 vehicleKeys = new List<Client>();
                 playersInVehicle = new List<Client>();
+            }
+
+            public string returnType()
+            {
+                return vehicleType;
             }
 
             public void setVehiclePosition(ColShape collision, Vector3 position)
@@ -100,6 +111,21 @@ namespace stuykserver.Util
             {
                 return vehicleID;
             }
+
+            public void Dispose()
+            {
+                disposed = true;
+                GC.SuppressFinalize(this);
+            }
+        }
+
+        public void disposeVehicle(NetHandle vehicleID, ColShape collision, List<Client> vehicleKeys, Client vehicleOwner, List<Client> playersInVehicle)
+        {
+            API.deleteEntity(vehicleID);
+            API.deleteColShape(collision);
+            vehicleKeys.Clear();
+            playersInVehicle.Clear();
+            vehicleOwner = null;
         }
 
         public VehicleHandler()
@@ -110,21 +136,23 @@ namespace stuykserver.Util
             API.onEntityExitColShape += API_onEntityExitColShape;
         }
 
-        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
+        public void removeDisconnectedVehicles(Client player)
         {
+            List<NetHandle> vehicles = API.getAllVehicles();
 
-            // Force Vehicle to stay in position after locking.
-            if (Convert.ToInt32(API.getEntityType(entity)) == 1)
+            foreach (NetHandle vehicle in vehicles)
             {
-                if (vehicleInformation.ContainsKey(entity))
+                if (vehicleInformation[vehicle].returnOwner() == player)
                 {
-                    if (vehicleInformation[entity].returnPosition() != null)
-                    {
-                        // API.setEntityPosition(entity, vehicleInformation[entity].returnPosition());
-                    }
+                    vehicleInformation[vehicle].Dispose();
+                    vehicleInformation.Remove(vehicle);
+                    API.deleteEntity(vehicle);
                 }
             }
+        }
 
+        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
+        {
             if (Convert.ToInt32(API.getEntityType(entity)) == 6)
             {
                 Client player = API.getPlayerFromHandle(entity);
@@ -214,7 +242,7 @@ namespace stuykserver.Util
             {
                 var rot = API.getEntityRotation(player.handle);
                 var vehicle = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
-                handleVehicleSpawn(player, vehicle, player.position);
+                handleVehicleSpawn(player, vehicle, player.position, API.getVehicleDisplayName(model));
                 return;
             }
             return;
@@ -223,17 +251,18 @@ namespace stuykserver.Util
         public Vehicle actionSetupPurchasedCar(Vector3 position, VehicleHash model, Client player)
         {
             Vehicle vehicle = API.createVehicle(model, position, new Vector3(), 0, 0);
-            handleVehicleSpawn(player, vehicle, position);
+            handleVehicleSpawn(player, vehicle, position, API.getVehicleDisplayName(model));
+            db.insertPurchasedVehicle(player, vehicle, model);
             return vehicle;
         }
 
-        public void handleVehicleSpawn(Client player, Vehicle vehicle, Vector3 where)
+        public void handleVehicleSpawn(Client player, Vehicle vehicle, Vector3 where, string type)
         {
             VehicleInformation newVehicle = new VehicleInformation();
             ColShape collision = API.createCylinderColShape(where, 2f, 2f);
             API.setVehicleLocked(vehicle, true);
             vehicle.engineStatus = false;
-            newVehicle.setupVehicle(vehicle, collision, where, player);
+            newVehicle.setupVehicle(vehicle, collision, where, player, type);
             vehicleInformation.Add(vehicle, newVehicle);
         }
 
@@ -322,8 +351,7 @@ namespace stuykserver.Util
                         {
                             API.setVehicleLocked(vehicle, false);
                             API.setVehicleDoorState(vehicle, 0, true);
-                            API.sendNativeToPlayersInRange(API.getEntityPosition(vehicle), 10f, (ulong)Hash.START_VEHICLE_HORN, vehicle, true);
-                            API.sendNativeToPlayersInRange(API.getEntityPosition(vehicle), 10f, (ulong)Hash.START_VEHICLE_HORN, vehicle, false);
+                            API.sendNotificationToPlayer(player, "~g~The vehicle has been unlocked.");
                             break;
                         }
                         else
@@ -333,8 +361,14 @@ namespace stuykserver.Util
                             API.setVehicleDoorState(vehicle, 1, false);
                             API.setVehicleDoorState(vehicle, 2, false);
                             API.setVehicleDoorState(vehicle, 3, false);
-                            API.sendNativeToPlayersInRange(API.getEntityPosition(vehicle), 10f, (ulong)Hash.START_VEHICLE_HORN, vehicle, true);
-                            API.sendNativeToPlayersInRange(API.getEntityPosition(vehicle), 10f, (ulong)Hash.START_VEHICLE_HORN, vehicle, false);
+                            API.sendNotificationToPlayer(player, "~r~The vehicle has been locked.");
+                            if (vehicleInformation[vehicle].returnOwner() == player)
+                            {
+                                Vector3 veh = API.getEntityPosition(vehicle);
+                                Vector3 vehR = API.getEntityRotation(vehicle);
+                                string query = string.Format("UPDATE PlayerVehicles SET PosX='{0}', PosY='{1}', PosZ='{2}', RotX='{3}', RotY='{4}', RotZ='{5}' WHERE Garage='{6}' AND VehicleType='{7}'", veh.X, veh.Y, veh.Z, vehR.X, vehR.Y, vehR.Z, player.name, vehicleInformation[vehicle].returnType());
+                                API.exported.database.executeQueryWithResult(query);
+                            }
                             break;
                         }
                     }
@@ -342,14 +376,42 @@ namespace stuykserver.Util
             }
         }
 
-        /*public void SpawnPlayerCars(Client player)
+        public void SpawnPlayerCars(Client player)
         {
-            if(db.databasePlayCarSlotExists(player, 0))
+            string query = string.Format("SELECT * FROM PlayerVehicles WHERE Garage='{0}'", player.name);
+            DataTable result = API.exported.database.executeQueryWithResult(query);
+
+            foreach (DataRow row in result.Rows)
             {
-                Vehicle slotZero = db.databaseSpawnPlayerCar(player, 0);
-                //handleVehicleSpawn(player, slotZero);
-                return;
+                float posX = Convert.ToSingle(row["PosX"]);
+                float posY = Convert.ToSingle(row["PosY"]);
+                float posZ = Convert.ToSingle(row["PosZ"]);
+                float rotX = Convert.ToSingle(row["RotX"]);
+                float rotY = Convert.ToSingle(row["RotY"]);
+                float rotZ = Convert.ToSingle(row["RotZ"]);
+                VehicleHash type = API.vehicleNameToModel(row["VehicleType"].ToString());
+
+                Vector3 position = new Vector3(posX, posY, posZ);
+                Vector3 rotation = new Vector3(rotX, rotY, rotZ);
+
+                Vehicle vehicle = API.createVehicle(type, position, rotation, 0, 0);
+
+                int r = Convert.ToInt32(row["Red"]);
+                int g = Convert.ToInt32(row["Green"]);
+                int b = Convert.ToInt32(row["Blue"]);
+
+                API.setVehicleCustomPrimaryColor(vehicle, r, g, b);
+
+                int sr = Convert.ToInt32(row["sRed"]);
+                int sg = Convert.ToInt32(row["sGreen"]);
+                int sb = Convert.ToInt32(row["sBlue"]);
+
+                API.setVehicleCustomSecondaryColor(vehicle, sr, sg, sb);
+
+                handleVehicleSpawn(player, vehicle, position, API.getVehicleDisplayName(type));
+
+                API.consoleOutput("Created vehicle for + " + row["Garage"].ToString());
             }
-        }*/
+        }
     }
 }

@@ -29,6 +29,8 @@ namespace stuykserver.Util
                 e.Cancel = true;
                 return;
             }
+            e.Cancel = true;
+            return;
         }
 
         public void sendProximityMessage(Client player, string message)

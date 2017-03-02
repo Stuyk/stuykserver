@@ -184,29 +184,23 @@ namespace stuykserver.Util
         {
             API.consoleOutput("Started: Bank Handler");
 
-            string query = "SELECT ID FROM Banks";
+            string query = "SELECT * FROM Banks";
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
             int initializedObjects = 0;
 
             foreach (DataRow row in result.Rows)
             {
-                foreach (DataColumn column in result.Columns)
-                {
-                    string selectedrow = row[column].ToString();
+                float posX = Convert.ToSingle(row["PosX"]);
+                float posY = Convert.ToSingle(row["PosY"]);
+                float posZ = Convert.ToSingle(row["PosZ"]);
+                float rotX = Convert.ToSingle(row["RotX"]);
+                float rotY = Convert.ToSingle(row["RotY"]);
+                float rotZ = Convert.ToSingle(row["RotZ"]);
+                int id = Convert.ToInt32(row["ID"]);
 
-                    float posX = Convert.ToSingle(db.pullDatabase("Banks", "PosX", "ID", selectedrow));
-                    float posY = Convert.ToSingle(db.pullDatabase("Banks", "PosY", "ID", selectedrow));
-                    float posZ = Convert.ToSingle(db.pullDatabase("Banks", "PosZ", "ID", selectedrow));
-                    float rotX = Convert.ToSingle(db.pullDatabase("Banks", "RotX", "ID", selectedrow));
-                    float rotY = Convert.ToSingle(db.pullDatabase("Banks", "RotY", "ID", selectedrow));
-                    float rotZ = Convert.ToSingle(db.pullDatabase("Banks", "RotZ", "ID", selectedrow));
-                    int id = Convert.ToInt32(row[column]);
-
-                    positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ), id);
-
-                    initializedObjects = ++initializedObjects;
-                }
+                positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ), id);
+                ++initializedObjects;
             }
 
             API.consoleOutput("Banks Initialized: " + initializedObjects.ToString());
