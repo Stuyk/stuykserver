@@ -4,8 +4,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/skinchanger.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/slider.css" />
   </head>
-  <body style="padding: 10px">
+  <body>
 		<div class="modal fade" id="genderChange" tabindex="-1" role="dialog" aria-labelledby="genderChangeLabel">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
@@ -24,166 +25,159 @@
 				</div>
 			</div>
 		</div>
-	<div class="col-md-4" id="leftColumn">
+	<div class="col-md-2 column-special pull-left" id="leftColumn">
 		<div id="leftColumnContent">
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="button" class="btn optionButton col-sm-3" data-toggle="modal" data-target="#genderChange">M</button>
-						<label class="col-sm-4 vertical-align">Gender</label>
-						<button type="button" class="btn optionButton col-sm-3" id="genderFemale" data-toggle="modal" data-target="#genderChange">F</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="shapeFirstNegative" onClick="resourceCall('changeFaceShapeOne', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceShapeOne">0</span>) Face Shape One </label>
-						<button type="submit" class="btn optionButton col-sm-3" id="shapeFirstPositive" onClick="resourceCall('changeFaceShapeOne', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="shapeSecondNegative" onClick="resourceCall('changeFaceShapeTwo', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceShapeTwo">0</span>) Face Shape Two </label>
-						<button type="submit" class="btn optionButton col-sm-3" id="shapeSecondPositive" onClick="resourceCall('changeFaceShapeTwo', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="skinFirstNegative" onClick="resourceCall('changeFaceSkinOne', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceSkinOne">0</span>) Skin One</label>
-						<button type="submit" class="btn optionButton col-sm-3" id="skinFirstPositive" onClick="resourceCall('changeFaceSkinOne', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="skinSecondNegative" onClick="resourceCall('changeFaceSkinTwo', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceSkinTwo">0</span>) Skin Two</label>
-						<button type="submit" class="btn optionButton col-sm-3" id="skinSecondPositive" onClick="resourceCall('changeFaceSkinTwo', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="shapeMixNegative" onClick="resourceCall('changeFaceShapeMix', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceShapeMix">0</span>) Shape Mix</label>
-						<button type="submit" class="btn optionButton col-sm-3" id="shapeMixPositive" onClick="resourceCall('changeFaceShapeMix', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="skinMixNegative" onClick="resourceCall('changeFaceSkinMix', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceSkinMix">0</span>) Skin Mix</label>
-						<button type="submit" class="btn optionButton col-sm-3" id="skinMixPositive" onClick="resourceCall('changeFaceSkinMix', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="hairStyleNegative" onClick="resourceCall('changeFaceHairstyle', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceHairStyle">0</span>) Hair Style</label>
-						<button type="submit" class="btn optionButton col-sm-3" id="hairStylePositive" onClick="resourceCall('changeFaceHairstyle', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="hairColorNegative" onClick="resourceCall('changeFaceHairstyleColor', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceHairColor">0</span>) Hair Color</label>
-						<button type="submit" class="btn optionButton col-sm-3" id="hairColorPositive" onClick="resourceCall('changeFaceHairstyleColor', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="hairHighlightNegative" onClick="resourceCall('changeFaceHairstyleHighlight', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceHairHighlight">0</span>) Hair Highlight Color</label>
-						<button type="submit" class="btn optionButton col-sm-3" id="hairHighlightPositive" onClick="resourceCall('changeFaceHairstyleHighlight', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="hairTextureNegative" onClick="resourceCall('changeFaceHairstyleTexture', -1);">-</button>
-						<label class="col-sm-4 vertical-align">(<span id="faceHairTexture">0</span>) Hair Texture</label>
-						<button type="submit" class="btn optionButton col-sm-3" id="hairTextureNegative" onClick="resourceCall('changeFaceHairstyleTexture', 1);">+</button>
-					</div>
-				</form>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<form class="form-inline col-sm-12">
-					<div class="row">
-						<button type="submit" class="btn optionButton col-sm-3" id="rotationLeft" onClick="resourceCall('changeRotationHandle', -30);"><</button>
-						<label class="col-sm-4 vertical-align">Rotation</label>
-						<button type="submit" class="btn btn-danger optionButton col-sm-3" id="rotationRight" onClick="resourceCall('changeRotationHandle', 30);">></button>
-					</div>
-				</form>
-				<div class="row">
-					<button id="saveButton" type="submit" class="btn col-sm-4 optionButtonModified" style="margin-left: 50px">Save</button>
-				</div>
-			</div>
-		</div>
+      <div class="column-header"><h2>Model Selection</h2></div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+    			<button type="button" class="btn optionButton pull-left" data-toggle="modal" data-target="#genderChange">M</button>
+    			<label class="vertical-align">Gender</label>
+    			<button type="button" class="btn optionButton pull-right" id="genderFemale" data-toggle="modal" data-target="#genderChange">F</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+    			<button type="submit" class="btn optionButton pull-left" id="shapeFirstNegative" onClick="resourceCall('changeFaceShapeOne', -1);">-</button>
+    			<label class="vertical-align">Face Shape One </label>
+    			<button type="submit" class="btn optionButton pull-right" id="shapeFirstPositive" onClick="resourceCall('changeFaceShapeOne', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+    			<button type="submit" class="btn optionButton pull-left" id="shapeSecondNegative" onClick="resourceCall('changeFaceShapeTwo', -1);">-</button>
+    			<label class="vertical-align">Face Shape Two </label>
+    			<button type="submit" class="btn optionButton pull-right" id="shapeSecondPositive" onClick="resourceCall('changeFaceShapeTwo', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+    					<button type="submit" class="btn optionButton pull-left" id="skinFirstNegative" onClick="resourceCall('changeFaceSkinOne', -1);">-</button>
+    					<label class="vertical-align">Skin One</label>
+    					<button type="submit" class="btn optionButton pull-right" id="skinFirstPositive" onClick="resourceCall('changeFaceSkinOne', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+					<button type="submit" class="btn optionButton pull-left" id="skinSecondNegative" onClick="resourceCall('changeFaceSkinTwo', -1);">-</button>
+					<label class="vertical-align">Skin Two</label>
+					<button type="submit" class="btn optionButton pull-right" id="skinSecondPositive" onClick="resourceCall('changeFaceSkinTwo', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+					<button type="submit" class="btn optionButton pull-left" id="shapeMixNegative" onClick="resourceCall('changeFaceShapeMix', -1);">-</button>
+					<label class="vertical-align">Shape Mix</label>
+					<button type="submit" class="btn optionButton pull-right" id="shapeMixPositive" onClick="resourceCall('changeFaceShapeMix', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+					<button type="submit" class="btn optionButton pull-left" id="skinMixNegative" onClick="resourceCall('changeFaceSkinMix', -1);">-</button>
+					<label class="vertical-align">Skin Mix</label>
+					<button type="submit" class="btn optionButton pull-right" id="skinMixPositive" onClick="resourceCall('changeFaceSkinMix', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+					<button type="submit" class="btn optionButton pull-left" id="hairStyleNegative" onClick="resourceCall('changeFaceHairstyle', -1);">-</button>
+					<label class="vertical-align">Hair Style</label>
+					<button type="submit" class="btn optionButton pull-right" id="hairStylePositive" onClick="resourceCall('changeFaceHairstyle', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+					<button type="submit" class="btn optionButton pull-left" id="hairColorNegative" onClick="resourceCall('changeFaceHairstyleColor', -1);">-</button>
+					<label class="vertical-align">Hair Color</label>
+					<button type="submit" class="btn optionButton pull-right" id="hairColorPositive" onClick="resourceCall('changeFaceHairstyleColor', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+					<button type="submit" class="btn optionButton pull-left" id="hairHighlightNegative" onClick="resourceCall('changeFaceHairstyleHighlight', -1);">-</button>
+					<label class="vertical-align">Hair Highlight Color</label>
+					<button type="submit" class="btn optionButton pull-right" id="hairHighlightPositive" onClick="resourceCall('changeFaceHairstyleHighlight', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+					<button type="submit" class="btn optionButton pull-left" id="hairTextureNegative" onClick="resourceCall('changeFaceHairstyleTexture', -1);">-</button>
+					<label class="vertical-align">Hair Texture</label>
+					<button type="submit" class="btn optionButton pull-right" id="hairTextureNegative" onClick="resourceCall('changeFaceHairstyleTexture', 1);">+</button>
+    		</div>
+    	</div>
+    	<div class="row space-row">
+    		<div class="col-sm-12">
+    				<button id="saveButton" type="submit" class="btn col-sm-12 optionButtonModified">Save</button>
+    		</div>
+    	</div>
 		</div>
 	</div>
-	<div class="col-md-4" id="middleColumn">
-		<div class="progress" id="progressBarSave" style="height: 35px; margin-top: 65%" hidden>
-			<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Updating Information</h5></div>
-		</div>
+	<div class="progress" id="progressBarSave" style="height: 35px" hidden>
+		<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Updating Information</h5></div>
 	</div>
+  <div class="col-md-2 column-special pull-right" id="rightColumn">
+    <div class="column-header"><h2>Properties:</h2></div>
+    <div class="col-md-12">
+      <div class="row space-row">
+        <span>Shape One # <span id="faceShapeOne"></span></span>
+      </div>
+      <div class="row space-row">
+        <span>Shape Two # <span id="faceShapeTwo"></span></span>
+      </div>
+      <div class="row space-row">
+        <span>Skin One # <span id="faceSkinOne"></span></span>
+      </div>
+      <div class="row space-row">
+        <span>Skin Two # <span id="faceSkinTwo"></span></span>
+      </div>
+      <div class="row space-row">
+        <span>Shape Mix # <span id="faceShapeMix"></span></span>
+      </div>
+      <div class="row space-row">
+        <span>Skin Mix # <span id="faceSkinMix"></span></span>
+      </div>
+      <div class="row space-row">
+        <span>Hairstyle # <span id="faceHairStyle"></span></span>
+      </div>
+      <div class="row space-row">
+        <span>Hairstyle Color # <span id="faceHairColor"></span></span>
+      </div>
+      <div class="row space-row">
+        <span>Hairstyle Highlight # <span id="faceHairHighlight"></span></span>
+      </div>
+      <div class="row space-row">
+        <span>Hairstyle Texture # <span id="faceHairTexture"></span></span>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <div class="container" id="sliderContainer">
+      <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="359" data-slider-step="1" data-slider-value="0"/>
+    </div>
+  </footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js">
 		$('#genderChange').modal('show');
 	</script>
+  <script src="js/bootstrap-slider.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			resourceCall("updateFaceProperties");
 		});
-	
+
+    $('#ex1').slider().on('slide', function(e) {
+			resourceCall("clothingRotatePlayer", e.value);
+		});
+
 		document.getElementById("saveButton").onclick = function ()
 		{
-			$('#leftColumnContent').hide();
+			$('#leftColumn').hide();
+      $('#sliderContainer').hide();
+      $('#rightColumn').hide();
 			$('#progressBarSave').show();
 			resourceCall("changeFaceSave");
 		}
-	
+
 		function updateProperties (faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairStyle, faceHairColor, faceHairHighlight, faceHairTexture) {
 			$('#faceShapeOne').html(faceShapeOne);
 			$('#faceShapeTwo').html(faceShapeTwo);
@@ -200,4 +194,3 @@
 	</script>
   </body>
 </html>
-

@@ -34,7 +34,7 @@ class CefHelper {
       API.setCanOpenChat(false);
     }
   }
-  
+
   destroy () {
     this.open = false;
     API.destroyCefBrowser(this.browser);
@@ -82,7 +82,7 @@ API.onKeyDown.connect(function(player, e) {
 			return;
 		}
 	}
-	
+
 	// B - KEYPRESS HELPER
 	if (!API.isChatOpen() && e.KeyCode == Keys.B) {
 		switch (currentCollisionType) {
@@ -91,55 +91,55 @@ API.onKeyDown.connect(function(player, e) {
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
-				
+
 			case "Bank":
 				API.triggerServerEvent("useFunction", "Bank");
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
-				
+
 			case "FishingSpot":
 				API.triggerServerEvent("useFunction", "FishingSpot");
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
-				
+
 			case "FishingSaleSpot":
 				API.triggerServerEvent("useFunction", "FishingSaleSpot");
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
-				
+
 			case "BarberShop":
 				API.triggerServerEvent("useFunction", "BarberShop");
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
-				
+
 			case "Clothing":
 				API.triggerServerEvent("useFunction", "Clothing");
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
-				
+
 			case "Dealership":
 				API.triggerServerEvent("useFunction", "Dealership");
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
-				
+
 			case "VehicleEngine":
 				API.triggerServerEvent("useFunction", "VehicleEngine");
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
-				
+
 			case "VehicleLock":
 				API.triggerServerEvent("useFunction", "VehicleLock");
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
-		}	
+		}
 	}
 });
 
@@ -160,7 +160,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			break;
 		}
 	}
-	
+
 	// CEF REQUEST PANEL EVENTS
 	if (pagePanel == null) {
 		switch(eventName) {
@@ -196,7 +196,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			}
 		}
 	}
-	
+
 	// CEF REQUEST CALL EVENTS
 	if (pagePanel != null) {
 		switch(eventName) {
@@ -245,12 +245,18 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 				pagePanel.browser.call("displayWord", args[0]);
 				break;
 			}
+			case "passVehicleModifications":
+			{
+				pagePanel.browser.call("passVehicleModifications", args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18]);
+        updateVehicleVariables(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18]);
+        break;
+      }
 		}
-		
+
 	}
-	
+
 	// EVENT NAMES THAT CAN'T GO ANYWHERE
-	
+
 	if (eventName == "killPanel") {
 		if (pagePanel != null) {
 			pagePanel.destroy();
@@ -258,17 +264,17 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			API.triggerServerEvent("stopAnimation");
 		}
 	}
-	
+
 	// LOADSAMONEY Proble
 	if (eventName === "update_money_display") {
         currentMoney = args[0];
     }
-	
+
 	// VEHICLE FUNCTIONS - CLOSE THE DOOR
 	if (eventName=="closeCarDoor") {
 		API.setVehicleDoorState(args[0], args[1], false);
 	}
-	
+
 	// CLOTHING CHANGER VARIABLES
 	if (eventName=="clothingLocalVariableUpdate") {
 		clothingPanelOpen = true;
@@ -282,7 +288,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		clothingShoesNum = args[7];
 		clothingShoesColorNum = args[8];
 	}
-	
+
 	// MODEL CHANGER VARIABLES
 	if (eventName=="loadFaceData") {
 		facePanelOpen = true;
@@ -297,26 +303,26 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		faceHairstyleHighlight = args[8];
 		faceHairstyleTexture = args[9];
 	}
-	
+
 	if (eventName=="updateKarma") { // Karma
 		karmaDisplay = args[0];
 	}
-	
+
 	if (eventName == "startBrowsing") { // Dealership
 		startBrowsing(args[0]);
 	}
-	
+
 	// SERVERSIDE CAMERA FUNCTIONS
 	// Create a camera.
 	if (eventName == "createCamera") {
 		var pos = args[0];
 		var target = args[1];
-		
+
 		var camera = API.createCamera(pos, new Vector3());
 		API.pointCameraAtPosition(camera, target);
 		API.setActiveCamera(camera);
 	}
-	
+
 	// Destroy a camera.
 	if (eventName == "endCamera") {
 		API.setActiveCamera(null);
@@ -329,47 +335,47 @@ API.onUpdate.connect(function() {
 		if (currentMoney != null) {
 			API.drawText("$" + currentMoney, resX - 25, 25, 1, 50, 211, 82, 255, 4, 2, false, true, 0);
 		}
-	
+
 		if (karmaDisplay != null) {
 			API.drawText(karmaDisplay, resX - 25, resY - 100, 1, 244, 244, 66, 255, 4, 2, false, true, 0);
 		}
 	}
-	
+
 	// USE FUNCTION DISPLAYS
 	if (useFunction != null) {
 		switch (currentCollisionType) {
 		case "VehicleModificationShop":
 			API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
-			
+
 		case "Bank":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
-			
+
 		case "FishingSpot":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
-			
+
 		case "FishingSaleSpot":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
-			
+
 		case "BarberShop":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
-			
+
 		case "Clothing":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
-			
+
 		case "Dealership":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
-			
+
 		case "VehicleEngine":
 			API.dxDrawTexture("clientside/resources/images/pressbalt.png", new Point(resX / 2 - 25, resY / 2 - 75), new Size(200, 125), 1);
 			break;
-			
+
 		case "VehicleLock":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
@@ -522,12 +528,12 @@ function changeUpdateFace() {
 }
 
 function changeFaceGender(amount) {
-	if (amount == 0) { 
+	if (amount == 0) {
 		API.setPlayerSkin(1885233650); // Set to Male
 		faceShapeMix = 0.9;
 		faceSkinMix = 0.9;
 	}
-	
+
 	if (amount == 1) {
 		API.setPlayerSkin(-1667301416); // Set to Female
 		faceShapeMix = 0.1;
@@ -537,57 +543,57 @@ function changeFaceGender(amount) {
 
 function changeFaceShapeOne(amount) {
 	faceShapeOne = faceShapeOne + amount;
-	
+
 	if (faceShapeOne <= -1) {
 		faceShapeOne = 0;
 	}
-	
+
 	if (faceShapeOne == 46) {
 		faceShapeOne = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceShapeTwo(amount) {
 	faceShapeTwo = faceShapeTwo + amount;
-	
+
 	if (faceShapeTwo <= -1) {
 		faceShapeTwo = 0;
 	}
-	
+
 	if (faceShapeTwo == 46) {
 		faceShapeTwo = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceSkinOne(amount) {
 	faceSkinOne = faceSkinOne + amount;
-	
+
 	if (faceSkinOne <= -1) {
 		faceSkinOne = 0;
 	}
-	
+
 	if (faceSkinOne == 46) {
 		faceSkinOne = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceSkinTwo(amount) {
 	faceSkinTwo = faceSkinTwo + amount;
-	
+
 	if (faceSkinTwo <= 0) {
 		faceSkinTwo = 0;
 	}
-	
+
 	if (faceSkinTwo == 46) {
 		faceSkinTwo = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
@@ -595,15 +601,15 @@ function changeFaceShapeMix(amount) {
 	if (amount == 1) {
 		faceShapeMix += 0.1
 	}
-	
+
 	if (amount == -1) {
 		faceShapeMix -= 0.1
 	}
-	
+
 	if (faceShapeMix <= 0.1) {
 		faceShapeMix = 0.1;
 	}
-	
+
 	if (faceShapeMix >= 0.9) {
 		faceShapeMix = 0.9;
 	}
@@ -614,15 +620,15 @@ function changeFaceSkinMix(amount) {
 	if (amount == 1) {
 		faceSkinMix += 0.1;
 	}
-	
+
 	if (amount == -1) {
 		faceSkinMix -= 0.1;
 	}
-	
+
 	if (faceSkinMix <= 0.1) {
 		faceSkinMix = 0.1;
 	}
-	
+
 	if (faceSkinMix >= 0.9) {
 		faceSkinMix = 0.9;
 	}
@@ -631,45 +637,45 @@ function changeFaceSkinMix(amount) {
 
 function changeFaceHairstyle(amount) {
 	faceHairstyle += amount;
-	
+
 	if (faceHairstyle <= 0) {
 		faceHairstyle = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceHairstyleColor(amount) {
 	faceHairstyleColor += amount;
-	
+
 	if (faceHairstyleColor <= 0) {
 		faceHairstyleColor = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceHairstyleHighlight(amount) {
 	faceHairstyleHighlight += amount;
-	
+
 	if (faceHairstyleHighlight <= 0) {
 		faceHairstyleHighlight = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceHairstyleTexture(amount) {
 	faceHairstyleTexture =+ amount;
-	
+
 	if (faceHairstyleTexture <= 0) {
 		faceHairstyleTexture = 0;
 	}
-	
+
 	if (faceHairstyleTexture == 4) {
 		faceHairstyleTexture = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 // ##########################
@@ -690,17 +696,16 @@ var clothingPanelOpen = null;
 function showClothingPanel() {
 	pagePanel = new CefHelper("clientside/resources/clothingpanel.html");
 	pagePanel.show();
-	updateClothingProperties();
 }
 
 function changeClothingTorso(amount) { // Torso Changer
 	if (clothingTorsoNum != null) {
 		clothingTorsoNum = clothingTorsoNum + amount;
-		
+
 		if (clothingTorsoNum <= -1) {
 			clothingTorsoNum = 0;
 		}
-		
+
 		API.setPlayerClothes(API.getLocalPlayer(), 3, clothingTorsoNum, 0);
 		updateClothingProperties();
 	}
@@ -709,15 +714,15 @@ function changeClothingTorso(amount) { // Torso Changer
 function changeClothingTop(amount) { // Top Changer
 	if (clothingTopNum != null) {
 		clothingTopNum = clothingTopNum + amount;
-		
+
 		if (clothingTopNum <= -1) {
 			clothingTopNum = 0;
 		}
-		
+
 		if (clothingTopNum >= 206) {
 			clothingTopNum = 0;
-		}	
-		
+		}
+
 		API.setPlayerClothes(API.getLocalPlayer(), 11, clothingTopNum, clothingTopColorNum);
 		updateClothingProperties();
 	}
@@ -726,11 +731,11 @@ function changeClothingTop(amount) { // Top Changer
 function changeClothingTopColor(amount) { // Top Color Changer
 	if (clothingTopColorNum != null) {
 		clothingTopColorNum = clothingTopColorNum + amount;
-		
+
 		if (clothingTopColorNum <= -1) {
 			clothingTopColorNum = 0;
 		}
-		
+
 		API.setPlayerClothes(API.getLocalPlayer(), 11, clothingTopNum, clothingTopColorNum);
 		updateClothingProperties();
 	}
@@ -739,15 +744,15 @@ function changeClothingTopColor(amount) { // Top Color Changer
 function changeClothingUndershirt(amount) { // Undershirt Changer
 	if (clothingUndershirtNum != null) {
 		clothingUndershirtNum = clothingUndershirtNum + amount;
-		
+
 		if (clothingUndershirtNum <= -1) {
 			clothingUndershirtNum = 96;
 		}
-		
+
 		if (clothingUndershirtNum >= 97) {
 			clothingUndershirtNum = 0;
 		}
-		
+
 		API.setPlayerClothes(API.getLocalPlayer(), 8, clothingUndershirtNum, clothingUndershirtColorNum);
 		updateClothingProperties();
 	}
@@ -756,11 +761,11 @@ function changeClothingUndershirt(amount) { // Undershirt Changer
 function changeClothingUndershirtColor(amount) { // Undershirt Color Changer
 	if (clothingUndershirtColorNum != null) {
 		clothingUndershirtColorNum = clothingUndershirtColorNum + amount;
-		
+
 		if (clothingUndershirtColorNum <= -1) {
 			clothingUndershirtColorNum = 0;
 		}
-		
+
 		API.setPlayerClothes(API.getLocalPlayer(), 8, clothingUndershirtNum, clothingUndershirtColorNum);
 		updateClothingProperties();
 	}
@@ -769,11 +774,11 @@ function changeClothingUndershirtColor(amount) { // Undershirt Color Changer
 function changeClothingLegs(amount) { // Legs Changer
 	if (clothingLegsNum != null) {
 		clothingLegsNum = clothingLegsNum + amount;
-		
+
 		if (clothingLegsNum <= -1) {
 			clothingLegsNum = 0;
 		}
-		
+
 		API.setPlayerClothes(API.getLocalPlayer(), 4, clothingLegsNum, clothingLegsColorNum);
 		updateClothingProperties();
 	}
@@ -782,11 +787,11 @@ function changeClothingLegs(amount) { // Legs Changer
 function changeClothingLegsColor(amount) { // Legs Color Changer
 	if (clothingLegsColorNum != null) {
 		clothingLegsColorNum = clothingLegsColorNum + amount;
-		
+
 		if (clothingLegsColorNum <= -1) {
 			clothingLegsColorNum = 0;
 		}
-		
+
 		API.setPlayerClothes(API.getLocalPlayer(), 4, clothingLegsNum, clothingLegsColorNum);
 		updateClothingProperties();
 	}
@@ -795,11 +800,11 @@ function changeClothingLegsColor(amount) { // Legs Color Changer
 function changeClothingShoes(amount) { // Shoes Changer
 	if (clothingShoesNum != null) {
 		clothingShoesNum = clothingShoesNum + amount;
-		
+
 		if (clothingShoesNum <= -1) {
 			clothingShoesNum = 0;
 		}
-		
+
 		API.setPlayerClothes(API.getLocalPlayer(), 6, clothingShoesNum, clothingShoesColorNum);
 		updateClothingProperties();
 	}
@@ -808,14 +813,21 @@ function changeClothingShoes(amount) { // Shoes Changer
 function changeClothingShoesColor(amount) { // Shoes Color Changer
 	if (clothingShoesColorNum != null) {
 		clothingShoesColorNum = clothingShoesColorNum + amount;
-		
+
 		if (clothingShoesColorNum <= -1) {
 			clothingShoesColorNum = 0;
 		}
-		
+
 		API.setPlayerClothes(API.getLocalPlayer(), 6, clothingShoesNum, clothingShoesColorNum);
 		updateClothingProperties();
 	}
+}
+
+function clothingRotatePlayer(amount) {
+  var player = API.getLocalPlayer();
+  var oldamount = API.getEntityRotation(player);
+  API.setEntityRotation(player, new Vector3(oldamount.X, oldamount.Y, amount));
+  API.playPlayerAnimation("amb@world_human_hang_out_street@male_b@base", "base", 0, -1);
 }
 
 function changeRotationHandle(amount) {
@@ -856,21 +868,46 @@ var bodyColorOneB = 0;
 var bodyColorTwoR = 0;
 var bodyColorTwoG = 0;
 var bodyColorTwoB = 0;
-var modA = 0; // Spoilers
-var modB = 0; // Front bumper
-var modC = 0; // Rear Bumper
-var modD = 0; // Side Skirt
-var modE = 0; // Exhaust
-var modF = 0; // Grille
-var modG = 0; // Hood
-var modH = 0; // Fender
-var modI = 0; // Right Fender
-var modJ = 0; // Roof
-var modK = 0; // Front Wheels
-var modL = 0; // Back Wheels
-var modM = 0; // Window Tint
-var modN = 0;
-var modO = 0;
+var modA = -1; // Spoilers
+var modB = -1; // Front bumper
+var modC = -1; // Rear Bumper
+var modD = -1; // Side Skirt
+var modE = -1; // Exhaust
+var modF = -1; // Grille
+var modG = -1; // Hood
+var modH = -1; // Fender
+var modI = -1; // Right Fender
+var modJ = -1; // Roof
+var modK = -1; // Front Wheels
+var modL = -1; // Back Wheels
+var modM = -1; // Window Tint
+var modN = -1;
+var modO = -1;
+
+function updateVehicleVariables(r, g, b, sr, sg, sb, spoiler, frontbumper, rearbumper, sideskirt, exhaust, grille, hood, fender, rightfender, roof, frontwheels, backwheels, windowtint) {
+  bodyColorOneR = r;
+  bodyColorOneG = g
+  bodyColorOneB = b;
+  bodyColorTwoR = sr;
+  bodyColorTwoG = sg;
+  bodyColorTwoB = sb;
+  modA = spoiler; // Spoilers
+  modB = frontbumper; // Front bumper
+  modC = rearbumper; // Rear Bumper
+  modD = sideskirt; // Side Skirt
+  modE = exhaust; // Exhaust
+  modF = grille; // Grille
+  modG = hood; // Hood
+  modH = fender; // Fender
+  modI = rightfender; // Right Fender
+  modJ = roof; // Roof
+  modK = frontwheels; // Front Wheels
+  modL = backwheels; // Back Wheels
+  modM = windowtint; // Window Tint
+  pushVehicleVariableChanges();
+}
+
+
 
 function leaveVehicleShop() {
 	API.triggerServerEvent("leaveVehicleShop");
@@ -884,7 +921,7 @@ function pushVehicleChanges() {
 }
 
 function updateVehicleMainColor(value) {
-	var playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
+	 playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
 	var temp = value.replace('rgb(', '');
 	var temptwo = temp.replace(')', '');
 	var colorOne = temptwo.split(',');
@@ -911,73 +948,149 @@ function updateVehicleRotation(value) {
 	API.setEntityRotation(playerVehicle, new Vector3(vehicleRotation.X, vehicleRotation.Y, value));
 }
 
+function pushVehicleVariableChanges() {
+  pagePanel.browser.call("pushVehicleVariableUpdate", modA, modB, modC, modD, modE, modF, modG, modH, modI, modJ, modK, modL, modM);
+}
+
+function pushLocalUpdate(modvar, value) {
+  switch(modvar) {
+    case "modA":
+    {
+      modA += value;
+      updateVehicleMod(0, modA);
+      break;
+    }
+    case "modB":
+    {
+      modB += value;
+      updateVehicleMod(1, modB);
+      break;
+    }
+    case "modC":
+    {
+      modC += value;
+      updateVehicleMod(2, modC);
+      break;
+    }
+    case "modD":
+    {
+      modD += value;
+      updateVehicleMod(3, modD);
+      break;
+    }
+    case "modE":
+    {
+      modE += value;
+      updateVehicleMod(4, modE);
+      break;
+    }
+    case "modF":
+    {
+      modF += value;
+      updateVehicleMod(6, modF);
+      break;
+    }
+    case "modG":
+    {
+      modG += value;
+      updateVehicleMod(7, modG);
+      break;
+    }
+    case "modH":
+    {
+      modH += value;
+      updateVehicleMod(8, modH);
+      break;
+    }
+    case "modI":
+    {
+      modI += value;
+      updateVehicleMod(9, modI);
+      break;
+    }
+    case "modJ":
+    {
+      modJ += value;
+      updateVehicleMod(10, modJ);
+      break;
+    }
+    case "modK":
+    {
+      modK += value;
+      updateVehicleMod(23, modK);
+      break;
+    }
+    case "modL":
+    {
+      modL += value;
+      updateVehicleMod(24, modL);
+      break;
+    }
+    case "modM":
+    {
+      modM += value;
+      updateVehicleMod(69, modM);
+      break;
+    }
+  }
+}
+
 function updateVehicleMod(modtype, value) {
 	var playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
-	
+
 	if (modtype == 0) { // Spoilers
 		API.setVehicleMod(playerVehicle, 0, value);
-		modA = value;
 	}
-	
+
 	if (modtype == 1) { // Front Bumper
 		API.setVehicleMod(playerVehicle, 1, value);
-		modB = value;
 	}
-	
+
 	if (modtype == 2) { // Rear Bumper
 		API.setVehicleMod(playerVehicle, 2, value);
-		modC = value;
 	}
-	
+
 	if (modtype == 3) { // Side Skirt
 		API.setVehicleMod(playerVehicle, 3, value);
-		modD = value;
 	}
-	
+
 	if (modtype == 4) { // Exhaust
 		API.setVehicleMod(playerVehicle, 4, value);
-		modE = value;
 	}
-	
+
 	if (modtype == 6) { // Grille
 		API.setVehicleMod(playerVehicle, 6, value);
-		modF = value;
 	}
-	
+
 	if (modtype == 7) { // Hood
 		API.setVehicleMod(playerVehicle, 7, value);
-		modG = value;
 	}
-	
+
 	if (modtype == 8) { // Fender
 		API.setVehicleMod(playerVehicle, 8, value);
-		modH = value;
 	}
-	
+
 	if (modtype == 9) { // Right Fender
 		API.setVehicleMod(playerVehicle, 9, value);
-		modI = value;
 	}
-	
+
 	if (modtype == 10) { // Roof
 		API.setVehicleMod(playerVehicle, 10, value);
-		modJ = value;
 	}
-	
+
 	if (modtype == 23) { // Front Wheels
 		API.setVehicleMod(playerVehicle, 23, value);
-		modK = value;
 	}
-	
+
 	if (modtype == 24) { // Back Wheels
 		API.setVehicleMod(playerVehicle, 24, value);
-		modL = value;
 	}
-	
+
 	if (modtype == 69) { // Window Tint
 		API.setVehicleMod(playerVehicle, 69, value);
-		modM = value;
 	}
+
+  pushVehicleVariableChanges();
 }
 
 // ##########################
@@ -996,7 +1109,7 @@ var vehiclesBoats = [
 	"Toro",
 	"Tropic"
 	];
-	
+
 var vehiclesCommercial = [
 	"Benson",
 	"Biff",
@@ -1036,7 +1149,7 @@ var vehiclesBicycles = [
 	"Scorcher",
 	"TriBike"
 	];
-	
+
 var vehiclesPolice = [
 	"FBI",
 	"FireTruck",
@@ -1060,7 +1173,7 @@ var vehiclesHelicopters = [
 	"Swift2",
 	"Volatus"
 	];
-	
+
 var vehiclesIndustrial = [
 	"Flatbed",
 	"Guardian",
@@ -1070,7 +1183,7 @@ var vehiclesIndustrial = [
 	"TipTruck",
 	"TipTruck2"
 	];
-	
+
 var vehiclesMotorcycles = [
 	"Akuma",
 	"Avarus",
@@ -1108,7 +1221,7 @@ var vehiclesMotorcycles = [
 	"ZombieA",
 	"ZombieB"
 	];
-	
+
  var vehiclesMuscle = [
 	"Blade",
 	"Buccaneer",
@@ -1139,7 +1252,7 @@ var vehiclesMotorcycles = [
 	"Voodoo",
 	"Voodoo2"
 	];
-	
+
 var vehiclesOffRoad = [
 	"BfInjection",
 	"Bifta",
@@ -1156,9 +1269,9 @@ var vehiclesOffRoad = [
 	"Rebel",
 	"Rebel2",
 	"Sandking",
-	"TrophyTruck"	
+	"TrophyTruck"
 	];
-	
+
 var vehiclesPlanes = [
 	"Besra",
 	"CargoPlane",
@@ -1175,8 +1288,8 @@ var vehiclesPlanes = [
 	"Velum",
 	"Vestra"
 	];
-	
-var vehiclesSUVS = [ 
+
+var vehiclesSUVS = [
 	"BJXL",
 	"Baller",
 	"Baller2",
@@ -1198,7 +1311,7 @@ var vehiclesSUVS = [
 	"Serrano",
 	"XLS"
 	];
-	
+
 var vehiclesSedans = [
 	"Asea",
 	"Asterope",
@@ -1221,7 +1334,7 @@ var vehiclesSedans = [
 	"Warrener",
 	"Washington"
 	];
-	
+
 var vehiclesService = [
 	"Airbus",
 	"Brickade",
@@ -1234,7 +1347,7 @@ var vehiclesService = [
 	"Trash",
 	"Trash2"
 	];
-	
+
 var vehiclesSports = [
 	"Alpha",
 	"Banshee",
@@ -1267,7 +1380,7 @@ var vehiclesSports = [
 	"Tropos",
 	"Verlierer2"
 	];
-	
+
 var vehiclesClassic = [
 	"BType",
 	"BType2",
@@ -1289,7 +1402,7 @@ var vehiclesClassic = [
 	"Tornado5",
 	"Tornado6"
 	];
-	
+
 var vehiclesSuper = [
 	"Adder",
 	"Bullet",
@@ -1335,8 +1448,8 @@ var vehiclesUtility = [
 	"UtilityTruck3",
 	"UtilliTruck2"
 	];
-	
-var vehiclesVans = [ 
+
+var vehiclesVans = [
 	"Bison",
 	"Bison2",
 	"Bison3",
@@ -1443,17 +1556,17 @@ function dealershipSetupVehicles() {
 	if (centerVehicle != null) {
 		API.deleteEntity(centerVehicle);
 	}
-	
+
 	if (currentVehicleIndex == -1) {
 		currentVehicleIndex = vehicleSelectionType.length - 1;
 	}
 	else if (currentVehicleIndex == vehicleSelectionType.length) {
 		currentVehicleIndex = 0;
 	}
-		
+
 	centerVehicle = API.createVehicle(API.vehicleNameToModel(vehicleSelectionType[currentVehicleIndex]), new Vector3(225.6238, -990, -98.99996), 0);
 	API.setVehiclePrimaryColor(centerVehicle, randomInteger(0, 159));
-	
+
 	if (pagePanel != null) {
 		pagePanel.browser.call("updateVehicle", vehicleSelectionType[currentVehicleIndex]);
 	}
@@ -1461,9 +1574,9 @@ function dealershipSetupVehicles() {
 
 function dealershipBrowseLeft() {
 	currentVehicleIndex -= 1;
-	
+
 	dealershipSetupVehicles();
-	
+
 	API.setPlayerIntoVehicle(centerVehicle, -1);
 }
 
@@ -1471,7 +1584,7 @@ function dealershipBrowseRight() {
 	currentVehicleIndex += 1;
 
 	dealershipSetupVehicles();
-	
+
 	API.setPlayerIntoVehicle(centerVehicle, -1);
 }
 
@@ -1485,10 +1598,3 @@ function dealershipPurchaseVehicle() {
 	API.triggerServerEvent("purchaseVehicle", vehicleSelectionType[currentVehicleIndex]);
 	killPanel();
 }
-
-
-
-
-
-
-

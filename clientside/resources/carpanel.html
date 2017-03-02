@@ -9,49 +9,91 @@
   </head>
   <body>
 	<!-- Left Column -->
-	<div class="col-md-2 column-special" id="leftColumn" class="column-special">
-		<div id="leftColumnContent">
-			<ul class="nav nav-pills nav-stacked col-sm-12">
-				<li class="active"><a data-toggle="tab" id="existingUser" role="tab" href="#main" class="custom-link">Main Body</a></li>
-				<li><a data-toggle="tab" role="tab" href="#spoilers" class="custom-link optionButton">Spoilers</a></li>
-				<li><a data-toggle="tab" role="tab" href="#frontBumper" class="custom-link optionButton">Front Bumper</a></li>
-				<li><a data-toggle="tab" role="tab" href="#rearBumper" class="custom-link optionButton">Rear Bumper</a></li>
-				<li><a data-toggle="tab" role="tab" href="#sideSkirts" class="custom-link optionButton">Side Skirts</a></li>
-				<li><a data-toggle="tab" role="tab" href="#exhaust" class="custom-link optionButton">Exhaust</a></li>
-				<li><a data-toggle="tab" role="tab" href="#grille" class="custom-link optionButton">Grille</a></li>
-				<li><a data-toggle="tab" role="tab" href="#hoods" class="custom-link optionButton">Hood</a></li>
-				<li><a data-toggle="tab" role="tab" href="#fender" class="custom-link optionButton">Fender</a></li>
-				<li><a data-toggle="tab" role="tab" href="#roof" class="custom-link optionButton">Roof</a></li>
-				<li><a data-toggle="tab" role="tab" href="#frontWheels" class="custom-link optionButton">Front Wheels</a></li>
-				<li><a data-toggle="tab" role="tab" href="#backWheels" class="custom-link optionButton">Back Wheels</a></li>
-				<li><a data-toggle="tab" role="tab" href="#windows" class="custom-link optionButton">Windows</a></li>
-				<li><a data-toggle="tab" role="tab" href="#misc" class="custom-link optionButton">Misc</a></li>
-				<li><a type="submit" class="custom-link optionButton" id="exitPanel">Exit</a></li>
-				<li><a type="submit" class="custom-link optionButton" id="savePanel">Save & Exit</a></li>
-			</ul>
-		</div>
+	<div class="col-md-2 column-special" id="leftColumn">
+    <div class="column-header col-md-12" style="margin-bottom: 10px"><h4>Category</h4></div>
+    <div class="row space-row">
+  		<div id="leftColumnContent" class="col-md-12">
+  			<ul class="nav nav-pills nav-stacked">
+  				<li><a data-toggle="tab" role="tab" href="#main" class="custom-link optionButton">Main Body</a></li>
+  				<li><a data-toggle="tab" role="tab" href="#frame" class="custom-link optionButton">Frame</a></li>
+  				<li><a data-toggle="tab" role="tab" href="#misc" class="custom-link optionButton">Misc</a></li>
+  			</ul>
+  		</div>
+    </div>
+    <div class="column-header col-md-12"><h4>Properties</h4></div>
+    <div class="row space-row" >
+      <span class="col-md-12" style="padding-top: 10px">Front Bumper # <span id="frontBumperNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Rear Bumper # <span id="rearBumperNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Side Skirts # <span id="sideSkirtsNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Spoiler # <span id="spoilerNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Hood # <span id="hoodNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Roof # <span id="roofNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Fender # <span id="fenderNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Misc Fender # <span id="miscFenderNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Exhaust # <span id="exhaustNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Grill # <span id="grillNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Front Wheels # <span id="frontWheelsNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Back Wheels # <span id="backWheelsNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12">Window Tint # <span id="windowTintNum"></span></span>
+    </div>
+    <div class="row space-row">
+      <span class="col-md-12" style="text-align: justify">Any number past any visible changes is considered stock. Body parts usually never pass the index of 10 or so.</span>
+    </div>
+    <div class="column-header col-md-12"><h4>Exit the Shop</h4></div>
+    <div class="col-md-12">
+      <div class="row space-row">
+        <button type="submit" class="btn btn-success col-md-12" id="savePanel">Save & Exit</button>
+      </div>
+      <div class="row space-row">
+        <button type="submit" class="btn btn-danger col-md-12" id="exitPanel">Exit</button>
+      </div>
+    </div>
 	</div>
-	
+
 	<!-- Middle Column -->
 	<div class="col-md-8" id="middleColumn">
 		<div class="row">
 			<div class="col-md-6 col-md-offset-3 column-header"><h1>Vehicle Modifications</h1></div>
 		</div>
-		
+
 		<!-- Progress Bar for Saving Purposes -->
 		<div class="progress" id="progressBarSave" style="height: 35px; margin-top: 65%" hidden>
 			<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Updating Information</h5></div>
 		</div>
 	</div>
-	
+
 	<!-- Right Column -->
 	<div class="col-md-2 column-special" id="rightColumn" >
-		<div class="row col-sm-12 pull-right"> 
+		<div class="row col-sm-12 pull-right">
 			<div class="tab-content">
 				<!-- Tab Content -->
 				<div role="tabpanel" class="tab-pane active" id="main">
 					<div class="column-header"><h2>Main Body</h2></div>
-					<form class="form-inline">
+            <div class="column-header"><h4>Colours</h4></div>
 						<div class="row space-row">
 							<div class="btn-group" data-toggle="buttons">
 								<label class="btn btn-primary active custom-link optionButton">
@@ -65,131 +107,145 @@
 						<div class="row space-row">
 							<input type="text" id="mainRGB" />
 						</div>
-					</form>
+            <div class="column-header"><h4>Body Parts</h4></div>
+            <!-- Front Bumper -->
+            <div class="row space-row">
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modB', -1)"><</button>
+              </div>
+              <label class="col-md-6" style="text-align: center; padding-top: 7px">Front Bumper</label>
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modB', 1)">></button>
+              </div>
+            </div>
+            <!-- Rear Bumper -->
+            <div class="row space-row">
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modC', -1)"><</button>
+              </div>
+              <label class="col-md-6" style="text-align: center; padding-top: 7px">Rear Bumper</label>
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modC', 1)">></button>
+              </div>
+            </div>
+            <!-- Side Skirts -->
+            <div class="row space-row">
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modD', -1)"><</button>
+              </div>
+              <label class="col-md-6" style="text-align: center; padding-top: 7px">Side Skirts</label>
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modD', 1)">></button>
+              </div>
+            </div>
+            <!-- Spoilers -->
+            <div class="row space-row">
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modA', -1)"><</button>
+              </div>
+              <label class="col-md-6" style="text-align: center; padding-top: 7px">Spoiler</label>
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modA', 1)">></button>
+              </div>
+            </div>
+            <!-- Hood -->
+            <div class="row space-row">
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modG', -1)"><</button>
+              </div>
+              <label class="col-md-6" style="text-align: center; padding-top: 7px">Hood</label>
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modG', 1)">></button>
+              </div>
+            </div>
+            <!-- Roof -->
+            <div class="row space-row">
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modJ', -1)"><</button>
+              </div>
+              <label class="col-md-6" style="text-align: center; padding-top: 7px">Roof</label>
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modJ', 1)">></button>
+              </div>
+            </div>
+            <!-- Fender -->
+            <div class="row space-row">
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modH', -1)"><</button>
+              </div>
+              <label class="col-md-6" style="text-align: center; padding-top: 7px">Fender</label>
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modH', 1)">></button>
+              </div>
+            </div>
+            <!-- Misc Fender -->
+            <div class="row space-row">
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modI', -1)"><</button>
+              </div>
+              <label class="col-md-6" style="text-align: center; padding-top: 7px">Misc Fender</label>
+              <div class="col-md-3">
+                <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modI', 1)">></button>
+              </div>
+            </div>
 				</div>
-				<!-- Spoilers -->
-				<div role="tabpanel" class="tab-pane" id="spoilers">
-					<div class="column-header"><h2>Spoilers</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="spoilersSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Front Bumper -->
-				<div role="tabpanel" class="tab-pane" id="frontBumper">
-					<div class="column-header"><h2>Front Bumper</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="frontBumperSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Rear Bumper -->
-				<div role="tabpanel" class="tab-pane" id="rearBumper">
-					<div class="column-header"><h2>Rear Bumper</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="rearBumperSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Side Skirts -->
-				<div role="tabpanel" class="tab-pane" id="sideSkirts">
-					<div class="column-header"><h2>Side Skirts</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="sideSkirtsSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Exhaust -->
-				<div role="tabpanel" class="tab-pane" id="exhaust">
-					<div class="column-header"><h2>Exhaust</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="exhaustSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Grille -->
-				<div role="tabpanel" class="tab-pane" id="grille">
-					<div class="column-header"><h2>Grille</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="grilleSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Hoods -->
-				<div role="tabpanel" class="tab-pane" id="hoods">
-					<div class="column-header"><h2>Hoods</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="hoodSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Fender -->
-				<div role="tabpanel" class="tab-pane" id="fender">
-					<div class="column-header"><h2>Fender</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="fenderSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Roof -->
-				<div role="tabpanel" class="tab-pane" id="roof">
-					<div class="column-header"><h2>Roof</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="roofSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Front Wheels -->
-				<div role="tabpanel" class="tab-pane" id="frontWheels">
-					<div class="column-header"><h2>Front Wheels</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="frontWheelsSlider" type="text" data-slider-min="0" data-slider-max="55" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Back Wheels -->
-				<div role="tabpanel" class="tab-pane" id="backWheels">
-					<div class="column-header"><h2>Back Wheels</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="backWheelsSlider" type="text" data-slider-min="0" data-slider-max="50" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
-				</div>
-				<!-- Windows -->
-				<div role="tabpanel" class="tab-pane" id="windows">
-					<div class="column-header"><h2>Windows</h2></div>
-					<div class="row space-row">
-						<p>If nothing appears, your value is too high.</p>
-					</div>
-					<br />
-					<input id="windowTintSlider" type="text" data-slider-min="0" data-slider-max="25" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical" />
-					<br />
+				<!-- Frame -->
+				<div role="tabpanel" class="tab-pane" id="frame">
+					<div class="column-header"><h2>Frame</h2></div>
+          <!-- Exhaust -->
+          <div class="row space-row">
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modE', -1)"><</button>
+            </div>
+            <label class="col-md-6" style="text-align: center; padding-top: 7px">Exhaust</label>
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modE', 1)">></button>
+            </div>
+          </div>
+          <!-- Grille -->
+          <div class="row space-row">
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modF', -1)"><</button>
+            </div>
+            <label class="col-md-6" style="text-align: center; padding-top: 7px">Grille</label>
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modF', 1)">></button>
+            </div>
+          </div>
+          <!-- Front Wheels -->
+          <div class="row space-row">
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modK', -1)"><</button>
+            </div>
+            <label class="col-md-6" style="text-align: center; padding-top: 7px">Front Wheels</label>
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modK', 1)">></button>
+            </div>
+          </div>
+          <!-- Back Wheels -->
+          <div class="row space-row">
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modL', -1)"><</button>
+            </div>
+            <label class="col-md-6" style="text-align: center; padding-top: 7px">Back Wheels</label>
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modL', 1)">></button>
+            </div>
+          </div>
 				</div>
 				<!-- Misc -->
 				<div role="tabpanel" class="tab-pane" id="misc">
 					<div class="column-header"><h2>Miscellaneous</h2></div>
+          <!-- Window Tint -->
+          <div class="row space-row">
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modM', -1)"><</button>
+            </div>
+            <label class="col-md-6" style="text-align: center; padding-top: 7px">Window Tint</label>
+            <div class="col-md-3">
+              <button class="btn btn-info" onclick="resourceCall('pushLocalUpdate', 'modM', 1)">></button>
+            </div>
+          </div>
 				</div>
 			</div>
 		</div>
@@ -206,89 +262,69 @@
 	<script src="js/spectrum.js"></script>
 	<script src="js/bootstrap-slider.js"></script>
 	<script>
+    $(document).ready(function() {
+      $('#mainColor').prop("checked", true);
+    });
+
 		$('#ex1').slider().on('slide', function(e) {
 			resourceCall("updateVehicleRotation", e.value);
 		});
-		
-		$('#spoilersSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 0, e.value);
-		});
-		
-		$('#frontBumperSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 1, e.value);
-		});
-		
-		$('#rearBumperSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 2, e.value);
-		});
-		
-		$('#sideSkirtsSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 3, e.value);
-		});
-		
-		$('#exhaustSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 4, e.value);
-		});
-		
-		$('#grilleSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 6, e.value);
-		});
-		
-		$('#hoodSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 7, e.value);
-		});
-		
-		$('#fenderSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 8, e.value);
-		});
-		
-		$('#rightFenderSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 9, e.value);
-		});
-		
-		$('#roofSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 10, e.value);
-		});
-		
-		$('#frontWheelsSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 23, e.value);
-		});
-		
-		$('#backWheelsSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 24, e.value);
-		});
-		
-		$('#windowTintSlider').slider().on('slide', function(e) {
-			resourceCall("updateVehicleMod", 69, e.value);
-		});
-		
+
 		document.getElementById("exitPanel").onclick = function ()
 		{
 			resourceCall("leaveVehicleShop");
 		}
-		
+
 		document.getElementById("savePanel").onclick = function () {
 			resourceCall("pushVehicleChanges");
 		}
-	
-		
+
 		$("#mainRGB").spectrum ({
-			move: function(color) 
-			{ 
-				if($('#mainColor').is(':checked'))
-				{
-					resourceCall("updateVehicleMainColor", color.toRgbString())
-				}
-				
-				if($('#secondaryColor').is(':checked')) {
-					resourceCall("updateVehicleSecondaryColor", color.toRgbString());
-				}
+      change: function(color) {
+        passVehicleColors(color);
+      },
+			move: function(color)
+			{
+				passVehicleColors(color);
 			},
 			preferredFormat: "rgb",
-			flat: true
+			flat: true,
+      showInput: true
 		});
+
+    function passVehicleColors(color) {
+      if($('#mainColor').is(':checked'))
+      {
+        resourceCall("updateVehicleMainColor", color.toRgbString())
+      }
+
+      if($('#secondaryColor').is(':checked')) {
+        resourceCall("updateVehicleSecondaryColor", color.toRgbString());
+      }
+    }
+
+		function passVehicleModifications(r, g, b, sr, sg, sb, spoilers, frontbumper, rearbumper, sideskirt, exhaust, grille, hood, fender, rightfender, roof, frontwheels, backwheels, windowtint) {
+			$('#spoilerSlider').slider().setValue(spoilers);
+			$('#frontBumperSlider').slider().setValue(frontbumper);
+			$('#rearBumperSlider').slider().setValue(rearbumper);
+		}
+
+    function pushVehicleVariableUpdate(spoilers, frontbumper, rearbumper, sideskirt, exhaust, grille, hood, fender, rightfender, roof, frontwheels, backwheels, windowtint) {
+			$('#spoilerNum').html(spoilers);
+      $('#frontBumperNum').html(frontbumper);
+      $('#rearBumperNum').html(rearbumper);
+      $('#sideSkirtsNum').html(sideskirt);
+      $('#exhaustNum').html(exhaust);
+      $('#grillNum').html(grille);
+      $('#hoodNum').html(hood);
+      $('#fenderNum').html(fender);
+      $('#miscFenderNum').html(rightfender);
+      $('#roofNum').html(roof);
+      $('#frontWheelsNum').html(frontwheels);
+      $('#backWheelsNum').html(backwheels);
+      $('#windowTintNum').html(windowtint);
+		}
 
 	</script>
   </body>
 </html>
-

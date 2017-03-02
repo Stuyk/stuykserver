@@ -188,6 +188,7 @@ namespace stuykserver.Util
             {
                 if (shopInformation[collision].returnCollisionPlayers().Contains(player) && !player.isInVehicle)
                 {
+                    db.setPlayerHUD(player, false);
                     shopInformation[collision].containedPlayersAdd(player);
                     API.setEntityDimension(player, new Random().Next(1, 1000));
                     API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
@@ -218,6 +219,7 @@ namespace stuykserver.Util
             {
                 if (shopInformation[collision].returnContainedPlayers().Contains(player))
                 {
+                    db.setPlayerHUD(player, true);
                     API.setEntityPosition(player, shopInformation[collision].returnPosition());
                     API.setEntityDimension(player, 0);
                     shopInformation[collision].containedPlayersRemove(player);

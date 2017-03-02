@@ -199,6 +199,7 @@ namespace stuykserver.Util
             {
                 if (shopInformation[collision].returnCollisionPlayers().Contains(player) && !player.isInVehicle)
                 {
+                    db.setPlayerHUD(player, false);
                     shopInformation[collision].containedPlayersAdd(player);
                     API.setEntityDimension(player, new Random().Next(1, 1000));
                     API.triggerClientEvent(player, "openSkinPanel", player.position);
@@ -217,6 +218,7 @@ namespace stuykserver.Util
             {
                 if (shopInformation[collision].returnContainedPlayers().Contains(player))
                 {
+                    db.setPlayerHUD(player, true);
                     API.setEntityDimension(player, 0);
                     API.setEntityPosition(player, shopInformation[collision].returnPosition());
                     shopInformation[collision].containedPlayersRemove(player);

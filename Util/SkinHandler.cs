@@ -55,16 +55,22 @@ namespace stuykserver.Util
 
         public void pullCurrentFace(Client player)
         {
-            API.exported.gtaocharacter.initializePedFace(player.handle);
-            API.setEntitySyncedData(player.handle, "GTAO_SHAPE_FIRST_ID", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinShapeFirst", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SHAPE_SECOND_ID", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinShapeSecond", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SKIN_FIRST_ID", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinSkinFirst", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SKIN_SECOND_ID", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinSkinSecond", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SHAPE_MIX", Convert.ToSingle(db.pullDatabase("PlayerSkins", "skinShapeMix", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SKIN_MIX", Convert.ToSingle(db.pullDatabase("PlayerSkins", "skinSkinMix", "Nametag", player.name)));
-            player.setClothes(2, Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinHairstyle", "Nametag", player.name)), Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinHairstyleTexture", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_HAIR_COLOR", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinHairstyleColor", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_HAIR_HIGHLIGHT_COLOR", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinHairstyleHighlight", "Nametag", player.name)));
+            string query = string.Format("SELECT * FROM PlayerSkins WHERE Nametag='{0}'", player.name);
+            DataTable result = API.exported.database.executeQueryWithResult(query);
+
+            foreach (DataRow row in result.Rows)
+            {
+                API.exported.gtaocharacter.initializePedFace(player.handle);
+                API.setEntitySyncedData(player.handle, "GTAO_SHAPE_FIRST_ID", Convert.ToInt32(row["skinShapeFirst"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SHAPE_SECOND_ID", Convert.ToInt32(row["skinShapeSecond"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SKIN_FIRST_ID", Convert.ToInt32(row["skinSkinFirst"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SKIN_SECOND_ID", Convert.ToInt32(row["skinSkinSecond"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SHAPE_MIX", Convert.ToSingle(row["skinShapeMix"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SKIN_MIX", Convert.ToSingle(row["skinSkinMix"]));
+                player.setClothes(2, Convert.ToInt32(row["skinHairstyle"]), Convert.ToInt32(row["skinHairstyleTexture"]));
+                API.setEntitySyncedData(player.handle, "GTAO_HAIR_COLOR", Convert.ToInt32(row["skinHairstyleColor"]));
+                API.setEntitySyncedData(player.handle, "GTAO_HAIR_HIGHLIGHT_COLOR", Convert.ToInt32(row["skinHairstyleHighlight"]));
+            }
         }
 
         public void loadLocalFaceData(Client player)
@@ -96,17 +102,23 @@ namespace stuykserver.Util
                 API.setPlayerSkin(player, PedHash.FreemodeFemale01);
             }
 
-            API.exported.gtaocharacter.initializePedFace(player.handle);
-            API.setEntitySyncedData(player.handle, "GTAO_SHAPE_FIRST_ID", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinShapeFirst", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SHAPE_SECOND_ID", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinShapeSecond", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SKIN_FIRST_ID", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinSkinFirst", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SKIN_SECOND_ID", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinSkinSecond", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SHAPE_MIX", Convert.ToSingle(db.pullDatabase("PlayerSkins", "skinShapeMix", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_SKIN_MIX", Convert.ToSingle(db.pullDatabase("PlayerSkins", "skinSkinMix", "Nametag", player.name)));
-            player.setClothes(2, Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinHairstyle", "Nametag", player.name)), Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinHairstyleTexture", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_HAIR_COLOR", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinHairstyleColor", "Nametag", player.name)));
-            API.setEntitySyncedData(player.handle, "GTAO_HAIR_HIGHLIGHT_COLOR", Convert.ToInt32(db.pullDatabase("PlayerSkins", "skinHairstyleHighlight", "Nametag", player.name)));
-            API.exported.gtaocharacter.updatePlayerFace(player.handle);
+            string query = string.Format("SELECT * FROM PlayerSkins WHERE Nametag='{0}'", player.name);
+            DataTable result = API.exported.database.executeQueryWithResult(query);
+
+            foreach (DataRow row in result.Rows)
+            {
+                API.exported.gtaocharacter.initializePedFace(player.handle);
+                API.setEntitySyncedData(player.handle, "GTAO_SHAPE_FIRST_ID", Convert.ToInt32(row["skinShapeFirst"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SHAPE_SECOND_ID", Convert.ToInt32(row["skinShapeSecond"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SKIN_FIRST_ID", Convert.ToInt32(row["skinSkinFirst"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SKIN_SECOND_ID", Convert.ToInt32(row["skinSkinSecond"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SHAPE_MIX", Convert.ToSingle(row["skinShapeMix"]));
+                API.setEntitySyncedData(player.handle, "GTAO_SKIN_MIX", Convert.ToSingle(row["skinSkinMix"]));
+                player.setClothes(2, Convert.ToInt32(row["skinHairstyle"]), Convert.ToInt32(row["skinHairstyleTexture"]));
+                API.setEntitySyncedData(player.handle, "GTAO_HAIR_COLOR", Convert.ToInt32(row["skinHairstyleColor"]));
+                API.setEntitySyncedData(player.handle, "GTAO_HAIR_HIGHLIGHT_COLOR", Convert.ToInt32(row["skinHairstyleHighlight"]));
+                API.exported.gtaocharacter.updatePlayerFace(player.handle);
+            }
         }
     }
 }

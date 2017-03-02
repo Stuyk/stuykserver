@@ -2,6 +2,7 @@
 using GTANetworkShared;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -18,40 +19,52 @@ namespace stuykserver.Util
 
         public void updateLocalClothingVariables(Client player)
         {
-            int torso = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingTorso", "Nametag", player.name));
-            int top = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingTop", "Nametag", player.name));
-            int topcolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingTopColor", "Nametag", player.name));
-            int undershirt = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingUndershirt", "Nametag", player.name));
-            int undershirtcolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingUndershirtColor", "Nametag", player.name));
-            int legs = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingLegs", "Nametag", player.name));
-            int legscolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingLegsColor", "Nametag", player.name));
-            int hat = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingHat", "Nametag", player.name));
-            int hatcolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingHatColor", "Nametag", player.name));
-            int shoes = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingShoes", "Nametag", player.name));
-            int shoescolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingShoesColor", "Nametag", player.name));
+            string query = string.Format("SELECT * FROM PlayerClothing WHERE Nametag='{0}'", player.name);
+            DataTable result = API.exported.database.executeQueryWithResult(query);
 
-            API.triggerClientEvent(player, "clothingLocalVariableUpdate", torso, top, topcolor, undershirt, undershirtcolor, legs, legscolor, shoes, shoescolor);
+            foreach (DataRow row in result.Rows)
+            {
+                int torso = Convert.ToInt32(row["clothingTorso"]);
+                int top = Convert.ToInt32(row["clothingTop"]);
+                int topcolor = Convert.ToInt32(row["clothingTopColor"]);
+                int undershirt = Convert.ToInt32(row["clothingUndershirt"]);
+                int undershirtcolor = Convert.ToInt32(row["clothingUndershirtColor"]);
+                int legs = Convert.ToInt32(row["clothingLegs"]);
+                int legscolor = Convert.ToInt32(row["clothingLegsColor"]);
+                int hat = Convert.ToInt32(row["clothingHat"]);
+                int hatcolor = Convert.ToInt32(row["clothingHatColor"]);
+                int shoes = Convert.ToInt32(row["clothingShoes"]);
+                int shoescolor = Convert.ToInt32(row["clothingShoesColor"]);
+
+                API.triggerClientEvent(player, "clothingLocalVariableUpdate", torso, top, topcolor, undershirt, undershirtcolor, legs, legscolor, shoes, shoescolor);
+            }
         }
 
         public void updateClothingForPlayer(Client player)
         {
-            int torso = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingTorso", "Nametag", player.name));
-            int top = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingTop", "Nametag", player.name));
-            int topcolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingTopColor", "Nametag", player.name));
-            int undershirt = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingUndershirt", "Nametag", player.name));
-            int undershirtcolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingUndershirtColor", "Nametag", player.name));
-            int legs = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingLegs", "Nametag", player.name));
-            int legscolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingLegsColor", "Nametag", player.name));
-            int hat = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingHat", "Nametag", player.name));
-            int hatcolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingHatColor", "Nametag", player.name));
-            int shoes = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingShoes", "Nametag", player.name));
-            int shoescolor = Convert.ToInt32(db.pullDatabase("PlayerClothing", "clothingShoesColor", "Nametag", player.name));
+            string query = string.Format("SELECT * FROM PlayerClothing WHERE Nametag='{0}'", player.name);
+            DataTable result = API.exported.database.executeQueryWithResult(query);
 
-            API.setPlayerClothes(player, 3, torso, 0);
-            API.setPlayerClothes(player, 11, top, topcolor);
-            API.setPlayerClothes(player, 4, legs, legscolor);
-            API.setPlayerClothes(player, 8, undershirt, undershirtcolor);
-            API.setPlayerClothes(player, 6, shoes, shoescolor);
+            foreach (DataRow row in result.Rows)
+            {
+                int torso = Convert.ToInt32(row["clothingTorso"]);
+                int top = Convert.ToInt32(row["clothingTop"]);
+                int topcolor = Convert.ToInt32(row["clothingTopColor"]);
+                int undershirt = Convert.ToInt32(row["clothingUndershirt"]);
+                int undershirtcolor = Convert.ToInt32(row["clothingUndershirtColor"]);
+                int legs = Convert.ToInt32(row["clothingLegs"]);
+                int legscolor = Convert.ToInt32(row["clothingLegsColor"]);
+                int hat = Convert.ToInt32(row["clothingHat"]);
+                int hatcolor = Convert.ToInt32(row["clothingHatColor"]);
+                int shoes = Convert.ToInt32(row["clothingShoes"]);
+                int shoescolor = Convert.ToInt32(row["clothingShoesColor"]);
+
+                API.setPlayerClothes(player, 3, torso, 0);
+                API.setPlayerClothes(player, 11, top, topcolor);
+                API.setPlayerClothes(player, 4, legs, legscolor);
+                API.setPlayerClothes(player, 8, undershirt, undershirtcolor);
+                API.setPlayerClothes(player, 6, shoes, shoescolor);
+            }
         }
 
         private void API_onClientEventTrigger(Client player, string eventName, params object[] args)

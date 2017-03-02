@@ -28,17 +28,19 @@ a {
 
 .sp-container {
 	border: 0px !important;
-	background: transparent !important;
-	border-radius: 0px !important;
+	background: rgba(255, 255, 255, 0.5) !important;
+	border-radius: 10px !important;
 }
 
 .sp-picker-container {
 	border: 0px !important;
 }
 
-.sp-palette-button-container, .sp-button-container {
+a.sp-cancel {
 	display: none !important;
 }
+
+
 
 .footer {
 	position: absolute;

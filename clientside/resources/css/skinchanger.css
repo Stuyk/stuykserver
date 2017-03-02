@@ -1,3 +1,8 @@
+@font-face {
+	font-family: Lobster;
+	src: url(../fonts/Lobster-Regular.ttf);
+}
+
 html, body {
   height: 100%;
   background: transparent;
@@ -11,6 +16,34 @@ body {
 
 label {
 	text-align: left;
+}
+
+.column-header {
+	background-color: rgba(0,0,0,0.70);
+	display: block;
+	padding: 5px;
+	margin-top: 10px;
+	border-radius: 5px;
+	font-family: Lobster;
+}
+
+.footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 60px;
+	background: transparent;
+}
+
+.space-row {
+	margin-top: 10px;
+}
+
+.column-special {
+	background-color: rgba(0,0,0,0.70);
+	display: block;
+	padding: 10px;
+	height: 100%;
 }
 
 .leftColumn {
