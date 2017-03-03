@@ -12,6 +12,7 @@ namespace stuykserver.Util
     public class HouseHandler : Script
     {
         Dictionary<ColShape, HouseInformation> houseInformation = new Dictionary<ColShape, HouseInformation>();
+        DatabaseHandler db = new DatabaseHandler();
 
         public enum HouseType
         {
@@ -40,7 +41,7 @@ namespace stuykserver.Util
 
         int currentDimension = 10;
 
-        public class HouseInformation
+        public class HouseInformation : Script
         {
             int houseID;
             ColShape houseCollision;
@@ -53,8 +54,10 @@ namespace stuykserver.Util
             Vector3 housePosition; // Set to housing Position.
             bool houseSale; // Set to FALSE if not for sale.
             int houseDimension;
+            int housePrice;
+            Blip houseBlip;
 
-            public void setupHouse(ColShape collision, int id, string player, HouseType type, Vector3 position, bool forSale, int dimension)
+            public void setupHouse(ColShape collision, int id, string player, HouseType type, Vector3 position, bool forSale, int dimension, int price, Blip blip)
             {
                 houseCollision = collision;
                 houseOwner = player;
@@ -66,11 +69,23 @@ namespace stuykserver.Util
                 housePlayersOutside = new List<Client>();
                 housePlayersInside = new List<Client>();
                 houseDimension = dimension;
+                housePrice = price;
+                houseBlip = blip;
             }
 
             public ColShape returnHouseExit()
             {
                 return houseExit;
+            }
+
+            public void setHousePrice(int price)
+            {
+                housePrice = price;
+            }
+
+            public int getHousePrice()
+            {
+                return housePrice;
             }
 
             public void setHouseExit(ColShape collision)
@@ -191,6 +206,23 @@ namespace stuykserver.Util
             {
                 return houseID;
             }
+
+            public Blip returnBlip()
+            {
+                return houseBlip;
+            }
+
+            public void setBlip(bool value)
+            {
+                if (value == true)
+                {
+                    API.setBlipSprite(houseBlip, 374);
+                }
+                else
+                {
+                    API.setBlipSprite(houseBlip, 40);
+                }
+            }
         }
 
         public HouseHandler()
@@ -198,6 +230,82 @@ namespace stuykserver.Util
             API.onResourceStart += API_onResourceStart;
             API.onEntityEnterColShape += API_onEntityEnterColShape;
             API.onEntityExitColShape += API_onEntityExitColShape;
+            API.onClientEventTrigger += API_onClientEventTrigger;
+        }
+
+        private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
+        {
+            if (eventName == "housePricePoint")
+            {
+                foreach (ColShape collision in houseInformation.Keys)
+                {
+                    if (houseInformation[collision].returnPlayersOutside().Contains(player))
+                    {
+                        API.triggerClientEvent(player, "passHousePrice", houseInformation[collision].getHousePrice());
+                        break;
+                    }
+                }
+            }
+
+            if (eventName == "housePurchase")
+            {
+                actionPurchaseHouse(player);
+            }
+
+            if (eventName == "setHouseProperties")
+            {
+                bool forSale = Convert.ToBoolean(arguments[0]);
+
+                if (forSale == true)
+                {
+                    if (arguments[0] != null)
+                    {
+                        int price = Convert.ToInt32(arguments[1]);
+                        if (price <= 1000000000)
+                        {
+                            foreach (ColShape collision in houseInformation.Keys)
+                            {
+                                if (houseInformation[collision].returnPlayersOutside().Contains(player))
+                                {
+                                    if (houseInformation[collision].returnOwner() == player.name)
+                                    {
+                                        houseInformation[collision].setForSale(forSale);
+                                        houseInformation[collision].setHousePrice(price);
+                                        houseInformation[collision].setBlip(true);
+                                        string query = string.Format("UPDATE PlayerHousing SET ForSale='1', Price='{0}' WHERE ID='{1}'", price, houseInformation[collision].returnID());
+                                        API.exported.database.executeQueryWithResult(query);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            API.sendNotificationToPlayer(player, "~r~ That's too much.");
+                        }
+                    }
+                    else
+                    {
+                        API.sendNotificationToPlayer(player, "~r~ You must specify a price to sell it.");
+                    }
+                }
+                else
+                {
+                    foreach (ColShape collision in houseInformation.Keys)
+                    {
+                        if (houseInformation[collision].returnPlayersOutside().Contains(player))
+                        {
+                            if (houseInformation[collision].returnOwner() == player.name)
+                            {
+                                houseInformation[collision].setForSale(forSale);
+                                houseInformation[collision].setHousePrice(0);
+                                houseInformation[collision].setBlip(false);
+                                string query = string.Format("UPDATE PlayerHousing SET ForSale='0', Price='0' WHERE ID='{0}'", houseInformation[collision].returnID());
+                                API.exported.database.executeQueryWithResult(query);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
@@ -263,15 +371,16 @@ namespace stuykserver.Util
                 bool forSale = Convert.ToBoolean(row["ForSale"]);
                 Vector3 position = new Vector3(Convert.ToSingle(row["PosX"]), Convert.ToSingle(row["PosY"]), Convert.ToSingle(row["PosZ"]));
                 HouseType type = (HouseType) Enum.Parse(typeof(HouseType), row["Type"].ToString());
+                int price = Convert.ToInt32(row["Price"]);
                 API.consoleOutput(type.ToString());
-                positionBlips(player, position, id, forSale, type);
+                positionBlips(player, position, id, forSale, type, price);
                 ++initialized;
             }
 
             API.consoleOutput("Houses Intialized: " + initialized.ToString());
         }
 
-        public void positionBlips(string player, Vector3 position, int id, bool forSale, HouseType type)
+        public void positionBlips(string player, Vector3 position, int id, bool forSale, HouseType type, int price)
         {
             HouseInformation newHouse = new HouseInformation();
             ColShape shape = API.createCylinderColShape(position, 3f, 2f);
@@ -290,7 +399,7 @@ namespace stuykserver.Util
 
             currentDimension += 1;
 
-            newHouse.setupHouse(shape, id, player, type, position, forSale, currentDimension);
+            newHouse.setupHouse(shape, id, player, type, position, forSale, currentDimension, price, newBlip);
             houseInformation.Add(shape, newHouse);
         }
 
@@ -328,8 +437,27 @@ namespace stuykserver.Util
 
         public void actionOpenHouseSale(Client player)
         {
-            API.sendNotificationToPlayer(player, "Totally for sale.");
-            // SALE ACTION HERE
+            API.triggerClientEvent(player, "showBuyHousing");
+        }
+
+        public void actionPurchaseHouse(Client player)
+        {
+            foreach (ColShape collision in houseInformation.Keys)
+            {
+                if (houseInformation[collision].returnPlayersOutside().Contains(player))
+                {
+                    if (Convert.ToBoolean(db.pullDatabase("PlayerHousing", "ForSale", "ID", houseInformation[collision].returnID().ToString())))
+                    {
+                        // MONEY STUFF
+                        houseInformation[collision].setOwner(player.name);
+                        houseInformation[collision].setForSale(false);
+                        houseInformation[collision].setBlip(false);
+                        string query = string.Format("UPDATE PlayerHousing SET ForSale='False', Owner='{0}' WHERE ID='{1}'", player.name, houseInformation[collision].returnID());
+                        API.exported.database.executeQueryWithResult(query);
+                        break;
+                    }
+                }
+            }
         }
 
         public void actionLeaveHouse(Client player, ColShape collision)
@@ -372,6 +500,18 @@ namespace stuykserver.Util
                     houseInformation[collision].addPlayersInside(player);
                     houseInformation[collision].setHouseExit(API.createCylinderColShape(new Vector3(-786.8663, 315.7642, 217.6385), 3f, 2f));
                     break;
+            }
+        }
+
+        public void actionHousePropertyPanel(Client player)
+        {
+            foreach (ColShape collision in houseInformation.Keys)
+            {
+                if (houseInformation[collision].returnOwner() == player.name)
+                {
+                    API.triggerClientEvent(player, "ShowHousePropertyPanel");
+                    break;
+                }
             }
         }
     }

@@ -70,6 +70,9 @@ namespace stuykserver.Util
                     case "House":
                         API.call("HouseHandler", "actionHouseControl", player);
                         break;
+                    case "HouseOwnershipPanel":
+                        API.call("HouseHandler", "actionHousePropertyPanel", player);
+                        break;
                 }
             }
         }

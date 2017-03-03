@@ -76,7 +76,14 @@ API.onKeyDown.connect(function(player, e) {
 	// SHIFT + B - KEYPRESS HELPER
 	if (!API.isChatOpen() && e.KeyCode == Keys.B && e.Shift) {
 		if (currentCollisionType == "VehicleLock") {
-			resource.Main.showRadialMenu();
+			showRadialMenu();
+			useFunction = null;
+			vehicleSpecialFunction = null;
+			return;
+		}
+		
+		if (currentCollisionType == "House") {
+			API.triggerServerEvent("useFunction", "HouseOwnershipPanel");
 			useFunction = null;
 			vehicleSpecialFunction = null;
 			return;
@@ -200,6 +207,16 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 				showFishing();
 				break;
 			}
+			case "showBuyHousing":
+			{
+				showBuyHouse();
+				break;
+			}
+			case "ShowHousePropertyPanel":
+			{
+				showHousePropertyPanel();
+				break;
+			}
 		}
 	}
 
@@ -254,9 +271,15 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			case "passVehicleModifications":
 			{
 				pagePanel.browser.call("passVehicleModifications", args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18]);
-        updateVehicleVariables(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18]);
-        break;
-      }
+				updateVehicleVariables(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18]);
+				break;
+			}
+			case "passHousePrice":
+			{
+				pagePanel.browser.call("pushHousePricePoint", args[0]);
+				break;
+			}
+				
 		}
 
 	}
@@ -387,11 +410,43 @@ API.onUpdate.connect(function() {
 			break;
 			
 		case "House":
-			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
 		}
 	}
 });
+// ##########################
+// # HOUSE     FUNCTIONS ####
+// #### WRITTEN BY STUYK ####
+// ##########################
+function housePurchase() {
+	API.triggerServerEvent("housePurchase");
+}
+
+function showBuyHouse() {
+	pagePanel = new CefHelper("clientside/resources/buyhousing.html");
+	pagePanel.show();
+	housePriceGet();
+}
+
+function showHousePropertyPanel() {
+	pagePanel = new CefHelper("clientside/resources/housing.html");
+	pagePanel.show();
+}
+
+function housePriceGet() {
+	API.triggerServerEvent("housePricePoint");
+}
+
+function housePropertyChanges(forSale, price) {
+	if (forSale == true) {
+		API.triggerServerEvent("setHouseProperties", true, price);
+	}
+	
+	if (forSale == false) {
+		API.triggerServerEvent("setHouseProperties", false, null);
+	}
+}
 
 // ##########################
 // # FISHING   FUNCTIONS ####

@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/housing.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="site-wrapper">
+      <div class="site-wrapper-inner">
+        <div class="cover-container">
+          <div class="inner cover">
+			<div class="col-sm-8 col-sm-offset-2 column-special">
+				<h1 class="header-text">Housing</h1>
+				<h4 class="header-text">Purchase this house?</h4>
+				<h5>$<span id="housePoint">0</span></h5>
+				<div class="row space-row">
+					<button class="btn btn-info col-sm-6 col-sm-offset-3" id="submitYes" tabindex="1" type="submit">Yes</button>
+				</div>
+				<div class="row space-row">
+					<button class="btn btn-warning col-sm-6 col-sm-offset-3" id="submitNo" tabindex="1" type="submit">No</button>
+				</div>
+			</div>
+          </div>
+        </div>
+      </div>
+    </div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			getHousePricePoint();
+		});
+		
+		$('#submitYes').click(function() {
+			resourceCall("housePurchase");
+			resourceCall("killPanel");
+		});
+		
+		$('#submitNo').click(function() {
+			resourceCall("killPanel");
+		});
+		
+		function getHousePricePoint() {
+			resourceCall("housePriceGet");
+		}
+		
+		function pushHousePricePoint(value) {
+			$('#housePoint').html(value);
+		}
+		
+	</script>
+	</body>
+</html>
+

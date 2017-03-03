@@ -19,6 +19,8 @@
 	<file src="clientside/resources/carpanel.html"/>
 	<file src="clientside/resources/menu_vehiclecontrols.html"/>
 	<file src="clientside/resources/fishing.html"/>
+	<file src="clientside/resources/buyhousing.html"/>
+	<file src="clientside/resources/housing.html"/>
 	
 	<file src="clientside/resources/js/bootstrap.js"/>
 	<file src="clientside/resources/js/bootstrap.min.js"/>
@@ -29,6 +31,7 @@
 	<file src="clientside/resources/js/raphael.min.js" />
 	<file src="clientside/resources/js/raphael.icons.min.js" />
 	<file src="clientside/resources/js/wheelnav.min.js" />
+	<file src="clientside/resources/js/bootstrap-toggle.js"/>
 	
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.eot" />
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.svg" />
@@ -37,6 +40,7 @@
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff2" />
 	<file src="clientside/resources/fonts/Lobster-Regular.ttf" />
 	
+	<file src="clientside/resources/css/housing.css" />
 	<file src="clientside/resources/css/atmpanelnew.css" />
 	<file src="clientside/resources/css/radialmenu.css" />
 	<file src="clientside/resources/css/login.css" />
@@ -53,6 +57,7 @@
 	<file src="clientside/resources/css/slider.css" />
 	<file src="clientside/resources/css/menu.css" />
 	<file src="clientside/resources/css/fishing.css" />
+	<file src="clientside/resources/css/bootstrap-toggle.css" />
 
 	<file src="clientside/resources/images/logo.png" />
 	<file src="clientside/resources/images/bg.png" />
@@ -61,13 +66,10 @@
 	<file src="clientside/resources/images/tweed.png" />
 	
 	<file src="clientside/resources/images/fishing.png" />
-	<file src="clientside/resources/images/pressn.png" />
 	<file src="clientside/resources/images/pressb.png" />
-	<file src="clientside/resources/images/pressnalt.png" />
 	<file src="clientside/resources/images/pressbalt.png" />
-	<file src="clientside/resources/images/pressnalt2.png" />
 	<file src="clientside/resources/images/pressbalt2.png" />
-	<file src="clientside/resources/images/pressevehicle.png" />
+	<file src="clientside/resources/images/pressbalt3.png" />
 	
 	<include resource="database"/>
 	<include resource="gtaocharacter" />

@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/housing.css" rel="stylesheet">
+	<link href="css/bootstrap-toggle.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="site-wrapper">
+      <div class="site-wrapper-inner">
+        <div class="cover-container">
+          <div class="inner cover">
+			<div class="col-sm-8 col-sm-offset-2 column-special">
+				<h1 class="header-text">Housing Properties</h1>
+				<h4 class="header-text">This is your house.</h4>
+				<div class="row space-row">
+					<div class="col-sm-8 col-sm-offset-3">
+						<h5 class="pull-left">For Sale:</h5><input class="pull-right" type="checkbox" data-toggle="toggle" id="toggleSale">
+					</div>
+				</div>
+				<div class="row space-row">
+					<div id="amountOption" class="input-group col-sm-6 col-sm-offset-3">
+						<div class="input-group-addon">$</div>
+						<input type="number" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' id="inputAmount" placeholder="Amount">
+						<div class="input-group-addon">.00</div>
+					</div>
+				</div>
+				<div class="row space-row">
+					<button class="btn btn-info col-sm-6 col-sm-offset-3" id="submitChanges" tabindex="1" type="submit">Save & Exit</button>
+				</div>
+			</div>
+          </div>
+        </div>
+      </div>
+    </div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-toggle.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			$('#toggleSale').bootstrapToggle();
+			$('#amountOption').hide();
+		});
+		
+		$('#toggleSale').change(function() {
+			if ($(this).prop('checked')) {
+				$('#amountOption').show();
+			}
+			else {
+				$('#amountOption').hide();
+			}
+		});
+		
+		$('#submitChanges').click(function() {
+			pushChanges();
+		});
+		
+		function pushChanges() {
+			if ($('#toggleSale').prop('checked')) {
+				resourceCall("housePropertyChanges", true, $('#inputAmount').val());
+				resourceCall("killPanel");
+			} else {
+				resourceCall("housePropertyChanges", false);
+				resourceCall("killPanel");
+			}
+		}
+	</script>
+	</body>
+</html>
+
