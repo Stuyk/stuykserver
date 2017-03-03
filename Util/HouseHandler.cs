@@ -345,6 +345,18 @@ namespace stuykserver.Util
             API.setEntityPosition(player, new Vector3(-1452.51, -653.32, 29.5831));
         }
 
+        [Command("givekeys")]
+        public void cmdGiveKeys(Client player, string target)
+        {
+            foreach (ColShape collision in houseInformation.Keys)
+            {
+                if (houseInformation[collision].returnOwner() == player.name)
+                {
+                    houseInformation[collision].addHouseKeys(API.getPlayerFromName(target));
+                }
+            }
+        }
+
         public void actionEnterHouse(Client player, ColShape collision)
         {
             HouseType type = houseInformation[collision].returnType();

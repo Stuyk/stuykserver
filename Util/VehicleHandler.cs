@@ -13,6 +13,7 @@ namespace stuykserver.Util
     {
         ChatHandler ch = new ChatHandler();
         DatabaseHandler db = new DatabaseHandler();
+        DateTime startTime;
 
         Dictionary<NetHandle, VehicleInformation> vehicleInformation = new Dictionary<NetHandle, VehicleInformation>();
 
@@ -131,6 +132,43 @@ namespace stuykserver.Util
             API.onPlayerExitVehicle += API_onPlayerExitVehicle;
             API.onEntityEnterColShape += API_onEntityEnterColShape;
             API.onEntityExitColShape += API_onEntityExitColShape;
+            API.onUpdate += API_onUpdate;
+            startTime = DateTime.Now;
+        }
+
+        private void API_onUpdate()
+        {
+            if (DateTime.Now > startTime.AddSeconds(15))
+            {
+                startTime = DateTime.Now;
+                updateVehicleCollisions();
+            }
+        }
+
+
+        // Update Vehicle Collisions Every 15 Seconds for Unoccupied Spawned Vehicles.
+        public void updateVehicleCollisions()
+        {
+            List<Client> players = API.getAllPlayers();
+            List<NetHandle> inVehicles = new List<NetHandle>();
+            foreach (Client player in players)
+            {
+                if (player.isInVehicle)
+                {
+                    if (vehicleInformation.ContainsKey(player.vehicle))
+                    {
+                        inVehicles.Add(player.vehicle);
+                    }
+                }
+            }
+
+            foreach (NetHandle vehicle in vehicleInformation.Keys)
+            {
+                if (!inVehicles.Contains(vehicle))
+                {
+                    vehicleInformation[vehicle].setVehiclePosition(API.createCylinderColShape(API.getEntityPosition(vehicle), 2f, 2f), API.getEntityPosition(vehicle));
+                }
+            }
         }
 
         public void removeDisconnectedVehicles(Client player)
@@ -150,7 +188,7 @@ namespace stuykserver.Util
 
         private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
         {
-            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            if (API.getEntityType(entity) == EntityType.Player)
             {
                 Client player = API.getPlayerFromHandle(entity);
                 if (!API.isPlayerInAnyVehicle(player))
@@ -162,7 +200,7 @@ namespace stuykserver.Util
 
         private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
         {
-            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
+            if (API.getEntityType(entity) == EntityType.Player)
             {
                 if (!API.isPlayerInAnyVehicle(API.getPlayerFromHandle(entity)))
                 {
