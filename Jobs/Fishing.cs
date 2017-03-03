@@ -175,7 +175,7 @@ namespace stuykserver.Jobs
             if (Convert.ToInt32(entityType) == 6)
             {
                 Client player = API.getPlayerFromHandle(entity);
-                if (fishingPoints.ContainsKey(colshape))
+                if (fishingPoints.ContainsKey(colshape) && !player.isInVehicle)
                 {
                     if (fishingPoints[colshape].returnType() == PointType.Fishing)
                     {
@@ -287,7 +287,7 @@ namespace stuykserver.Jobs
             foreach (ColShape collision in fishingPoints.Keys)
             {
                 // Check if player is in the collision and the collision type is of the 'Sale Type'
-                if (fishingPoints[collision].returnCollisionPlayers().Contains(player) && fishingPoints[collision].returnType() == PointType.Sale)
+                if (fishingPoints[collision].returnCollisionPlayers().Contains(player) && fishingPoints[collision].returnType() == PointType.Sale && !player.isInVehicle)
                 {
                     int fish = Convert.ToInt32(db.pullDatabase("PlayerInventory", "Fish", "Nametag", player.name));
                     if (fish <= 0)
@@ -310,7 +310,7 @@ namespace stuykserver.Jobs
             foreach (ColShape collision in fishingPoints.Keys)
             {
                 // Check if player is in the collision and the collision type is of the 'Fishing Type'
-                if (fishingPoints[collision].returnCollisionPlayers().Contains(player) && fishingPoints[collision].returnType() == PointType.Fishing)
+                if (fishingPoints[collision].returnCollisionPlayers().Contains(player) && fishingPoints[collision].returnType() == PointType.Fishing && !player.isInVehicle)
                 {
                     // Check if Inventory contains less than 10 fish. Check if they're already fishing.
                     if (!playersFishing.ContainsKey(player))

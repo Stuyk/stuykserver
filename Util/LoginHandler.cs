@@ -96,7 +96,6 @@ namespace stuykserver.Util
                     db.updateDatabase("Players", "Password", hash, "Nametag", player.name);
                     db.updateDatabase("Players", "IP", player.address, "Nametag", player.name);
                     db.updateDatabase("Players", "SocialClub", player.socialClubName, "Nametag", player.name);
-                    db.insertDatabase("PlayerVehicles", "Garage", player.name);
                     db.insertDatabase("PlayerInventory", "Nametag", player.name);
                     db.insertDatabase("PlayerSkins", "Nametag", player.name);
                     db.insertDatabase("PlayerClothing", "Nametag", player.name);

@@ -71,6 +71,7 @@
     <Compile Include="Util\ConnectionHandler.cs" />
     <Compile Include="Util\DatabaseHandler.cs" />
     <Compile Include="Util\DeathHandler.cs" />
+    <Compile Include="Util\HouseHandler.cs" />
     <Compile Include="Util\KarmaHandler.cs" />
     <Compile Include="Util\KeyPressHandler.cs" />
     <Compile Include="Util\LoginHandler.cs" />

@@ -139,6 +139,12 @@ API.onKeyDown.connect(function(player, e) {
 				vehicleSpecialFunction = null;
 				useFunction = null;
 				break;
+				
+			case "House":
+				API.triggerServerEvent("useFunction", "House");
+				vehicleSpecialFunction = null;
+				useFunction = null;
+				break;
 		}
 	}
 });
@@ -377,6 +383,10 @@ API.onUpdate.connect(function() {
 			break;
 
 		case "VehicleLock":
+			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+			
+		case "House":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
 		}
