@@ -32,6 +32,14 @@
 			getHousePricePoint();
 		});
 		
+		$(document).keydown(function(e) {
+			switch (e.keyCode) {
+				case 112: // F1
+					resourceCall("killPanel");
+					break;
+			}
+		});
+		
 		$('#submitYes').click(function() {
 			resourceCall("housePurchase");
 			resourceCall("killPanel");

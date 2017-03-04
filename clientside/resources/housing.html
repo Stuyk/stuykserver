@@ -43,6 +43,14 @@
 			$('#amountOption').hide();
 		});
 		
+		$(document).keydown(function(e) {
+		switch (e.keyCode) {
+			case 112: // F1
+				resourceCall("killPanel");
+				break;
+			}
+		});
+		
 		$('#toggleSale').change(function() {
 			if ($(this).prop('checked')) {
 				$('#amountOption').show();

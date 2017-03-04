@@ -107,7 +107,12 @@
     	</div>
     	<div class="row space-row">
     		<div class="col-sm-12">
-    				<button id="saveButton" type="submit" class="btn col-sm-12 optionButtonModified">Save</button>
+    				<button id="saveButton" type="submit" class="btn col-sm-12 optionButtonModified">Save & Exit</button>
+    		</div>
+    	</div>
+		<div class="row space-row">
+    		<div class="col-sm-12">
+					<button id="exitButton" type="submit" class="btn col-sm-12 optionButtonModified">Exit</button>
     		</div>
     	</div>
 		</div>
@@ -164,16 +169,33 @@
 		$(document).ready(function() {
 			resourceCall("updateFaceProperties");
 		});
+		
+		$(document).keydown(function(e) {
+		switch (e.keyCode) {
+			case 112: // F1
+				leaveShop();
+				break;
+			}
+		});
 
-    $('#ex1').slider().on('slide', function(e) {
+		$('#ex1').slider().on('slide', function(e) {
 			resourceCall("clothingRotatePlayer", e.value);
 		});
 
 		document.getElementById("saveButton").onclick = function ()
 		{
+			leaveShop();
+		}
+		
+		document.getElementById("exitButton").onclick = function ()
+		{
+			resourceCall("changeFaceExit");
+		}
+		
+		function leaveShop() {
 			$('#leftColumn').hide();
-      $('#sliderContainer').hide();
-      $('#rightColumn').hide();
+			$('#sliderContainer').hide();
+			$('#rightColumn').hide();
 			$('#progressBarSave').show();
 			resourceCall("changeFaceSave");
 		}

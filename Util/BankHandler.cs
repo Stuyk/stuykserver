@@ -235,6 +235,7 @@ namespace stuykserver.Util
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 108);
             API.setBlipColor(newBlip, 2);
+            API.setBlipShortRange(newBlip, true);
 
             GTANetworkServer.Object atmObject = API.createObject(-870868698, new Vector3(position.X, position.Y, position.Z - 1), new Vector3(rotation.X, rotation.Y, rotation.Z - 180));
 

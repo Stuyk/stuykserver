@@ -54,6 +54,14 @@
 			getBalance();
 		});
 		
+		$(document).keydown(function(e) {
+			switch (e.keyCode) {
+				case 112: // F1
+					resourceCall("killPanel");
+					break;
+			}
+		});
+		
 		$('#closeButton').click(function() {
 			resourceCall("killPanel");
 			return;

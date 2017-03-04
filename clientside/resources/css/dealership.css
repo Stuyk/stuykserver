@@ -1,0 +1,183 @@
+@font-face {
+	font-family: Lobster;
+	src: url(../fonts/Lobster-Regular.ttf);
+}
+
+html,
+body {
+  height: 100%;
+  background: rgba(20,20,20,0.10);
+  overflow: hidden;
+}
+
+body {
+  color: #fff;
+  text-align: center;
+}
+
+.dealership-text {
+	font-family: Lobster;
+}
+
+.dealership-text-small {
+	font-family: Lobster;
+	font-size: 22;
+}
+
+.special-button {
+	display: block;
+	background: rgba(255, 255, 255, 0.50);
+	border-radius: 50%;
+	height: 200px;
+	width: 200px;
+	margin: 0 auto;
+	border: 0px;
+}
+
+.special-button:hover {
+	background: rgba(255, 255, 255, 0.25);
+	color: #FFF;
+}
+
+.footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 100px;
+	background: transparent;
+}
+
+.header {
+	position: absolute;
+	top: 0;
+	height: 200px;
+	background: transparent;
+}
+
+.special-button:visited {
+	color: #FFF;
+}
+
+.special-button:focus {
+	outline: 0;
+}
+
+.special-button:active {
+	background: rgba(255, 255, 255, 0.70);
+	outline: 0;
+}
+
+.special-button-offset {
+	display: block;
+	background: rgba(255, 255, 255, 0.50);
+	border-radius: 50%;
+	height: 150px;
+	width: 150px;
+	margin: 0 auto;
+	margin-top: 25px;
+	border: 0px;
+}
+
+.special-button-offset:hover {
+	background: rgba(255, 255, 255, 0.25);
+	color: #FFF;
+	outline: 0;
+}
+
+.special-button-offset:visited {
+	color: #FFF;
+	outline: 0;
+}
+
+.special-button-offset:focus {
+	outline: 0;
+}
+
+.special-button-offset:active {
+	outline: 0;
+	background: rgba(255, 255, 255, 0.70);
+}
+
+.special-button-offmost {
+	display: block;
+	background-color: rgba(0,0,0,0.70);
+	border-radius: 50%;
+	height: 100px;
+	width: 100px;
+	margin: 0 auto;
+	margin-top: 50px;
+	border: 0px;
+}
+
+.special-button-offmost:hover {
+	background-color: rgba(0,0,0,0.50);
+	color: #FFF;
+}
+
+.special-button-offmost:visited {
+	color: #FFF;
+}
+
+.special-button-offmost:focus {
+	outline: 0;
+}
+
+.special-button-offmost:active {
+	outline: 0;
+	background: rgba(255, 255, 255, 0.70);
+}
+
+h2, h3 {
+	font-weight: bold;
+	font-variant: small-caps;
+	margin-bottom: 20px;
+}
+
+h4 {
+	font-weight: bold;
+	font-variant: small-caps;
+	margin-bottom: 10px;
+}
+
+.custom-center {
+	width: 100%;
+}
+
+.custom-link {
+	color: #000;
+	background-color: rgba(255,255,255,0.25);
+}
+
+.special-column {
+	background-color: rgba(0,0,0,0.70);
+	border-radius: 10px;
+	padding: 10px;
+	margin-bottom: 5px;
+}
+
+.site-wrapper {
+	margin: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.site-wrapper.responsive {
+	width: 100%;
+	height: 22%;
+}
+
+/*
+ * Cover
+ */
+
+.cover {
+  padding: 0 20px;
+}
+.cover .btn-lg {
+  padding: 10px 20px;
+  font-weight: bold;
+}
+

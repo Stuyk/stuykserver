@@ -25,7 +25,7 @@ namespace stuykserver.Util
             Cancellable = 1 << 7
         }
 
-        class ShopInformation
+        class ShopInformation : Script, IDisposable
         {
             ColShape collisionShape;
             int collisionID;
@@ -104,6 +104,11 @@ namespace stuykserver.Util
             public Blip returnBlip()
             {
                 return collisionBlip;
+            }
+
+            public void Dispose()
+            {
+                GC.SuppressFinalize(this);
             }
         }
 

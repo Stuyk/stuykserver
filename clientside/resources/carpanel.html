@@ -265,32 +265,41 @@
     $(document).ready(function() {
       $('#mainColor').prop("checked", true);
     });
+	
+	$(document).keydown(function(e) {
+		switch (e.keyCode) {
+			case 112: // F1
+				resourceCall("leaveVehicleShop");
+				break;
+		}
+	});
+	
 
-		$('#ex1').slider().on('slide', function(e) {
-			resourceCall("updateVehicleRotation", e.value);
-		});
+	$('#ex1').slider().on('slide', function(e) {
+		resourceCall("updateVehicleRotation", e.value);
+	});
 
-		document.getElementById("exitPanel").onclick = function ()
+	document.getElementById("exitPanel").onclick = function ()
+	{
+		resourceCall("leaveVehicleShop");
+	}
+
+	document.getElementById("savePanel").onclick = function () {
+		resourceCall("pushVehicleChanges");
+	}
+
+	$("#mainRGB").spectrum ({
+		change: function(color) {
+			passVehicleColors(color);
+		},
+		move: function(color)
 		{
-			resourceCall("leaveVehicleShop");
-		}
-
-		document.getElementById("savePanel").onclick = function () {
-			resourceCall("pushVehicleChanges");
-		}
-
-		$("#mainRGB").spectrum ({
-      change: function(color) {
-        passVehicleColors(color);
-      },
-			move: function(color)
-			{
-				passVehicleColors(color);
-			},
-			preferredFormat: "rgb",
-			flat: true,
-      showInput: true
-		});
+			passVehicleColors(color);
+		},
+		preferredFormat: "rgb",
+		flat: true,
+		showInput: true
+	});
 
     function passVehicleColors(color) {
       if($('#mainColor').is(':checked'))
@@ -303,27 +312,27 @@
       }
     }
 
-		function passVehicleModifications(r, g, b, sr, sg, sb, spoilers, frontbumper, rearbumper, sideskirt, exhaust, grille, hood, fender, rightfender, roof, frontwheels, backwheels, windowtint) {
-			$('#spoilerSlider').slider().setValue(spoilers);
-			$('#frontBumperSlider').slider().setValue(frontbumper);
-			$('#rearBumperSlider').slider().setValue(rearbumper);
-		}
+	function passVehicleModifications(r, g, b, sr, sg, sb, spoilers, frontbumper, rearbumper, sideskirt, exhaust, grille, hood, fender, rightfender, roof, frontwheels, backwheels, windowtint) {
+		$('#spoilerSlider').slider().setValue(spoilers);
+		$('#frontBumperSlider').slider().setValue(frontbumper);
+		$('#rearBumperSlider').slider().setValue(rearbumper);
+	}
 
     function pushVehicleVariableUpdate(spoilers, frontbumper, rearbumper, sideskirt, exhaust, grille, hood, fender, rightfender, roof, frontwheels, backwheels, windowtint) {
-			$('#spoilerNum').html(spoilers);
-      $('#frontBumperNum').html(frontbumper);
-      $('#rearBumperNum').html(rearbumper);
-      $('#sideSkirtsNum').html(sideskirt);
-      $('#exhaustNum').html(exhaust);
-      $('#grillNum').html(grille);
-      $('#hoodNum').html(hood);
-      $('#fenderNum').html(fender);
-      $('#miscFenderNum').html(rightfender);
-      $('#roofNum').html(roof);
-      $('#frontWheelsNum').html(frontwheels);
-      $('#backWheelsNum').html(backwheels);
-      $('#windowTintNum').html(windowtint);
-		}
+		$('#spoilerNum').html(spoilers);
+		$('#frontBumperNum').html(frontbumper);
+		$('#rearBumperNum').html(rearbumper);
+		$('#sideSkirtsNum').html(sideskirt);
+		$('#exhaustNum').html(exhaust);
+		$('#grillNum').html(grille);
+		$('#hoodNum').html(hood);
+		$('#fenderNum').html(fender);
+		$('#miscFenderNum').html(rightfender);
+		$('#roofNum').html(roof);
+		$('#frontWheelsNum').html(frontwheels);
+		$('#backWheelsNum').html(backwheels);
+		$('#windowTintNum').html(windowtint);
+	}
 
 	</script>
   </body>

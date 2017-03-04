@@ -88,6 +88,14 @@ namespace stuykserver.Util
                 API.triggerClientEvent(player, "killPanel");
                 API.triggerClientEvent(player, "endCamera");
             }
+
+            if (eventName == "exitClothingShop")
+            {
+                API.call("ClothingShopHandler", "leaveClothingShop", player);
+                API.triggerClientEvent(player, "killPanel");
+                API.triggerClientEvent(player, "endCamera");
+                updateClothingForPlayer(player);
+            }
         }
     }
 }

@@ -40,6 +40,7 @@
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff2" />
 	<file src="clientside/resources/fonts/Lobster-Regular.ttf" />
 	
+	<file src="clientside/resources/css/dealership.css" />
 	<file src="clientside/resources/css/housing.css" />
 	<file src="clientside/resources/css/atmpanelnew.css" />
 	<file src="clientside/resources/css/radialmenu.css" />

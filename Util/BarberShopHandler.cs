@@ -25,7 +25,7 @@ namespace stuykserver.Util
             Cancellable = 1 << 7
         }
 
-        class ShopInformation
+        class ShopInformation : Script, IDisposable
         {
             ColShape collisionShape;
             int collisionID;
@@ -104,6 +104,11 @@ namespace stuykserver.Util
             public Blip returnBlip()
             {
                 return collisionBlip;
+            }
+
+            public void Dispose()
+            {
+                GC.SuppressFinalize(this);
             }
         }
 
@@ -188,6 +193,7 @@ namespace stuykserver.Util
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 480);
             API.setBlipColor(newBlip, 9);
+            API.setBlipShortRange(newBlip, true);
 
             newShop.setupPoint(shape, id, new Vector3(position.X, position.Y, position.Z), newBlip);
             shopInformation.Add(shape, newShop);

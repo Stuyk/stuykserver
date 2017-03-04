@@ -584,6 +584,10 @@ function changeFaceSave() {
 	API.stopPlayerAnimation();
 }
 
+function changeFaceExit() {
+	API.triggerServerEvent("exitFace");
+}
+
 function changeUpdateFace() {
 	var player = API.getLocalPlayer();
 	updateFaceProperties();
@@ -761,6 +765,10 @@ var clothingPanelOpen = null;
 function showClothingPanel() {
 	pagePanel = new CefHelper("clientside/resources/clothingpanel.html");
 	pagePanel.show();
+}
+
+function changeClothingExitShop() {
+	API.triggerServerEvent("exitClothingShop");
 }
 
 function changeClothingTorso(amount) { // Torso Changer
@@ -980,7 +988,6 @@ function leaveVehicleShop() {
 }
 
 function pushVehicleChanges() {
-	API.triggerServerEvent("leaveVehicleShop");
 	API.triggerServerEvent("pushVehicleChanges", bodyColorOneR, bodyColorOneG, bodyColorOneB, bodyColorTwoR, bodyColorTwoG, bodyColorTwoB, modA, modB, modC, modD, modE, modF, modG, modH, modI, modJ, modK, modL, modM, modN, modO);
 	killPanel();
 }
@@ -1536,7 +1543,7 @@ var vehiclesVans = [
 	"Youga"
 	];
 
-var currentVehicleIndex = 6;
+var currentVehicleIndex = 1;
 var centerVehicle = null;
 var vehicleSelectionType = null;
 
@@ -1547,11 +1554,17 @@ function showDealership() {
 	}
 }
 
+function dealershipLeave() {
+	API.triggerServerEvent("leaveDealership");
+	killPanel();
+}
+
 function randomInteger(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function startBrowsing(type) {
+	
 	switch (type) {
 		case "Boats":
 			vehicleSelectionType = vehiclesBoats;
@@ -1611,6 +1624,7 @@ function startBrowsing(type) {
 			vehicleSelectionType = vehiclesVans;
 			break;
 	}
+	
 	dealershipSetupVehicles();
 	API.setPlayerIntoVehicle(centerVehicle, -1);
 	API.triggerServerEvent("dealershipReady");

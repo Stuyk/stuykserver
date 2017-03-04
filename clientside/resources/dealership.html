@@ -3,10 +3,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/menu.css" rel="stylesheet">
+    <link href="css/dealership.css" rel="stylesheet">
 	<link rel="stylesheet" href="css/slider.css" />
   </head>
   <body>
+	<header class="header col-md-11">
+		<div class="row">
+			<div class="col-md-3 col-md-offset-5 special-column">
+				<span class="dealership-text-small" id="vehicleName">Vehicle Name</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3 col-md-offset-5 special-column">
+				<button class="btn btn-info col-md-5 pull-left" type="submit" id="purchaseVehicle">Purchase</button>
+				<button class="btn btn-warning col-md-5 pull-right" type="submit" id="exitShop">Exit</button>
+			</div>
+		</div>
+	</header>
     <div class="site-wrapper responsive">
 		<div class="col-md-12">
 			<div class="col-md-1 col-md-offset-2" id="leftMostColumn">
@@ -17,21 +30,6 @@
 			<div class="col-md-2" id="leftColumn">
 			</div>
 			<div class="col-md-2" id="centerColumn">
-				<div class="row">
-					<div class="col-md-12 special-column">
-						<h1 class="dealership-text">Dealership</h1>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12 special-column">
-						<span class="dealership-text-small" id="vehicleName">Vehicle Name</span>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<button class="btn btn-info" type="submit" id="purchaseVehicle">Purchase</button>
-					</div>
-				</div>
 			</div>
 			<div class="col-md-2" id="rightColumn">
 			
@@ -44,9 +42,11 @@
 		</div>
     </div>
 	<footer class="footer">
-			<div class="container">
+		<div class="container">
+			<div class="row space-row">
 				<input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="359" data-slider-step="1" data-slider-value="0"/>
 			</div>
+		</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
@@ -56,12 +56,18 @@
 			resourceCall("dealershipVehicleRotation", e.value);
 		});
 	
-		$(document).keypress(function(e) {
-			if(e.which == 66 || e.which == 27 || e.which == 32) {
-				resourceCall("killPanel");
-				return;
+		$(document).keydown(function(e) {
+		switch (e.keyCode) {
+			case 112: // F1
+				leaveShop();
+				break;
 			}
 		});
+		
+		function leaveShop() {
+			resourceCall("dealershipLeave");
+			return;
+		}
 		
 		$('#purchaseVehicle').click(function() {
 			resourceCall("dealershipPurchaseVehicle");
@@ -76,6 +82,10 @@
 		$('#browseRight').click(function() {
 			resourceCall("dealershipBrowseRight");
 			return;
+		});
+		
+		$('#exitShop').click(function() {
+			leaveShop();
 		});
 		
 		function updateVehicle(value) {

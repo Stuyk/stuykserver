@@ -75,11 +75,16 @@
       	</div>
         <div class="row space-row">
           <div class="col-sm-12">
-             <button id="saveButton" type="submit" class="btn col-sm-12 optionButtonModified">Save</button>
+             <button id="saveButton" type="submit" class="btn col-sm-12 optionButtonModified">Save & Exit</button>
           </div>
         </div>
-      </div>
+		<div class="row space-row">
+			<div class="col-sm-12">
+				<button id="exitButton" type="submit" class="btn col-sm-12 optionButtonModified">Exit</button>
+			</div>
 		</div>
+      </div>
+	</div>
 	<div class="progress" id="progressBarSave" style="height: 35px" hidden>
 		<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Updating Information</h5></div>
 	</div>
@@ -126,35 +131,52 @@
 	<script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-slider.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function() {
-			resourceCall("updateClothingProperties");
-		});
+	$(document).ready(function() {
+		resourceCall("updateClothingProperties");
+	});
+	
+	$(document).keydown(function(e) {
+		switch (e.keyCode) {
+			case 112: // F1
+				leaveShop();
+				break;
+		}
+	});
 
     $('#ex1').slider().on('slide', function(e) {
 			resourceCall("clothingRotatePlayer", e.value);
 		});
 
-		document.getElementById("saveButton").onclick = function ()
-		{
-			$('#leftColumn').hide();
-      $('#rightColumn').hide();
-      $('#sliderContainer').hide();
-			$('#progressBarSave').show();
-			resourceCall("changePushClothingChanges");
-		}
+	document.getElementById("saveButton").onclick = function ()
+	{
+		leaveShop();
+	}
+	
+	$('#exitButton').click(function() {
+		resourceCall("changeClothingExitShop");
+	});
+	
+	
+	function leaveShop() {
+		$('#leftColumn').hide();
+		$('#rightColumn').hide();
+		$('#sliderContainer').hide();
+		$('#progressBarSave').show();
+		resourceCall("changePushClothingChanges");
+	}
 
-		function updateClothingProperties (clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum) {
-			$('#clothingTopNum').html(clothingTopNum);
-			$('#clothingTopColorNum').html(clothingTopColorNum);
-			$('#clothingUndershirtNum').html(clothingUndershirtNum);
-			$('#clothingUndershirtColorNum').html(clothingUndershirtColorNum);
-			$('#clothingTorsoNum').html(clothingTorsoNum);
-			$('#clothingLegsNum').html(clothingLegsNum);
-			$('#clothingLegsColorNum').html(clothingLegsColorNum);
-			$('#clothingShoesNum').html(clothingShoesNum);
-			$('#clothingShoesColorNum').html(clothingShoesColorNum);
-			return;
-		}
+	function updateClothingProperties (clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum) {
+		$('#clothingTopNum').html(clothingTopNum);
+		$('#clothingTopColorNum').html(clothingTopColorNum);
+		$('#clothingUndershirtNum').html(clothingUndershirtNum);
+		$('#clothingUndershirtColorNum').html(clothingUndershirtColorNum);
+		$('#clothingTorsoNum').html(clothingTorsoNum);
+		$('#clothingLegsNum').html(clothingLegsNum);
+		$('#clothingLegsColorNum').html(clothingLegsColorNum);
+		$('#clothingShoesNum').html(clothingShoesNum);
+		$('#clothingShoesColorNum').html(clothingShoesColorNum);
+		return;
+	}
 	</script>
   </body>
 </html>

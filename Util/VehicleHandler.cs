@@ -16,6 +16,7 @@ namespace stuykserver.Util
         DateTime startTime;
 
         Dictionary<NetHandle, VehicleInformation> vehicleInformation = new Dictionary<NetHandle, VehicleInformation>();
+        List<string> bicycles = new List<string>(new string[] {"Bmx", "Cruiser", "Fixter", "Scorcher", "TriBike" });
 
         public class VehicleInformation : IDisposable
         {
@@ -117,14 +118,7 @@ namespace stuykserver.Util
             }
         }
 
-        public void disposeVehicle(NetHandle vehicleID, ColShape collision, List<Client> vehicleKeys, Client vehicleOwner, List<Client> playersInVehicle)
-        {
-            API.deleteEntity(vehicleID);
-            API.deleteColShape(collision);
-            vehicleKeys.Clear();
-            playersInVehicle.Clear();
-            vehicleOwner = null;
-        }
+        
 
         public VehicleHandler()
         {
@@ -252,7 +246,7 @@ namespace stuykserver.Util
                 if (!vehicleInformation[vehicle].returnPlayersInVehicle().Contains(player))
                 {
                     vehicleInformation[vehicle].playersInVehicleAdd(player);
-                    if (API.getPlayerVehicleSeat(player) == -1)
+                    if (API.getPlayerVehicleSeat(player) == -1 && !bicycles.Contains(vehicleInformation[vehicle].returnType()))
                     {
                         API.triggerClientEvent(player, "triggerUseFunction", "VehicleEngine");
                         if (vehicleInformation[vehicle].returnOwner() == player || vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
@@ -283,10 +277,11 @@ namespace stuykserver.Util
             return;
         }
 
-        public Vehicle actionSetupPurchasedCar(Vector3 position, VehicleHash model, Client player)
+        public Vehicle actionSetupPurchasedCar(Vector3 position, string model, Client player)
         {
-            Vehicle vehicle = API.createVehicle(model, position, new Vector3(), 0, 0);
-            handleVehicleSpawn(player, vehicle, position, API.getVehicleDisplayName(model));
+            VehicleHash name = API.vehicleNameToModel(model);
+            Vehicle vehicle = API.createVehicle(name, position, new Vector3(), 0, 0);
+            handleVehicleSpawn(player, vehicle, position, model);
             db.insertPurchasedVehicle(player, vehicle, model);
             return vehicle;
         }
@@ -463,6 +458,50 @@ namespace stuykserver.Util
                 handleVehicleSpawn(player, vehicle, position, API.getVehicleDisplayName(type));
 
                 API.consoleOutput("Created vehicle for: " + row["Garage"].ToString());
+            }
+        }
+
+        public void initializeVehicleMods(Client player)
+        {
+            if (player.isInVehicle)
+            {
+                string query = string.Format("SELECT * FROM PlayerVehicles WHERE Garage='{0}' AND VehicleType='{1}'", player.name, vehicleInformation[player.vehicle].returnType());
+                DataTable result = API.exported.database.executeQueryWithResult(query);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Vehicle vehicle = player.vehicle;
+
+                    // Primary RGB
+                    int r = Convert.ToInt32(row["Red"]);
+                    int g = Convert.ToInt32(row["Green"]);
+                    int b = Convert.ToInt32(row["Blue"]);
+
+                    API.setVehicleCustomPrimaryColor(vehicle, r, g, b);
+
+                    // Secondary RGB
+                    int sr = Convert.ToInt32(row["sRed"]);
+                    int sg = Convert.ToInt32(row["sGreen"]);
+                    int sb = Convert.ToInt32(row["sBlue"]);
+
+                    API.setVehicleCustomSecondaryColor(vehicle, sr, sg, sb);
+
+                    // Mods
+                    API.setVehicleMod(vehicle, 0, Convert.ToInt32(row["Spoilers"])); // Spoilers
+                    API.setVehicleMod(vehicle, 1, Convert.ToInt32(row["FrontBumper"])); // Front Bumper
+                    API.setVehicleMod(vehicle, 2, Convert.ToInt32(row["RearBumper"])); // Rear Bumper
+                    API.setVehicleMod(vehicle, 3, Convert.ToInt32(row["SideSkirt"])); // Side Skirt
+                    API.setVehicleMod(vehicle, 4, Convert.ToInt32(row["Exhaust"])); // Exhaust
+                    API.setVehicleMod(vehicle, 6, Convert.ToInt32(row["Grille"])); // Grille
+                    API.setVehicleMod(vehicle, 7, Convert.ToInt32(row["Hood"])); // Hood
+                    API.setVehicleMod(vehicle, 8, Convert.ToInt32(row["Fender"])); // Fender
+                    API.setVehicleMod(vehicle, 9, Convert.ToInt32(row["RightFender"])); // Right Fender
+                    API.setVehicleMod(vehicle, 10, Convert.ToInt32(row["Roof"])); // Roof
+                    API.setVehicleMod(vehicle, 23, Convert.ToInt32(row["FrontWheels"])); // Front Wheels
+                    API.setVehicleMod(vehicle, 24, Convert.ToInt32(row["BackWheels"])); // Back Wheels
+                    API.setVehicleMod(vehicle, 69, Convert.ToInt32(row["WindowTint"])); // Window Tint
+                    break;
+                }
             }
         }
     }

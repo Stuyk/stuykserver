@@ -39,24 +39,27 @@ namespace stuykserver.Util
 
             foreach (Client player in playerList)
             {
-                db.setPlayerLoggedOut(player);
-                db.setPlayerPosition(player);
-                db.updateDatabase("Players", "CurrentSkin", ((PedHash)API.getEntityModel(player)).ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "Health", API.getPlayerHealth(player).ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "Armor", API.getPlayerArmor(player).ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "JobStarted", "False", "Nametag", player.name);
-                db.updateDatabase("Players", "JobX", "0", "Nametag", player.name);
-                db.updateDatabase("Players", "JobY", "0", "Nametag", player.name);
-                db.updateDatabase("Players", "JobZ", "0", "Nametag", player.name);
-                db.updateDatabase("Players", "JobType", "None", "Nametag", player.name);
-
-                if (db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name) != "None")
+                if (db.isPlayerLoggedIn(player))
                 {
-                    NetHandle tempVehicle = new NetHandle(Convert.ToInt32(db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name)));
-                    API.deleteEntity(tempVehicle);
-                }
+                    db.setPlayerLoggedOut(player);
+                    db.setPlayerPosition(player);
+                    db.updateDatabase("Players", "CurrentSkin", ((PedHash)API.getEntityModel(player)).ToString(), "Nametag", player.name);
+                    db.updateDatabase("Players", "Health", API.getPlayerHealth(player).ToString(), "Nametag", player.name);
+                    db.updateDatabase("Players", "Armor", API.getPlayerArmor(player).ToString(), "Nametag", player.name);
+                    db.updateDatabase("Players", "JobStarted", "False", "Nametag", player.name);
+                    db.updateDatabase("Players", "JobX", "0", "Nametag", player.name);
+                    db.updateDatabase("Players", "JobY", "0", "Nametag", player.name);
+                    db.updateDatabase("Players", "JobZ", "0", "Nametag", player.name);
+                    db.updateDatabase("Players", "JobType", "None", "Nametag", player.name);
 
-                db.updateDatabase("Players", "TempJobVehicle", "None", "Nametag", player.name);
+                    if (db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name) != "None")
+                    {
+                        NetHandle tempVehicle = new NetHandle(Convert.ToInt32(db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name)));
+                        API.deleteEntity(tempVehicle);
+                    }
+
+                    db.updateDatabase("Players", "TempJobVehicle", "None", "Nametag", player.name);
+                }
             }
         }
 
@@ -150,6 +153,8 @@ namespace stuykserver.Util
             API.triggerClientEvent(player, "endCamera");
             API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
             API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
+
+            API.sendNotificationToPlayer(player, "If a menu freezes. Press F1.");
         }
 
         [Flags]

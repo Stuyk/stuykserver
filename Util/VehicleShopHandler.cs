@@ -343,7 +343,8 @@ namespace stuykserver.Util
                 float rotY = Convert.ToSingle(row["RotY"]);
                 float rotZ = Convert.ToSingle(row["RotZ"]);
                 int id = Convert.ToInt32(row["ID"]);
-                PointType type = convertToPointType(row["Type"].ToString());
+                PointType type = (PointType) Enum.Parse(typeof(PointType), row["Type"].ToString());
+                API.consoleOutput(type.ToString());
                 Vector3 centerPoint = db.convertStringToVector3(row["CenterPoint"].ToString());
                 Vector3 cameraPoint = db.convertStringToVector3(row["CameraPoint"].ToString());
                 Vector3 exitPoint = db.convertStringToVector3(row["ExitPoint"].ToString());
@@ -353,53 +354,6 @@ namespace stuykserver.Util
             }
 
             API.consoleOutput("Vehicle Shops Initialized: " + initializedObjects.ToString());
-        }
-
-        public PointType convertToPointType(string input)
-        {
-            switch(input)
-            {
-                case "Boats":
-                    return PointType.Boats;
-                case "Commercial":
-                    return PointType.Commercial;
-                case "Compacts":
-                    return PointType.Compacts;
-                case "Coupes":
-                    return PointType.Coupes;
-                case "Bicycles":
-                    return PointType.Bicycles;
-                case "Police":
-                    return PointType.Police;
-                case "Helicopters":
-                    return PointType.Helicopters;
-                case "Industrial":
-                    return PointType.Industrial;
-                case "Motorcycles":
-                    return PointType.Motorcycles;
-                case "Muscle":
-                    return PointType.Muscle;
-                case "OffRoad":
-                    return PointType.OffRoad;
-                case "Planes":
-                    return PointType.Planes;
-                case "SUVS":
-                    return PointType.SUVS;
-                case "Sedans":
-                    return PointType.Sedans;
-                case "Sports":
-                    return PointType.Sports;
-                case "Classic":
-                    return PointType.Classic;
-                case "Super":
-                    return PointType.Super;
-                case "Utility":
-                    return PointType.Utility;
-                case "Vans":
-                    return PointType.Vans;
-                default:
-                    return PointType.Null;
-            }
         }
 
         // When a player tries to enter a Dealership.
@@ -417,7 +371,7 @@ namespace stuykserver.Util
                     shopInformation[collision].containedPlayersAdd(player);
                     API.setEntityPosition(player, shopInformation[collision].returnShopCenterPoint());
                     API.setEntityDimension(player, new Random().Next(1, 1000));
-                    db.setPlayerHUD(player, false);
+                    //db.setPlayerHUD(player, false);
                     API.triggerClientEvent(player, "startBrowsing", shopInformation[collision].returnType().ToString());
                     break;
                 }
@@ -436,7 +390,7 @@ namespace stuykserver.Util
                     API.setEntityPosition(player, shopInformation[collision].returnPosition());
                     shopInformation[collision].containedPlayersRemove(player);
                     Vector3 exitPoint = db.convertStringToVector3(db.pullDatabase("VehicleShops", "ExitPoint", "ID", shopInformation[collision].returnID().ToString()));
-                    API.call("VehicleHandler", "actionSetupPurchasedCar", exitPoint, API.vehicleNameToModel(vehicleType), player);
+                    API.call("VehicleHandler", "actionSetupPurchasedCar", exitPoint, vehicleType, player);
                     break;
                 }
             }
@@ -504,6 +458,7 @@ namespace stuykserver.Util
                     break;
             }
 
+            API.setBlipShortRange(newBlip, true);
             API.setBlipColor(newBlip, 73); // Yellow
 
             newShop.setupPoint(shape, id, position, newBlip, type, centerPoint, cameraPoint, exitPoint);

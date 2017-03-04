@@ -349,12 +349,14 @@ namespace stuykserver.Jobs
             {
                 API.setBlipSprite(newBlip, 68);
                 API.setBlipColor(newBlip, 42);
+                API.setBlipShortRange(newBlip, true);
             }
 
             if (point == PointType.Sale)
             {
                 API.setBlipSprite(newBlip, 431);
                 API.setBlipColor(newBlip, 42);
+                API.setBlipShortRange(newBlip, true);
             }
             
             newPoint.setupPoint(shape, id, new Vector3(position.X, position.Y, position.Z), newBlip, point);

@@ -150,11 +150,13 @@ namespace stuykserver.Util
                 API.setVehicleMod(playerVehicle, 69, Convert.ToInt32(args[18])); // Window Tint
                 query = string.Format("UPDATE PlayerVehicles SET FrontWheels='{0}', BackWheels='{1}', WindowTint='{2}' WHERE Garage='{3}' AND VehicleType='{4}'", args[16], args[17], args[18], player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
                 API.exported.database.executeQueryWithResult(query);
+                actionEnterShop(player);
             }
 
             if (eventName == "leaveVehicleShop")
             {
                 actionExitShop(player);
+                API.call("VehicleHandler", "initializeVehicleMods", player);
             }
         }
 
@@ -222,9 +224,11 @@ namespace stuykserver.Util
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 402);
             API.setBlipColor(newBlip, 59);
+            API.setBlipShortRange(newBlip, true);
 
             newShop.setupPoint(shape, id, new Vector3(position.X, position.Y, position.Z), newBlip);
             shopInformation.Add(shape, newShop);
+            
         }
 
         public void actionEnterShop(Client player)
@@ -283,6 +287,9 @@ namespace stuykserver.Util
                 API.triggerClientEvent(player, "passVehicleModifications", r, g, b, sr, sg, sb, spoiler, frontBumper, rearBumper, sideSkirt, exhaust, grille, hood, fender, rightFender, roof, frontWheels, backWheels, windowTint);
             }
         }
+
+        
+    
 
         public void actionExitShop(Client player)
         {

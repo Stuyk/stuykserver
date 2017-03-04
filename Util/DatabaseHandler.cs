@@ -248,11 +248,11 @@ namespace stuykserver.Util
             return finalVector;
         }
 
-        public void insertPurchasedVehicle(Client player, Vehicle vehicle, VehicleHash vehicletype)
+        public void insertPurchasedVehicle(Client player, Vehicle vehicle, string displayName)
         {
             Vector3 pos = API.getEntityPosition(vehicle);
             Vector3 rot = API.getEntityRotation(vehicle);
-            string query = string.Format("INSERT INTO PlayerVehicles (Garage, PosX, PosY, PosZ, RotX, RotY, RotZ, VehicleType) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')", player.name, pos.X, pos.Y, pos.Z, rot.X, rot.Y, rot.Z, API.getVehicleDisplayName(vehicletype));
+            string query = string.Format("INSERT INTO PlayerVehicles (Garage, PosX, PosY, PosZ, RotX, RotY, RotZ, VehicleType) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')", player.name, pos.X, pos.Y, pos.Z, rot.X, rot.Y, rot.Z, displayName);
             API.exported.database.executeQueryWithResult(query);
         }
     }

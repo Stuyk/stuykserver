@@ -51,6 +51,15 @@ namespace stuykserver.Util
                 API.triggerClientEvent(player, "killPanel");
                 API.triggerClientEvent(player, "endCamera");
             }
+
+            if (eventName == "exitFace")
+            {
+                API.call("BarberShopHandler", "leaveBarberShop", player);
+                API.triggerClientEvent(player, "killPanel");
+                API.triggerClientEvent(player, "endCamera");
+                loadCurrentFace(player);
+                API.call("ClothingHandler", "updateClothingForPlayer", player);
+            }
         }
 
         public void pullCurrentFace(Client player)
