@@ -5,6 +5,8 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/skinchanger.css" rel="stylesheet">
     <link rel="stylesheet" href="css/slider.css" />
+	<link href="css/bootstrap-toggle.css" rel="stylesheet">
+	<link href="css/bootstrap-select.css" rel="stylesheet">
   </head>
   <body>
 		<div class="modal fade" id="genderChange" tabindex="-1" role="dialog" aria-labelledby="genderChangeLabel">
@@ -26,8 +28,47 @@
 			</div>
 		</div>
 	<div class="col-md-2 column-special pull-left" id="leftColumn">
-		<div id="leftColumnContent">
-      <div class="column-header"><h2>Model Selection</h2></div>
+	<div class="column-header"><h2>Model Selection</h2></div>
+	<div class="row space-row">
+		<div class="col-sm-12">
+			<label style="margin-top: 5px; margin-right: 20px">Advanced Mode</label>
+			<input type="checkbox" data-toggle="toggle" id="toggleAdvanced"/>
+		</div>
+	</div>
+	<div id="leftColumnAdvanced" hidden>
+		<div class="row space-row">
+			<div class="dropdown show">
+				<div class="col-sm-12">
+					<select class="selectpicker" id="selectionBox">
+						<option>Select Facial Feature</option>
+						<option>Nose Width</option>
+						<option>Nose Height</option>
+						<option>Nose Length</option>
+						<option>Nose Bridge</option>
+						<option>Nose Tip</option>
+						<option>Nose Bridge Depth</option>
+						<option>Eyebrow Height</option>
+						<option>Eyebrow Depth</option>
+						<option>Cheekbone Height</option>
+						<option>Cheekbone Depth</option>
+						<option>Cheekbone Width</option>
+						<option>Eyelids</option>
+						<option>Lips</option>
+						<option>Jaw Width</option>
+						<option>Jaw Depth</option>
+						<option>Jaw Length</option>
+						<option>Chin Fullness</option>
+						<option>Chin Width</option>
+						<option>Neck Width</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="row space-row">
+			<label>-1</label> <input id="sliderFeature" style="width: 200px" data-slider-tooltip="hide" data-slider-value="1" data-slider-id="sliderFeature" type="text" data-slider-min="-1" data-slider-max="1" data-slider-step="0.1"/> <label>1</label>
+		</div>
+	</div>
+	<div id="leftColumnContent">
     	<div class="row space-row">
     		<div class="col-sm-12">
     			<button type="button" class="btn optionButton pull-left" data-toggle="modal" data-target="#genderChange">M</button>
@@ -115,7 +156,7 @@
 					<button id="exitButton" type="submit" class="btn col-sm-12 optionButtonModified">Exit</button>
     		</div>
     	</div>
-		</div>
+	</div>
 	</div>
 	<div class="progress" id="progressBarSave" style="height: 35px" hidden>
 		<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" style="width: 100%; margin-bottom: 10px"><h5>Updating Information</h5></div>
@@ -165,9 +206,26 @@
 		$('#genderChange').modal('show');
 	</script>
   <script src="js/bootstrap-slider.js"></script>
+  <script src="js/bootstrap-toggle.js"></script>
+  <script src="js/bootstrap-select.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			resourceCall("updateFaceProperties");
+		});
+		
+		$(function() {
+			$('#toggleAdvanced').bootstrapToggle();
+		});
+		
+		$('#toggleAdvanced').change(function() {
+			if ($(this).prop('checked')) {
+				$('#leftColumnContent').hide();
+				$('#leftColumnAdvanced').show();
+			}
+			else {
+				$('#leftColumnContent').show();
+				$('#leftColumnAdvanced').hide();
+			}
 		});
 		
 		$(document).keydown(function(e) {
@@ -177,7 +235,72 @@
 				break;
 			}
 		});
+		
+		$('#sliderFeature').slider().on('slide', function(e) {
+			var selectionValue = $('#selectionBox').val();
+			switch (selectionValue)
+			{
+				case "Nose Width":
+					resourceCall("changeFacialFeature", 0, e.value);
+					break;
+				case "Nose Height":
+					resourceCall("changeFacialFeature", 1, e.value);
+					break;
+				case "Nose Length":
+					resourceCall("changeFacialFeature", 2, e.value);
+					break;
+				case "Nose Bridge":
+					resourceCall("changeFacialFeature", 3, e.value);
+					break;
+				case "Nose Tip":
+					resourceCall("changeFacialFeature", 4, e.value);
+					break;
+				case "Nose Bridge Depth":
+					resourceCall("changeFacialFeature", 5, e.value);
+					break;
+				case "Eyebrow Height":
+					resourceCall("changeFacialFeature", 6, e.value);
+					break;
+				case "Eyebrow Depth":
+					resourceCall("changeFacialFeature", 7, e.value);
+					break;
+				case "Cheekbone Height":
+					resourceCall("changeFacialFeature", 8, e.value);
+					break;
+				case "Cheekbone Depth":
+					resourceCall("changeFacialFeature", 9, e.value);
+					break;
+				case "Cheekbone Width":
+					resourceCall("changeFacialFeature", 10, e.value);
+					break;
+				case "Eyelids":
+					resourceCall("changeFacialFeature", 11, e.value);
+					break;
+				case "Lips":
+					resourceCall("changeFacialFeature", 12, e.value);
+					break;
+				case "Jaw Width":
+					resourceCall("changeFacialFeature", 13, e.value);
+					break;
+				case "Jaw Depth":
+					resourceCall("changeFacialFeature", 14, e.value);
+					break;
+				case "Jaw Length":
+					resourceCall("changeFacialFeature", 15, e.value);
+					break;
+				case "Chin Fullness":
+					resourceCall("changeFacialFeature", 16, e.value);
+					break;
+				case "Chin Width":
+					resourceCall("changeFacialFeature", 17, e.value);
+					break;
+				case "Neck Width":
+					resourceCall("changeFacialFeature", 19, e.value);
+					break;
+			}
+		});
 
+		
 		$('#ex1').slider().on('slide', function(e) {
 			resourceCall("clothingRotatePlayer", e.value);
 		});

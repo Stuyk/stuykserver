@@ -32,6 +32,7 @@
 	<file src="clientside/resources/js/raphael.icons.min.js" />
 	<file src="clientside/resources/js/wheelnav.min.js" />
 	<file src="clientside/resources/js/bootstrap-toggle.js"/>
+	<file src="clientside/resources/js/bootstrap-select.js"/>
 	
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.eot" />
 	<file src="clientside/resources/fonts/glyphicons-halflings-regular.svg" />
@@ -59,6 +60,7 @@
 	<file src="clientside/resources/css/menu.css" />
 	<file src="clientside/resources/css/fishing.css" />
 	<file src="clientside/resources/css/bootstrap-toggle.css" />
+	<file src="clientside/resources/css/bootstrap-select.css"/>
 
 	<file src="clientside/resources/images/logo.png" />
 	<file src="clientside/resources/images/bg.png" />

@@ -21,6 +21,19 @@ namespace stuykserver.Util
             API.consoleOutput("Started: Admin Commands");
         }
 
+        [Command("stopserver")]
+        public void cmdStopServer(Client player)
+        {
+            if (db.isAdmin(player.name))
+            {
+                List<Client> players = API.getAllPlayers();
+                foreach (Client p in players)
+                {
+                    API.kickPlayer(p, "Restarting server.");
+                }
+            }
+        }
+
         [Command("spawn")] //Temporary
         public void cmdSpawn(Client player)
         {

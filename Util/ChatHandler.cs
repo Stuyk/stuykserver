@@ -36,15 +36,16 @@ namespace stuykserver.Util
 
         public void sendProximityMessage(Client player, string message, int dimension)
         {
-            var players = API.getPlayersInRadiusOfPlayer(10, player);
+            List<Client> players = API.getPlayersInRadiusOfPlayer(10f, player);
             foreach (Client p in players)
             {
                 if (p.position.DistanceTo(player.position) <= 10 && API.getEntityDimension(p) == dimension)
                 {
                     API.sendChatMessageToPlayer(p, "~#49A1F4~", replaceUnderscore(player.name) + " says: ~w~" + message);
-                    API.consoleOutput(string.Format("[{0}] {1}: {2}", dimension, player.name, message));
+                    
                 }
             }
+            API.consoleOutput(string.Format("[{0}] {1}: {2}", dimension, player.name, message));
         }
 
         [Command("me", GreedyArg = true)]

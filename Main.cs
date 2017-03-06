@@ -17,7 +17,6 @@ namespace stuykserver
         public Main()
         {
             API.onPlayerHealthChange += API_onPlayerHealthChange;
-            API.onUpdate += API_onUpdate;
             API.onResourceStart += API_onResourceStart;
         }
 
@@ -26,15 +25,11 @@ namespace stuykserver
             API.consoleOutput("Started: Main");
         }
 
-        private void API_onUpdate()
-        {
-        }
 
         private void API_onPlayerHealthChange(Client player, int oldValue)
         {
             db.updateDatabase("Players", "Health", player.health.ToString(), "Nametag", player.name);
         }
-
 
         [Command("resetdimension")]
         public void cmdResetDimension(Client player)

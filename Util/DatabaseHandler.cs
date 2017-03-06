@@ -47,16 +47,14 @@ namespace stuykserver.Util
         // ########################################
         public void setPlayerPosition(Client player)
         {
-            updateDatabase("Players", "LASTX", player.position.X.ToString(), "Nametag", player.name);
-            updateDatabase("Players", "LASTY", player.position.Y.ToString(), "Nametag", player.name);
-            updateDatabase("Players", "LASTZ", player.position.Z.ToString(), "Nametag", player.name);
+            string query = string.Format("UPDATE Players SET LASTX='{0}', LASTY='{1}', LASTZ='{2}' WHERE Nametag='{3}'", player.position.X, player.position.Y, player.position.Z, player.name);
+            API.exported.database.executeQuery(query);
         }
 
-        public void setPlayerPositionByVector(Client player, Vector3 vector3)
+        public void setPlayerPositionByVector(Client player, Vector3 pos)
         {
-            updateDatabase("Players", "LASTX", vector3.X.ToString(), "Nametag", player.name);
-            updateDatabase("Players", "LASTY", vector3.Y.ToString(), "Nametag", player.name);
-            updateDatabase("Players", "LASTZ", vector3.Z.ToString(), "Nametag", player.name);
+            string query = string.Format("UPDATE Players SET LASTX='{0}', LASTY='{1}', LASTZ='{2}' WHERE Nametag='{3}'", pos.X, pos.Y, pos.Z, player.name);
+            API.exported.database.executeQuery(query);
         }
 
         public void setPlayerHUD(Client player, bool setting)

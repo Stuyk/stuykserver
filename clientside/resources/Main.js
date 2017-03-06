@@ -1,18 +1,18 @@
-var pagePanel = null; // CEF
-var cashDisplay = null;
-var res = API.getScreenResolution();
-var currentMoney = null; // Cash Display
-var resX = API.getScreenResolutionMantainRatio().Width;
-var resY = API.getScreenResolutionMantainRatio().Height;
-var currentjob = null;
-var karmaDisplay = null; // Karma Display
-var playerAccountBalance = null; // Player Account Balance
-var email = ""; // Registration System
-var password = ""; // Registration System
-var page = ""; // CEF? Probably unused.
-var useFunction = null; // KEYPRESS USE BUTTON System
-var vehicleSpecialFunction = null; // KEYPRESS USE BUTTON System
-var currentCollisionType = null; // KEYPRESS USE BUTTON System
+ pagePanel = null; // CEF
+ cashDisplay = null;
+ res = API.getScreenResolution();
+ currentMoney = null; // Cash Display
+ resX = API.getScreenResolutionMantainRatio().Width;
+ resY = API.getScreenResolutionMantainRatio().Height;
+ currentjob = null;
+ karmaDisplay = null; // Karma Display
+ playerAccountBalance = null; // Player Account Balance
+ email = ""; // Registration System
+ password = ""; // Registration System
+ page = ""; // CEF? Probably unused.
+ useFunction = null; // KEYPRESS USE BUTTON System
+ vehicleSpecialFunction = null; // KEYPRESS USE BUTTON System
+ currentCollisionType = null; // KEYPRESS USE BUTTON System
 
 // CEF Boilerplate
 class CefHelper {
@@ -79,6 +79,7 @@ API.onKeyDown.connect(function(player, e) {
 			showRadialMenu();
 			useFunction = null;
 			vehicleSpecialFunction = null;
+			API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 			return;
 		}
 		
@@ -86,6 +87,7 @@ API.onKeyDown.connect(function(player, e) {
 			API.triggerServerEvent("useFunction", "HouseOwnershipPanel");
 			useFunction = null;
 			vehicleSpecialFunction = null;
+			API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 			return;
 		}
 	}
@@ -97,60 +99,70 @@ API.onKeyDown.connect(function(player, e) {
 				API.triggerServerEvent("useFunction", "VehicleModificationShop");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 
 			case "Bank":
 				API.triggerServerEvent("useFunction", "Bank");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 
 			case "FishingSpot":
 				API.triggerServerEvent("useFunction", "FishingSpot");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 
 			case "FishingSaleSpot":
 				API.triggerServerEvent("useFunction", "FishingSaleSpot");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 
 			case "BarberShop":
 				API.triggerServerEvent("useFunction", "BarberShop");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 
 			case "Clothing":
 				API.triggerServerEvent("useFunction", "Clothing");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 
 			case "Dealership":
 				API.triggerServerEvent("useFunction", "Dealership");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 
 			case "VehicleEngine":
 				API.triggerServerEvent("useFunction", "VehicleEngine");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 
 			case "VehicleLock":
 				API.triggerServerEvent("useFunction", "VehicleLock");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 				
 			case "House":
 				API.triggerServerEvent("useFunction", "House");
 				vehicleSpecialFunction = null;
 				useFunction = null;
+				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
 		}
 	}
@@ -163,6 +175,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		{
 			useFunction = true;
 			currentCollisionType = args[0];
+			API.playSoundFrontEnd("Click_Special", "WEB_NAVIGATION_SOUNDS_PHONE");
 			break;
 		}
 		case "removeUseFunction":
@@ -170,6 +183,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			currentCollisionType = null;
 			vehicleSpecialFunction = null;
 			useFunction = null;
+			API.playSoundFrontEnd("CLICK_BACK", "WEB_NAVIGATION_SOUNDS_PHONE");
 			break;
 		}
 	}
@@ -285,7 +299,6 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	}
 
 	// EVENT NAMES THAT CAN'T GO ANYWHERE
-
 	if (eventName == "killPanel") {
 		if (pagePanel != null) {
 			pagePanel.destroy();
@@ -331,6 +344,25 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		faceHairstyleColor = args[7];
 		faceHairstyleHighlight = args[8];
 		faceHairstyleTexture = args[9];
+		faceNoseWidth = args[10];
+		faceNoseHeight = args[11];
+		faceNoseLength = args[12];
+		faceNoseBridge = args[13];
+		faceNoseTip = args[14];
+		faceNoseBridgeDepth = args[15];
+		faceEyebrowHeight = args[16];
+		faceEyebrowDepth = args[17];
+		faceCheekboneHeight = args[18];
+		faceCheekboneDepth = args[19];
+		faceCheekboneWidth = args[20];
+		faceEyelids = args[21];
+		faceLips = args[22];
+		faceJawWidth = args[23];
+		faceJawDepth = args[24];
+		faceJawLength = args[25];
+		faceChinFullness = args[26];
+		faceChinWidth = args[27];
+		faceNeckWidth = args[28];
 	}
 
 	if (eventName=="updateKarma") { // Karma
@@ -541,18 +573,38 @@ function showRadialMenu() {
 // #### WRITTEN BY STUYK ####
 // ##########################
 
-var faceGender = null;
-var faceShapeOne = null;
-var faceShapeTwo = null;
-var faceSkinOne = null;
-var faceSkinTwo = null;
-var faceShapeMix = null;
-var faceSkinMix = null;
-var faceHairstyle = null;
-var faceHairstyleColor = null;
-var faceHairstyleHighlight = null;
-var faceHairstyleTexture = null;
-var facePanelOpen = null;
+ faceGender = null;
+ faceShapeOne = null;
+ faceShapeTwo = null;
+ faceSkinOne = null;
+ faceSkinTwo = null;
+ faceShapeMix = null;
+ faceSkinMix = null;
+ faceHairstyle = null;
+ faceHairstyleColor = null;
+ faceHairstyleHighlight = null;
+ faceHairstyleTexture = null;
+ facePanelOpen = null;
+// Facial Features
+ faceNoseWidth = 0; // 0
+ faceNoseHeight = 0; // 1
+ faceNoseLength = 0; // 2
+ faceNoseBridge = 0; // 3
+ faceNoseTip = 0; // 4
+ faceNoseBridgeDepth = 0; // 5
+ faceEyebrowHeight = 0; // 6
+ faceEyebrowDepth = 0; // 7
+ faceCheekboneHeight = 0; // 8
+ faceCheekboneDepth = 0; // 9
+ faceCheekboneWidth = 0; // 10
+ faceEyelids = 0; // 11
+ faceLips = 0; // 12
+ faceJawWidth = 0; // 13
+ faceJawDepth = 0; // 14
+ faceJawLength = 0; // 15
+ faceChinFullness = 0; // 16
+ faceChinWidth = 0; // 17
+ faceNeckWidth = 0; // 19
 
 function showModelMenu() {
 	pagePanel = new CefHelper("clientside/resources/skinchanger.html");
@@ -569,7 +621,7 @@ function updateFaceProperties() {
 }
 
 function changeFaceSave() {
-	API.triggerServerEvent("saveFace", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture);
+	API.triggerServerEvent("saveFace", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture, intToFloat(faceNoseWidth), intToFloat(faceNoseHeight), intToFloat(faceNoseLength), intToFloat(faceNoseBridge), intToFloat(faceNoseTip), intToFloat(faceNoseBridgeDepth), intToFloat(faceEyebrowHeight), intToFloat(faceEyebrowDepth), intToFloat(faceCheekboneHeight), intToFloat(faceCheekboneDepth), intToFloat(faceCheekboneWidth), intToFloat(faceEyelids), intToFloat(faceLips), intToFloat(faceJawWidth), intToFloat(faceJawDepth), intToFloat(faceJawLength), intToFloat(faceChinFullness), intToFloat(faceChinWidth), intToFloat(faceNeckWidth));
 	faceShapeOne = null;
 	faceShapeTwo = null;
 	faceSkinOne = null;
@@ -592,8 +644,98 @@ function changeUpdateFace() {
 	var player = API.getLocalPlayer();
 	updateFaceProperties();
 	API.callNative("SET_PED_HEAD_BLEND_DATA", player, faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, intToFloat(faceShapeMix), intToFloat(faceSkinMix), 0, false);
+	API.callNative("UPDATE_PED_HEAD_BLEND_DATA", player, intToFloat(faceShapeMix), intToFloat(faceSkinMix), 0);
 	API.callNative("_SET_PED_HAIR_COLOR", player, faceHairstyleColor, faceHairstyleHighlight);
 	API.setPlayerClothes(player, 2, faceHairstyle, faceHairstyleTexture);
+}
+
+function changeBlendData() {
+	var player = API.getLocalPlayer();
+	API.callNative("UPDATE_PED_HEAD_BLEND_DATA", player, intToFloat(faceShapeMix), intToFloat(faceSkinMix), 0);
+	updateFaceProperties();
+}
+
+function changeFacialFeature(type, amount) {
+	var player = API.getLocalPlayer();
+	switch (type)
+	{
+		case 0:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 0, API.f(amount));
+			faceNoseWidth = amount;
+			break;
+		case 1:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 1, API.f(amount));
+			faceNoseHeight = amount;
+			break;
+		case 2:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 2, API.f(amount));
+			faceNoseLength = amount;
+			break;
+		case 3:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 3, API.f(amount));
+			faceNoseBridge = amount;
+			break;
+		case 4:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 4, API.f(amount));
+			faceNoseTip = amount;
+			break;
+		case 5:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 5, API.f(amount));
+			faceNoseBridgeDepth = amount;
+			break;
+		case 6:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 6, API.f(amount));
+			faceEyebrowHeight = amount;
+			break;
+		case 7:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 7, API.f(amount));
+			faceEyebrowDepth = amount;
+			break;
+		case 8:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 8, API.f(amount));
+			faceCheekboneHeight = amount;
+			break;
+		case 9:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 9, API.f(amount));
+			faceCheekboneDepth = amount;
+			break;
+		case 10:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 10, API.f(amount));
+			faceCheekboneWidth = amount;
+			break;
+		case 11:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 11, API.f(amount));
+			faceEyelids = amount;
+			break;
+		case 12:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 12, API.f(amount));
+			faceLips = amount;
+			break;
+		case 13:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 13, API.f(amount));
+			faceJawWidth = amount;
+			break;
+		case 14:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 14, API.f(amount));
+			faceJawDepth = amount;
+			break;
+		case 15:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 15, API.f(amount));
+			faceJawLength = amount;
+			break;
+		case 16:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 16, API.f(amount));
+			faceChinFullness = amount;
+			break;
+		case 17:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 17, API.f(amount));
+			faceChinWidth = amount;
+			break;
+		case 19:
+			API.callNative("_SET_PED_FACE_FEATURE", player, 19, API.f(amount));
+			faceNeckWidth = amount;
+			break;
+	}
 }
 
 function changeFaceGender(amount) {
@@ -668,11 +810,11 @@ function changeFaceSkinTwo(amount) {
 
 function changeFaceShapeMix(amount) {
 	if (amount == 1) {
-		faceShapeMix += 0.1
+		faceShapeMix += 0.1;
 	}
 
 	if (amount == -1) {
-		faceShapeMix -= 0.1
+		faceShapeMix -= 0.1;
 	}
 
 	if (faceShapeMix <= 0.1) {
@@ -682,7 +824,7 @@ function changeFaceShapeMix(amount) {
 	if (faceShapeMix >= 0.9) {
 		faceShapeMix = 0.9;
 	}
-	changeUpdateFace();
+	changeBlendData();
 }
 
 function changeFaceSkinMix(amount) {
@@ -701,7 +843,7 @@ function changeFaceSkinMix(amount) {
 	if (faceSkinMix >= 0.9) {
 		faceSkinMix = 0.9;
 	}
-	changeUpdateFace();
+	changeBlendData();
 }
 
 function changeFaceHairstyle(amount) {
@@ -959,7 +1101,7 @@ var modO = -1;
 
 function updateVehicleVariables(r, g, b, sr, sg, sb, spoiler, frontbumper, rearbumper, sideskirt, exhaust, grille, hood, fender, rightfender, roof, frontwheels, backwheels, windowtint) {
   bodyColorOneR = r;
-  bodyColorOneG = g
+  bodyColorOneG = g;
   bodyColorOneB = b;
   bodyColorTwoR = sr;
   bodyColorTwoG = sg;
@@ -979,8 +1121,6 @@ function updateVehicleVariables(r, g, b, sr, sg, sb, spoiler, frontbumper, rearb
   modM = windowtint; // Window Tint
   pushVehicleVariableChanges();
 }
-
-
 
 function leaveVehicleShop() {
 	API.triggerServerEvent("leaveVehicleShop");
