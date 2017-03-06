@@ -368,11 +368,12 @@ namespace stuykserver.Util
 
                 if (shopInformation[collision].returnCollisionPlayers().Contains(player))
                 {
+                    int rand = new Random().Next(1, 1000);
                     shopInformation[collision].containedPlayersAdd(player);
                     API.setEntityPosition(player, shopInformation[collision].returnShopCenterPoint());
-                    API.setEntityDimension(player, new Random().Next(1, 1000));
-                    //db.setPlayerHUD(player, false);
-                    API.triggerClientEvent(player, "startBrowsing", shopInformation[collision].returnType().ToString());
+                    API.setEntityDimension(player, rand);
+                    db.setPlayerHUD(player, false);
+                    API.triggerClientEvent(player, "startBrowsing", shopInformation[collision].returnType().ToString(), rand);
                     break;
                 }
             }

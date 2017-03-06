@@ -121,42 +121,36 @@ namespace stuykserver.Util
             if (eventName == "pushVehicleChanges")
             {
                 Vehicle playerVehicle = player.vehicle;
-                // Vehicle Colors
-                API.setVehicleCustomPrimaryColor(playerVehicle, Convert.ToInt32(args[0]), Convert.ToInt32(args[1]), Convert.ToInt32(args[2]));
-                API.setVehicleCustomSecondaryColor(playerVehicle, Convert.ToInt32(args[3]), Convert.ToInt32(args[4]), Convert.ToInt32(args[5]));
-                string query = string.Format("UPDATE PlayerVehicles SET Red='{0}', Green='{1}', Blue='{2}', sRed='{3}', sGreen='{4}', sBlue='{5}' WHERE Garage='{6}' AND VehicleType='{7}'", args[0], args[1], args[2], args[3], args[4], args[5], player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
-                API.exported.database.executeQueryWithResult(query);
+                string[] varNames = { "Red", "Green", "Blue", "sRed", "sGreen", "sBlue", "Spoilers", "FrontBumper", "RearBumper", "SideSkirt", "Exhaust", "Grille", "Hood", "Fender", "RightFender", "Roof", "FrontWheels", "BackWheels", "WindowTint" };
 
-                // Mod Query - Spoilers, Front Bumper, Rear Bumper, Side Skirts, Exhaust.
-                API.setVehicleMod(playerVehicle, 0, Convert.ToInt32(args[6])); // Spoilers
-                API.setVehicleMod(playerVehicle, 1, Convert.ToInt32(args[7])); // Front Bumper
-                API.setVehicleMod(playerVehicle, 2, Convert.ToInt32(args[8])); // Rear Bumper
-                API.setVehicleMod(playerVehicle, 3, Convert.ToInt32(args[9])); // Side Skirt
-                API.setVehicleMod(playerVehicle, 4, Convert.ToInt32(args[10])); // Exhaust
-                query = string.Format("UPDATE PlayerVehicles SET Spoilers='{0}', FrontBumper='{1}', RearBumper='{2}', SideSkirt='{3}', Exhaust='{4}' WHERE Garage='{5}' AND VehicleType='{6}'", args[6], args[7], args[8], args[9], args[10], player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
-                API.exported.database.executeQueryWithResult(query);
+                Dictionary<string, string> parameters = new Dictionary<string, string>();
+                int i = 0;
+                string query = "UPDATE PlayerVehicles SET";
 
-                // Mod Query - Grille, Hood, Fender, Right Fender, Roof
-                API.setVehicleMod(playerVehicle, 6, Convert.ToInt32(args[11])); // Grille
-                API.setVehicleMod(playerVehicle, 7, Convert.ToInt32(args[12])); // Hood
-                API.setVehicleMod(playerVehicle, 8, Convert.ToInt32(args[13])); // Fender
-                API.setVehicleMod(playerVehicle, 9, Convert.ToInt32(args[14])); // Right Fender
-                API.setVehicleMod(playerVehicle, 10, Convert.ToInt32(args[15])); // Roof
-                query = string.Format("UPDATE PlayerVehicles SET Grille='{0}', Hood='{1}', Fender='{2}', RightFender='{3}', Roof='{4}' WHERE Garage='{5}' AND VehicleType='{6}'", args[11], args[12], args[13], args[14], args[15], player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
-                API.exported.database.executeQueryWithResult(query);
+                foreach (string label in varNames)
+                {
+                    if (i == varNames.Length - 1)
+                    {
+                        query = string.Format("{0} {1}=@{1}", query, label);
+                    }
+                    else
+                    {
+                        query = string.Format("{0} {1}=@{1},", query, label);
+                    }
+                    
+                    parameters.Add(string.Format("@{0}", label), args[i].ToString());
+                    ++i;
+                }
 
-                API.setVehicleMod(playerVehicle, 23, Convert.ToInt32(args[16])); // Front Wheels
-                API.setVehicleMod(playerVehicle, 24, Convert.ToInt32(args[17])); // Back Wheels
-                API.setVehicleMod(playerVehicle, 69, Convert.ToInt32(args[18])); // Window Tint
-                query = string.Format("UPDATE PlayerVehicles SET FrontWheels='{0}', BackWheels='{1}', WindowTint='{2}' WHERE Garage='{3}' AND VehicleType='{4}'", args[16], args[17], args[18], player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
-                API.exported.database.executeQueryWithResult(query);
-                actionEnterShop(player);
+                query = string.Format("{0} WHERE Garage='{1}' AND VehicleType='{2}'", query, player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
+                API.exported.database.executePreparedQuery(query, parameters);
+
+                actionExitShop(player);
             }
 
             if (eventName == "leaveVehicleShop")
             {
                 actionExitShop(player);
-                API.call("VehicleHandler", "initializeVehicleMods", player);
             }
         }
 
@@ -305,6 +299,7 @@ namespace stuykserver.Util
                     player.vehicle.engineStatus = true;
                     API.triggerClientEvent(player, "endCamera");
                     db.setPlayerHUD(player, true);
+                    API.call("VehicleHandler", "initializeVehicleMods", player);
                 }
             }
         }

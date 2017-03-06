@@ -363,6 +363,12 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		faceChinFullness = args[26];
 		faceChinWidth = args[27];
 		faceNeckWidth = args[28];
+		faceFacialHair = args[29];
+		faceFacialHairColor = args[30];
+		faceFacialHairColor2 = args[31];
+		faceAgeing = args[32];
+		faceComplexion = args[33];
+		faceMoles = args[34];
 	}
 
 	if (eventName=="updateKarma") { // Karma
@@ -370,7 +376,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	}
 
 	if (eventName == "startBrowsing") { // Dealership
-		startBrowsing(args[0]);
+		startBrowsing(args[0], args[1]);
 	}
 
 	// SERVERSIDE CAMERA FUNCTIONS
@@ -605,6 +611,12 @@ function showRadialMenu() {
  faceChinFullness = 0; // 16
  faceChinWidth = 0; // 17
  faceNeckWidth = 0; // 19
+ faceFacialHair = 0;
+ faceFacialHairColor = 0;
+ faceFacialHairColorTwo = 0;
+ faceAgeing = 0;
+ faceComplexion = 0;
+ faceMoles = 0;
 
 function showModelMenu() {
 	pagePanel = new CefHelper("clientside/resources/skinchanger.html");
@@ -621,7 +633,7 @@ function updateFaceProperties() {
 }
 
 function changeFaceSave() {
-	API.triggerServerEvent("saveFace", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture, intToFloat(faceNoseWidth), intToFloat(faceNoseHeight), intToFloat(faceNoseLength), intToFloat(faceNoseBridge), intToFloat(faceNoseTip), intToFloat(faceNoseBridgeDepth), intToFloat(faceEyebrowHeight), intToFloat(faceEyebrowDepth), intToFloat(faceCheekboneHeight), intToFloat(faceCheekboneDepth), intToFloat(faceCheekboneWidth), intToFloat(faceEyelids), intToFloat(faceLips), intToFloat(faceJawWidth), intToFloat(faceJawDepth), intToFloat(faceJawLength), intToFloat(faceChinFullness), intToFloat(faceChinWidth), intToFloat(faceNeckWidth));
+	API.triggerServerEvent("saveFace", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture, intToFloat(faceNoseWidth), intToFloat(faceNoseHeight), intToFloat(faceNoseLength), intToFloat(faceNoseBridge), intToFloat(faceNoseTip), intToFloat(faceNoseBridgeDepth), intToFloat(faceEyebrowHeight), intToFloat(faceEyebrowDepth), intToFloat(faceCheekboneHeight), intToFloat(faceCheekboneDepth), intToFloat(faceCheekboneWidth), intToFloat(faceEyelids), intToFloat(faceLips), intToFloat(faceJawWidth), intToFloat(faceJawDepth), intToFloat(faceJawLength), intToFloat(faceChinFullness), intToFloat(faceChinWidth), intToFloat(faceNeckWidth), faceFacialHair, faceFacialHairColor, faceFacialHairColorTwo, faceAgeing, faceComplexion, faceMoles);
 	faceShapeOne = null;
 	faceShapeTwo = null;
 	faceSkinOne = null;
@@ -643,10 +655,15 @@ function changeFaceExit() {
 function changeUpdateFace() {
 	var player = API.getLocalPlayer();
 	updateFaceProperties();
-	API.callNative("SET_PED_HEAD_BLEND_DATA", player, faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, intToFloat(faceShapeMix), intToFloat(faceSkinMix), 0, false);
-	API.callNative("UPDATE_PED_HEAD_BLEND_DATA", player, intToFloat(faceShapeMix), intToFloat(faceSkinMix), 0);
+	API.callNative("SET_PED_HEAD_BLEND_DATA", player, faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, API.f(faceShapeMix), API.f(faceSkinMix), 0, false);
+	API.callNative("UPDATE_PED_HEAD_BLEND_DATA", player, API.f(faceShapeMix), API.f(faceSkinMix), 0);
 	API.callNative("_SET_PED_HAIR_COLOR", player, faceHairstyleColor, faceHairstyleHighlight);
 	API.setPlayerClothes(player, 2, faceHairstyle, faceHairstyleTexture);
+	API.callNative("SET_PED_HEAD_OVERLAY", player, 1, faceFacialHair, API.f(1));
+	API.callNative("_SET_PED_HEAD_OVERLAY_COLOR", player, 1, 1, faceFacialHairColor, faceFacialHairColorTwo);
+	API.callNative("SET_PED_HEAD_OVERLAY", player, 3, faceAgeing, API.f(1));
+	API.callNative("SET_PED_HEAD_OVERLAY", player, 6, faceComplexion, API.f(1));
+	API.callNative("SET_PED_HEAD_OVERLAY", player, 9, faceMoles, API.f(1));
 }
 
 function changeBlendData() {
@@ -736,6 +753,66 @@ function changeFacialFeature(type, amount) {
 			faceNeckWidth = amount;
 			break;
 	}
+}
+
+function changeFaceHair(amount) {
+	faceFacialHair += amount;
+	
+	if (faceFacialHair <= -1) {
+		faceFacialHair = 0;
+	}
+	
+	changeUpdateFace();
+}
+
+function changeFaceHairColor(amount) {
+	faceFacialHairColor += amount;
+	
+	if (faceFacialHairColor <= -1) {
+		faceFacialHairColor = 0;
+	}
+	
+	changeUpdateFace();
+}
+
+function changeFaceHairColorTwo(amount) {
+	faceFacialHairColorTwo += amount;
+	
+	if (faceFacialHairColorTwo <= -1) {
+		faceFacialHairColorTwo = 0;
+	}
+	
+	changeUpdateFace();
+}
+
+function changeFaceAgeing(amount) {
+	faceAgeing += amount;
+	
+	if (faceAgeing <= -1) {
+		faceAgeing = 0;
+	}
+	
+	changeUpdateFace();
+}
+
+function changeFaceComplexion(amount) {
+	faceComplexion += amount;
+	
+	if (faceComplexion <= -1) {
+		faceComplexion = 0;
+	}
+	
+	changeUpdateFace();
+}
+
+function changeFaceMoles(amount) {
+	faceMoles += amount;
+	
+	if (faceMoles <= -1) {
+		faceMoles = 0;
+	}
+	
+	changeUpdateFace();
 }
 
 function changeFaceGender(amount) {
@@ -1686,6 +1763,7 @@ var vehiclesVans = [
 var currentVehicleIndex = 1;
 var centerVehicle = null;
 var vehicleSelectionType = null;
+var vehicleSelectionDimension = null;
 
 function showDealership() {
 	if (pagePanel == null) {
@@ -1703,8 +1781,8 @@ function randomInteger(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function startBrowsing(type) {
-	
+function startBrowsing(type, dimension) {
+	vehicleSelectionDimension = dimension;
 	switch (type) {
 		case "Boats":
 			vehicleSelectionType = vehiclesBoats;
@@ -1765,13 +1843,13 @@ function startBrowsing(type) {
 			break;
 	}
 	
-	dealershipSetupVehicles();
+	dealershipSetupVehicles(vehicleSelectionDimension);
 	API.setPlayerIntoVehicle(centerVehicle, -1);
 	API.triggerServerEvent("dealershipReady");
 	showDealership();
 }
 
-function dealershipSetupVehicles() {
+function dealershipSetupVehicles(dimension) {
 	if (centerVehicle != null) {
 		API.deleteEntity(centerVehicle);
 	}
@@ -1784,6 +1862,7 @@ function dealershipSetupVehicles() {
 	}
 
 	centerVehicle = API.createVehicle(API.vehicleNameToModel(vehicleSelectionType[currentVehicleIndex]), new Vector3(225.6238, -990, -98.99996), 0);
+	API.setEntityDimension(centerVehicle, dimension);
 	API.setVehiclePrimaryColor(centerVehicle, randomInteger(0, 159));
 
 	if (pagePanel != null) {
@@ -1794,7 +1873,7 @@ function dealershipSetupVehicles() {
 function dealershipBrowseLeft() {
 	currentVehicleIndex -= 1;
 
-	dealershipSetupVehicles();
+	dealershipSetupVehicles(vehicleSelectionDimension);
 
 	API.setPlayerIntoVehicle(centerVehicle, -1);
 }
@@ -1802,7 +1881,7 @@ function dealershipBrowseLeft() {
 function dealershipBrowseRight() {
 	currentVehicleIndex += 1;
 
-	dealershipSetupVehicles();
+	dealershipSetupVehicles(vehicleSelectionDimension);
 
 	API.setPlayerIntoVehicle(centerVehicle, -1);
 }

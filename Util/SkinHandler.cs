@@ -32,7 +32,7 @@ namespace stuykserver.Util
         {
             if (eventName == "saveFace")
             {
-                string query = string.Format("UPDATE PlayerSkins SET skinShapeFirst=@skinShapeFirst, skinShapeSecond=@skinShapeSecond, skinSkinFirst=@skinSkinFirst, skinSkinSecond=@skinSkinSecond, skinShapeMix=@skinShapeMix, skinSkinMix=@skinSkinMix, skinHairstyle=@skinHairstyle, skinHairstyleColor=@skinHairstyleColor, skinHairstyleHighlight=@skinHairstyleHighlight, skinHairstyleTexture=@skinHairstyleTexture, NoseWidth=@NoseWidth, NoseHeight=@NoseHeight, NoseLength=@NoseLength, NoseBridge=@NoseBridge, NoseTip=@NoseTip, NoseBridgeDepth=@NoseBridgeDepth, EyebrowHeight=@EyebrowHeight, EyebrowDepth=@EyebrowDepth, CheekboneHeight=@CheekboneHeight, CheekboneDepth=@CheekboneDepth, CheekboneWidth=@CheekboneWidth, Eyelids=@Eyelids, Lips=@Lips, JawWidth=@JawWidth, JawDepth=@JawDepth, JawLength=@JawLength, ChinFullness=@ChinFullness, ChinWidth=@ChinWidth, NeckWidth=@NeckWidth WHERE Nametag='{0}'", player.name);
+                string query = string.Format("UPDATE PlayerSkins SET skinShapeFirst=@skinShapeFirst, skinShapeSecond=@skinShapeSecond, skinSkinFirst=@skinSkinFirst, skinSkinSecond=@skinSkinSecond, skinShapeMix=@skinShapeMix, skinSkinMix=@skinSkinMix, skinHairstyle=@skinHairstyle, skinHairstyleColor=@skinHairstyleColor, skinHairstyleHighlight=@skinHairstyleHighlight, skinHairstyleTexture=@skinHairstyleTexture, NoseWidth=@NoseWidth, NoseHeight=@NoseHeight, NoseLength=@NoseLength, NoseBridge=@NoseBridge, NoseTip=@NoseTip, NoseBridgeDepth=@NoseBridgeDepth, EyebrowHeight=@EyebrowHeight, EyebrowDepth=@EyebrowDepth, CheekboneHeight=@CheekboneHeight, CheekboneDepth=@CheekboneDepth, CheekboneWidth=@CheekboneWidth, Eyelids=@Eyelids, Lips=@Lips, JawWidth=@JawWidth, JawDepth=@JawDepth, JawLength=@JawLength, ChinFullness=@ChinFullness, ChinWidth=@ChinWidth, NeckWidth=@NeckWidth, FacialHair=@FacialHair, FacialHairColor=@FacialHairColor, FacialHairColor2=@FacialHairColor2, Ageing=@Ageing, Complexion=@Complexion, Moles=@Moles WHERE Nametag='{0}'", player.name);
 
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
                 parameters.Add("@skinShapeFirst", args[0].ToString());
@@ -64,6 +64,12 @@ namespace stuykserver.Util
                 parameters.Add("@ChinFullness", args[26].ToString());
                 parameters.Add("@ChinWidth", args[27].ToString());
                 parameters.Add("@NeckWidth", args[28].ToString());
+                parameters.Add("@FacialHair", args[29].ToString());
+                parameters.Add("@FacialHairColor", args[30].ToString());
+                parameters.Add("@FacialHairColor2", args[31].ToString());
+                parameters.Add("@Ageing", args[32].ToString());
+                parameters.Add("@Complexion", args[33].ToString());
+                parameters.Add("@Moles", args[34].ToString());
 
                 API.exported.database.executePreparedQuery(query, parameters);
                 pullCurrentFace(player);
@@ -103,13 +109,12 @@ namespace stuykserver.Util
                 API.setEntitySyncedData(player.handle, "GTAO_HAIR_COLOR", Convert.ToInt32(row["skinHairstyleColor"]));
                 API.setEntitySyncedData(player.handle, "GTAO_HAIR_HIGHLIGHT_COLOR", Convert.ToInt32(row["skinHairstyleHighlight"]));
 
-                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR", 10);
-                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR", 5);
-                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR2", 6);
-
-                API.setEntitySyncedData(player.handle, "GTAO_AGEING", 5);
-                API.setEntitySyncedData(player.handle, "GTAO_COMPLEXION", 6);
-                API.setEntitySyncedData(player.handle, "GTAO_MOLES", 5);
+                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR", Convert.ToInt32(row["FacialHair"]));
+                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR", Convert.ToInt32(row["FacialHairColor"]));
+                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR2", Convert.ToInt32(row["FacialHairColor2"]));
+                API.setEntitySyncedData(player.handle, "GTAO_AGEING", Convert.ToInt32(row["Ageing"]));
+                API.setEntitySyncedData(player.handle, "GTAO_COMPLEXION", Convert.ToInt32(row["Complexion"]));
+                API.setEntitySyncedData(player.handle, "GTAO_MOLES", Convert.ToInt32(row["Moles"]));
 
                 var list = new float[21];
                 list[0] = Convert.ToSingle(row["NoseWidth"]);
@@ -176,7 +181,14 @@ namespace stuykserver.Util
                 float chinWidth = Convert.ToSingle(row["ChinWidth"]);
                 float neckWidth = Convert.ToSingle(row["NeckWidth"]);
 
-                API.triggerClientEvent(player, "loadFaceData", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture, noseWidth, noseHeight, noseLength, noseBridge, noseTip, noseBridgeDepth, eyeBrowHeight, eyeBrowDepth, cheekboneHeight, cheekboneDepth, cheekboneWidth, eyeLids, lips, jawWidth, jawDepth, jawLength, chinFullness, chinWidth, neckWidth);
+                int facialHair = Convert.ToInt32(row["FacialHair"]);
+                int facialHairColor = Convert.ToInt32(row["FacialHairColor"]);
+                int facialHairColorTwo = Convert.ToInt32(row["FacialHairColor2"]);
+                int facialAgeing = Convert.ToInt32(row["Ageing"]);
+                int facialComplexion = Convert.ToInt32(row["Complexion"]);
+                int facialMoles = Convert.ToInt32(row["Moles"]);
+
+                API.triggerClientEvent(player, "loadFaceData", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture, noseWidth, noseHeight, noseLength, noseBridge, noseTip, noseBridgeDepth, eyeBrowHeight, eyeBrowDepth, cheekboneHeight, cheekboneDepth, cheekboneWidth, eyeLids, lips, jawWidth, jawDepth, jawLength, chinFullness, chinWidth, neckWidth, facialHair, facialHairColor, facialHairColorTwo, facialAgeing, facialComplexion, facialMoles);
             }
         }
 
@@ -208,17 +220,12 @@ namespace stuykserver.Util
                 player.setClothes(2, Convert.ToInt32(row["skinHairstyle"]), Convert.ToInt32(row["skinHairstyleTexture"]));
                 API.setEntitySyncedData(player.handle, "GTAO_HAIR_COLOR", Convert.ToInt32(row["skinHairstyleColor"]));
                 API.setEntitySyncedData(player.handle, "GTAO_HAIR_HIGHLIGHT_COLOR", Convert.ToInt32(row["skinHairstyleHighlight"]));
-
-                API.setEntitySyncedData(player.handle, "GTAO_EYEBROWS_COLOR", 3);
-                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR", 10);
-                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR", 5);
-                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR2", 6);
-
-                API.setEntitySyncedData(player.handle, "GTAO_AGEING", 5);
-
-                API.setEntitySyncedData(player.handle, "GTAO_COMPLEXION", 6);
-
-                API.setEntitySyncedData(player.handle, "GTAO_MOLES", 5);
+                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR", Convert.ToInt32(row["FacialHair"]));
+                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR", Convert.ToInt32(row["FacialHairColor"]));
+                API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR2", Convert.ToInt32(row["FacialHairColor2"]));
+                API.setEntitySyncedData(player.handle, "GTAO_AGEING", Convert.ToInt32(row["Ageing"]));
+                API.setEntitySyncedData(player.handle, "GTAO_COMPLEXION", Convert.ToInt32(row["Complexion"]));
+                API.setEntitySyncedData(player.handle, "GTAO_MOLES", Convert.ToInt32(row["Moles"]));
 
                 var list = new float[21];
                 list[0] = Convert.ToSingle(row["NoseWidth"]);
