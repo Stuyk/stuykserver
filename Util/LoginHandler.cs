@@ -46,7 +46,23 @@ namespace stuykserver.Util
 
         public void cmdLogin(Client player, string email, string password)
         {
-            string passwordHash = db.pullDatabase("Players", "Password", "Email", email);
+            string[] varNames = { "ID" };
+            string before = "SELECT ID FROM Players WHERE";
+            object[] data = { email, BCr.BCrypt.HashPassword(password) };
+            string after = string.Format("")
+
+
+
+            string query = string.Format("SELECT ID FROM Players WHERE Email='{0}' AND Password='{1}'", email, BCr.BCrypt.HashPassword(password));
+            DataTable result = API.exported.database.executeQueryWithResult(query);
+
+            if (result != null)
+            {
+
+            }
+
+
+
 
             if (player.name == db.pullDatabase("Players", "Nametag", "Email", email))
             {

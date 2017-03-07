@@ -92,6 +92,13 @@ namespace stuykserver.Util
         {
             string s = player.socialClubName;
 
+            API.setEntitySyncedData(player, "PLAYERID", 0);
+
+            int id = Convert.ToInt32(API.getEntitySyncedData(player, "PLAYERID"));
+
+
+
+
             string query = string.Format("SELECT LASTX, LASTY, LASTZ, Dead FROM Players WHERE Nametag='{0}'", player.name);
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
