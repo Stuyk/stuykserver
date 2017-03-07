@@ -7,10 +7,10 @@
 	<script src="clientside/resources/ActiveShooter.js" type="client" lang="javascript" />
 	<script src="clientside/resources/PaperBoy.js" type="client" lang="javascript" />
 	<script src="clientside/resources/Fishing.js" type="client" lang="javascript" />
-	
-	<file src="clientside/resources/dealership.html"/>
+
+  <file src="clientside/resources/dealership.html"/>
 	<file src="clientside/resources/skinchanger.html"/>
-    <file src="clientside/resources/index.html"/>
+  <file src="clientside/resources/index.html"/>
 	<file src="clientside/resources/regsuccess.html"/>
 	<file src="clientside/resources/inventory.html"/>
 	<file src="clientside/resources/loading.html"/>

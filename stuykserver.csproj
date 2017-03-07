@@ -141,6 +141,7 @@
     <Content Include="clientside\resources\skinselector.html" />
     <Content Include="clientside\serversideCamera.js" />
     <Content Include="clientside\WaypointHelper.js" />
+    <Content Include="meta.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

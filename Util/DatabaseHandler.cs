@@ -17,6 +17,38 @@ namespace stuykserver.Util
             API.onResourceStart += API_onResourceStart;
         }
 
+        public void compileQuery(string before, string after, string[] vars, object[] data)
+        {
+            int i = 0;
+            string query;
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            
+            //Add the beginning of our query
+            query = string.Format("{0}", before);
+
+            //format and add our params
+            foreach (string label in vars)
+            {
+                if (i == vars.Length - 1)
+                {
+                    query = string.Format("{0} {1}=@{1}", query, label);
+                }
+                else
+                {
+                    query = string.Format("{0} {1}=@{1},", query, label);
+                }
+
+                parameters.Add(string.Format("@{0}", label), data[i].ToString());
+                ++i;
+            }
+
+            //Add anything after the data formatting
+            query = string.Format("{0} {1}", query, after);
+
+            //Execute it
+            API.exported.database.executePreparedQuery(query, parameters);
+        }
+
         private void API_onResourceStart()
         {
             API.consoleOutput("Started: DatabaseHandler");

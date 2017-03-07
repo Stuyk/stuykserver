@@ -120,30 +120,13 @@ namespace stuykserver.Util
         {
             if (eventName == "pushVehicleChanges")
             {
-                Vehicle playerVehicle = player.vehicle;
+                // Gather all our data
                 string[] varNames = { "Red", "Green", "Blue", "sRed", "sGreen", "sBlue", "Spoilers", "FrontBumper", "RearBumper", "SideSkirt", "Exhaust", "Grille", "Hood", "Fender", "RightFender", "Roof", "FrontWheels", "BackWheels", "WindowTint" };
+                string before = "UPDATE PlayerVehicles SET";
+                string after = string.Format("WHERE Garage='{0}' AND VehicleType='{1}'", player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
 
-                Dictionary<string, string> parameters = new Dictionary<string, string>();
-                int i = 0;
-                string query = "UPDATE PlayerVehicles SET";
-
-                foreach (string label in varNames)
-                {
-                    if (i == varNames.Length - 1)
-                    {
-                        query = string.Format("{0} {1}=@{1}", query, label);
-                    }
-                    else
-                    {
-                        query = string.Format("{0} {1}=@{1},", query, label);
-                    }
-                    
-                    parameters.Add(string.Format("@{0}", label), args[i].ToString());
-                    ++i;
-                }
-
-                query = string.Format("{0} WHERE Garage='{1}' AND VehicleType='{2}'", query, player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
-                API.exported.database.executePreparedQuery(query, parameters);
+                // Send all our data to generate the query and run it
+                this.db.compileQuery(before, after, varNames, args);
 
                 actionExitShop(player);
             }

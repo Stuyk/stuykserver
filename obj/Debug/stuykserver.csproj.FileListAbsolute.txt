@@ -7,3 +7,12 @@ A:\GTANetwork\resources\stuykserver\BCrypt.Net.dll
 A:\GTANetwork\resources\stuykserver\GTANetworkServer.exe
 A:\GTANetwork\resources\stuykserver\GTANetworkShared.dll
 A:\GTANetwork\resources\stuykserver\BCrypt.Net.xml
+C:\GTANetwork\server\resources\stuykserver\stuykserver.dll.config
+C:\GTANetwork\server\resources\stuykserver\obj\Debug\stuykserver.dll
+C:\GTANetwork\server\resources\stuykserver\obj\Debug\stuykserver.pdb
+C:\GTANetwork\server\resources\stuykserver\stuykserver.dll
+C:\GTANetwork\server\resources\stuykserver\BCrypt.Net.dll
+C:\GTANetwork\server\resources\stuykserver\GTANetworkServer.exe
+C:\GTANetwork\server\resources\stuykserver\GTANetworkShared.dll
+C:\GTANetwork\server\resources\stuykserver\BCrypt.Net.xml
+C:\GTANetwork\server\resources\stuykserver\stuykserver.pdb
