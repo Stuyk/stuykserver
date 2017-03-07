@@ -1,5 +1,6 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
+using stuykserver.Classes;
 using stuykserver.Util;
 using System;
 using System.Collections.Generic;
@@ -12,84 +13,12 @@ namespace stuykserver.Jobs
 {
     public class Fishing : Script
     {
-        public enum PointType
-        {
-            Fishing,
-            Sale
-        }
-
         DatabaseHandler db = new DatabaseHandler();
 
         Dictionary<Client,string> playersFishing = new Dictionary<Client, string>();
         Dictionary<Client, NetHandle> playersFishingRods = new Dictionary<Client, NetHandle>();
 
-        Dictionary<ColShape, FishingPointInformation> fishingPoints = new Dictionary<ColShape, FishingPointInformation>();
-
-        class FishingPointInformation
-        {
-            ColShape collisionShape;
-            int collisionID;
-            Vector3 collisionPosition;
-            Blip collisionBlip;
-            PointType collisionType;
-            List<Client> collisionPlayers;
-
-            public void setupPoint(ColShape collision, int id, Vector3 position, Blip blip, PointType type)
-            {
-                collisionShape = collision;
-                collisionID = id;
-                collisionPosition = position;
-                collisionBlip = blip;
-                collisionType = type;
-                collisionPlayers = new List<Client>();
-            }
-
-            public void collisionPlayersAdd(Client player)
-            {
-                if (!collisionPlayers.Contains(player))
-                {
-                    collisionPlayers.Add(player);
-                }
-            }
-
-            public void collisionPlayersRemove(Client player)
-            {
-                if (collisionPlayers.Contains(player))
-                {
-                    collisionPlayers.Remove(player);
-                }
-            }
-
-            public List<Client> returnCollisionPlayers()
-            {
-                return collisionPlayers;
-            }
-
-            public int returnID()
-            {
-                return collisionID;
-            }
-
-            public ColShape returnCollision()
-            {
-                return collisionShape;
-            }
-
-            public Vector3 returnPosition()
-            {
-                return collisionPosition;
-            }
-
-            public Blip returnBlip()
-            {
-                return collisionBlip;
-            }
-
-            public PointType returnType()
-            {
-                return collisionType;
-            }
-        }
+        Dictionary<ColShape, ShopInformationHandling> fishingPoints = new Dictionary<ColShape, ShopInformationHandling>();
 
         public Fishing()
         {
@@ -117,7 +46,7 @@ namespace stuykserver.Jobs
                 float posZ = Convert.ToSingle(row["PosZ"]);
                 int id = Convert.ToInt32(row["ID"]);
 
-                positionBlips(new Vector3(posX, posY, posZ), id, PointType.Fishing);
+                positionBlips(new Vector3(posX, posY, posZ), id, ShopInformationHandling.ShopType.Fishing);
 
                 ++initializedObjects;
             }
@@ -137,7 +66,7 @@ namespace stuykserver.Jobs
                 float posZ = Convert.ToSingle(row["PosZ"]);
                 int id = Convert.ToInt32(row["ID"]);
 
-                positionBlips(new Vector3(posX, posY, posZ), id, PointType.Sale);
+                positionBlips(new Vector3(posX, posY, posZ), id, ShopInformationHandling.ShopType.FishingSale);
                 ++initializedObjects;
             }
 
@@ -152,17 +81,17 @@ namespace stuykserver.Jobs
                 Client player = API.getPlayerFromHandle(entity);
                 if (fishingPoints.ContainsKey(colshape))
                 {
-                    if (fishingPoints[colshape].returnType() == PointType.Fishing)
+                    if (fishingPoints[colshape].returnShopType() == ShopInformationHandling.ShopType.Fishing)
                     {
                         API.triggerClientEvent(player, "removeUseFunction");
-                        fishingPoints[colshape].collisionPlayersRemove(player);
+                        fishingPoints[colshape].removeOutsidePlayer(player);
                         return;
                     }
                     
-                    if (fishingPoints[colshape].returnType() == PointType.Sale)
+                    if (fishingPoints[colshape].returnShopType() == ShopInformationHandling.ShopType.FishingSale)
                     {
                         API.triggerClientEvent(player, "removeUseFunction");
-                        fishingPoints[colshape].collisionPlayersRemove(player);
+                        fishingPoints[colshape].removeOutsidePlayer(player);
                         return;
                     }
                 }
@@ -177,19 +106,19 @@ namespace stuykserver.Jobs
                 Client player = API.getPlayerFromHandle(entity);
                 if (fishingPoints.ContainsKey(colshape) && !player.isInVehicle)
                 {
-                    if (fishingPoints[colshape].returnType() == PointType.Fishing)
+                    if (fishingPoints[colshape].returnShopType() == ShopInformationHandling.ShopType.Fishing)
                     {
                         API.triggerClientEvent(player, "triggerUseFunction", "FishingSpot");
                         API.sendNotificationToPlayer(player, "~b~There seem to be a lot of fish in this area.");
-                        fishingPoints[colshape].collisionPlayersAdd(player);
+                        fishingPoints[colshape].addOutsidePlayer(player);
                         return;
                     }
 
-                    if (fishingPoints[colshape].returnType() == PointType.Sale)
+                    if (fishingPoints[colshape].returnShopType() == ShopInformationHandling.ShopType.FishingSale)
                     {
                         API.triggerClientEvent(player, "triggerUseFunction", "FishingSaleSpot");
                         API.sendNotificationToPlayer(player, "~b~The cooks here seem to appreciate fresh fish.");
-                        fishingPoints[colshape].collisionPlayersAdd(player);
+                        fishingPoints[colshape].addOutsidePlayer(player);
                         return;
                     }
                 }
@@ -211,9 +140,9 @@ namespace stuykserver.Jobs
 
             foreach (ColShape collision in fishingPoints.Keys)
             {
-                if (fishingPoints[collision].returnCollisionPlayers().Contains(player))
+                if (fishingPoints[collision].returnOutsidePlayers().Contains(player))
                 {
-                    fishingPoints[collision].collisionPlayersRemove(player);
+                    fishingPoints[collision].removeOutsidePlayer(player);
                     break;
                 }
             }
@@ -287,7 +216,7 @@ namespace stuykserver.Jobs
             foreach (ColShape collision in fishingPoints.Keys)
             {
                 // Check if player is in the collision and the collision type is of the 'Sale Type'
-                if (fishingPoints[collision].returnCollisionPlayers().Contains(player) && fishingPoints[collision].returnType() == PointType.Sale && !player.isInVehicle)
+                if (fishingPoints[collision].returnOutsidePlayers().Contains(player) && fishingPoints[collision].returnShopType() == ShopInformationHandling.ShopType.FishingSale && !player.isInVehicle)
                 {
                     int fish = Convert.ToInt32(db.pullDatabase("PlayerInventory", "Fish", "Nametag", player.name));
                     if (fish <= 0)
@@ -310,7 +239,7 @@ namespace stuykserver.Jobs
             foreach (ColShape collision in fishingPoints.Keys)
             {
                 // Check if player is in the collision and the collision type is of the 'Fishing Type'
-                if (fishingPoints[collision].returnCollisionPlayers().Contains(player) && fishingPoints[collision].returnType() == PointType.Fishing && !player.isInVehicle)
+                if (fishingPoints[collision].returnOutsidePlayers().Contains(player) && fishingPoints[collision].returnShopType() == ShopInformationHandling.ShopType.Fishing && !player.isInVehicle)
                 {
                     // Check if Inventory contains less than 10 fish. Check if they're already fishing.
                     if (!playersFishing.ContainsKey(player))
@@ -338,28 +267,33 @@ namespace stuykserver.Jobs
             }
         }
 
-        public void positionBlips(Vector3 position, int id, PointType point)
+        public void positionBlips(Vector3 position, int id, ShopInformationHandling.ShopType point)
         {
-            FishingPointInformation newPoint = new FishingPointInformation();
+            ShopInformationHandling newPoint = new ShopInformationHandling();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 10f, 5f);
            
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
 
-            if (point == PointType.Fishing)
+            if (point == ShopInformationHandling.ShopType.Fishing)
             {
                 API.setBlipSprite(newBlip, 68);
                 API.setBlipColor(newBlip, 42);
                 API.setBlipShortRange(newBlip, true);
             }
 
-            if (point == PointType.Sale)
+            if (point == ShopInformationHandling.ShopType.FishingSale)
             {
                 API.setBlipSprite(newBlip, 431);
                 API.setBlipColor(newBlip, 42);
                 API.setBlipShortRange(newBlip, true);
             }
-            
-            newPoint.setupPoint(shape, id, new Vector3(position.X, position.Y, position.Z), newBlip, point);
+
+            newPoint.setCollisionShape(shape);
+            newPoint.setCollisionID(id);
+            newPoint.setCollisionPosition(position);
+            newPoint.setBlip(newBlip);
+            newPoint.setShopType(point);
+
             fishingPoints.Add(shape, newPoint);
         }
 

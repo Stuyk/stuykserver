@@ -63,7 +63,7 @@ namespace stuykserver.Classes
             Utility,
             Vans,
             Fishing,
-            Sale,
+            FishingSale,
             apa_v_mp_h_01_a,
             apa_v_mp_h_01_c,
             apa_v_mp_h_01_b,
