@@ -95,9 +95,12 @@ namespace stuykserver.Util
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            var x = Convert.ToSingle(db.pullDatabase("Players", "LastX", "Nametag", player.name));
-            var y = Convert.ToSingle(db.pullDatabase("Players", "LastY", "Nametag", player.name));
-            var z = Convert.ToSingle(db.pullDatabase("Players", "LastZ", "Nametag", player.name));
+            string query = string.Format("SELECT LastX, LastY, LastZ FROM Players WHERE Nametag='{0]'", player.name);
+            DataTable result = API.exported.database.executeQueryWithResult(query);
+
+            var x = result.Rows[0]["LASTX"];
+            var y = result.Rows[0]["LASTY"];
+            var z = result.Rows[0]["LASTZ"];
 
             player.freezePosition = false;
 
