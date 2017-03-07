@@ -96,12 +96,13 @@ namespace stuykserver.Util
             stopWatch.Start();
 
 
-            string query = string.Format("SELECT LASTX, LASTY, LASTZ FROM Players WHERE Nametag='{0]'", player.name);
+            string query = string.Format("SELECT LASTX, LASTY, LASTZ, Dead FROM Players WHERE Nametag='{0]'", player.name);
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
             var x = Convert.ToSingle(result.Rows[0]["LASTX"]);
             var y = Convert.ToSingle(result.Rows[0]["LASTY"]);
             var z = Convert.ToSingle(result.Rows[0]["LASTZ"]);
+            string dead = result.Rows[0]["Dead"].ToString();
 
             player.freezePosition = false;
 
@@ -117,7 +118,7 @@ namespace stuykserver.Util
 
             API.call("VehicleHandler", "SpawnPlayerCars", player);
 
-            if (db.pullDatabase("Players", "Dead", "Nametag", player.name) == "1")
+            if (dead == "1")
             {
                 API.sendNotificationToPlayer(player, "~r~You have died.");
                 API.sendChatMessageToPlayer(player, "~g~/service EMS");
