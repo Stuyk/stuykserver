@@ -1,5 +1,6 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
+using stuykserver.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,7 +14,7 @@ namespace stuykserver.Util
         SkinHandler skinHandler = new SkinHandler();
         DatabaseHandler db = new DatabaseHandler();
 
-        Dictionary<ColShape, ShopInformation> shopInformation = new Dictionary<ColShape, ShopInformation>();
+        Dictionary<ColShape, ShopInformationHandling> shopInformation = new Dictionary<ColShape, ShopInformationHandling>();
 
         [Flags]
         public enum AnimationFlags
@@ -24,95 +25,6 @@ namespace stuykserver.Util
             AllowPlayerControl = 1 << 5,
             Cancellable = 1 << 7
         }
-
-        class ShopInformation : Script, IDisposable
-        {
-            ColShape collisionShape;
-            int collisionID;
-            Vector3 collisionPosition;
-            Blip collisionBlip;
-            List<Client> collisionPlayers; // When a player is in the collision.
-            List<Client> containedPlayers; // When a player enters a shop.
-
-            public void setupPoint(ColShape collision, int id, Vector3 position, Blip blip)
-            {
-                collisionShape = collision;
-                collisionID = id;
-                collisionPosition = position;
-                collisionBlip = blip;
-                containedPlayers = new List<Client>();
-                collisionPlayers = new List<Client>();
-            }
-
-            public void collisionPlayersAdd(Client player)
-            {
-                if (!collisionPlayers.Contains(player))
-                {
-                    collisionPlayers.Add(player);
-                }
-            }
-
-            public void collisionPlayersRemove(Client player)
-            {
-                if (collisionPlayers.Contains(player))
-                {
-                    collisionPlayers.Remove(player);
-                }
-            }
-
-            public void containedPlayersAdd(Client player)
-            {
-                if (!containedPlayers.Contains(player))
-                {
-                    containedPlayers.Add(player);
-                }
-            }
-
-            public void containedPlayersRemove(Client player)
-            {
-                if (containedPlayers.Contains(player))
-                {
-                    containedPlayers.Remove(player);
-                }
-            }
-
-            public List<Client> returnCollisionPlayers()
-            {
-                return collisionPlayers;
-            }
-
-            public List<Client> returnContainedPlayers()
-            {
-                return containedPlayers;
-            }
-
-            public int returnID()
-            {
-                return collisionID;
-            }
-
-            public ColShape returnCollision()
-            {
-                return collisionShape;
-            }
-
-            public Vector3 returnPosition()
-            {
-                return collisionPosition;
-            }
-
-            public Blip returnBlip()
-            {
-                return collisionBlip;
-            }
-
-            public void Dispose()
-            {
-                GC.SuppressFinalize(this);
-            }
-        }
-
-
 
         public BarberShopHandler()
         {
@@ -126,9 +38,9 @@ namespace stuykserver.Util
         {
             foreach (ColShape collision in shopInformation.Keys)
             {
-                if (shopInformation[collision].returnContainedPlayers().Contains(player))
+                if (shopInformation[collision].returnInsidePlayers().ContainsKey(player))
                 {
-                    db.setPlayerPositionByVector(player, shopInformation[collision].returnPosition());
+                    db.setPlayerPositionByVector(player, shopInformation[collision].returnCollisionPosition());
                 }
             }
         }
@@ -140,7 +52,7 @@ namespace stuykserver.Util
                 Client player = API.getPlayerFromHandle(entity);
                 if (shopInformation.ContainsKey(colshape))
                 {
-                    shopInformation[colshape].collisionPlayersRemove(player);
+                    shopInformation[colshape].removeOutsidePlayer(player);
                     API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
                 }
             }
@@ -153,7 +65,7 @@ namespace stuykserver.Util
                 Client player = API.getPlayerFromHandle(entity);
                 if (shopInformation.ContainsKey(colshape) && !player.isInVehicle)
                 {
-                    shopInformation[colshape].collisionPlayersAdd(player);
+                    shopInformation[colshape].addOutsidePlayer(player);
                     API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "BarberShop");
                     API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "A classic looking barbershop.");
                 }
@@ -187,15 +99,15 @@ namespace stuykserver.Util
         // Place blips and text labels for interactions.
         public void positionBlips(Vector3 position, int id)
         {
-            ShopInformation newShop = new ShopInformation();
+            ShopInformationHandling newShop = new ShopInformationHandling();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f);
 
-            var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
-            API.setBlipSprite(newBlip, 480);
-            API.setBlipColor(newBlip, 9);
-            API.setBlipShortRange(newBlip, true);
+            newShop.setCollisionShape(shape);
+            newShop.setCollisionID(id);
+            newShop.setCollisionPosition(position);
+            newShop.setShopType(ShopInformationHandling.ShopType.Barbershop);
+            newShop.setupBlip();
 
-            newShop.setupPoint(shape, id, new Vector3(position.X, position.Y, position.Z), newBlip);
             shopInformation.Add(shape, newShop);
         }
 
@@ -203,10 +115,10 @@ namespace stuykserver.Util
         {
             foreach (ColShape collision in shopInformation.Keys)
             {
-                if (shopInformation[collision].returnCollisionPlayers().Contains(player) && !player.isInVehicle)
+                if (shopInformation[collision].returnOutsidePlayers().Contains(player) && !player.isInVehicle)
                 {
                     db.setPlayerHUD(player, false);
-                    shopInformation[collision].containedPlayersAdd(player);
+                    shopInformation[collision].addInsidePlayer(player, player.handle);
                     API.setEntityDimension(player, new Random().Next(1, 1000));
                     API.triggerClientEvent(player, "openSkinPanel", player.position);
                     API.setEntityPosition(player, new Vector3(-1279.177, -1118.023, 6.990117));
@@ -222,12 +134,12 @@ namespace stuykserver.Util
         {
             foreach (ColShape collision in shopInformation.Keys)
             {
-                if (shopInformation[collision].returnContainedPlayers().Contains(player))
+                if (shopInformation[collision].returnInsidePlayers().ContainsKey(player))
                 {
                     db.setPlayerHUD(player, true);
                     API.setEntityDimension(player, 0);
-                    API.setEntityPosition(player, shopInformation[collision].returnPosition());
-                    shopInformation[collision].containedPlayersRemove(player);
+                    API.setEntityPosition(player, shopInformation[collision].returnCollisionPosition());
+                    shopInformation[collision].removeInsidePlayer(player);
                     API.stopPlayerAnimation(player);
                     API.stopPedAnimation(player);
                 }

@@ -271,49 +271,6 @@ namespace stuykserver.Util
             ShopInformationHandling newShop = new ShopInformationHandling();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 3f, 5f);
 
-            var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
-
-            switch (type)
-            {
-                case ShopInformationHandling.ShopType.Motorcycles:
-                    API.setBlipSprite(newBlip, 226);
-                    break;
-                case ShopInformationHandling.ShopType.Helicopters:
-                    API.setBlipSprite(newBlip, 43);
-                    break;
-                case ShopInformationHandling.ShopType.Industrial:
-                    API.setBlipSprite(newBlip, 318);
-                    break;
-                case ShopInformationHandling.ShopType.Commercial:
-                    API.setBlipSprite(newBlip, 477);
-                    break;
-                case ShopInformationHandling.ShopType.Planes:
-                    API.setBlipSprite(newBlip, 251);
-                    break;
-                case ShopInformationHandling.ShopType.Super:
-                    API.setBlipSprite(newBlip, 147);
-                    break;
-                case ShopInformationHandling.ShopType.Boats:
-                    API.setBlipSprite(newBlip, 455);
-                    break;
-                case ShopInformationHandling.ShopType.OffRoad:
-                    API.setBlipSprite(newBlip, 512);
-                    break;
-                case ShopInformationHandling.ShopType.Vans:
-                    API.setBlipSprite(newBlip, 67);
-                    break;
-                case ShopInformationHandling.ShopType.Bicycles:
-                    API.setBlipSprite(newBlip, 348);
-                    break;
-                default:
-                    API.setBlipSprite(newBlip, 225);
-                    break;
-            }
-
-            API.setBlipShortRange(newBlip, true);
-            API.setBlipColor(newBlip, 73); // Yellow
-
-            newShop.setBlip(newBlip);
             newShop.setCollisionID(id);
             newShop.setCollisionPosition(position);
             newShop.setCollisionShape(shape);
@@ -321,6 +278,7 @@ namespace stuykserver.Util
             newShop.setCameraCenterPoint(centerPoint);
             newShop.setCameraPoint(cameraPoint);
             newShop.setExitPoint(exitPoint);
+            newShop.setupBlip();
 
             shopInformation.Add(shape, newShop);
         }

@@ -18,6 +18,7 @@ namespace stuykserver.Classes
             insidePlayers = new Dictionary<Client, NetHandle>();
             shopObjects = new List<GTANetworkServer.Object>();
             shopKeys = new List<Client>();
+            shopType = ShopType.None;
         }
 
         // SHOP OWNERSHIP PROPERTIES
@@ -38,6 +39,7 @@ namespace stuykserver.Classes
         // SHOP PROPERTIES
         public enum ShopType
         {
+            None,
             Atm,
             Barbershop,
             Boats,
@@ -289,6 +291,93 @@ namespace stuykserver.Classes
             return collisionBlip;
         }
 
+        public void setupBlip()
+        {
+            if (collisionPosition != null)
+            {
+                collisionBlip = API.createBlip(collisionPosition);
+            }
+
+            if (collisionBlip != null)
+            {
+                switch (shopType)
+                {
+                    case ShopType.None:
+                        API.setBlipSprite(collisionBlip, 66);
+                        break;
+                    case ShopType.Atm:
+                        API.setBlipSprite(collisionBlip, 108);
+                        API.setBlipColor(collisionBlip, 2);
+                        break;
+                    case ShopType.Barbershop:
+                        API.setBlipSprite(collisionBlip, 480);
+                        API.setBlipColor(collisionBlip, 9);
+                        break;
+                    case ShopType.Motorcycles:
+                        API.setBlipSprite(collisionBlip, 226);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.Helicopters:
+                        API.setBlipSprite(collisionBlip, 43);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.Industrial:
+                        API.setBlipSprite(collisionBlip, 318);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.Commercial:
+                        API.setBlipSprite(collisionBlip, 477);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.Planes:
+                        API.setBlipSprite(collisionBlip, 251);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.Super:
+                        API.setBlipSprite(collisionBlip, 147);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.Boats:
+                        API.setBlipSprite(collisionBlip, 455);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.OffRoad:
+                        API.setBlipSprite(collisionBlip, 512);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.Vans:
+                        API.setBlipSprite(collisionBlip, 67);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.Bicycles:
+                        API.setBlipSprite(collisionBlip, 348);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                    case ShopType.Clothing:
+                        API.setBlipSprite(collisionBlip, 366);
+                        API.setBlipColor(collisionBlip, 7);
+                        break;
+                    case ShopType.FishingSale:
+                        API.setBlipSprite(collisionBlip, 431);
+                        API.setBlipColor(collisionBlip, 42);
+                        break;
+                    case ShopType.Fishing:
+                        API.setBlipSprite(collisionBlip, 68);
+                        API.setBlipColor(collisionBlip, 42);
+                        break;
+                    case ShopType.Modification:
+                        API.setBlipSprite(collisionBlip, 402);
+                        API.setBlipColor(collisionBlip, 59);
+                        break;
+                    default:
+                        API.setBlipSprite(collisionBlip, 225);
+                        API.setBlipColor(collisionBlip, 73);
+                        break;
+                }
+                API.setBlipShortRange(collisionBlip, true);
+            }
+        }
+
         // OutsidePlayers
         public void addOutsidePlayer(Client player)
         {
@@ -459,6 +548,29 @@ namespace stuykserver.Classes
 
         public void Dispose()
         {
+            collisionID = -1;
+            collisionPosition = null;
+            API.deleteEntity(collisionBlip);
+            outsidePlayers.Clear();
+            insidePlayers.Clear();
+            shopType = ShopType.None;
+            shopCenterPoint = null;
+            shopCameraPoint = null;
+            shopExit = null;
+            if (shopExitCollision != null)
+            {
+                API.deleteColShape(shopExitCollision);
+            }
+
+            if (collisionShape != null)
+            {
+                API.deleteColShape(collisionShape);
+            }
+
+            foreach(GTANetworkServer.Object obj in shopObjects)
+            {
+                API.deleteEntity(obj);
+            }
             GC.SuppressFinalize(this);
         }
     }

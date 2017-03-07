@@ -172,22 +172,15 @@ namespace stuykserver.Util
             ShopInformationHandling newShop = new ShopInformationHandling();
             ColShape collision = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 2f, 2f);
             List<GTANetworkServer.Object> shopObjects = new List<GTANetworkServer.Object>();
-
             GTANetworkServer.Object atmObject = API.createObject(-870868698, new Vector3(position.X, position.Y, position.Z - 1), new Vector3(rotation.X, rotation.Y, rotation.Z - 180));
-
             shopObjects.Add(atmObject);
 
-            var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
-            API.setBlipSprite(newBlip, 108);
-            API.setBlipColor(newBlip, 2);
-            API.setBlipShortRange(newBlip, true);
-
-            newShop.setBlip(newBlip);
             newShop.setCollisionID(id);
             newShop.setCollisionPosition(position);
             newShop.setCollisionShape(collision);
             newShop.setShopObjects(shopObjects);
             newShop.setShopType(ShopInformationHandling.ShopType.Atm);
+            newShop.setupBlip();
 
             shopInformation.Add(collision, newShop);
         }

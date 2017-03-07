@@ -65,7 +65,7 @@
     <Compile Include="Util\ActiveShooter.cs" />
     <Compile Include="Util\AdminCommands.cs" />
     <Compile Include="Classes\BankHandler.cs" />
-    <Compile Include="Util\BarberShopHandler.cs" />
+    <Compile Include="Classes\BarberShopHandler.cs" />
     <Compile Include="Util\ChatHandler.cs" />
     <Compile Include="Util\ClothingHandler.cs" />
     <Compile Include="Classes\ClothingShopHandler.cs" />

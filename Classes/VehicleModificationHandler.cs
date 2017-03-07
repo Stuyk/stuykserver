@@ -121,18 +121,11 @@ namespace stuykserver.Util
         {
             ShopInformationHandling newShop = new ShopInformationHandling();
             ColShape collision = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f);
-
-            var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
-            API.setBlipSprite(newBlip, 402);
-            API.setBlipColor(newBlip, 59);
-            API.setBlipShortRange(newBlip, true);
-
             newShop.setCollisionShape(collision);
-            newShop.setBlip(newBlip);
+            newShop.setShopType(ShopInformationHandling.ShopType.Modification);
+            newShop.setupBlip();
             newShop.setCollisionID(id);
             newShop.setCollisionPosition(position);
-            newShop.setShopType(ShopInformationHandling.ShopType.Modification);
-
             shopInformation.Add(collision, newShop);
         }
 

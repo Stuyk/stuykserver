@@ -271,27 +271,12 @@ namespace stuykserver.Jobs
         {
             ShopInformationHandling newPoint = new ShopInformationHandling();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 10f, 5f);
-           
-            var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
-
-            if (point == ShopInformationHandling.ShopType.Fishing)
-            {
-                API.setBlipSprite(newBlip, 68);
-                API.setBlipColor(newBlip, 42);
-                API.setBlipShortRange(newBlip, true);
-            }
-
-            if (point == ShopInformationHandling.ShopType.FishingSale)
-            {
-                API.setBlipSprite(newBlip, 431);
-                API.setBlipColor(newBlip, 42);
-                API.setBlipShortRange(newBlip, true);
-            }
-
+          
             newPoint.setCollisionShape(shape);
             newPoint.setCollisionID(id);
             newPoint.setCollisionPosition(position);
-            newPoint.setBlip(newBlip);
+            newPoint.setShopType(point);
+            newPoint.setupBlip();
             newPoint.setShopType(point);
 
             fishingPoints.Add(shape, newPoint);
