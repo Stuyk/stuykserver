@@ -32,46 +32,14 @@ namespace stuykserver.Util
         {
             if (eventName == "saveFace")
             {
-                string query = string.Format("UPDATE PlayerSkins SET skinShapeFirst=@skinShapeFirst, skinShapeSecond=@skinShapeSecond, skinSkinFirst=@skinSkinFirst, skinSkinSecond=@skinSkinSecond, skinShapeMix=@skinShapeMix, skinSkinMix=@skinSkinMix, skinHairstyle=@skinHairstyle, skinHairstyleColor=@skinHairstyleColor, skinHairstyleHighlight=@skinHairstyleHighlight, skinHairstyleTexture=@skinHairstyleTexture, NoseWidth=@NoseWidth, NoseHeight=@NoseHeight, NoseLength=@NoseLength, NoseBridge=@NoseBridge, NoseTip=@NoseTip, NoseBridgeDepth=@NoseBridgeDepth, EyebrowHeight=@EyebrowHeight, EyebrowDepth=@EyebrowDepth, CheekboneHeight=@CheekboneHeight, CheekboneDepth=@CheekboneDepth, CheekboneWidth=@CheekboneWidth, Eyelids=@Eyelids, Lips=@Lips, JawWidth=@JawWidth, JawDepth=@JawDepth, JawLength=@JawLength, ChinFullness=@ChinFullness, ChinWidth=@ChinWidth, NeckWidth=@NeckWidth, FacialHair=@FacialHair, FacialHairColor=@FacialHairColor, FacialHairColor2=@FacialHairColor2, Ageing=@Ageing, Complexion=@Complexion, Moles=@Moles WHERE Nametag='{0}'", player.name);
+                // Gather all our data
+                string[] varNames = { "skinShapeFirst", "skinShapeSecond", "skinSkinFirst", "skinSkinSecond", "skinShapeMix", "skinSkinMix", "skinHairstyle", "skinHairstyleColor", "skinHairstyleHighlight", "skinHairstyleTexture", "NoseWidth", "NoseHeight", "NoseLength", "NoseBridge", "NoseTip", "NoseBridgeDepth", "EyebrowHeight", "EyebrowDepth", "CheekboneHeight", "CheekboneDepth", "CheekboneWidth", "Eyelids", "Lips", "JawWidth", "JawDepth", "JawLength", "ChinFullness", "ChinWidth", "NeckWidth", "FacialHair", "FacialHairColor", "FacialHairColor2", "Ageing", "Complexion", "Moles" };
+                string before = "UPDATE PlayerSkins SET";
+                string after = string.Format("WHERE Nametag='{0}'", player.name);
 
-                Dictionary<string, string> parameters = new Dictionary<string, string>();
-                parameters.Add("@skinShapeFirst", args[0].ToString());
-                parameters.Add("@skinShapeSecond", args[1].ToString());
-                parameters.Add("@skinSkinFirst", args[2].ToString());
-                parameters.Add("@skinSkinSecond", args[3].ToString());
-                parameters.Add("@skinShapeMix", args[4].ToString());
-                parameters.Add("@skinSkinMix", args[5].ToString());
-                parameters.Add("@skinHairstyle", args[6].ToString());
-                parameters.Add("@skinHairstyleColor", args[7].ToString());
-                parameters.Add("@skinHairstyleHighlight", args[8].ToString());
-                parameters.Add("@skinHairstyleTexture", args[9].ToString());
-                parameters.Add("@NoseWidth", args[10].ToString());
-                parameters.Add("@NoseHeight", args[11].ToString());
-                parameters.Add("@NoseLength", args[12].ToString());
-                parameters.Add("@NoseBridge", args[13].ToString());
-                parameters.Add("@NoseTip", args[14].ToString());
-                parameters.Add("@NoseBridgeDepth", args[15].ToString());
-                parameters.Add("@EyebrowHeight", args[16].ToString());
-                parameters.Add("@EyebrowDepth", args[17].ToString());
-                parameters.Add("@CheekboneHeight", args[18].ToString());
-                parameters.Add("@CheekboneDepth", args[19].ToString());
-                parameters.Add("@CheekboneWidth", args[20].ToString());
-                parameters.Add("@Eyelids", args[21].ToString());
-                parameters.Add("@Lips", args[22].ToString());
-                parameters.Add("@JawWidth", args[23].ToString());
-                parameters.Add("@JawDepth", args[24].ToString());
-                parameters.Add("@JawLength", args[25].ToString());
-                parameters.Add("@ChinFullness", args[26].ToString());
-                parameters.Add("@ChinWidth", args[27].ToString());
-                parameters.Add("@NeckWidth", args[28].ToString());
-                parameters.Add("@FacialHair", args[29].ToString());
-                parameters.Add("@FacialHairColor", args[30].ToString());
-                parameters.Add("@FacialHairColor2", args[31].ToString());
-                parameters.Add("@Ageing", args[32].ToString());
-                parameters.Add("@Complexion", args[33].ToString());
-                parameters.Add("@Moles", args[34].ToString());
+                // Send all our data to generate the query and run it
+                this.db.compileQuery(before, after, varNames, args);
 
-                API.exported.database.executePreparedQuery(query, parameters);
                 pullCurrentFace(player);
                 API.exported.gtaocharacter.updatePlayerFace(player.handle);
                 API.stopPlayerAnimation(player);
