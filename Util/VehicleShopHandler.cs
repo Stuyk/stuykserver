@@ -390,8 +390,7 @@ namespace stuykserver.Util
                     API.setEntityDimension(player, 0);
                     API.setEntityPosition(player, shopInformation[collision].returnPosition());
                     shopInformation[collision].containedPlayersRemove(player);
-                    Vector3 exitPoint = db.convertStringToVector3(db.pullDatabase("VehicleShops", "ExitPoint", "ID", shopInformation[collision].returnID().ToString()));
-                    API.call("VehicleHandler", "actionSetupPurchasedCar", exitPoint, vehicleType, player);
+                    API.call("VehicleHandler", "actionSetupPurchasedCar", shopInformation[collision].returnShopExitPoint(), vehicleType, player);
                     break;
                 }
             }

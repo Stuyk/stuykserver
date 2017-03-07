@@ -1844,6 +1844,7 @@ function startBrowsing(type, dimension) {
 	}
 	
 	dealershipSetupVehicles(vehicleSelectionDimension);
+	API.setEntityDimension(API.getLocalPlayer(), vehicleSelectionDimension);
 	API.setPlayerIntoVehicle(centerVehicle, -1);
 	API.triggerServerEvent("dealershipReady");
 	showDealership();
@@ -1862,28 +1863,25 @@ function dealershipSetupVehicles(dimension) {
 	}
 
 	centerVehicle = API.createVehicle(API.vehicleNameToModel(vehicleSelectionType[currentVehicleIndex]), new Vector3(225.6238, -990, -98.99996), 0);
-	API.setEntityDimension(centerVehicle, dimension);
 	API.setVehiclePrimaryColor(centerVehicle, randomInteger(0, 159));
 
 	if (pagePanel != null) {
 		pagePanel.browser.call("updateVehicle", vehicleSelectionType[currentVehicleIndex]);
 	}
+	
+	API.setPlayerIntoVehicle(centerVehicle, -1);
 }
 
 function dealershipBrowseLeft() {
 	currentVehicleIndex -= 1;
 
 	dealershipSetupVehicles(vehicleSelectionDimension);
-
-	API.setPlayerIntoVehicle(centerVehicle, -1);
 }
 
 function dealershipBrowseRight() {
 	currentVehicleIndex += 1;
 
 	dealershipSetupVehicles(vehicleSelectionDimension);
-
-	API.setPlayerIntoVehicle(centerVehicle, -1);
 }
 
 function dealershipVehicleRotation(value) {
@@ -1895,4 +1893,5 @@ function dealershipVehicleRotation(value) {
 function dealershipPurchaseVehicle() {
 	API.triggerServerEvent("purchaseVehicle", vehicleSelectionType[currentVehicleIndex]);
 	killPanel();
+	API.setActiveCamera(null);
 }
