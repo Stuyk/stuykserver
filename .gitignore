@@ -2,3 +2,5 @@ stuykserver.dll
 *.pdb
 /obj/*
 /Properties/*
+obj/Debug/stuykserver.dll
+obj/Debug/stuykserver.pdb

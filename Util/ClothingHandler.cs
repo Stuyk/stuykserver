@@ -35,8 +35,9 @@ namespace stuykserver.Util
                 int hatcolor = Convert.ToInt32(row["clothingHatColor"]);
                 int shoes = Convert.ToInt32(row["clothingShoes"]);
                 int shoescolor = Convert.ToInt32(row["clothingShoesColor"]);
+                int accessory = Convert.ToInt32(row["clothingAccessory"]);
 
-                API.triggerClientEvent(player, "clothingLocalVariableUpdate", torso, top, topcolor, undershirt, undershirtcolor, legs, legscolor, shoes, shoescolor);
+                API.triggerClientEvent(player, "clothingLocalVariableUpdate", torso, top, topcolor, undershirt, undershirtcolor, legs, legscolor, shoes, shoescolor, accessory);
             }
         }
 
@@ -58,12 +59,14 @@ namespace stuykserver.Util
                 int hatcolor = Convert.ToInt32(row["clothingHatColor"]);
                 int shoes = Convert.ToInt32(row["clothingShoes"]);
                 int shoescolor = Convert.ToInt32(row["clothingShoesColor"]);
+                int accessory = Convert.ToInt32(row["clothingAccessory"]);
 
                 API.setPlayerClothes(player, 3, torso, 0);
                 API.setPlayerClothes(player, 11, top, topcolor);
                 API.setPlayerClothes(player, 4, legs, legscolor);
                 API.setPlayerClothes(player, 8, undershirt, undershirtcolor);
                 API.setPlayerClothes(player, 6, shoes, shoescolor);
+                API.setPlayerClothes(player, 7, accessory, 0);
             }
         }
 
@@ -80,6 +83,7 @@ namespace stuykserver.Util
                 db.updateDatabase("PlayerClothing", "clothingLegsColor", args[6].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerClothing", "clothingShoes", args[7].ToString(), "Nametag", player.name);
                 db.updateDatabase("PlayerClothing", "clothingShoesColor", args[8].ToString(), "Nametag", player.name);
+                db.updateDatabase("PlayerClothing", "clothingAccessory", args[9].ToString(), "Nametag", player.name);
                 updateClothingForPlayer(player);
                 API.stopPedAnimation(player);
                 API.stopPlayerAnimation(player);

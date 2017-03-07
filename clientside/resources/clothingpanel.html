@@ -73,6 +73,13 @@
       			<button type="submit" class="btn  optionButton pull-right" id="hairColorPositive" onClick="resourceCall('changeClothingShoesColor', 1);">></button>
       		</div>
       	</div>
+		<div class="row space-row">
+      		<div class="col-sm-12">
+      			<button type="submit" class="btn  optionButton pull-left" id="hairColorNegative" onClick="resourceCall('changeAccessory', -1);"><</button>
+      			<label class="vertical-align">Accessory</label>
+      			<button type="submit" class="btn  optionButton pull-right" id="hairColorPositive" onClick="resourceCall('changeAccessory', 1);">></button>
+      		</div>
+      	</div>
         <div class="row space-row">
           <div class="col-sm-12">
              <button id="saveButton" type="submit" class="btn col-sm-12 optionButtonModified">Save & Exit</button>
@@ -117,6 +124,9 @@
         </div>
         <div class="row space-row">
           <span>Shoes Color # <span id="clothingShoesColorNum"></span></span>
+        </div>
+		<div class="row space-row">
+          <span>Accessory # <span id="clothingAccessoryNum"></span></span>
         </div>
       </div>
   </div>
@@ -165,7 +175,7 @@
 		resourceCall("changePushClothingChanges");
 	}
 
-	function updateClothingProperties (clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum) {
+	function updateClothingProperties (clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum, clothingAccessoryNum) {
 		$('#clothingTopNum').html(clothingTopNum);
 		$('#clothingTopColorNum').html(clothingTopColorNum);
 		$('#clothingUndershirtNum').html(clothingUndershirtNum);
@@ -175,6 +185,7 @@
 		$('#clothingLegsColorNum').html(clothingLegsColorNum);
 		$('#clothingShoesNum').html(clothingShoesNum);
 		$('#clothingShoesColorNum').html(clothingShoesColorNum);
+		$('#clothingAccessoryNum').html(clothingAccessoryNum);
 		return;
 	}
 	</script>

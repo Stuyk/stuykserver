@@ -329,6 +329,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		clothingLegsColorNum = args[6];
 		clothingShoesNum = args[7];
 		clothingShoesColorNum = args[8];
+		clothingAccessory = args[9];
 	}
 
 	// MODEL CHANGER VARIABLES
@@ -980,6 +981,7 @@ var clothingShoesNum = null;
 var clothingShoesColorNum = null;
 var clothingTorsoNum = null;
 var clothingPanelOpen = null;
+var clothingAccessory = null;
 
 function showClothingPanel() {
 	pagePanel = new CefHelper("clientside/resources/clothingpanel.html");
@@ -988,6 +990,19 @@ function showClothingPanel() {
 
 function changeClothingExitShop() {
 	API.triggerServerEvent("exitClothingShop");
+}
+
+function changeAccessory(amount) {
+	if (clothingAccessory != null) {
+		clothingAccessory += 1;
+
+		if (clothingAccessory <= -1) {
+			clothingAccessory = 0;
+		}
+
+		API.setPlayerClothes(API.getLocalPlayer(), 7, clothingAccessory, 0);
+		updateClothingProperties();
+	}
 }
 
 function changeClothingTorso(amount) { // Torso Changer
@@ -1130,11 +1145,11 @@ function changeRotationHandle(amount) {
 }
 
 function updateClothingProperties() {
-	pagePanel.browser.call("updateClothingProperties", clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum);
+	pagePanel.browser.call("updateClothingProperties", clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum, clothingAccessory);
 }
 
 function changePushClothingChanges() {
-	API.triggerServerEvent("clothingSave", clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum);
+	API.triggerServerEvent("clothingSave", clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum, clothingAccessory);
 	API.stopPlayerAnimation();
 	clothingPanelOpen = null;
 	clothingTorsoNum = null;
@@ -1148,6 +1163,7 @@ function changePushClothingChanges() {
 	clothingHatColorNum = null;
 	clothingShoesNum = null;
 	clothingShoesColorNum = null;
+	clothingAccessory = null;
 }
 
 // ##########################

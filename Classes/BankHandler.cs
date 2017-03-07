@@ -1,5 +1,6 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
+using stuykserver.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,7 +14,7 @@ namespace stuykserver.Util
         DatabaseHandler db = new DatabaseHandler();
         Main main = new Main();
 
-        Dictionary<ColShape, ShopInformation> shopInformation = new Dictionary<ColShape, ShopInformation>();
+        Dictionary<ColShape, ShopInformationHandling> shopInformation = new Dictionary<ColShape, ShopInformationHandling>();
 
         [Flags]
         public enum AnimationFlags
@@ -23,67 +24,6 @@ namespace stuykserver.Util
             OnlyAnimateUpperBody = 1 << 4,
             AllowPlayerControl = 1 << 5,
             Cancellable = 1 << 7
-        }
-
-        class ShopInformation
-        {
-            ColShape collisionShape;
-            int collisionID;
-            Vector3 collisionPosition;
-            Blip collisionBlip;
-            GTANetworkServer.Object attachedATM;
-            List<Client> collisionPlayers;
-
-            public void setupPoint(ColShape collision, int id, Vector3 position, Blip blip, GTANetworkServer.Object atm)
-            {
-                collisionShape = collision;
-                collisionID = id;
-                collisionPosition = position;
-                collisionBlip = blip;
-                collisionPlayers = new List<Client>();
-                attachedATM = atm;
-            }
-
-            public void collisionPlayersAdd(Client player)
-            {
-                if (!collisionPlayers.Contains(player))
-                {
-                    collisionPlayers.Add(player);
-                }
-            }
-
-            public void collisionPlayersRemove(Client player)
-            {
-                if (collisionPlayers.Contains(player))
-                {
-                    collisionPlayers.Remove(player);
-                }
-            }
-
-            public List<Client> returnCollisionPlayers()
-            {
-                return collisionPlayers;
-            }
-
-            public int returnID()
-            {
-                return collisionID;
-            }
-
-            public ColShape returnCollision()
-            {
-                return collisionShape;
-            }
-
-            public Vector3 returnPosition()
-            {
-                return collisionPosition;
-            }
-
-            public Blip returnBlip()
-            {
-                return collisionBlip;
-            }
         }
 
         public BankHandler()
@@ -101,9 +41,9 @@ namespace stuykserver.Util
                 Client player = API.getPlayerFromHandle(entity);
                 if (shopInformation.ContainsKey(colshape))
                 {
-                    if (shopInformation[colshape].returnCollisionPlayers().Contains(player))
+                    if (shopInformation[colshape].returnOutsidePlayers().Contains(player))
                     {
-                        shopInformation[colshape].collisionPlayersRemove(player);
+                        shopInformation[colshape].removeOutsidePlayer(player);
                         API.triggerClientEvent(player, "removeUseFunction");
                     }
                 }
@@ -117,9 +57,9 @@ namespace stuykserver.Util
                 Client player = API.getPlayerFromHandle(entity);
                 if (shopInformation.ContainsKey(colshape))
                 {
-                    if (!shopInformation[colshape].returnCollisionPlayers().Contains(player))
+                    if (!shopInformation[colshape].returnOutsidePlayers().Contains(player))
                     {
-                        shopInformation[colshape].collisionPlayersAdd(player);
+                        shopInformation[colshape].addOutsidePlayer(player);
                         API.triggerClientEvent(player, "triggerUseFunction", "Bank");
                         API.sendNotificationToPlayer(player, "This will let me deposit my cash.");
                     }
@@ -218,7 +158,7 @@ namespace stuykserver.Util
         {
             foreach (ColShape collision in shopInformation.Keys)
             {
-                if (shopInformation[collision].returnCollisionPlayers().Contains(player) && !player.isInVehicle)
+                if (shopInformation[collision].returnOutsidePlayers().Contains(player) && !player.isInVehicle)
                 {
                     API.triggerClientEvent(player, "loadATM", db.getPlayerAtmMoney(player));
                     break;
@@ -229,17 +169,26 @@ namespace stuykserver.Util
         // Positions the objects, blips, and text when initialized or created.
         public void positionBlips(Vector3 position, Vector3 rotation, int id)
         {
-            ShopInformation newShop = new ShopInformation();
+            ShopInformationHandling newShop = new ShopInformationHandling();
             ColShape collision = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 2f, 2f);
+            List<GTANetworkServer.Object> shopObjects = new List<GTANetworkServer.Object>();
+
+            GTANetworkServer.Object atmObject = API.createObject(-870868698, new Vector3(position.X, position.Y, position.Z - 1), new Vector3(rotation.X, rotation.Y, rotation.Z - 180));
+
+            shopObjects.Add(atmObject);
 
             var newBlip = API.createBlip(new Vector3(position.X, position.Y, position.Z));
             API.setBlipSprite(newBlip, 108);
             API.setBlipColor(newBlip, 2);
             API.setBlipShortRange(newBlip, true);
 
-            GTANetworkServer.Object atmObject = API.createObject(-870868698, new Vector3(position.X, position.Y, position.Z - 1), new Vector3(rotation.X, rotation.Y, rotation.Z - 180));
+            newShop.setBlip(newBlip);
+            newShop.setCollisionID(id);
+            newShop.setCollisionPosition(position);
+            newShop.setCollisionShape(collision);
+            newShop.setShopObjects(shopObjects);
+            newShop.setShopType(ShopInformationHandling.ShopType.Atm);
 
-            newShop.setupPoint(collision, id, new Vector3(position.X, position.Y, position.Z), newBlip, atmObject);
             shopInformation.Add(collision, newShop);
         }
     }
