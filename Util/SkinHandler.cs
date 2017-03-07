@@ -33,7 +33,11 @@ namespace stuykserver.Util
             if (eventName == "saveFace")
             {
                 // Gather all our data
-                string[] varNames = { "skinShapeFirst", "skinShapeSecond", "skinSkinFirst", "skinSkinSecond", "skinShapeMix", "skinSkinMix", "skinHairstyle", "skinHairstyleColor", "skinHairstyleHighlight", "skinHairstyleTexture", "NoseWidth", "NoseHeight", "NoseLength", "NoseBridge", "NoseTip", "NoseBridgeDepth", "EyebrowHeight", "EyebrowDepth", "CheekboneHeight", "CheekboneDepth", "CheekboneWidth", "Eyelids", "Lips", "JawWidth", "JawDepth", "JawLength", "ChinFullness", "ChinWidth", "NeckWidth", "FacialHair", "FacialHairColor", "FacialHairColor2", "Ageing", "Complexion", "Moles" };
+                string[] varNames = { "skinShapeFirst", "skinShapeSecond", "skinSkinFirst", "skinSkinSecond", "skinShapeMix", "skinSkinMix", "skinHairstyle", "skinHairstyleColor",
+                    "skinHairstyleHighlight", "skinHairstyleTexture", "NoseWidth", "NoseHeight", "NoseLength", "NoseBridge", "NoseTip", "NoseBridgeDepth", "EyebrowHeight", "EyebrowDepth",
+                    "CheekboneHeight", "CheekboneDepth", "CheekboneWidth", "Eyelids", "Lips", "JawWidth", "JawDepth", "JawLength", "ChinFullness", "ChinWidth", "NeckWidth", "FacialHair",
+                    "FacialHairColor", "FacialHairColor2", "Ageing", "Complexion", "Moles" };
+
                 string before = "UPDATE PlayerSkins SET";
                 string after = string.Format("WHERE Nametag='{0}'", player.name);
 
