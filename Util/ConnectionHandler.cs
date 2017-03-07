@@ -33,6 +33,25 @@ namespace stuykserver.Util
             API.consoleOutput("Started: ConnectionHandler");
         }
 
+        private void storePlayer(Client player)
+        {
+            // Delete the temp vehicle first
+            if (db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name) != "None")
+            {
+                NetHandle tempVehicle = new NetHandle(Convert.ToInt32(db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name)));
+                API.deleteEntity(tempVehicle);
+            }
+
+            // Gather all our data
+            string[] varNames = { "LASTX", "LASTY", "LASTZ", "LoggedIn", "CurrentSkin", "Health", "Armor", "JobStarted", "JobX", "JobY", "JobZ", "JobType", "TempJobVehicle" };
+            string before = "UPDATE Players SET";
+            object[] data = { player.position.X, player.position.Y, player.position.Z, "0", ((PedHash)API.getEntityModel(player)).ToString(), API.getPlayerHealth(player).ToString(), API.getPlayerArmor(player).ToString(), "False", "0", "0", "0", "None", "None" };
+            string after = string.Format("WHERE Nametag='{0}'", player.name);
+
+            // Send all our data to generate the query and run it
+            this.db.compileQuery(before, after, varNames, data);
+        }
+
         private void API_onResourceStop()
         {
             List<Client> playerList = API.getAllPlayers();
@@ -41,21 +60,7 @@ namespace stuykserver.Util
             {
                 if (db.isPlayerLoggedIn(player))
                 {
-                    // Delete the temp vehicle first
-                    if (db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name) != "None")
-                    {
-                        NetHandle tempVehicle = new NetHandle(Convert.ToInt32(db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name)));
-                        API.deleteEntity(tempVehicle);
-                    }
-
-                    // Gather all our data
-                    string[] varNames = { "LASTX", "LASTY", "LASTZ", "LoggedIn", "CurrentSkin", "Health", "Armor", "JobStarted", "JobX", "JobY", "JobZ", "JobType", "TempJobVehicle" };
-                    string before = "UPDATE Players SET";
-                    object[] data = { player.position.X, player.position.Y, player.position.Z, "0", ((PedHash)API.getEntityModel(player)).ToString(), API.getPlayerHealth(player).ToString(), API.getPlayerArmor(player).ToString(), "False", "0", "0", "0", "None", "None" };
-                    string after = string.Format("WHERE Nametag='{0}'", player.name);
-
-                    // Send all our data to generate the query and run it
-                    this.db.compileQuery(before, after, varNames, data);
+                    this.storePlayer(player);
                 }
             }
         }
@@ -84,24 +89,8 @@ namespace stuykserver.Util
         {
             if (db.isPlayerLoggedIn(player))
             {
-                db.setPlayerPosition(player);
-                db.setPlayerLoggedOut(player);
-                db.updateDatabase("Players", "CurrentSkin", ((PedHash)API.getEntityModel(player)).ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "Health", API.getPlayerHealth(player).ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "Armor", API.getPlayerArmor(player).ToString(), "Nametag", player.name);
-                db.updateDatabase("Players", "JobStarted", "False", "Nametag", player.name);
-                db.updateDatabase("Players", "JobX", "0", "Nametag", player.name);
-                db.updateDatabase("Players", "JobY", "0", "Nametag", player.name);
-                db.updateDatabase("Players", "JobZ", "0", "Nametag", player.name);
-                db.updateDatabase("Players", "JobType", "None", "Nametag", player.name);
+                this.storePlayer(player);
                 API.consoleOutput("[DATABASE] " + player.name.ToString() + " has disconnected.");
-                if (db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name) != "None")
-                {
-                    NetHandle tempVehicle = new NetHandle(Convert.ToInt32(db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name)));
-                    API.deleteEntity(tempVehicle);
-                }
-                db.updateDatabase("Players", "TempJobVehicle", "None", "Nametag", player.name);
-
                 API.call("VehicleHandler", "removeDisconnectedVehicles", player);
             }
         }
