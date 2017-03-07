@@ -96,7 +96,7 @@ namespace stuykserver.Util
             stopWatch.Start();
 
 
-            string query = string.Format("SELECT LastX, LastY, LastZ FROM Players WHERE Nametag='{0]'", player.name);
+            string query = string.Format("SELECT LASTX, LASTY, LASTZ FROM Players WHERE Nametag='{0]'", player.name);
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
             var x = Convert.ToSingle(result.Rows[0]["LASTX"]);
