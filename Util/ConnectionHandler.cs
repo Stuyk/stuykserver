@@ -95,12 +95,13 @@ namespace stuykserver.Util
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
+
             string query = string.Format("SELECT LastX, LastY, LastZ FROM Players WHERE Nametag='{0]'", player.name);
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
-            var x = result.Rows[0]["LASTX"];
-            var y = result.Rows[0]["LASTY"];
-            var z = result.Rows[0]["LASTZ"];
+            var x = Convert.ToSingle(result.Rows[0]["LASTX"]);
+            var y = Convert.ToSingle(result.Rows[0]["LASTY"]);
+            var z = Convert.ToSingle(result.Rows[0]["LASTZ"]);
 
             player.freezePosition = false;
 
