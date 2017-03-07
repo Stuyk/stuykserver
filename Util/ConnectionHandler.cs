@@ -35,17 +35,10 @@ namespace stuykserver.Util
 
         private void storePlayer(Client player)
         {
-            // Delete the temp vehicle first
-            if (db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name) != "None")
-            {
-                NetHandle tempVehicle = new NetHandle(Convert.ToInt32(db.pullDatabase("Players", "TempJobVehicle", "Nametag", player.name)));
-                API.deleteEntity(tempVehicle);
-            }
-
             // Gather all our data
-            string[] varNames = { "LASTX", "LASTY", "LASTZ", "LoggedIn", "CurrentSkin", "Health", "Armor", "JobStarted", "JobX", "JobY", "JobZ", "JobType", "TempJobVehicle" };
+            string[] varNames = { "LASTX", "LASTY", "LASTZ", "LoggedIn", "CurrentSkin", "Health", "Armor" };
             string before = "UPDATE Players SET";
-            object[] data = { player.position.X, player.position.Y, player.position.Z, "0", ((PedHash)API.getEntityModel(player)).ToString(), API.getPlayerHealth(player).ToString(), API.getPlayerArmor(player).ToString(), "False", "0", "0", "0", "None", "None" };
+            object[] data = { player.position.X, player.position.Y, player.position.Z, "0", ((PedHash)API.getEntityModel(player)).ToString(), API.getPlayerHealth(player).ToString(), API.getPlayerArmor(player).ToString() };
             string after = string.Format("WHERE Nametag='{0}'", player.name);
 
             // Send all our data to generate the query and run it
@@ -105,12 +98,6 @@ namespace stuykserver.Util
             var x = Convert.ToSingle(db.pullDatabase("Players", "LastX", "Nametag", player.name));
             var y = Convert.ToSingle(db.pullDatabase("Players", "LastY", "Nametag", player.name));
             var z = Convert.ToSingle(db.pullDatabase("Players", "LastZ", "Nametag", player.name));
-
-            db.updateDatabase("Players", "JobStarted", "False", "Nametag", player.name);
-            db.updateDatabase("Players", "JobX", "0", "Nametag", player.name);
-            db.updateDatabase("Players", "JobY", "0", "Nametag", player.name);
-            db.updateDatabase("Players", "JobZ", "0", "Nametag", player.name);
-            db.updateDatabase("Players", "JobType", "None", "Nametag", player.name);
 
             player.freezePosition = false;
 

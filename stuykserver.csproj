@@ -142,7 +142,9 @@
     <Content Include="clientside\resources\skinselector.html" />
     <Content Include="clientside\serversideCamera.js" />
     <Content Include="clientside\WaypointHelper.js" />
-    <Content Include="meta.xml" />
+    <Content Include="meta.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
