@@ -1,2 +1,3 @@
 stuykserver.dll
 *.pdb
+/obj/*
