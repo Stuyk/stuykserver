@@ -129,53 +129,30 @@ namespace stuykserver.Util
             API.consoleOutput("Started: DatabaseHandler");
         }
 
-        // ########################################
-        //        Login Handling / Setting
-        // ########################################
-        public void setPlayerLoggedIn(Client player)
-        {
-            updateDatabase("Players", "LoggedIn", "1", "Nametag", player.name);
-            API.consoleOutput("{0} has logged in.", player.name);
-        }
-
-        public void setPlayerLoggedOut(Client player)
-        {
-            updateDatabase("Players", "LoggedIn", "0", "Nametag", player.name);
-            API.consoleOutput("{0} has logged out.", player.name);
-        }
-
-        public bool isPlayerLoggedIn(Client player)
-        {
-            return Convert.ToBoolean(pullDatabase("Players", "LoggedIn", "Nametag", player.name));
-        }
-
-        // ########################################
-        //        Player Specific Settings
-        // ########################################
-        public void setPlayerPosition(Client player)
-        {
-            string query = string.Format("UPDATE Players SET LASTX='{0}', LASTY='{1}', LASTZ='{2}' WHERE Nametag='{3}'", player.position.X, player.position.Y, player.position.Z, player.name);
-            API.exported.database.executeQuery(query);
-        }
-
-        public void setPlayerPositionByVector(Client player, Vector3 pos)
-        {
-            string query = string.Format("UPDATE Players SET LASTX='{0}', LASTY='{1}', LASTZ='{2}' WHERE Nametag='{3}'", pos.X, pos.Y, pos.Z, player.name);
-            API.exported.database.executeQuery(query);
-        }
-
         public void setPlayerHUD(Client player, bool setting)
         {
             API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, setting);
             API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, setting);
         }
 
-
-        // Check if player is an admin.
-        public bool isAdmin(string playerName)
+        // Just Set Player Position by Vector3
+        public void setPlayerPositionByVector(Client player, Vector3 position)
         {
-            bool result = Convert.ToBoolean(pullDatabase("Players", "Admin", "Nametag", playerName));
-            if (result)
+            string[] varNames = { "LASTX", "LASTY", "LASTZ" };
+            string before = "UPDATE Players SET";
+            object[] data = { position.X.ToString(), position.Y.ToString(), position.Z.ToString() };
+            string after = string.Format("WHERE ID='{0}'", Convert.ToString(API.getEntityData(player, "PlayerID")));
+
+            // Send all our data to generate the query and run it
+            compileQuery(before, after, varNames, data);
+        }
+
+        // Return if player is logged in.
+        public bool isPlayerLoggedIn(Client player)
+        {
+            int id = Convert.ToInt32(API.getEntityData(player, "PlayerID"));
+
+            if (id > 0)
             {
                 return true;
             }

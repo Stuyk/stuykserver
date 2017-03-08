@@ -14,6 +14,7 @@ namespace stuykserver.Jobs
     public class Fishing : Script
     {
         DatabaseHandler db = new DatabaseHandler();
+        Util.Util util = new Util.Util();
 
         Dictionary<Client,string> playersFishing = new Dictionary<Client, string>();
         Dictionary<Client, NetHandle> playersFishingRods = new Dictionary<Client, NetHandle>();
@@ -187,27 +188,6 @@ namespace stuykserver.Jobs
                     }
                 }
 
-            }
-        }
-
-        [Command("createfishingpoint")]
-        public void cmdCreateFishingPoint(Client player, string id)
-        {
-            if (db.isAdmin(player.name))
-            {
-                db.insertDataPointPosition("Fishing", player);
-                API.sendNotificationToPlayer(player, "~g~A fishing point has been created.");
-                return;
-            }
-        }
-
-        [Command("createfishingsalepoint")]
-        public void cmdCreateFishingSellPoint(Client player)
-        {
-            if (db.isAdmin(player.name))
-            {
-                db.insertDataPointPosition("FishingSalePoints", player);
-                API.sendNotificationToPlayer(player, "~g~A fishing sale point has been created.");
             }
         }
 

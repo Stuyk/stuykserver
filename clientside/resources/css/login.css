@@ -27,7 +27,7 @@ a:hover {
 html,
 body {
   height: 100%;
-  background: rgba(20,20,20,0.50);
+  background: rgba(20,20,20,0.0);
   overflow: hidden;
 }
 body {
@@ -60,7 +60,7 @@ body {
 }
 
 .custom-form {
-	background-color: rgba(255,255,255,0.25);
+	background-color: rgba(0,0,0,0.70);
 	color: #000;
 	border-radius: 5px;
 	height: auto;

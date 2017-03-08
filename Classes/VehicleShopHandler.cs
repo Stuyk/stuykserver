@@ -13,6 +13,7 @@ namespace stuykserver.Util
     {
         DatabaseHandler db = new DatabaseHandler();
         Main main = new Main();
+        Util util = new Util();
 
         Dictionary<ColShape, ShopInformationHandling> shopInformation = new Dictionary<ColShape, ShopInformationHandling>();
 
@@ -23,78 +24,6 @@ namespace stuykserver.Util
             API.onEntityExitColShape += API_onEntityExitColShape;
             API.onClientEventTrigger += API_onClientEventTrigger;
             API.onPlayerDisconnected += API_onPlayerDisconnected;
-        }
-
-        [Command("dealership")]
-        public void cmdDealership(Client player, string action, string type)
-        {
-            if (db.isAdmin(player.name))
-            {
-                if (action == "create")
-                {
-                    db.insertDataPointPosition("VehicleShops", player);
-                    API.sendNotificationToPlayer(player, "~g~Created a dealership.");
-                }
-
-                if (action == "get")
-                {
-                    foreach (ColShape collision in shopInformation.Keys)
-                    {
-                        if (shopInformation[collision].returnCollisionPosition().DistanceTo(player.position) <= 30)
-                        {
-                            API.sendChatMessageToPlayer(player, string.Format("~y~Dealership ID: ~w~{0}", shopInformation[collision].returnCollisionID().ToString()));
-                        }
-                    }
-                }
-
-                if (action == "setexit")
-                {
-                    foreach (ColShape collision in shopInformation.Keys)
-                    {
-                        if (shopInformation[collision].returnCollisionPosition().DistanceTo(player.position) <= 30)
-                        {
-                            db.updateDatabase("VehicleShops", "ExitPoint", player.position.ToString(), "ID", shopInformation[collision].returnCollisionID().ToString());
-                            API.sendNotificationToPlayer(player, "~g~Updated Exit Point.");
-                        }
-                    }
-                }
-
-                if (action == "setfocus")
-                {
-                    foreach (ColShape collision in shopInformation.Keys)
-                    {
-                        if (shopInformation[collision].returnCollisionPosition().DistanceTo(player.position) <= 30)
-                        {
-                            db.updateDatabase("VehicleShops", "CenterPoint", player.position.ToString(), "ID", shopInformation[collision].returnCollisionID().ToString());
-                            API.sendNotificationToPlayer(player, "~g~Updated Focus Point.");
-                        }
-                    }
-                }
-
-                if (action == "setcamera")
-                {
-                    foreach (ColShape collision in shopInformation.Keys)
-                    {
-                        if (shopInformation[collision].returnCollisionPosition().DistanceTo(player.position) <= 30)
-                        {
-                            db.updateDatabase("VehicleShops", "CameraPoint", player.position.ToString(), "ID", shopInformation[collision].returnCollisionID().ToString());
-                            API.sendNotificationToPlayer(player, "~g~Updated Camera Point.");
-                        }
-                    }
-                }
-
-                if (action == "type")
-                {
-                    foreach (ColShape collision in shopInformation.Keys)
-                    {
-                        if (shopInformation[collision].returnCollisionPosition().DistanceTo(player.position) <= 30)
-                        {
-                            db.updateDatabase("VehicleShops", "Type", type.ToString(), "ID", shopInformation[collision].returnCollisionID().ToString());
-                            API.sendNotificationToPlayer(player, "~g~Updated Type to: " + type);
-                        }
-                    }
-                }
-            }
         }
 
         private void API_onPlayerDisconnected(Client player, string reason)

@@ -36,14 +36,22 @@ namespace stuykserver.Util
 
         private void storePlayer(Client player)
         {
+            DateTime endTime = DateTime.Now;
+            DateTime startTime = Convert.ToDateTime(API.getEntityData(player, "Session"));
+            TimeSpan span = (endTime - startTime);
+
+            int timePlayed = Convert.ToInt32(span.Minutes);
+            int lastTime = Convert.ToInt32(API.getEntityData(player, "Time"));
+            timePlayed += lastTime;
+
             // Gather all our data
-            string[] varNames = { "LASTX", "LASTY", "LASTZ", "LoggedIn", "CurrentSkin", "Health", "Armor" };
+            string[] varNames = { "LASTX", "LASTY", "LASTZ", "LoggedIn", "CurrentSkin", "Health", "Armor", "Time" };
             string before = "UPDATE Players SET";
-            object[] data = { player.position.X, player.position.Y, player.position.Z, "0", ((PedHash)API.getEntityModel(player)).ToString(), API.getPlayerHealth(player).ToString(), API.getPlayerArmor(player).ToString() };
-            string after = string.Format("WHERE ID='{0}'", API.getEntitySyncedData(player, "PlayerID"));
+            object[] data = { player.position.X, player.position.Y, player.position.Z, "0", ((PedHash)API.getEntityModel(player)).ToString(), API.getPlayerHealth(player).ToString(), API.getPlayerArmor(player).ToString(), timePlayed };
+            string after = string.Format("WHERE ID='{0}'", API.getEntityData(player, "PlayerID"));
 
             // Send all our data to generate the query and run it
-            this.db.compileQuery(before, after, varNames, data);
+            db.compileQuery(before, after, varNames, data);
         }
 
         private void API_onResourceStop()
@@ -54,15 +62,28 @@ namespace stuykserver.Util
             {
                 if (db.isPlayerLoggedIn(player))
                 {
-                    this.storePlayer(player);
+                    storePlayer(player);
                 }
             }
         }
 
         public void API_onPlayerFinishedDownload(Client player)
         {
+            if (!util.isValidUsername(player.name))
+            {
+                db.setPlayerHUD(player, false);
+                API.triggerClientEvent(player, "createCamera", new Vector3(-1605.505, -1089.018, 30), new Vector3(40, 0, 0));
+                API.triggerClientEvent(player, "showInvalidName");
+                Random randum = new Random();
+                int ran = randum.Next(1, 1000);
+                API.setEntityDimension(player, ran);
+                API.setEntityPosition(player, new Vector3(-1605.505, -1089.018, 13.01836));
+                return;
+            }
+
             db.setPlayerHUD(player, false);
             API.triggerClientEvent(player, "createCamera", new Vector3(-1605.505, -1089.018, 30), new Vector3(40, 0, 0));
+            API.triggerClientEvent(player, "showLogin");
             Random random = new Random();
             int r = random.Next(1, 1000);
             API.setEntityDimension(player, r);
@@ -72,11 +93,7 @@ namespace stuykserver.Util
         private void API_onPlayerBeginConnect(Client player, CancelEventArgs cancelConnection)
         {
             // Check if player has a valid username before connecting.
-            if (!util.isValidUsername(player.name))
-            {
-                API.kickPlayer(player, "Invalid Username Format. Example: John_Doe");
-                return;
-            }
+            
         }
 
         private void API_onPlayerDisconnected(Client player, string reason)
@@ -91,10 +108,9 @@ namespace stuykserver.Util
 
         public void SpawnPlayer(Client player)
         {
-            db.setPlayerLoggedIn(player);
             string[] varNames = { "ID" };
-            string before = "SELECT LASTX, LASTY, LASTZ, Dead, Money, Nametag, Health, Armor, Admin, Karma FROM Players WHERE";
-            object[] data = { Convert.ToString(API.getEntitySyncedData(player, "PlayerID")) };
+            string before = "SELECT LASTX, LASTY, LASTZ, Dead, Money, Nametag, Health, Armor, Admin, Karma, Time FROM Players WHERE";
+            object[] data = { Convert.ToString(API.getEntityData(player, "PlayerID")) };
             DataTable result = db.compileSelectQuery(before, varNames, data);
             
             // Player Setup Calls
@@ -118,8 +134,10 @@ namespace stuykserver.Util
             API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
             API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
             API.sendNotificationToPlayer(player, "If a menu freezes. Press F1.");
-            API.setEntitySyncedData(player, "Admin", Convert.ToBoolean(result.Rows[0]["Admin"]));
-            API.setEntitySyncedData(player, "Karma", Convert.ToInt32(result.Rows[0]["Karma"]));
+            API.setEntityData(player, "Admin", Convert.ToBoolean(result.Rows[0]["Admin"]));
+            API.setEntityData(player, "Karma", Convert.ToInt32(result.Rows[0]["Karma"]));
+            API.setEntityData(player, "Session", DateTime.Now);
+            API.setEntityData(player, "Time", Convert.ToInt32(result.Rows[0]["Time"]));
 
             // Death Handling
             if (result.Rows[0]["Dead"].ToString() == "1")
@@ -130,7 +148,16 @@ namespace stuykserver.Util
                 API.playPlayerAnimation(player, (int)(AnimationFlags.StopOnLastFrame), "combat@death@from_writhe", "death_c");
             }
 
-            API.consoleOutput("{0} logged in || Admin = {1}", player.name, Convert.ToBoolean(API.getEntitySyncedData(player, "Admin")));
+            string dateTime = DateTime.Now.ToString();
+
+            API.consoleOutput("{0} logged in || Admin = {1} || On: {2}", player.name, Convert.ToBoolean(API.getEntitySyncedData(player, "Admin")), dateTime);
+            string[] logNames = { "LoggedIn" };
+            string logBefore = "UPDATE Players SET";
+            object[] logData = { "1" };
+            string after = string.Format("WHERE ID='{0}'", Convert.ToString(API.getEntityData(player, "PlayerID")));
+
+            // Send all our data to generate the query and run it
+            db.compileQuery(logBefore, after, logNames, logData);
         }
 
         [Flags]

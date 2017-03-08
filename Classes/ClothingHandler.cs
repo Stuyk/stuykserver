@@ -26,7 +26,7 @@ namespace stuykserver.Util
         {
             string[] varNames = { "ID" };
             string before = "SELECT * FROM PlayerClothing WHERE";
-            object[] data = { Convert.ToString(API.getEntitySyncedData(player, "PlayerID")) };
+            object[] data = { Convert.ToString(API.getEntityData(player, "PlayerID")) };
             DataTable result = db.compileSelectQuery(before, varNames, data);
 
             // Assign all clothing to Variables.
@@ -70,7 +70,7 @@ namespace stuykserver.Util
         {
             string[] varNames = { "clothingTop", "clothingTopColor", "clothingUndershirt", "clothingUndershirtColor", "clothingTorso", "clothingLegs", "clothingLegsColor", "clothingShoes", "clothingShoesColor", "clothingAccessory" };
             string before = "UPDATE PlayerClothing SET";
-            string after = string.Format("WHERE PlayerID='{0}'", Convert.ToString(API.getEntitySyncedData(player, "PlayerID")));
+            string after = string.Format("WHERE PlayerID='{0}'", Convert.ToString(API.getEntityData(player, "PlayerID")));
             db.compileQuery(before, after, varNames, args);
             updateClothingForPlayer(player);
 

@@ -146,5 +146,17 @@ namespace stuykserver.Util
                 API.sendNotificationToPlayer(player, string.Format("{0}'s Karma Is: {1}", target, API.getEntitySyncedData(API.getPlayerFromName(target), "Karma")));
             }
         }
+
+        [Command("spawncar")]
+        public void cmdSpawnCar(Client player, VehicleHash model)
+        {
+            if (util.isAdmin(player))
+            {
+                var rot = API.getEntityRotation(player.handle);
+                var vehicle = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
+                return;
+            }
+            return;
+        }
     }
 }

@@ -22,6 +22,7 @@ namespace stuykserver
 
         private void API_onResourceStart()
         {
+            API.setGamemodeName("~r~Stuyk ~w~Premier ~b~Roleplay");
             API.consoleOutput("Started: Main");
         }
 

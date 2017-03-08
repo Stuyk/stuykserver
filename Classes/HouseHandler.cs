@@ -14,6 +14,7 @@ namespace stuykserver.Util
     {
         Dictionary<ColShape, ShopInformationHandling> houseInformation = new Dictionary<ColShape, ShopInformationHandling>();
         DatabaseHandler db = new DatabaseHandler();
+        Util util = new Util();
 
         int currentDimension = 10;
 
@@ -63,8 +64,13 @@ namespace stuykserver.Util
                                     {
                                         houseInformation[collision].setForSale(forSale);
                                         houseInformation[collision].setShopPrice(price);
-                                        string query = string.Format("UPDATE PlayerHousing SET ForSale='1', Price='{0}' WHERE ID='{1}'", price, houseInformation[collision].returnCollisionID());
-                                        API.exported.database.executeQueryWithResult(query);
+
+                                        string[] varNames = { "ForSale", "Price" };
+                                        string before = "UPDATE PlayerHousing SET";
+                                        object[] data = { "1", price.ToString() };
+                                        string after = string.Format("WHERE ID='{0}'", houseInformation[collision].returnCollisionID());
+
+                                        db.compileQuery(before, after, varNames, data);
                                     }
                                 }
                             }
@@ -89,8 +95,13 @@ namespace stuykserver.Util
                             {
                                 houseInformation[collision].setForSale(forSale);
                                 houseInformation[collision].setShopPrice(0);
-                                string query = string.Format("UPDATE PlayerHousing SET ForSale='0', Price='0' WHERE ID='{0}'", houseInformation[collision].returnCollisionID());
-                                API.exported.database.executeQueryWithResult(query);
+
+                                string[] varNames = { "ForSale", "Price" };
+                                string before = "UPDATE PlayerHousing SET";
+                                object[] data = { "0", "0" };
+                                string after = string.Format("WHERE ID='{0}'", houseInformation[collision].returnCollisionID());
+
+                                db.compileQuery(before, after, varNames, data);
                             }
                         }
                     }
@@ -186,12 +197,14 @@ namespace stuykserver.Util
         }
 
         [Command("addhouse")]
-        public void cmdHouseHandlerAddHouse(Client player)
+        public void cmdHouseHandlerAddHouse(Client player, int price = 100000, bool forSale = true)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
-                string query = string.Format("INSERT INTO PlayerHousing (PosX, PosY, PosZ) VALUES ('{0}', '{1}', '{2}')", player.position.X, player.position.Y, player.position.Z);
-                API.exported.database.executeQuery(query);
+                string[] varNamesTwo = { "PosX", "PosY", "PosZ", "Price", "ForSale" };
+                string tableName = "PlayerHousing";
+                string[] dataTwo = { player.position.X.ToString(), player.position.Y.ToString(), player.position.Z.ToString(), price.ToString(), forSale.ToString() };
+                db.compileInsertQuery(tableName, varNamesTwo, dataTwo);
                 initializeHousing();
             }
         }

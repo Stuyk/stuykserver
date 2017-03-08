@@ -1,5 +1,5 @@
 <meta>
-	<info name="StuykServer" type="gamemode" author="Stuyk" version="0.1" description="Unassigned" />
+	<info name="Stuyk Premier RP" type="gamemode" author="Stuyk" version="0.1" description="Unassigned" />
 
 	<script src="stuykserver.dll" type="server" lang="compiled" />
 
@@ -8,9 +8,10 @@
 	<script src="clientside/resources/PaperBoy.js" type="client" lang="javascript" />
 	<script src="clientside/resources/Fishing.js" type="client" lang="javascript" />
 
-  <file src="clientside/resources/dealership.html"/>
+	<file src="clientside/resources/invalidname.html"/>
+	<file src="clientside/resources/dealership.html"/>
 	<file src="clientside/resources/skinchanger.html"/>
-  <file src="clientside/resources/index.html"/>
+	<file src="clientside/resources/index.html"/>
 	<file src="clientside/resources/regsuccess.html"/>
 	<file src="clientside/resources/inventory.html"/>
 	<file src="clientside/resources/loading.html"/>

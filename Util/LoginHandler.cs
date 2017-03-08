@@ -82,7 +82,7 @@ namespace stuykserver.Util
                 return;
             }
 
-            API.setEntitySyncedData(player, "PlayerID", Convert.ToInt32(result.Rows[0]["ID"]));
+            API.setEntityData(player, "PlayerID", Convert.ToInt32(result.Rows[0]["ID"]));
             API.call("ConnectionHandler", "SpawnPlayer", player);
         }
 
@@ -119,9 +119,11 @@ namespace stuykserver.Util
                 return;
             }
 
-            string[] varNamesTwo = { "Email", "Nametag", "Password", "SocialClub", "IP", "Health", "Armor" };
+            DateTime date = DateTime.Now;
+
+            string[] varNamesTwo = { "Email", "Nametag", "Password", "SocialClub", "IP", "Health", "Armor", "RegisterDate" };
             string tableName = "Players";
-            string[] dataTwo = { email, player.name, hash, player.socialClubName, player.address, "100", "0" };
+            string[] dataTwo = { email, player.name, hash, player.socialClubName, player.address, "100", "0", date.ToString("yyyy-MM-dd HH:mm:ss") };
             db.compileInsertQuery(tableName, varNamesTwo, dataTwo);
 
             result = API.exported.database.executeQueryWithResult("SELECT ID FROM Players ORDER BY ID DESC LIMIT 1");

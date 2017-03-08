@@ -59,7 +59,7 @@ namespace stuykserver.Util
                     "CheekboneHeight", "CheekboneDepth", "CheekboneWidth", "Eyelids", "Lips", "JawWidth", "JawDepth", "JawLength", "ChinFullness", "ChinWidth", "NeckWidth", "FacialHair",
                     "FacialHairColor", "FacialHairColor2", "Ageing", "Complexion", "Moles" };
             string before = "UPDATE PlayerSkins SET";
-            string after = string.Format("WHERE PlayerID='{0}'", Convert.ToString(API.getEntitySyncedData(player, "PlayerID")));
+            string after = string.Format("WHERE PlayerID='{0}'", Convert.ToString(API.getEntityData(player, "PlayerID")));
 
             db.compileQuery(before, after, varNames, args);
         }
@@ -68,7 +68,7 @@ namespace stuykserver.Util
         {
             string[] varNames = { "PlayerID" };
             string before = "SELECT * FROM PlayerSkins WHERE";
-            object[] data = { Convert.ToInt32(API.getEntitySyncedData(player, "PlayerID")) };
+            object[] data = { Convert.ToInt32(API.getEntityData(player, "PlayerID")) };
             DataTable result = db.compileSelectQuery(before, varNames, data);
 
             int gender = Convert.ToInt32(result.Rows[0]["skinGender"]);

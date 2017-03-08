@@ -29,7 +29,7 @@ namespace stuykserver.Util
         // Check if Admin.
         public bool isAdmin(Client player)
         {
-            return Convert.ToBoolean(API.getEntitySyncedData(player, "Admin"));
+            return Convert.ToBoolean(API.getEntityData(player, "Admin"));
         }
     }
 }

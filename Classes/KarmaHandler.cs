@@ -22,25 +22,25 @@ namespace stuykserver.Util
 
         public void addKarma(Client player, int amount) // player is a variable, amount is a variable.
         {
-            int currentKarma = Convert.ToInt32(API.getEntitySyncedData(player, "Karma"));
+            int currentKarma = Convert.ToInt32(API.getEntityData(player, "Karma"));
             currentKarma += amount;
-            API.setEntitySyncedData(player, "Karma", currentKarma);
+            API.setEntityData(player, "Karma", currentKarma);
             pushKarma(player);
             API.sendNotificationToPlayer(player, "~g~You've gained some karma.");
         }
 
         public void removeKarma(Client player, int amount)
         {
-            int currentKarma = Convert.ToInt32(API.getEntitySyncedData(player, "Karma"));
+            int currentKarma = Convert.ToInt32(API.getEntityData(player, "Karma"));
             currentKarma -= amount;
-            API.setEntitySyncedData(player, "Karma", currentKarma);
+            API.setEntityData(player, "Karma", currentKarma);
             pushKarma(player);
             API.sendNotificationToPlayer(player, "~r~You have lost some karma.");
         }
 
         public bool checkKarma(Client player, int amount)
         {
-            int currentKarma = Convert.ToInt32(API.getEntitySyncedData(player, "Karma"));
+            int currentKarma = Convert.ToInt32(API.getEntityData(player, "Karma"));
             if (currentKarma >= amount)
             {
                 return true;
@@ -52,15 +52,15 @@ namespace stuykserver.Util
         {
             string[] varNames = { "Karma" };
             string before = "UPDATE Players SET";
-            string after = string.Format("WHERE ID='{0}'", Convert.ToInt32(API.getEntitySyncedData(player, "ID")));
-            object[] args = { Convert.ToInt32(API.getEntitySyncedData(player, "Karma")) };
+            string after = string.Format("WHERE ID='{0}'", Convert.ToInt32(API.getEntityData(player, "ID")));
+            object[] args = { Convert.ToInt32(API.getEntityData(player, "Karma")) };
             db.compileQuery(before, after, varNames, args);
             updateKarma(player);
         }
 
         public void updateKarma(Client player)
         {
-            int currentKarma = Convert.ToInt32(API.getEntitySyncedData(player, "Karma"));
+            int currentKarma = Convert.ToInt32(API.getEntityData(player, "Karma"));
             if (currentKarma == 0)
             {
                 string displayText = "Pure Neutral";

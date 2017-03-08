@@ -56,14 +56,6 @@ function killPanel() {
 	}
 }
 
-// PARSE LOGIN SCREEN: GO! GO! GO!
-API.onResourceStart.connect(function() {
-  if (pagePanel == null) {
-    pagePanel = new CefHelper("clientside/resources/index.html");
-    pagePanel.show();
-  }
-});
-
 // DISCONNECTED? BETTER STOP THE CEF SHIT.
 API.onResourceStop.connect(function() {
     if (pagePanel != null) {
@@ -191,6 +183,16 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	// CEF REQUEST PANEL EVENTS
 	if (pagePanel == null) {
 		switch(eventName) {
+			case "showLogin":
+			{
+				showLoginScreen();
+				break;
+			}
+			case "showInvalidName":
+			{
+				showInvalidUsernameScreen();
+				break;
+			}
 			case "openInventory":
 			{
 				showInventory();
@@ -450,6 +452,10 @@ API.onUpdate.connect(function() {
 		}
 	}
 });
+
+
+
+
 // ##########################
 // # HOUSE     FUNCTIONS ####
 // #### WRITTEN BY STUYK ####
@@ -510,6 +516,20 @@ function registerHandler(email, password) {
 
 function loginHandler(email, password) {
     API.triggerServerEvent("clientLogin", email, password);
+}
+
+function showLoginScreen() {
+	if (pagePanel == null) {
+		pagePanel = new CefHelper("clientside/resources/index.html");
+		pagePanel.show();
+	}
+}
+
+function showInvalidUsernameScreen() {
+	if (pagePanel == null) {
+		pagePanel = new CefHelper("clientside/resources/invalidname.html");
+		pagePanel.show();
+	}
 }
 
 // ##########################
