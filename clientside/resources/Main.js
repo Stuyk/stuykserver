@@ -82,7 +82,7 @@ API.onKeyDown.connect(function(player, e) {
 			API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 			return;
 		}
-		
+
 		if (currentCollisionType == "House") {
 			API.triggerServerEvent("useFunction", "HouseOwnershipPanel");
 			useFunction = null;
@@ -157,7 +157,7 @@ API.onKeyDown.connect(function(player, e) {
 				useFunction = null;
 				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 				break;
-				
+
 			case "House":
 				API.triggerServerEvent("useFunction", "House");
 				vehicleSpecialFunction = null;
@@ -267,6 +267,11 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 				pagePanel.browser.call("doesNotMatch");
 				break;
 			}
+			case "alreadyLoggedIn":
+			{
+				pagePanel.browser.call("alreadyLoggedIn");
+				break;
+			}
 			case "accountDoesNotExist":
 			{
 				pagePanel.browser.call("doesNotExist");
@@ -293,7 +298,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 				pagePanel.browser.call("pushHousePricePoint", args[0]);
 				break;
 			}
-				
+
 		}
 
 	}
@@ -447,7 +452,7 @@ API.onUpdate.connect(function() {
 		case "VehicleLock":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
-			
+
 		case "House":
 			API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
@@ -481,7 +486,7 @@ function housePropertyChanges(forSale, price) {
 	if (forSale == true) {
 		API.triggerServerEvent("setHouseProperties", true, price);
 	}
-	
+
 	if (forSale == false) {
 		API.triggerServerEvent("setHouseProperties", false, null);
 	}
@@ -758,61 +763,61 @@ function changeFacialFeature(type, amount) {
 
 function changeFaceHair(amount) {
 	faceFacialHair += amount;
-	
+
 	if (faceFacialHair <= -1) {
 		faceFacialHair = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceHairColor(amount) {
 	faceFacialHairColor += amount;
-	
+
 	if (faceFacialHairColor <= -1) {
 		faceFacialHairColor = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceHairColorTwo(amount) {
 	faceFacialHairColorTwo += amount;
-	
+
 	if (faceFacialHairColorTwo <= -1) {
 		faceFacialHairColorTwo = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceAgeing(amount) {
 	faceAgeing += amount;
-	
+
 	if (faceAgeing <= -1) {
 		faceAgeing = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceComplexion(amount) {
 	faceComplexion += amount;
-	
+
 	if (faceComplexion <= -1) {
 		faceComplexion = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
 function changeFaceMoles(amount) {
 	faceMoles += amount;
-	
+
 	if (faceMoles <= -1) {
 		faceMoles = 0;
 	}
-	
+
 	changeUpdateFace();
 }
 
@@ -1858,7 +1863,7 @@ function startBrowsing(type, dimension) {
 			vehicleSelectionType = vehiclesVans;
 			break;
 	}
-	
+
 	dealershipSetupVehicles(vehicleSelectionDimension);
 	API.setEntityDimension(API.getLocalPlayer(), vehicleSelectionDimension);
 	API.setPlayerIntoVehicle(centerVehicle, -1);
@@ -1884,7 +1889,7 @@ function dealershipSetupVehicles(dimension) {
 	if (pagePanel != null) {
 		pagePanel.browser.call("updateVehicle", vehicleSelectionType[currentVehicleIndex]);
 	}
-	
+
 	API.setPlayerIntoVehicle(centerVehicle, -1);
 }
 

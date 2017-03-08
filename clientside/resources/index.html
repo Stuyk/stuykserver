@@ -21,6 +21,7 @@
 					<div id="login" class="tab-pane fade in active">
 						<div class="form-group">
 							<div class="col-sm-12">
+                <div class="alert alert-danger" id="alreadyLoggedIn" role="alert" hidden>Account already logged in.</div>
 								<div class="alert alert-danger" id="doesNotMatch" role="alert" hidden>Email or password does not match.</div>
 								<div class="alert alert-danger" id="doesNotExist" role="alert" hidden>This account does not exist.</div>
 								<div class="alert alert-danger" id="doesNotMatchAccount" role="alert" hidden>Username does not match account.</div>
@@ -80,8 +81,8 @@
 	$(document).ready(function() {
 		$('#inputEmail').focus();
 	});
-	
-	
+
+
 	$('#login').keydown(function(e) {
 		if (e.which == 13) {
 			var inputEmail = $('#inputEmail').val();
@@ -90,7 +91,7 @@
 			}
 		}
 	});
-	
+
 	$('#register').keydown(function(e) {
 		if (e.which == 13) {
 			var registerEmail = $('#registerEmail').val();
@@ -109,7 +110,7 @@
 	{
 		parseRegistration();
 	}
-	
+
 	function parseLogin() {
 		var email = document.getElementById("inputEmail").value;
 		var password = document.getElementById("inputPassword").value;
@@ -124,7 +125,7 @@
 			$('#doesNotMatchAccount').hide();
 		}
 	}
-	
+
 	function parseRegistration() {
 		var email = document.getElementById("registerEmail").value;
 		var password = document.getElementById("registerPassword").value;
@@ -148,33 +149,46 @@
 			$('#invalidEmail').show();
 		}
 	}
-	
-	
+
+
 	function showLogin() {
 		$('#pushingRegistration').hide();
 		$('#registrationSuccess').show();
 	}
-	
+
 	function doesNotMatch() {
 		$('#doesNotMatch').show();
 		$('#doesNotExist').hide();
+  		$('#alreadyLoggedIn').hide();
 		$('#doesNotMatchAccount').hide();
 		$('#inputEmail').show();
 		$('#inputPassword').show();
 		$('#loginButton').show();
 		$('#pushingLogin').hide();
 	}
-	
-	function doesNotExist() {
-		$('#doesNotExist').show();
+
+  function alreadyLoggedIn() {
+		$('#alreadyLoggedIn').show();
+		$('#doesNotExist').hide();
 		$('#doesNotMatch').hide();
 		$('#doesNotMatchAccount').hide();
 		$('#inputEmail').show();
 		$('#inputPassword').show();
 		$('#loginButton').show();
 		$('#pushingLogin').hide();
+  }
+
+	function doesNotExist() {
+		$('#doesNotExist').show();
+		$('#doesNotMatch').hide();
+		$('#alreadyLoggedIn').hide();
+		$('#doesNotMatchAccount').hide();
+		$('#inputEmail').show();
+		$('#inputPassword').show();
+		$('#loginButton').show();
+		$('#pushingLogin').hide();
 	}
-	
+
 	function doesNotMatchAccount() {
 		$('#doesNotMatchAccount').show();
 		$('#doesNotMatch').hide();
@@ -187,4 +201,3 @@
 	</script>
 	</body>
 </html>
-

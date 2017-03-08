@@ -32,7 +32,7 @@ API.onServerEventTrigger.connect(function (eventName, args) {
 			panelOpen = false;
 		}
 	}
-	
+
 	if (eventName == "stopFishing") {
 		casting = null;
 		storedword = null;
@@ -61,8 +61,8 @@ API.onKeyDown.connect(function(player, e) {
 						fishingTimeout();
 						return;
 					}
-				} 
-				else if (!API.isChatOpen() && e.KeyCode == Keys.Space) 
+				}
+				else if (!API.isChatOpen() && e.KeyCode == Keys.Space)
 				{
 					fishingTimeout();
 					return;
@@ -84,20 +84,20 @@ API.onUpdate.connect(function() { //700 HZ is about 10 Seconds, 350HZ is about 5
 				queuetask = true;
 			}
 		}
-		
+
 		if (biteTime > 5000) {
 			fishingTimeout();
 		}
-		
+
 		if (currentword != null) {
 			if (startTime > 10 && startTime < 13) {
 				API.playSoundFrontEnd("CHECKPOINT_NORMAL", "HUD_MINI_GAME_SOUNDSET");
 			}
-		
+
 			if (startTime > 700) {
 				fishingTimeout();
 			}
-			
+
 			API.drawText(Math.floor(startTime / 70).toString() + "/10", resX / 2 + 200, resY - 200, 1, 255, 255, 255, 255, 4, 2, true, true, 0);
 
 			startTime += 1;
