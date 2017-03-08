@@ -17,7 +17,7 @@ namespace stuykserver.Util
             API.onResourceStart += API_onResourceStart;
         }
 
-        public DataTable compileSelectQuery(string before, string after, string[] vars, object[] data)
+        public DataTable compileSelectQuery(string before, string[] vars, object[] data, string after = "")
         {
             int i = 0;
             string query;
@@ -35,7 +35,7 @@ namespace stuykserver.Util
                 }
                 else
                 {
-                    query = string.Format("{0} {1}=@{1},", query, label);
+                    query = string.Format("{0} {1}=@{1} AND", query, label);
                 }
 
                 parameters.Add(string.Format("@{0}", label), data[i].ToString());

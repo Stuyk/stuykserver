@@ -90,17 +90,11 @@ namespace stuykserver.Util
 
         public void SpawnPlayer(Client player)
         {
-            string s = player.socialClubName;
-
-            API.setEntitySyncedData(player, "PLAYERID", 0);
-
-            int id = Convert.ToInt32(API.getEntitySyncedData(player, "PLAYERID"));
-
-
-
-
-            string query = string.Format("SELECT LASTX, LASTY, LASTZ, Dead FROM Players WHERE Nametag='{0}'", player.name);
+            string query = string.Format("SELECT LASTX, LASTY, LASTZ, Dead, Money, Nametag FROM Players WHERE ID='{0}'", API.getEntitySyncedData(player, "PlayerID"));
             DataTable result = API.exported.database.executeQueryWithResult(query);
+
+            API.triggerClientEvent(player, "update_money_display", Convert.ToInt32(result.Rows[0]["Money"]));
+            db.setPlayerLoggedIn(player);
 
             var x = Convert.ToSingle(result.Rows[0]["LASTX"]);
             var y = Convert.ToSingle(result.Rows[0]["LASTY"]);

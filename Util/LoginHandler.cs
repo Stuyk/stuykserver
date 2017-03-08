@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Security.Cryptography;
 
 using BCr = BCrypt.Net;
 
@@ -44,54 +45,48 @@ namespace stuykserver.Util
             API.consoleOutput("Started: LoginHandler");
         }
 
+        static string GetMd5Hash(MD5 md5Hash, string input)
+        {
+            byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            StringBuilder sBuilder = new StringBuilder();
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            } 
+
+            return sBuilder.ToString();
+        }
+
         public void cmdLogin(Client player, string email, string password)
         {
-            string[] varNames = { "ID" };
-            string before = "SELECT ID FROM Players WHERE";
-            object[] data = { email, BCr.BCrypt.HashPassword(password) };
-            string after = string.Format("")
+            string hash;
 
-
-
-            string query = string.Format("SELECT ID FROM Players WHERE Email='{0}' AND Password='{1}'", email, BCr.BCrypt.HashPassword(password));
-            DataTable result = API.exported.database.executeQueryWithResult(query);
-
-            if (result != null)
+            using (MD5 md5Hash = MD5.Create())
             {
-
+                hash = GetMd5Hash(md5Hash, password);
             }
 
+            string[] varNames = { "Email", "Password" };
+            string before = "SELECT ID, LoggedIn FROM Players WHERE";
+            object[] data = { email, hash };
+            DataTable result = db.compileSelectQuery(before, varNames, data);
 
-
-
-            if (player.name == db.pullDatabase("Players", "Nametag", "Email", email))
+            if (result.Rows.Count != 1)
             {
-                if (passwordHash != null)
-                {
-                    if (BCr.BCrypt.Verify(password, passwordHash))
-                    {
-                        if (!db.isPlayerLoggedIn(player))
-                        {
-                            API.call("ConnectionHandler", "SpawnPlayer", player);
-                            int money = Convert.ToInt32(db.pullDatabase("Players", "Money", "Nametag", player.name));
-                            API.triggerClientEvent(player, "update_money_display", money);
-                            db.setPlayerLoggedIn(player);
-                            return;
-                        }
-                        API.kickPlayer(player, "You are already logged in.");
-                        return;
-                    }
-                    else
-                    {
-                        API.triggerClientEvent(player, "passwordDoesNotMatch");
-                        return;
-                    }
-                }
                 API.triggerClientEvent(player, "passwordDoesNotMatch");
                 return;
             }
-            API.triggerClientEvent(player, "doesNotMatchAccount");
-            return;
+
+            if (Convert.ToBoolean(result.Rows[0]["LoggedIn"]))
+            {
+                API.triggerClientEvent(player, "alreadyLoggedIn");
+                return;
+            }
+
+            API.setEntitySyncedData(player, "PlayerID", Convert.ToInt32(result.Rows[0]["ID"]));
+            API.call("ConnectionHandler", "SpawnPlayer", player);
         }
 
         public void cmdRegister(Client player, string email, string password)
