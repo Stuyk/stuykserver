@@ -80,6 +80,7 @@
     <Compile Include="Classes\OrganizationHandler.cs" />
     <Compile Include="Util\SkinHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\Util.cs" />
     <Compile Include="Util\VehicleHandler.cs" />
     <Compile Include="Classes\VehicleModificationHandler.cs" />
     <Compile Include="Classes\VehicleShopHandler.cs" />

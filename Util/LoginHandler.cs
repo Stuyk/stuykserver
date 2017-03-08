@@ -91,42 +91,53 @@ namespace stuykserver.Util
 
         public void cmdRegister(Client player, string email, string password)
         {
-            // Check if Email already exists in the database.
-            string query = "SELECT Email FROM Players";
-            DataTable result = API.exported.database.executeQueryWithResult(query);
+            string hash;
 
-            bool exists = result.Select().ToList().Exists(row => row["Email"].ToString() == email);
-
-            if (!exists)
+            using (MD5 md5Hash = MD5.Create())
             {
-                if (!db.usernameExists(player.name.ToString()))
-                {
-                    var hash = BCr.BCrypt.HashPassword(password, BCr.BCrypt.GenerateSalt(12));
-                    db.insertDatabase("Players", "Email", email);
-                    db.updateDatabase("Players", "Nametag", player.name, "Email", email);
-                    db.updateDatabase("Players", "Password", hash, "Nametag", player.name);
-                    db.updateDatabase("Players", "IP", player.address, "Nametag", player.name);
-                    db.updateDatabase("Players", "SocialClub", player.socialClubName, "Nametag", player.name);
-                    db.insertDatabase("PlayerInventory", "Nametag", player.name);
-                    db.insertDatabase("PlayerSkins", "Nametag", player.name);
-                    db.insertDatabase("PlayerClothing", "Nametag", player.name);
-                    // ...  Add More Here
-                    API.triggerClientEvent(player, "registerSuccessful");
-                }
-                else
-                {
-                    // Feedback if username already exists.
-                    API.sendNotificationToPlayer(player, "~r~Sorry, that username exists.");
-                    return;
-                }
+                hash = GetMd5Hash(md5Hash, password);
             }
-            else
+
+            string[] varNames = { "Email", "Nametag" };
+            string before = "SELECT Email FROM Players WHERE";
+            object[] data = { email, player.name };
+            DataTable result = db.compileSelectQuery(before, varNames, data);
+
+            if (result.Rows.Count >= 1)
             {
-                // Feedback if email already exists.
-                API.sendNotificationToPlayer(player, "~r~Sorry, that email exists.");
+                // Account Exists
                 return;
             }
-            return;
+
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            string query = "INSERT INTO Players (Email, Nametag, Password, IP, SocialClub) VALUES (@Email, @Nametag, @Password, @IP, @SocialClub)";
+            parameters.Add("@Email", email);
+            parameters.Add("@Nametag", player.name);
+            parameters.Add("@Password", hash);
+            parameters.Add("@SocialClub", player.socialClubName);
+            parameters.Add("@IP", player.address);
+            API.exported.database.executePreparedQuery(query, parameters);
+            result = API.exported.database.executeQueryWithResult("SELECT ID FROM Players ORDER BY ID DESC LIMIT 1");
+            string playerID = result.Rows[0]["ID"].ToString();
+            parameters.Clear();
+
+            query = "INSERT INTO PlayerInventory (PlayerID) VALUES (@PlayerID)";
+            parameters.Add("@PlayerID", playerID);
+            API.exported.database.executePreparedQuery(query, parameters);
+            parameters.Clear();
+
+            query = "INSERT INTO PlayerSkins (PlayerID) VALUES (@PlayerID)";
+            parameters.Add("@PlayerID", playerID);
+            API.exported.database.executePreparedQuery(query, parameters);
+            parameters.Clear();
+
+            query = "INSERT INTO PlayerClothing (PlayerID) VALUES (@PlayerID)";
+            parameters.Add("@PlayerID", playerID);
+            API.exported.database.executePreparedQuery(query, parameters);
+            parameters.Clear();
+
+            API.consoleOutput("Registered {0} at {1}.", player.name, playerID);
+            API.triggerClientEvent(player, "registerSuccessful");
         }
     }
 }

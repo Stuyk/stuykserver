@@ -18,6 +18,7 @@ namespace stuykserver.Util
         SkinHandler skinHandler = new SkinHandler();
         ClothingHandler clothingHandler = new ClothingHandler();
         KarmaHandler kh = new KarmaHandler();
+        Util util = new Util();
 
         public ConnectionHandler()
         {
@@ -90,46 +91,40 @@ namespace stuykserver.Util
 
         public void SpawnPlayer(Client player)
         {
-            string query = string.Format("SELECT LASTX, LASTY, LASTZ, Dead, Money, Nametag FROM Players WHERE ID='{0}'", API.getEntitySyncedData(player, "PlayerID"));
-            DataTable result = API.exported.database.executeQueryWithResult(query);
-
-            API.triggerClientEvent(player, "update_money_display", Convert.ToInt32(result.Rows[0]["Money"]));
             db.setPlayerLoggedIn(player);
-
-            var x = Convert.ToSingle(result.Rows[0]["LASTX"]);
-            var y = Convert.ToSingle(result.Rows[0]["LASTY"]);
-            var z = Convert.ToSingle(result.Rows[0]["LASTZ"]);
-            string dead = result.Rows[0]["Dead"].ToString();
-
-            player.freezePosition = false;
-
-            // Set / Load Player Data
-            API.setEntityPosition(player, new Vector3(x, y, z));
-            skinHandler.loadCurrentFace(player);
-            clothingHandler.updateClothingForPlayer(player);
-            kh.updateKarma(player);
-
-            // Kill any open panels.
-            API.triggerClientEvent(player, "killPanel");
-            API.setEntityDimension(player, 0);
-
+            string query = string.Format("SELECT LASTX, LASTY, LASTZ, Dead, Money, Nametag, Health, Armor FROM Players WHERE ID='{0}'", API.getEntitySyncedData(player, "PlayerID"));
+            DataTable result = API.exported.database.executeQueryWithResult(query);
+            
+            // Player Setup Calls
+            API.call("SkinHandler", "loadCurrentFace", player);
+            API.call("ClothingHandler", "updateClothingForPlayer", player);
+            API.call("KarmaHandler", "updateKarma", player);
             API.call("VehicleHandler", "SpawnPlayerCars", player);
+            API.exported.gtaocharacter.updatePlayerFace(player.handle);
 
-            if (dead == "1")
+            // Player Client Events
+            API.triggerClientEvent(player, "update_money_display", Convert.ToInt32(result.Rows[0]["Money"]));
+            API.triggerClientEvent(player, "killPanel");
+            API.triggerClientEvent(player, "endCamera");
+
+            // Player Specific Settings
+            API.freezePlayer(player, false);
+            API.setEntityPosition(player, util.convertToVector3(result.Rows[0]["LASTX"], result.Rows[0]["LASTY"], result.Rows[0]["LASTZ"]));
+            API.setPlayerHealth(player, Convert.ToInt32(result.Rows[0]["Health"]));
+            API.setPlayerArmor(player, Convert.ToInt32(result.Rows[0]["Armor"]));
+            API.setEntityDimension(player, 0);
+            API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
+            API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
+            API.sendNotificationToPlayer(player, "If a menu freezes. Press F1.");
+
+            // Death Handling
+            if (result.Rows[0]["Dead"].ToString() == "1")
             {
                 API.sendNotificationToPlayer(player, "~r~You have died.");
                 API.sendChatMessageToPlayer(player, "~g~/service EMS");
                 API.sendChatMessageToPlayer(player, "~r~/tapout");
                 API.playPlayerAnimation(player, (int)(AnimationFlags.StopOnLastFrame), "combat@death@from_writhe", "death_c");
             }
-
-            API.exported.gtaocharacter.updatePlayerFace(player.handle);
-
-            API.triggerClientEvent(player, "endCamera");
-            API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
-            API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
-
-            API.sendNotificationToPlayer(player, "If a menu freezes. Press F1.");
         }
 
         [Flags]
