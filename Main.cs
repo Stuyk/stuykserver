@@ -70,36 +70,6 @@ namespace stuykserver
             return;
         }
 
-        [Command("nametag")] //Temporary
-        public void nameTag(Client player, string name)
-        {
-            if (db.isPlayerLoggedIn(player))
-            {
-                if (isValidUsername(name))
-                {
-                    if (!db.usernameExists(name))
-                    {
-                        API.setPlayerNametag(player, name);
-                        API.setPlayerName(player, name);
-                        db.updateDatabase("Players", "Nametag", name, "Nametag", player.name);
-                        sendNotification(player, msgPrefix + "Your name has been changed to:" + name);
-                        return;
-                    }
-                    else
-                    {
-                        API.sendNotificationToPlayer(player, "~r~That username already exists.");
-                        return;
-                    } 
-                }
-                else
-                {
-                    API.sendNotificationToPlayer(player, "~r~Not a valid username format. EX: Johnny_Ringo");
-                    return;
-                }
-            }
-            return;
-        }
-
         [Command("inventory")]
         public void cmdInventory(Client player)
         {
@@ -108,14 +78,6 @@ namespace stuykserver
                 API.triggerClientEvent(player, "openInventory", player.name);
                 return;
             }
-        }
-
-        // Used to check if the string is a valid username.
-        public bool isValidUsername(string input)
-        {
-            string pattern = "^(([A-Z][a-z]+)(([ _][A-Z][a-z]+)|([ _][A-z]+[ _][A-Z][a-z]+)))$";
-            bool returnBool = Regex.IsMatch(input, pattern);
-            return returnBool;
         }
 
         // Modified send notificaiton with clientside noise.

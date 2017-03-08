@@ -180,7 +180,6 @@ namespace stuykserver.Util
                 int price = Convert.ToInt32(row["Price"]);
                 positionBlips(player, position, id, forSale, type, price);
                 ++initialized;
-                API.consoleOutput(type.ToString());
             }
 
             API.consoleOutput("Houses Intialized: " + initialized.ToString());

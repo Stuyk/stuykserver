@@ -10,6 +10,7 @@ namespace stuykserver.Util
     public class AdminCommands : Script
     {
         DatabaseHandler db = new DatabaseHandler();
+        Util util = new Util();
 
         public AdminCommands()
         {
@@ -24,7 +25,7 @@ namespace stuykserver.Util
         [Command("stopserver")]
         public void cmdStopServer(Client player)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 List<Client> players = API.getAllPlayers();
                 foreach (Client p in players)
@@ -37,7 +38,7 @@ namespace stuykserver.Util
         [Command("spawn")] //Temporary
         public void cmdSpawn(Client player)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 API.setEntityPosition(player, new Vector3(-1537.53, -942.0224, 12));
             }
@@ -46,7 +47,7 @@ namespace stuykserver.Util
         [Command("spectate")] // Admin Command
         public void cmdSpectate(Client player, string target)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 API.setPlayerToSpectatePlayer(player, API.getPlayerFromName(target));
                 API.sendNotificationToPlayer(player, "You are now spectating " + target);
@@ -56,7 +57,7 @@ namespace stuykserver.Util
         [Command("stopspectate")] // Admin Command
         public void cmdStopSpectate(Client player)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 API.unspectatePlayer(player);
             }
@@ -66,7 +67,7 @@ namespace stuykserver.Util
         [Command("giveweapon")] // Temporary
         public void WeaponCommand(Client player, WeaponHash hash)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 API.givePlayerWeapon(player, hash, 500, true, true);
             }
@@ -75,7 +76,7 @@ namespace stuykserver.Util
         [Command("giveadminmoney")] // Admin Command
         public void cmdGiveMoney(Client player, int amount)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 db.setPlayerMoney(player, amount);
             }
@@ -84,7 +85,7 @@ namespace stuykserver.Util
         [Command("adminkick")] // Kick a player.
         public void cmdKick(Client player, string target)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 API.kickPlayer(API.getPlayerFromName(target), "You were kicked by an admin.");
                 API.sendNotificationToPlayer(player, target + " has been kicked.");
@@ -94,7 +95,7 @@ namespace stuykserver.Util
         [Command("adminban")]
         public void cmdBan(Client player, string target)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 API.banPlayer(API.getPlayerFromName(target));
                 API.sendNotificationToPlayer(player, target + " has been banned.");
@@ -104,7 +105,7 @@ namespace stuykserver.Util
         [Command("mx")]
         public void cmdMX(Client player)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 API.setEntityPosition(player, new Vector3(player.position.X + 5, player.position.Y, player.position.Z));
             }
@@ -113,9 +114,36 @@ namespace stuykserver.Util
         [Command("my")]
         public void cmdMY(Client player)
         {
-            if (db.isAdmin(player.name))
+            if (util.isAdmin(player))
             {
                 API.setEntityPosition(player, new Vector3(player.position.X, player.position.Y + 5, player.position.Z));
+            }
+        }
+
+        [Command("addKarma")]
+        public void cmdAdminAddKarma(Client player, string target, int amount)
+        {
+            if (util.isAdmin(player))
+            {
+                API.call("KarmaHandler", "addKarma", API.getPlayerFromName(target), amount);
+            }
+        }
+
+        [Command("removeKarma")]
+        public void cmdAdminRemoveKarma(Client player, string target, int amount)
+        {
+            if (util.isAdmin(player))
+            {
+                API.call("KarmaHandler", "removeKarma", API.getPlayerFromName(target), amount);
+            }
+        }
+
+        [Command("getKarma")]
+        public void cmdAdminGetKarma(Client player, string target)
+        {
+            if (util.isAdmin(player))
+            {
+                API.sendNotificationToPlayer(player, string.Format("{0}'s Karma Is: {1}", target, API.getEntitySyncedData(API.getPlayerFromName(target), "Karma")));
             }
         }
     }

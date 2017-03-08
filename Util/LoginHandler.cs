@@ -6,9 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
-
-using BCr = BCrypt.Net;
-
 namespace stuykserver.Util
 {
     public class LoginHandler : Script
@@ -98,43 +95,48 @@ namespace stuykserver.Util
                 hash = GetMd5Hash(md5Hash, password);
             }
 
-            string[] varNames = { "Email", "Nametag" };
-            string before = "SELECT Email FROM Players WHERE";
-            object[] data = { email, player.name };
-            DataTable result = db.compileSelectQuery(before, varNames, data);
+            string[] varNamesZero = { "Email" };
+            string beforeZero = "SELECT Email FROM Players WHERE";
+            object[] dataZero = { email };
+            DataTable result = db.compileSelectQuery(beforeZero, varNamesZero, dataZero);
 
             if (result.Rows.Count >= 1)
             {
-                // Account Exists
+                // Email Exists
+                API.sendNotificationToPlayer(player, "That email already exists.");
                 return;
             }
 
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            string query = "INSERT INTO Players (Email, Nametag, Password, IP, SocialClub) VALUES (@Email, @Nametag, @Password, @IP, @SocialClub)";
-            parameters.Add("@Email", email);
-            parameters.Add("@Nametag", player.name);
-            parameters.Add("@Password", hash);
-            parameters.Add("@SocialClub", player.socialClubName);
-            parameters.Add("@IP", player.address);
-            API.exported.database.executePreparedQuery(query, parameters);
+            string[] varNamesOne = { "Nametag" };
+            string beforeOne = "SELECT Nametag FROM Players WHERE";
+            object[] dataOne = { player.name };
+            result = db.compileSelectQuery(beforeOne, varNamesOne, dataOne);
+
+            if (result.Rows.Count >= 1)
+            {
+                // Nametag Exists
+                API.sendNotificationToPlayer(player, "That nametag already exists.");
+                return;
+            }
+
+            string[] varNamesTwo = { "Email", "Nametag", "Password", "SocialClub", "IP", "Health", "Armor" };
+            string tableName = "Players";
+            string[] dataTwo = { email, player.name, hash, player.socialClubName, player.address, "100", "0" };
+            db.compileInsertQuery(tableName, varNamesTwo, dataTwo);
+
             result = API.exported.database.executeQueryWithResult("SELECT ID FROM Players ORDER BY ID DESC LIMIT 1");
             string playerID = result.Rows[0]["ID"].ToString();
-            parameters.Clear();
 
-            query = "INSERT INTO PlayerInventory (PlayerID) VALUES (@PlayerID)";
-            parameters.Add("@PlayerID", playerID);
-            API.exported.database.executePreparedQuery(query, parameters);
-            parameters.Clear();
+            string[] varNamesThree = { "PlayerID", "Nametag" };
+            tableName = "PlayerInventory";
+            string[] dataThree = { playerID, player.name };
+            db.compileInsertQuery(tableName, varNamesThree, dataThree);
 
-            query = "INSERT INTO PlayerSkins (PlayerID) VALUES (@PlayerID)";
-            parameters.Add("@PlayerID", playerID);
-            API.exported.database.executePreparedQuery(query, parameters);
-            parameters.Clear();
+            tableName = "PlayerSkins";
+            db.compileInsertQuery(tableName, varNamesThree, dataThree);
 
-            query = "INSERT INTO PlayerClothing (PlayerID) VALUES (@PlayerID)";
-            parameters.Add("@PlayerID", playerID);
-            API.exported.database.executePreparedQuery(query, parameters);
-            parameters.Clear();
+            tableName = "PlayerClothing";
+            db.compileInsertQuery(tableName, varNamesThree, dataThree);
 
             API.consoleOutput("Registered {0} at {1}.", player.name, playerID);
             API.triggerClientEvent(player, "registerSuccessful");

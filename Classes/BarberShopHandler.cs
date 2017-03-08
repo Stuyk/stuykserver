@@ -120,12 +120,11 @@ namespace stuykserver.Util
                     db.setPlayerHUD(player, false);
                     shopInformation[collision].addInsidePlayer(player, player.handle);
                     API.setEntityDimension(player, new Random().Next(1, 1000));
-                    API.triggerClientEvent(player, "openSkinPanel", player.position);
+                    API.triggerClientEvent(player, "openSkinPanel", player.handle);
                     API.setEntityPosition(player, new Vector3(-1279.177, -1118.023, 6.990117));
                     API.triggerClientEvent(player, "createCamera", new Vector3(-1281.826, -1118.141, 7.5), player.position);
                     API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
                     player.rotation = new Vector3(0, 0, 88.95126);
-                    skinHandler.loadLocalFaceData(player);
                 }
             }
         }

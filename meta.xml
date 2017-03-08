@@ -79,5 +79,4 @@
 	
 	<assembly ref="System.Data.dll"/>
 	<assembly ref="System.Xml.dll"/>
-	<assembly ref="Bcrypt.Net.dll"/>
 </meta>

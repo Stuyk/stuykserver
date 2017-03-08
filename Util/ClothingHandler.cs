@@ -19,78 +19,74 @@ namespace stuykserver.Util
 
         public void updateLocalClothingVariables(Client player)
         {
-            string query = string.Format("SELECT * FROM PlayerClothing WHERE Nametag='{0}'", player.name);
-            DataTable result = API.exported.database.executeQueryWithResult(query);
-
-            foreach (DataRow row in result.Rows)
-            {
-                int torso = Convert.ToInt32(row["clothingTorso"]);
-                int top = Convert.ToInt32(row["clothingTop"]);
-                int topcolor = Convert.ToInt32(row["clothingTopColor"]);
-                int undershirt = Convert.ToInt32(row["clothingUndershirt"]);
-                int undershirtcolor = Convert.ToInt32(row["clothingUndershirtColor"]);
-                int legs = Convert.ToInt32(row["clothingLegs"]);
-                int legscolor = Convert.ToInt32(row["clothingLegsColor"]);
-                int hat = Convert.ToInt32(row["clothingHat"]);
-                int hatcolor = Convert.ToInt32(row["clothingHatColor"]);
-                int shoes = Convert.ToInt32(row["clothingShoes"]);
-                int shoescolor = Convert.ToInt32(row["clothingShoesColor"]);
-                int accessory = Convert.ToInt32(row["clothingAccessory"]);
-
-                API.triggerClientEvent(player, "clothingLocalVariableUpdate", torso, top, topcolor, undershirt, undershirtcolor, legs, legscolor, shoes, shoescolor, accessory);
-            }
+            API.triggerClientEvent(player, "clothingLocalVariableUpdate", player.handle);
         }
 
         public void updateClothingForPlayer(Client player)
         {
-            string query = string.Format("SELECT * FROM PlayerClothing WHERE Nametag='{0}'", player.name);
-            DataTable result = API.exported.database.executeQueryWithResult(query);
+            string[] varNames = { "ID" };
+            string before = "SELECT * FROM PlayerClothing WHERE";
+            object[] data = { Convert.ToString(API.getEntitySyncedData(player, "PlayerID")) };
+            DataTable result = db.compileSelectQuery(before, varNames, data);
 
-            foreach (DataRow row in result.Rows)
-            {
-                int torso = Convert.ToInt32(row["clothingTorso"]);
-                int top = Convert.ToInt32(row["clothingTop"]);
-                int topcolor = Convert.ToInt32(row["clothingTopColor"]);
-                int undershirt = Convert.ToInt32(row["clothingUndershirt"]);
-                int undershirtcolor = Convert.ToInt32(row["clothingUndershirtColor"]);
-                int legs = Convert.ToInt32(row["clothingLegs"]);
-                int legscolor = Convert.ToInt32(row["clothingLegsColor"]);
-                int hat = Convert.ToInt32(row["clothingHat"]);
-                int hatcolor = Convert.ToInt32(row["clothingHatColor"]);
-                int shoes = Convert.ToInt32(row["clothingShoes"]);
-                int shoescolor = Convert.ToInt32(row["clothingShoesColor"]);
-                int accessory = Convert.ToInt32(row["clothingAccessory"]);
+            // Assign all clothing to Variables.
+            int torso = Convert.ToInt32(result.Rows[0]["clothingTorso"]);
+            int top = Convert.ToInt32(result.Rows[0]["clothingTop"]);
+            int topcolor = Convert.ToInt32(result.Rows[0]["clothingTopColor"]);
+            int undershirt = Convert.ToInt32(result.Rows[0]["clothingUndershirt"]);
+            int undershirtcolor = Convert.ToInt32(result.Rows[0]["clothingUndershirtColor"]);
+            int legs = Convert.ToInt32(result.Rows[0]["clothingLegs"]);
+            int legscolor = Convert.ToInt32(result.Rows[0]["clothingLegsColor"]);
+            int hat = Convert.ToInt32(result.Rows[0]["clothingHat"]);
+            int hatcolor = Convert.ToInt32(result.Rows[0]["clothingHatColor"]);
+            int shoes = Convert.ToInt32(result.Rows[0]["clothingShoes"]);
+            int shoescolor = Convert.ToInt32(result.Rows[0]["clothingShoesColor"]);
+            int accessory = Convert.ToInt32(result.Rows[0]["clothingAccessory"]);
+            
+            // Set Clothes
+            API.setPlayerClothes(player, 3, torso, 0);
+            API.setPlayerClothes(player, 11, top, topcolor);
+            API.setPlayerClothes(player, 4, legs, legscolor);
+            API.setPlayerClothes(player, 8, undershirt, undershirtcolor);
+            API.setPlayerClothes(player, 6, shoes, shoescolor);
+            API.setPlayerClothes(player, 7, accessory, 0);
 
-                API.setPlayerClothes(player, 3, torso, 0);
-                API.setPlayerClothes(player, 11, top, topcolor);
-                API.setPlayerClothes(player, 4, legs, legscolor);
-                API.setPlayerClothes(player, 8, undershirt, undershirtcolor);
-                API.setPlayerClothes(player, 6, shoes, shoescolor);
-                API.setPlayerClothes(player, 7, accessory, 0);
-            }
+            // Set Sync Data
+            API.setEntitySyncedData(player.handle, "clothingTorso", torso);
+            API.setEntitySyncedData(player.handle, "clothingTop", top);
+            API.setEntitySyncedData(player.handle, "clothingTopColor", topcolor);
+            API.setEntitySyncedData(player.handle, "clothingUndershirt", undershirt);
+            API.setEntitySyncedData(player.handle, "clothingUndershirtColor", undershirtcolor);
+            API.setEntitySyncedData(player.handle, "clothingLegs", legs);
+            API.setEntitySyncedData(player.handle, "clothingLegsColor", legscolor);
+            API.setEntitySyncedData(player.handle, "clothingHat", hat);
+            API.setEntitySyncedData(player.handle, "clothingHatColor", hatcolor);
+            API.setEntitySyncedData(player.handle, "clothingShoes", shoes);
+            API.setEntitySyncedData(player.handle, "clothingShoesColor", shoescolor);
+            API.setEntitySyncedData(player.handle, "clothingAccessory", accessory);
         }
+
+        public void actionSaveClothing(Client player, params object[] args)
+        {
+            string[] varNames = { "clothingTop", "clothingTopColor", "clothingUndershirt", "clothingUndershirtColor", "clothingTorso", "clothingLegs", "clothingLegsColor", "clothingShoes", "clothingShoesColor", "clothingAccessory" };
+            string before = "UPDATE PlayerClothing SET";
+            string after = string.Format("WHERE PlayerID='{0}'", Convert.ToString(API.getEntitySyncedData(player, "PlayerID")));
+            db.compileQuery(before, after, varNames, args);
+            updateClothingForPlayer(player);
+
+            API.call("ClothingShopHandler", "leaveClothingShop", player);
+            API.triggerClientEvent(player, "killPanel");
+            API.triggerClientEvent(player, "endCamera");
+            API.stopPedAnimation(player);
+            API.stopPlayerAnimation(player);
+        }
+
 
         private void API_onClientEventTrigger(Client player, string eventName, params object[] args)
         {
             if (eventName == "clothingSave")
             {
-                db.updateDatabase("PlayerClothing", "clothingTop", args[0].ToString(), "Nametag", player.name);
-                db.updateDatabase("PlayerClothing", "clothingTopColor", args[1].ToString(), "Nametag", player.name);
-                db.updateDatabase("PlayerClothing", "clothingUndershirt", args[2].ToString(), "Nametag", player.name);
-                db.updateDatabase("PlayerClothing", "clothingUndershirtColor", args[3].ToString(), "Nametag", player.name);
-                db.updateDatabase("PlayerClothing", "clothingTorso", args[4].ToString(), "Nametag", player.name);
-                db.updateDatabase("PlayerClothing", "clothingLegs", args[5].ToString(), "Nametag", player.name);
-                db.updateDatabase("PlayerClothing", "clothingLegsColor", args[6].ToString(), "Nametag", player.name);
-                db.updateDatabase("PlayerClothing", "clothingShoes", args[7].ToString(), "Nametag", player.name);
-                db.updateDatabase("PlayerClothing", "clothingShoesColor", args[8].ToString(), "Nametag", player.name);
-                db.updateDatabase("PlayerClothing", "clothingAccessory", args[9].ToString(), "Nametag", player.name);
-                updateClothingForPlayer(player);
-                API.stopPedAnimation(player);
-                API.stopPlayerAnimation(player);
-
-                API.call("ClothingShopHandler", "leaveClothingShop", player);
-                API.triggerClientEvent(player, "killPanel");
-                API.triggerClientEvent(player, "endCamera");
+                actionSaveClothing(player, args);
             }
 
             if (eventName == "exitClothingShop")

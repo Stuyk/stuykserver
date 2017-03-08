@@ -198,7 +198,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			}
 			case "openSkinPanel":
 			{
-				showModelMenu();
+				showModelMenu(args[0]);
 				break;
 			}
 			case "openClothingPanel":
@@ -324,22 +324,13 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 
 	// CLOTHING CHANGER VARIABLES
 	if (eventName=="clothingLocalVariableUpdate") {
-		clothingPanelOpen = true;
-		clothingTorsoNum = args[0];
-		clothingTopNum = args[1];
-		clothingTopColorNum = args[2];
-		clothingUndershirtNum = args[3];
-		clothingUndershirtColorNum = args[4];
-		clothingLegsNum = args[5];
-		clothingLegsColorNum = args[6];
-		clothingShoesNum = args[7];
-		clothingShoesColorNum = args[8];
-		clothingAccessory = args[9];
+		clothingPassLocalVariableUpdate(args[0]);
 	}
 
 	// MODEL CHANGER VARIABLES
 	if (eventName=="loadFaceData") {
 		facePanelOpen = true;
+		var player = API.getLocalPlayer();
 		faceShapeOne = args[0];
 		faceShapeTwo = args[1];
 		faceSkinOne = args[2];
@@ -585,48 +576,87 @@ function showRadialMenu() {
 // #### WRITTEN BY STUYK ####
 // ##########################
 
- faceGender = null;
- faceShapeOne = null;
- faceShapeTwo = null;
- faceSkinOne = null;
- faceSkinTwo = null;
- faceShapeMix = null;
- faceSkinMix = null;
- faceHairstyle = null;
- faceHairstyleColor = null;
- faceHairstyleHighlight = null;
- faceHairstyleTexture = null;
- facePanelOpen = null;
+var faceGender = null;
+var faceShapeOne = null;
+var faceShapeTwo = null;
+var faceSkinOne = null;
+var faceSkinTwo = null;
+var faceShapeMix = null;
+var faceSkinMix = null;
+var faceHairstyle = null;
+var faceHairstyleColor = null;
+var faceHairstyleHighlight = null;
+var faceHairstyleTexture = null;
+var facePanelOpen = null;
 // Facial Features
- faceNoseWidth = 0; // 0
- faceNoseHeight = 0; // 1
- faceNoseLength = 0; // 2
- faceNoseBridge = 0; // 3
- faceNoseTip = 0; // 4
- faceNoseBridgeDepth = 0; // 5
- faceEyebrowHeight = 0; // 6
- faceEyebrowDepth = 0; // 7
- faceCheekboneHeight = 0; // 8
- faceCheekboneDepth = 0; // 9
- faceCheekboneWidth = 0; // 10
- faceEyelids = 0; // 11
- faceLips = 0; // 12
- faceJawWidth = 0; // 13
- faceJawDepth = 0; // 14
- faceJawLength = 0; // 15
- faceChinFullness = 0; // 16
- faceChinWidth = 0; // 17
- faceNeckWidth = 0; // 19
- faceFacialHair = 0;
- faceFacialHairColor = 0;
- faceFacialHairColorTwo = 0;
- faceAgeing = 0;
- faceComplexion = 0;
- faceMoles = 0;
+var faceNoseWidth = 0; // 0
+var faceNoseHeight = 0; // 1
+var faceNoseLength = 0; // 2
+var faceNoseBridge = 0; // 3
+var faceNoseTip = 0; // 4
+var faceNoseBridgeDepth = 0; // 5
+var faceEyebrowHeight = 0; // 6
+var faceEyebrowDepth = 0; // 7
+var faceCheekboneHeight = 0; // 8
+var faceCheekboneDepth = 0; // 9
+var faceCheekboneWidth = 0; // 10
+var faceEyelids = 0; // 11
+var faceLips = 0; // 12
+var faceJawWidth = 0; // 13
+var faceJawDepth = 0; // 14
+var faceJawLength = 0; // 15
+var faceChinFullness = 0; // 16
+var faceChinWidth = 0; // 17
+var faceNeckWidth = 0; // 19
+var faceFacialHair = 0;
+var faceFacialHairColor = 0;
+var faceFacialHairColorTwo = 0;
+var faceAgeing = 0;
+var faceComplexion = 0;
+var faceMoles = 0;
 
-function showModelMenu() {
+function showModelMenu(player) {
 	pagePanel = new CefHelper("clientside/resources/skinchanger.html");
 	pagePanel.show();
+	
+	faceShapeOne = Number(API.getEntitySyncedData(player, "GTAO_SHAPE_FIRST_ID"));
+	faceShapeTwo = Number(API.getEntitySyncedData(player, "GTAO_SHAPE_SECOND_ID"));
+	faceSkinOne = Number(API.getEntitySyncedData(player, "GTAO_SKIN_FIRST_ID"));
+	faceSkinTwo = Number(API.getEntitySyncedData(player, "GTAO_SKIN_SECOND_ID"));
+	faceShapeMix = Number(API.getEntitySyncedData(player, "GTAO_SHAPE_MIX"));
+	faceSkinMix = Number(API.getEntitySyncedData(player, "GTAO_SKIN_MIX"));
+	faceHairstyle = Number(API.getEntitySyncedData(player, "GTAO_HAIRSTYLE"));
+	faceHairstyleColor = Number(API.getEntitySyncedData(player, "GTAO_HAIR_COLOR"));
+	faceHairstyleHighlight = Number(API.getEntitySyncedData(player, "GTAO_HAIR_HIGHLIGHT_COLOR"));
+	faceHairstyleTexture = Number(API.getEntitySyncedData(player, "GTAO_HAIRSTYLE_TEXTURE"));
+	
+	var faceFeatureList = API.getEntitySyncedData(player, "GTAO_FACE_FEATURES_LIST");
+	faceNoseWidth = Number(faceFeatureList[0]);
+	faceNoseHeight = Number(faceFeatureList[1]);
+	faceNoseLength = Number(faceFeatureList[2]);
+	faceNoseBridge = Number(faceFeatureList[3]);
+	faceNoseTip = Number(faceFeatureList[4]);
+	faceNoseBridgeDepth = Number(faceFeatureList[5]);
+	faceEyebrowHeight = Number(faceFeatureList[6]);
+	faceEyebrowDepth = Number(faceFeatureList[7]);
+	faceCheekboneHeight = Number(faceFeatureList[8]);
+	faceCheekboneDepth = Number(faceFeatureList[9]);
+	faceCheekboneWidth = Number(faceFeatureList[10]);
+	faceEyelids = Number(faceFeatureList[11]);
+	faceLips = Number(faceFeatureList[12]);
+	faceJawWidth = Number(faceFeatureList[13]);
+	faceJawDepth = Number(faceFeatureList[14]);
+	faceJawLength = Number(faceFeatureList[15]);
+	faceChinFullness = Number(faceFeatureList[16]);
+	faceChinWidth = Number(faceFeatureList[17]);
+	faceNeckWidth = Number(faceFeatureList[19]);
+	faceFacialHair = Number(API.getEntitySyncedData(player, "GTAO_FACIAL_HAIR"));
+	faceFacialHairColor = Number(API.getEntitySyncedData(player, "GTAO_FACIAL_HAIR_COLOR"));
+	faceFacialHairColor2 = Number(API.getEntitySyncedData(player, "GTAO_FACIAL_HAIR_COLOR2"));
+	faceAgeing = Number(API.getEntitySyncedData(player, "GTAO_AGEING"));
+	faceComplexion = Number(API.getEntitySyncedData(player, "GTAO_COMPLEXION"));
+	faceMoles = Number(API.getEntitySyncedData(player, "GTAO_MOLES"));
+
 	updateFaceProperties();
 }
 
@@ -995,6 +1025,21 @@ function showClothingPanel() {
 
 function changeClothingExitShop() {
 	API.triggerServerEvent("exitClothingShop");
+}
+
+function clothingPassLocalVariableUpdate(player) {
+	clothingPanelOpen = true;
+	clothingTorsoNum = Number(API.getEntitySyncedData(player, "clothingTorso"));
+	clothingTopNum = Number(API.getEntitySyncedData(player, "clothingTop"));
+	clothingTopColorNum = Number(API.getEntitySyncedData(player, "clothingTopColor"));
+	clothingUndershirtNum = Number(API.getEntitySyncedData(player, "clothingUndershirt"));
+	clothingUndershirtColorNum = Number(API.getEntitySyncedData(player, "clothingUndershirtColor"));
+	clothingLegsNum = Number(API.getEntitySyncedData(player, "clothingLegs"));;
+	clothingLegsColorNum = Number(API.getEntitySyncedData(player, "clothingLegsColor"));
+	clothingShoesNum = Number(API.getEntitySyncedData(player, "clothingShoes"));
+	clothingShoesColorNum = Number(API.getEntitySyncedData(player, "clothingShoesColor"));
+	clothingAccessory = Number(API.getEntitySyncedData(player, "clothingAccessory"));
+	updateClothingProperties();
 }
 
 function changeAccessory(amount) {

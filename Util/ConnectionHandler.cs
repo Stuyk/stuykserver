@@ -40,7 +40,7 @@ namespace stuykserver.Util
             string[] varNames = { "LASTX", "LASTY", "LASTZ", "LoggedIn", "CurrentSkin", "Health", "Armor" };
             string before = "UPDATE Players SET";
             object[] data = { player.position.X, player.position.Y, player.position.Z, "0", ((PedHash)API.getEntityModel(player)).ToString(), API.getPlayerHealth(player).ToString(), API.getPlayerArmor(player).ToString() };
-            string after = string.Format("WHERE Nametag='{0}'", player.name);
+            string after = string.Format("WHERE ID='{0}'", API.getEntitySyncedData(player, "PlayerID"));
 
             // Send all our data to generate the query and run it
             this.db.compileQuery(before, after, varNames, data);
@@ -72,7 +72,7 @@ namespace stuykserver.Util
         private void API_onPlayerBeginConnect(Client player, CancelEventArgs cancelConnection)
         {
             // Check if player has a valid username before connecting.
-            if (!main.isValidUsername(player.name))
+            if (!util.isValidUsername(player.name))
             {
                 API.kickPlayer(player, "Invalid Username Format. Example: John_Doe");
                 return;
@@ -92,8 +92,10 @@ namespace stuykserver.Util
         public void SpawnPlayer(Client player)
         {
             db.setPlayerLoggedIn(player);
-            string query = string.Format("SELECT LASTX, LASTY, LASTZ, Dead, Money, Nametag, Health, Armor FROM Players WHERE ID='{0}'", API.getEntitySyncedData(player, "PlayerID"));
-            DataTable result = API.exported.database.executeQueryWithResult(query);
+            string[] varNames = { "ID" };
+            string before = "SELECT LASTX, LASTY, LASTZ, Dead, Money, Nametag, Health, Armor, Admin, Karma FROM Players WHERE";
+            object[] data = { Convert.ToString(API.getEntitySyncedData(player, "PlayerID")) };
+            DataTable result = db.compileSelectQuery(before, varNames, data);
             
             // Player Setup Calls
             API.call("SkinHandler", "loadCurrentFace", player);
@@ -116,6 +118,8 @@ namespace stuykserver.Util
             API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
             API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
             API.sendNotificationToPlayer(player, "If a menu freezes. Press F1.");
+            API.setEntitySyncedData(player, "Admin", Convert.ToBoolean(result.Rows[0]["Admin"]));
+            API.setEntitySyncedData(player, "Karma", Convert.ToInt32(result.Rows[0]["Karma"]));
 
             // Death Handling
             if (result.Rows[0]["Dead"].ToString() == "1")
@@ -125,6 +129,8 @@ namespace stuykserver.Util
                 API.sendChatMessageToPlayer(player, "~r~/tapout");
                 API.playPlayerAnimation(player, (int)(AnimationFlags.StopOnLastFrame), "combat@death@from_writhe", "death_c");
             }
+
+            API.consoleOutput("{0} logged in || Admin = {1}", player.name, Convert.ToBoolean(API.getEntitySyncedData(player, "Admin")));
         }
 
         [Flags]
