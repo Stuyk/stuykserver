@@ -35,6 +35,7 @@ namespace stuykserver.Classes
         Dictionary<EmployeeRank, int> shopEmployeePayrates; // Employee Ranks + PayRates.
         List<Client> shopKeys; // Exactly what it is.
         int shopBalance; // Amount of cash the shop has.
+        int shopUnits;
 
         // SHOP PROPERTIES
         public enum ShopType
@@ -572,6 +573,22 @@ namespace stuykserver.Classes
                 API.deleteEntity(obj);
             }
             GC.SuppressFinalize(this);
+        }
+
+        // Units
+        public void setShopUnits(int value)
+        {
+            shopUnits = value;
+        }
+
+        public void addShopUnits(int value)
+        {
+            shopUnits += value;
+        }
+
+        public void removeShopUnits(int value)
+        {
+            shopUnits -= value;
         }
     }
 }

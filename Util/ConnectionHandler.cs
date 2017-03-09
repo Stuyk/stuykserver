@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using stuykserver.Classes;
 
 namespace stuykserver.Util
 {
@@ -109,7 +110,7 @@ namespace stuykserver.Util
         public void SpawnPlayer(Client player)
         {
             string[] varNames = { "ID" };
-            string before = "SELECT LASTX, LASTY, LASTZ, Dead, Money, Nametag, Health, Armor, Admin, Karma, Time FROM Players WHERE";
+            string before = "SELECT LASTX, LASTY, LASTZ, Dead, Money, Nametag, Health, Armor, Admin, Karma, Time, Organization, Business FROM Players WHERE";
             object[] data = { Convert.ToString(API.getEntityData(player, "PlayerID")) };
             DataTable result = db.compileSelectQuery(before, varNames, data);
             
@@ -138,6 +139,15 @@ namespace stuykserver.Util
             API.setEntityData(player, "Karma", Convert.ToInt32(result.Rows[0]["Karma"]));
             API.setEntityData(player, "Session", DateTime.Now);
             API.setEntityData(player, "Time", Convert.ToInt32(result.Rows[0]["Time"]));
+            API.setEntityData(player, "Organization", Convert.ToInt32(result.Rows[0]["Organization"]));
+            API.setEntityData(player, "Business", Convert.ToInt32(result.Rows[0]["Business"]));
+
+            // Organization Login Message
+            if (Convert.ToInt32(result.Rows[0]["Organization"]) != 0)
+            {
+                object message = API.call("OrganizationHandler", "fetchOrgMessage", Convert.ToInt32(result.Rows[0]["Organization"]));
+                API.sendChatMessageToPlayer(player, string.Format("{0}", message));
+            }
 
             // Death Handling
             if (result.Rows[0]["Dead"].ToString() == "1")

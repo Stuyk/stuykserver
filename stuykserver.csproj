@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\OrganizationHandler.cs" />
     <Compile Include="Classes\PlayerInformation.cs" />
     <Compile Include="Classes\ShopInformationHandling.cs" />
     <Compile Include="Main.cs" />
@@ -72,7 +73,7 @@
     <Compile Include="Classes\KarmaHandler.cs" />
     <Compile Include="Util\KeyPressHandler.cs" />
     <Compile Include="Util\LoginHandler.cs" />
-    <Compile Include="Classes\OrganizationHandler.cs" />
+    <Compile Include="Classes\Organization.cs" />
     <Compile Include="Classes\SkinHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Util.cs" />
