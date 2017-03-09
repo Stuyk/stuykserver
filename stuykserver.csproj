@@ -55,7 +55,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\OrganizationHandler.cs" />
-    <Compile Include="Classes\PlayerInformation.cs" />
+    <Compile Include="Classes\Player.cs" />
+    <Compile Include="Classes\PlayerHandler.cs" />
     <Compile Include="Classes\ShopInformationHandling.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Jobs\Fishing.cs" />
