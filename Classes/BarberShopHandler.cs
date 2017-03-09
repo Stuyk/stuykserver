@@ -14,7 +14,7 @@ namespace stuykserver.Util
         SkinHandler skinHandler = new SkinHandler();
         DatabaseHandler db = new DatabaseHandler();
 
-        Dictionary<ColShape, ShopInformationHandling> shopInformation = new Dictionary<ColShape, ShopInformationHandling>();
+        Dictionary<ColShape, Shop> shopInformation = new Dictionary<ColShape, Shop>();
 
         [Flags]
         public enum AnimationFlags
@@ -99,13 +99,13 @@ namespace stuykserver.Util
         // Place blips and text labels for interactions.
         public void positionBlips(Vector3 position, int id)
         {
-            ShopInformationHandling newShop = new ShopInformationHandling();
+            Shop newShop = new Shop();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f);
 
             newShop.setCollisionShape(shape);
             newShop.setCollisionID(id);
             newShop.setCollisionPosition(position);
-            newShop.setShopType(ShopInformationHandling.ShopType.Barbershop);
+            newShop.setShopType(Shop.ShopType.Barbershop);
             newShop.setupBlip();
 
             shopInformation.Add(shape, newShop);

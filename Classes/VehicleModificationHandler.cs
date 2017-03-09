@@ -12,7 +12,7 @@ namespace stuykserver.Util
     public class VehicleModificationHandler : Script
     {
         DatabaseHandler db = new DatabaseHandler();
-        Dictionary<ColShape, ShopInformationHandling> shopInformation = new Dictionary<ColShape, ShopInformationHandling>();
+        Dictionary<ColShape, Shop> shopInformation = new Dictionary<ColShape, Shop>();
 
         public VehicleModificationHandler()
         {
@@ -119,10 +119,10 @@ namespace stuykserver.Util
         // POSITION BLIPS
         public void positionBlips(Vector3 position, int id)
         {
-            ShopInformationHandling newShop = new ShopInformationHandling();
+            Shop newShop = new Shop();
             ColShape collision = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f);
             newShop.setCollisionShape(collision);
-            newShop.setShopType(ShopInformationHandling.ShopType.Modification);
+            newShop.setShopType(Shop.ShopType.Modification);
             newShop.setupBlip();
             newShop.setCollisionID(id);
             newShop.setCollisionPosition(position);

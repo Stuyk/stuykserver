@@ -36,7 +36,7 @@ namespace stuykserver.Util
 
         public void sendProximityMessage(Client player, string message, int dimension)
         {
-            List<Client> players = API.getPlayersInRadiusOfPlayer(10f, player);
+            List<Client> players = API.getPlayersInRadiusOfPlayer(20f, player);
             foreach (Client p in players)
             {
                 if (p.position.DistanceTo(player.position) <= 10 && API.getEntityDimension(p) == dimension)
@@ -88,7 +88,7 @@ namespace stuykserver.Util
         public void cmdChatShout(Client player, string message)
         {
             int dimension = API.getEntityDimension(player);
-            List<Client> players = API.getPlayersInRadiusOfPlayer(15, player);
+            List<Client> players = API.getPlayersInRadiusOfPlayer(35, player);
             if (db.isPlayerLoggedIn(player))
             {
                 for (int i = 0; i < players.Count; i++)
@@ -107,12 +107,12 @@ namespace stuykserver.Util
         public void cmdChatWhisper(Client player, string message)
         {
             int dimension = API.getEntityDimension(player);
-            List<Client> players = API.getPlayersInRadiusOfPlayer(15, player);
+            List<Client> players = API.getPlayersInRadiusOfPlayer(7, player);
             if (db.isPlayerLoggedIn(player))
             {
                 for (int i = 0; i < players.Count; i++)
                 {
-                    if (players[i].position.DistanceTo(player.position) <= 15 && players[i].dimension == dimension)
+                    if (players[i].position.DistanceTo(player.position) <= 7 && players[i].dimension == dimension)
                     {
                         API.sendChatMessageToPlayer(players[i], "~#A6B7C1~", replaceUnderscore(player.name) + " whispers: ~w~" + message);
                         API.consoleOutput(string.Format("[{0}] {1}: {2}", dimension, player.name, message));

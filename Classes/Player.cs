@@ -96,6 +96,7 @@ namespace stuykserver.Classes
             // Send all our data to generate the query and run it
             db.compileQuery(logBefore, after, logNames, logData);
 
+            API.setEntityDimension(playerClient, 0);
             API.setEntityPosition(playerClient, position);
         }
 
@@ -120,6 +121,15 @@ namespace stuykserver.Classes
         public bool isDead()
         {
             if (dead)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool isAdmin()
+        {
+            if (admin)
             {
                 return true;
             }

@@ -2,23 +2,45 @@
 using GTANetworkShared;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace stuykserver.Classes
 {
-    public class ShopInformationHandling : Script, IDisposable
+    public class Shop : Script, IDisposable
     {
-        public ShopInformationHandling()
+        public Shop()
         {
-            shopEmployees = new Dictionary<string, EmployeeRank>();
-            shopEmployeePayrates = new Dictionary<EmployeeRank, int>();
+            // Unused
+        }
+
+        public Shop(DataRow row)
+        {
+            shopID = Convert.ToInt32(row["ID"]);
+            collisionID = shopID;
+            shopOwner = Convert.ToInt32(row["PlayerID"]);
+            shopUnits = Convert.ToInt32(row["Units"]);
+            shopBalance = Convert.ToInt32(row["Money"]);
+            shopType = (ShopType)row["Type"];
+            collisionPosition = new Vector3(Convert.ToSingle(row["PosX"]), Convert.ToSingle(row["PosY"]), Convert.ToSingle(row["PosZ"]));
+            shopExit = new Vector3(Convert.ToSingle(row["ExitX"]), Convert.ToSingle(row["ExitY"]), Convert.ToSingle(row["ExitZ"]));
+            shopCenterPoint = new Vector3(Convert.ToSingle(row["FocusX"]), Convert.ToSingle(row["FocusY"]), Convert.ToSingle(row["FocusZ"]));
+            shopCameraPoint = new Vector3(Convert.ToSingle(row["CamX"]), Convert.ToSingle(row["CamY"]), Convert.ToSingle(row["CamZ"]));
+            forSale = Convert.ToBoolean(row["ForSale"]);
+            shopPrice = Convert.ToInt32(row["Price"]);
+            range = Convert.ToSingle(row["Range"]);
+            height = Convert.ToSingle(row["Height"]);
             outsidePlayers = new List<Client>();
             insidePlayers = new Dictionary<Client, NetHandle>();
-            shopObjects = new List<GTANetworkServer.Object>();
+            shopEmployees = new Dictionary<string, EmployeeRank>();
             shopKeys = new List<Client>();
-            shopType = ShopType.None;
+            shopEmployeePayrates = new Dictionary<EmployeeRank, int>();
+            shopObjects = new List<GTANetworkServer.Object>();
+            setupBlip();
+            setupCollision();
+            API.consoleOutput("Setup a shop at {0}", collisionPosition);
         }
 
         // SHOP OWNERSHIP PROPERTIES
@@ -30,12 +52,14 @@ namespace stuykserver.Classes
             Owner
         }
 
-        string shopOwner; // Used to set the Owner of the shop.
+        int shopID;
+        int shopOwner; // Used to set the Owner of the shop.
+        ShopType shopType; // Determines what icons go with the shop.
         Dictionary<string, EmployeeRank> shopEmployees; // Shop Employees with Ranks.
         Dictionary<EmployeeRank, int> shopEmployeePayrates; // Employee Ranks + PayRates.
         List<Client> shopKeys; // Exactly what it is.
         int shopBalance; // Amount of cash the shop has.
-        int shopUnits;
+        int shopUnits; // Units the shop has.
 
         // SHOP PROPERTIES
         public enum ShopType
@@ -95,12 +119,13 @@ namespace stuykserver.Classes
 
         ColShape collisionShape; // Used for the main point.
         int collisionID; // Pulled from the Database.
+        float range; // Collision Range
+        float height; // Collision Height
         Vector3 collisionPosition; // Position for the collision, point of Exit / Entrance.
         Blip collisionBlip; // Blip attached to the Collision.
         List<Client> outsidePlayers; // Players inside of the collision.
         Dictionary<Client, NetHandle> insidePlayers; // Players inside of an interior or shop.
-        ShopType shopType; // Determines what icons go with the shop.
-
+        
         //Optional Properties
         Vector3 shopCenterPoint; // Used to determine where the player is positioned.
         Vector3 shopCameraPoint; // Used to determine where the camera faces the player from.
@@ -111,13 +136,25 @@ namespace stuykserver.Classes
         int shopPrice; // Mostly used for HOUSING.
         int shopDimension; // Mostly used for HOUSING.
 
+        // Setup Collision
+        public void setupCollision()
+        {
+            collisionShape = API.createCylinderColShape(collisionPosition, range, height);
+        }
+
+        // SHOP ID
+        public int returnShopID()
+        {
+            return shopID;
+        }
+
         // SHOP OWNER
-        public void setShopOwner(string value)
+        public void setShopOwner(int value)
         {
             shopOwner = value;
         }
 
-        public string returnShopOwner()
+        public int returnShopOwner()
         {
             return shopOwner;
         }
@@ -294,10 +331,7 @@ namespace stuykserver.Classes
 
         public void setupBlip()
         {
-            if (collisionPosition != null)
-            {
-                collisionBlip = API.createBlip(collisionPosition);
-            }
+            collisionBlip = API.createBlip(collisionPosition);
 
             if (collisionBlip != null)
             {

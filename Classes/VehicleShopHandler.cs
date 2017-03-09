@@ -15,7 +15,7 @@ namespace stuykserver.Util
         Main main = new Main();
         Util util = new Util();
 
-        Dictionary<ColShape, ShopInformationHandling> shopInformation = new Dictionary<ColShape, ShopInformationHandling>();
+        Dictionary<ColShape, Shop> shopInformation = new Dictionary<ColShape, Shop>();
 
         public VehicleShopHandler()
         {
@@ -124,7 +124,7 @@ namespace stuykserver.Util
                 float rotY = Convert.ToSingle(row["RotY"]);
                 float rotZ = Convert.ToSingle(row["RotZ"]);
                 int id = Convert.ToInt32(row["ID"]);
-                ShopInformationHandling.ShopType type = (ShopInformationHandling.ShopType) Enum.Parse(typeof(ShopInformationHandling.ShopType), row["Type"].ToString());
+                Shop.ShopType type = (Shop.ShopType) Enum.Parse(typeof(Shop.ShopType), row["Type"].ToString());
                 API.consoleOutput(type.ToString());
                 Vector3 centerPoint = db.convertStringToVector3(row["CenterPoint"].ToString());
                 Vector3 cameraPoint = db.convertStringToVector3(row["CameraPoint"].ToString());
@@ -195,9 +195,9 @@ namespace stuykserver.Util
             }
         }
 
-        public void positionBlips(Vector3 position, Vector3 rotation, int id, ShopInformationHandling.ShopType type, Vector3 centerPoint, Vector3 cameraPoint, Vector3 exitPoint)
+        public void positionBlips(Vector3 position, Vector3 rotation, int id, Shop.ShopType type, Vector3 centerPoint, Vector3 cameraPoint, Vector3 exitPoint)
         {
-            ShopInformationHandling newShop = new ShopInformationHandling();
+            Shop newShop = new Shop();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 3f, 5f);
 
             newShop.setCollisionID(id);

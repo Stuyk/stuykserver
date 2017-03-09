@@ -86,6 +86,9 @@ API.onKeyDown.connect(function(player, e) {
 
 	// B - KEYPRESS HELPER
 	if (!API.isChatOpen() && e.KeyCode == Keys.B) {
+		API.triggerServerEvent("useFunction");
+		return;
+		
 		switch (currentCollisionType) {
 			case "VehicleModificationShop":
 				API.triggerServerEvent("useFunction", "VehicleModificationShop");

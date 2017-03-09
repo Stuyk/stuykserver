@@ -40,6 +40,13 @@ namespace stuykserver.Util
         private void API_onResourceStart()
         {
             API.consoleOutput("Started: LoginHandler");
+
+            // Set all logins to "0".
+            string[] varNames = { "LoggedIn" };
+            string before = "UPDATE Players SET";
+            object[] data = { "0" };
+            string after = string.Format("");
+            db.compileQuery(before, after, varNames, data);
         }
 
         static string GetMd5Hash(MD5 md5Hash, string input)

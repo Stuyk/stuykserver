@@ -54,10 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\CollisionHandler.cs" />
     <Compile Include="Classes\OrganizationHandler.cs" />
     <Compile Include="Classes\Player.cs" />
     <Compile Include="Classes\PlayerHandler.cs" />
-    <Compile Include="Classes\ShopInformationHandling.cs" />
+    <Compile Include="Classes\ShopHandler.cs" />
+    <Compile Include="Classes\Shop.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Jobs\Fishing.cs" />
     <Compile Include="Util\ActiveShooter.cs" />

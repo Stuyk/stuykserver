@@ -14,7 +14,7 @@ namespace stuykserver.Util
         ClothingHandler clothingHandler = new ClothingHandler();
         DatabaseHandler db = new DatabaseHandler();
 
-        Dictionary<ColShape, ShopInformationHandling> shopInformation = new Dictionary<ColShape, ShopInformationHandling>();
+        Dictionary<ColShape, Shop> shopInformation = new Dictionary<ColShape, Shop>();
 
         [Flags]
         public enum AnimationFlags
@@ -121,13 +121,13 @@ namespace stuykserver.Util
 
         public void positionBlips(Vector3 position, int id)
         {
-            ShopInformationHandling newShop = new ShopInformationHandling();
+            Shop newShop = new Shop();
             ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f);
 
             newShop.setCollisionShape(shape);
             newShop.setCollisionID(id);
             newShop.setCollisionPosition(position);
-            newShop.setShopType(ShopInformationHandling.ShopType.Clothing);
+            newShop.setShopType(Shop.ShopType.Clothing);
             newShop.setupBlip();
 
             shopInformation.Add(shape, newShop);

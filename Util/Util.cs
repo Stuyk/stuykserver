@@ -1,5 +1,6 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
+using stuykserver.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +27,5 @@ namespace stuykserver.Util
             return returnBool;
         }
 
-        // Check if Admin.
-        public bool isAdmin(Client player)
-        {
-            return Convert.ToBoolean(API.getEntityData(player, "Admin"));
-        }
     }
 }

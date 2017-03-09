@@ -40,10 +40,7 @@ namespace stuykserver.Util
 
             foreach (Client player in playerList)
             {
-                if (db.isPlayerLoggedIn(player))
-                {
-                    API.call("PlayerHandler", "cleanupPlayer", player);
-                }
+                API.call("PlayerHandler", "cleanupPlayer", player);
             }
         }
 
@@ -112,7 +109,6 @@ namespace stuykserver.Util
                 string message = (string)API.call("OrganizationHandler", "fetchOrgMessage", playerInstance.returnPlayerOrganization());
                 API.sendChatMessageToPlayer(player, message);
             }
-
 
             // Death Handling
             if (playerInstance.isDead())
