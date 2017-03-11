@@ -16,23 +16,8 @@ namespace stuykserver.Util
 
         public VehicleModificationHandler()
         {
-            API.onResourceStart += API_onResourceStart;
-            API.onEntityEnterColShape += API_onEntityEnterColShape;
-            API.onEntityExitColShape += API_onEntityExitColShape;
+            API.consoleOutput("Started: Vehicle Modification Handler");
             API.onClientEventTrigger += API_onClientEventTrigger;
-            API.onPlayerDisconnected += API_onPlayerDisconnected;
-        }
-
-        // CLIENT DISCONNECTS
-        private void API_onPlayerDisconnected(Client player, string reason)
-        {
-            foreach (ColShape collision in shopInformation.Keys)
-            {
-                if (shopInformation[collision].returnInsidePlayers().ContainsKey(player))
-                {
-                    db.setPlayerPositionByVector(player, shopInformation[collision].returnCollisionPosition());
-                }
-            }
         }
 
         // CLIENT EVENTS
@@ -43,7 +28,7 @@ namespace stuykserver.Util
                 // Gather all our data
                 string[] varNames = { "Red", "Green", "Blue", "sRed", "sGreen", "sBlue", "Spoilers", "FrontBumper", "RearBumper", "SideSkirt", "Exhaust", "Grille", "Hood", "Fender", "RightFender", "Roof", "FrontWheels", "BackWheels", "WindowTint" };
                 string before = "UPDATE PlayerVehicles SET";
-                string after = string.Format("WHERE Garage='{0}' AND VehicleType='{1}'", player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
+                string after = string.Format("WHERE PlayerID='{0}' AND VehicleType='{1}'", Convert.ToString(API.getEntityData(player, "PlayerID")), API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
 
                 // Send all our data to generate the query and run it
                 this.db.compileQuery(before, after, varNames, args);
@@ -57,124 +42,80 @@ namespace stuykserver.Util
             }
         }
 
-
-        // COLSHAPES
-        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
-        {
-            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
-            {
-                Client player = API.getPlayerFromHandle(entity);
-                if (shopInformation.ContainsKey(colshape))
-                {
-                    if (shopInformation[colshape].returnOutsidePlayers().Contains(player))
-                    {
-                        shopInformation[colshape].removeOutsidePlayer(player);
-                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
-                    }
-                }
-            }
-        }
-
-        private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
-        {
-            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
-            {
-                Client player = API.getPlayerFromHandle(entity);
-                if (shopInformation.ContainsKey(colshape))
-                {
-                    if (!shopInformation[colshape].returnOutsidePlayers().Contains(player) && player.isInVehicle)
-                    {
-                        shopInformation[colshape].addOutsidePlayer(player);
-                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "VehicleModificationShop");
-                        API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), "This place seems to have a lot of car parts.");
-                    }
-                }
-            }
-        }
-
-        // RESOURCE START
-        private void API_onResourceStart()
-        {
-            API.consoleOutput("Started: Vehicle Modification Handler");
-
-            string query = "SELECT * FROM VehicleModificationShops";
-            DataTable result = API.exported.database.executeQueryWithResult(query);
-
-            int initializedObjects = 0;
-
-            foreach (DataRow row in result.Rows)
-            {
-                float posX = Convert.ToSingle(row["PosX"]);
-                float posY = Convert.ToSingle(row["PosY"]);
-                float posZ = Convert.ToSingle(row["PosZ"]);
-                int id = Convert.ToInt32(row["ID"]);
-                positionBlips(new Vector3(posX, posY, posZ), id);
-
-                ++initializedObjects;
-            }
-
-            API.consoleOutput("Vehicle Mod Shops Initialized: " + initializedObjects.ToString());
-        }
-
-        // POSITION BLIPS
-        public void positionBlips(Vector3 position, int id)
-        {
-            Shop newShop = new Shop();
-            ColShape collision = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 5f, 5f);
-            newShop.setCollisionShape(collision);
-            newShop.setShopType(Shop.ShopType.Modification);
-            newShop.setupBlip();
-            newShop.setCollisionID(id);
-            newShop.setCollisionPosition(position);
-            shopInformation.Add(collision, newShop);
-        }
-
         // ACTIONS
         public void actionEnterShop(Client player)
         {
-            foreach (ColShape collision in shopInformation.Keys)
+            if (!player.isInVehicle)
             {
-                if (shopInformation[collision].returnOutsidePlayers().Contains(player) && player.isInVehicle)
-                {
-                    int dimension = new Random().Next(1, 1000);
-                    shopInformation[collision].addInsidePlayer(player, player.vehicle);
-                    db.setPlayerHUD(player, false);
-                    API.setEntityPosition(player.vehicle, new Vector3(-1156.071, -2005.241, 13.18026));
-                    API.setEntityDimension(player.vehicle, dimension);
-                    API.setEntityDimension(player, dimension);
-                    API.setPlayerIntoVehicle(player, shopInformation[collision].returnInsidePlayers()[player], -1);
-                    player.vehicle.engineStatus = false;
-                    API.triggerClientEvent(player, "createCamera", new Vector3(-1149.901, -2006.942, 14.14681), player.vehicle.position);
-                    API.triggerClientEvent(player, "openCarPanel");
-                    parseVehicleMods(player); // Setup Mods for Variable Use
-                }
+                return;
             }
+
+            NetHandle playerVehicle = API.getPlayerVehicle(player);
+
+            db.setPlayerHUD(player, false);
+            API.setEntityData(player, "ReturnPosition", player.position);
+            API.setEntityDimension(player.vehicle, Convert.ToInt32(API.getEntityData(player, "PlayerID")));
+            API.setEntityDimension(player, Convert.ToInt32(API.getEntityData(player, "PlayerID")));
+
+            ColShape colshape = (ColShape)API.getEntityData(player, "ColShape");
+            Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
+            // Temporary Holding Collision
+            API.setEntityData(player, "ExitPoint", shop.returnExitPoint());
+
+            // Custom
+            if (shop.returnCameraCenterPoint() != new Vector3(0, 0, 0) && shop.returnCameraPoint() != new Vector3(0, 0, 0))
+            {
+                API.setEntityPosition(player.vehicle, shop.returnCameraCenterPoint());
+                API.setPlayerIntoVehicle(player, playerVehicle, -1);
+                API.triggerClientEvent(player, "createCamera", shop.returnCameraPoint(), shop.returnCameraCenterPoint());
+                API.triggerClientEvent(player, "openCarPanel");
+                parseVehicleMods(player); // Setup Mods for Variable Use
+                return;
+            }
+
+            // Default
+            API.setEntityPosition(player.vehicle, new Vector3(-1156.071, -2005.241, 13.18026));
+            API.setPlayerIntoVehicle(player, playerVehicle, -1);
+            API.triggerClientEvent(player, "createCamera", new Vector3(-1149.901, -2006.942, 14.14681), player.vehicle.position);
+            API.triggerClientEvent(player, "openCarPanel");
+            parseVehicleMods(player); // Setup Mods for Variable User
+            return;
+
+            //API.setEntityDimension(player, dimension);
+            //API.setPlayerIntoVehicle(player, shopInformation[collision].returnInsidePlayers()[player], -1);
         }
 
         public void actionExitShop(Client player)
         {
-            foreach (ColShape collision in shopInformation.Keys)
-            {
-                if (shopInformation[collision].returnInsidePlayers().ContainsKey(player))
-                {
-                    API.setEntityPosition(player.vehicle, shopInformation[collision].returnCollisionPosition());
-                    API.setPlayerIntoVehicle(player, shopInformation[collision].returnInsidePlayers()[player], -1);
-                    API.setEntityDimension(player.vehicle, 0);
-                    API.setEntityDimension(player, 0);
+            NetHandle playerVehicle = API.getPlayerVehicle(player);
 
-                    shopInformation[collision].removeInsidePlayer(player);
-                    player.vehicle.engineStatus = true;
-                    API.triggerClientEvent(player, "endCamera");
-                    db.setPlayerHUD(player, true);
-                    API.call("VehicleHandler", "initializeVehicleMods", player);
-                }
+            db.setPlayerHUD(player, true);
+            API.triggerClientEvent(player, "endCamera");
+            player.vehicle.engineStatus = true;
+
+            if (API.getEntityData(player, "ExitPoint") != null)
+            {
+                Vector3 exitPoint = (Vector3)API.getEntityData(player, "ExitPoint");
+                API.setEntityPosition(player.vehicle, exitPoint);
+                API.setEntityDimension(player.vehicle, 0);
+                API.setEntityDimension(player, 0);
+                API.setPlayerIntoVehicle(player, playerVehicle, -1);
+                API.call("VehicleHandler", "initializeVehicleMods", player);
+                return;
             }
+
+            Vector3 returnPoint = (Vector3)API.getEntityData(player, "ReturnPosition");
+            API.setEntityPosition(player.vehicle, returnPoint);
+            API.setEntityDimension(player.vehicle, 0);
+            API.setEntityDimension(player, 0);
+            API.setPlayerIntoVehicle(player, playerVehicle, -1);
+            API.call("VehicleHandler", "initializeVehicleMods", player);
         }
 
         // VEHICLE MOD HELPER
         public void parseVehicleMods(Client player)
         {
-            string query = string.Format("SELECT * FROM PlayerVehicles WHERE Garage='{0}' AND VehicleType='{1}'", player.name, API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
+            string query = string.Format("SELECT * FROM PlayerVehicles WHERE PlayerID='{0}' AND VehicleType='{1}'", Convert.ToString(API.getEntityData(player, "PlayerID")), API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
             DataTable result = API.exported.database.executeQueryWithResult(query);
 
             foreach (DataRow row in result.Rows)

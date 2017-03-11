@@ -43,7 +43,7 @@ namespace stuykserver.Util
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
             if (instance.isAdmin())
             {
-                API.setEntityPosition(player, new Vector3(649.5031, -10.4181, -126.3709));
+                API.setEntityPosition(player, new Vector3(649.5031, -10.4181, 82.7862));
             }
         }
 
@@ -172,6 +172,19 @@ namespace stuykserver.Util
                 return;
             }
             return;
+        }
+
+        [Command("coords")]
+        public void cmdCoords(Client player, float x=0, float y=0, float z=0)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                Vector3 pos = new Vector3(x, y, z);
+                API.setEntityPosition(player, pos);
+                API.sendChatMessageToPlayer(player, "~g~SSSSCCHHHWWWIIIIIING!");
+                return;
+            }
         }
     }
 }

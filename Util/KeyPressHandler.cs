@@ -116,10 +116,63 @@ namespace stuykserver.Util
                         API.call("VehicleHandler", "actionLockCar", player);
                     }
 
-                    // DEALERSHIP - BOATS TYPE
-                    if (currentFunction == "Boats")
+                    // Dealership Switch
+                    switch (currentFunction)
                     {
-                        API.call("VehicleShopHandler", "browserDealership", player, currentFunction);
+                        case "Boats":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Classic":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Commercial":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Compacts":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Coupes":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Bicycles":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Helicopters":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Industrial":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Motorcycles":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "OffRoad":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Planes":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Police":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "SUVS":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Sedans":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Sports":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Super":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Utility":
+                            pushDealership(player, currentFunction);
+                            break;
+                        case "Vans":
+                            pushDealership(player, currentFunction);
+                            break;
                     }
                 }
 
@@ -140,6 +193,11 @@ namespace stuykserver.Util
                     }
                 }
             }
+        }
+
+        public void pushDealership(Client player, string currentFunction)
+        {
+            API.call("VehicleShopHandler", "browseDealership", player, currentFunction);
         }
     }
 }

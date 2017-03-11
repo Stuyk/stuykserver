@@ -25,9 +25,15 @@ namespace stuykserver.Classes
                 House house = (House)API.call("HouseHandler", "getHouse", colshape);
                 if (shop != null)
                 {
+                    if (shop.returnShopType().ToString() == "Modification" && !player.isInVehicle)
+                    {
+                        return;
+                    }
+
                     API.setEntityData(player, "Collision", shop.returnShopType().ToString());
                     API.setEntityData(player, "ColShape", colshape);
                     API.triggerClientEvent(player, "triggerUseFunction", shop.returnShopType().ToString());
+                    return;
                 }
 
                 if (house != null)

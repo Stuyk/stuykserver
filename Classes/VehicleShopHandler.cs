@@ -19,42 +19,14 @@ namespace stuykserver.Util
 
         public VehicleShopHandler()
         {
-            API.onResourceStart += API_onResourceStart;
-            API.onEntityEnterColShape += API_onEntityEnterColShape;
-            API.onEntityExitColShape += API_onEntityExitColShape;
             API.onClientEventTrigger += API_onClientEventTrigger;
-            API.onPlayerDisconnected += API_onPlayerDisconnected;
-        }
-
-        private void API_onPlayerDisconnected(Client player, string reason)
-        {
-            foreach (ColShape collision in shopInformation.Keys)
-            {
-                if (shopInformation[collision].returnInsidePlayers().ContainsKey(player))
-                {
-                    db.setPlayerPositionByVector(player, shopInformation[collision].returnCollisionPosition());
-                    shopInformation[collision].removeInsidePlayer(player);
-                }
-
-                if (shopInformation[collision].returnOutsidePlayers().Contains(player))
-                {
-                    shopInformation[collision].removeOutsidePlayer(player);
-                }
-            }
         }
 
         private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
         {
             if (eventName == "dealershipReady")
             {
-                foreach (ColShape collision in shopInformation.Keys)
-                {
-                    if (shopInformation[collision].returnInsidePlayers().ContainsKey(player))
-                    {
-                        API.triggerClientEvent(player, "createCamera", shopInformation[collision].returnCameraCenterPoint(), shopInformation[collision].returnCameraPoint());
-                        API.setEntityDimension(player, 0);
-                    }
-                }
+                // Fuckin Nothihng
             }
 
             if (eventName == "leaveDealership")
@@ -70,146 +42,56 @@ namespace stuykserver.Util
             }
         }
 
-        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
-        {
-            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
-            {
-                Client player = API.getPlayerFromHandle(entity);
-                if (shopInformation.ContainsKey(colshape))
-                {
-                    if (shopInformation[colshape].returnOutsidePlayers().Contains(player))
-                    {
-                        shopInformation[colshape].removeOutsidePlayer(player);
-                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
-                    }
-                }
-            }
-                
-        }
-
-        private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
-        {
-            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
-            {
-                Client player = API.getPlayerFromHandle(entity);
-                if (shopInformation.ContainsKey(colshape))
-                {
-                    if (!shopInformation[colshape].returnOutsidePlayers().Contains(player) && !player.isInVehicle)
-                    {
-                        shopInformation[colshape].addOutsidePlayer(player);
-                        API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "Dealership");
-                        string type = shopInformation[colshape].returnShopType().ToString();
-                        API.sendNotificationToPlayer(API.getPlayerFromHandle(entity), string.Format("This shop carries the type: {0}", type));
-                    }
-                }
-            }
-        }
-
-        private void API_onResourceStart()
-        {
-            API.consoleOutput("Started: Vehicle Shop Handler");
-
-            string query = "SELECT * FROM VehicleShops";
-            DataTable result = API.exported.database.executeQueryWithResult(query);
-
-            int initializedObjects = 0;
-
-            // Setup Shops
-            foreach (DataRow row in result.Rows)
-            {
-                float posX = Convert.ToSingle(row["PosX"]);
-                float posY = Convert.ToSingle(row["PosY"]);
-                float posZ = Convert.ToSingle(row["PosZ"]);
-                float rotX = Convert.ToSingle(row["RotX"]);
-                float rotY = Convert.ToSingle(row["RotY"]);
-                float rotZ = Convert.ToSingle(row["RotZ"]);
-                int id = Convert.ToInt32(row["ID"]);
-                Shop.ShopType type = (Shop.ShopType) Enum.Parse(typeof(Shop.ShopType), row["Type"].ToString());
-                API.consoleOutput(type.ToString());
-                Vector3 centerPoint = db.convertStringToVector3(row["CenterPoint"].ToString());
-                Vector3 cameraPoint = db.convertStringToVector3(row["CameraPoint"].ToString());
-                Vector3 exitPoint = db.convertStringToVector3(row["ExitPoint"].ToString());
-
-                positionBlips(new Vector3(posX, posY, posZ), new Vector3(rotX, rotY, rotZ), id, type, centerPoint, cameraPoint, exitPoint);
-                ++initializedObjects;
-            }
-
-            API.consoleOutput("Vehicle Shops Initialized: " + initializedObjects.ToString());
-        }
-
         // When a player tries to enter a Dealership.
-        public void browseDealership(Client player)
+        public void browseDealership(Client player, string type)
         {
-            foreach (ColShape collision in shopInformation.Keys)
+            if (!player.isInVehicle)
             {
-                if (API.isPlayerInAnyVehicle(player))
+                db.setPlayerHUD(player, false);
+                API.setEntityData(player, "ReturnPosition", player.position);
+                API.setEntityDimension(player, Convert.ToInt32(API.getEntityData(player, "PlayerID")));
+
+                ColShape colshape = (ColShape)API.getEntityData(player, "ColShape");
+                Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
+                // Temporary Holding Collision
+                API.setEntityData(player, "ExitPoint", shop.returnExitPoint());
+                // Custom Camera
+                if (shop.returnCameraCenterPoint() != new Vector3(0, 0, 0) && shop.returnCameraPoint() != new Vector3(0, 0, 0))
                 {
-                    break;
+                    API.setEntityPosition(player, shop.returnCameraCenterPoint());
+                    API.triggerClientEvent(player, "startBrowsing", Convert.ToString(API.getEntityData(player, "Collision")), Convert.ToInt32(API.getEntityData(player, "PlayerID")), shop.returnCameraCenterPoint());
+                    API.triggerClientEvent(player, "createCamera", shop.returnCameraPoint(), shop.returnCameraCenterPoint());
+                    return;
                 }
 
-                if (shopInformation[collision].returnOutsidePlayers().Contains(player))
-                {
-                    int rand = new Random().Next(1, 1000);
-                    shopInformation[collision].addInsidePlayer(player, player.handle);
-                    API.setEntityPosition(player, shopInformation[collision].returnCameraCenterPoint());
-                    API.setEntityDimension(player, rand);
-                    db.setPlayerHUD(player, false);
-                    API.triggerClientEvent(player, "startBrowsing", shopInformation[collision].returnShopType().ToString(), rand);
-                    break;
-                }
-            }
+                // Default Camera
+                API.setEntityPosition(player, new Vector3(198.9816, -1000.94, -98));
+                API.triggerClientEvent(player, "startBrowsing", Convert.ToString(API.getEntityData(player, "Collision")), Convert.ToInt32(API.getEntityData(player, "PlayerID")), new Vector3(198.9816, -1000.94, -98));
+                API.triggerClientEvent(player, "createCamera", new Vector3(206.339, -1000.967, -98.5), new Vector3(198.9816, -1000.94, -98));
+                return;
+            }     
         }
 
         // When a player purchased a vehicle from a Dealership.
         public void purchaseDealershipVehicle(Client player, string vehicleType)
         {
-            foreach (ColShape collision in shopInformation.Keys)
-            {
-                if (shopInformation[collision].returnInsidePlayers().ContainsKey(player))
-                {
-                    db.setPlayerHUD(player, true);
-                    API.setEntityDimension(player, 0);
-                    API.setEntityPosition(player, shopInformation[collision].returnCollisionPosition());
-                    shopInformation[collision].removeInsidePlayer(player);
-                    API.call("VehicleHandler", "actionSetupPurchasedCar", shopInformation[collision].returnExitPoint(), vehicleType, player);
-                    break;
-                }
-            }
+            Vector3 exitPoint = (Vector3)API.getEntityData(player, "ExitPoint");
+            API.call("VehicleHandler", "actionSetupPurchasedCar", exitPoint, vehicleType, player);
+            leaveDealership(player);
         }
 
         // When a player leaves a dealership without a purchase.
         public void leaveDealership(Client player)
         {
-            foreach (ColShape collision in shopInformation.Keys)
-            {
-                if (shopInformation[collision].returnInsidePlayers().ContainsKey(player))
-                {
-                    db.setPlayerHUD(player, true);
-                    API.setEntityDimension(player, 0);
-                    API.setEntityPosition(player, shopInformation[collision].returnCollisionPosition());
-                    shopInformation[collision].removeInsidePlayer(player);
-                    API.stopPlayerAnimation(player);
-                    API.stopPedAnimation(player);
-                    break;
-                }
-            }
-        }
-
-        public void positionBlips(Vector3 position, Vector3 rotation, int id, Shop.ShopType type, Vector3 centerPoint, Vector3 cameraPoint, Vector3 exitPoint)
-        {
-            Shop newShop = new Shop();
-            ColShape shape = API.createCylinderColShape(new Vector3(position.X, position.Y, position.Z), 3f, 5f);
-
-            newShop.setCollisionID(id);
-            newShop.setCollisionPosition(position);
-            newShop.setCollisionShape(shape);
-            newShop.setShopType(type);
-            newShop.setCameraCenterPoint(centerPoint);
-            newShop.setCameraPoint(cameraPoint);
-            newShop.setExitPoint(exitPoint);
-            newShop.setupBlip();
-
-            shopInformation.Add(shape, newShop);
+            Vector3 returnPosition = (Vector3)API.getEntityData(player, "ReturnPosition");
+            db.setPlayerHUD(player, true);
+            API.setEntityPosition(player, returnPosition);
+            API.setEntityDimension(player, 0);
+            API.stopPlayerAnimation(player);
+            API.stopPedAnimation(player);
+            API.setEntityData(player, "ReturnPosition", null);
+            API.setEntityData(player, "ExitPoint", null);
+            API.triggerClientEvent(player, "killPanel");
         }
     }
 }

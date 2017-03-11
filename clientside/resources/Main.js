@@ -300,7 +300,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	}
 
 	if (eventName == "startBrowsing") { // Dealership
-		startBrowsing(args[0], args[1]);
+		startBrowsing(args[0], args[1], args[2]);
 	}
 
 	// SERVERSIDE CAMERA FUNCTIONS
@@ -344,49 +344,117 @@ API.onUpdate.connect(function() {
 	// USE FUNCTION DISPLAYS
 	if (useFunction != null) {
 		switch (currentCollisionType) {
-		case "Modification":
-			API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
+			case "Modification":
+				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
 
-		case "Atm":
-			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
+			case "Atm":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
 
-		case "Fishing":
-			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
+			case "Fishing":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
 
-		case "FishingSale":
-			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
+			case "FishingSale":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
 
-		case "Barbershop":
-			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
+			case "Barbershop":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
 
-		case "Clothing":
-			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
+			case "Clothing":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
 
-		case "Dealership":
-			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
+			case "VehicleEngine":
+				API.dxDrawTexture("clientside/resources/images/pressbalt.png", new Point(resX / 2 - 25, resY / 2 - 75), new Size(200, 125), 1);
+				break;
 
-		case "VehicleEngine":
-			API.dxDrawTexture("clientside/resources/images/pressbalt.png", new Point(resX / 2 - 25, resY / 2 - 75), new Size(200, 125), 1);
-			break;
+			case "VehicleLock":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
 
-		case "VehicleLock":
-			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
-
-		case "House":
-			API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
-			
-		case "ForSale":
-			API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
-			break;
+			case "House":
+				API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "ForSale":
+				API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Boats":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Classic":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Commercial":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Compacts":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Coupes":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Bicycles":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Helicopters":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Industrial":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Motorcycles":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "OffRoad":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Planes":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Police":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "SUVS":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Sedans":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Sports":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Super":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Utility":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Vans":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
 		}
 	}
 });
@@ -1788,6 +1856,7 @@ var currentVehicleIndex = 1;
 var centerVehicle = null;
 var vehicleSelectionType = null;
 var vehicleSelectionDimension = null;
+var vehiclePosition = null;
 
 function showDealership() {
 	if (pagePanel == null) {
@@ -1805,8 +1874,9 @@ function randomInteger(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function startBrowsing(type, dimension) {
+function startBrowsing(type, dimension, vehPos) {
 	vehicleSelectionDimension = dimension;
+	vehiclePosition = vehPos
 	switch (type) {
 		case "Boats":
 			vehicleSelectionType = vehiclesBoats;
@@ -1886,7 +1956,8 @@ function dealershipSetupVehicles(dimension) {
 		currentVehicleIndex = 0;
 	}
 
-	centerVehicle = API.createVehicle(API.vehicleNameToModel(vehicleSelectionType[currentVehicleIndex]), new Vector3(225.6238, -990, -98.99996), 0);
+	centerVehicle = API.createVehicle(API.vehicleNameToModel(vehicleSelectionType[currentVehicleIndex]), vehiclePosition, 0);
+	
 	API.setVehiclePrimaryColor(centerVehicle, randomInteger(0, 159));
 
 	if (pagePanel != null) {
