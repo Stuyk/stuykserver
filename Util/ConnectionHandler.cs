@@ -49,24 +49,26 @@ namespace stuykserver.Util
             // If the username is invalid. Display the panel.
             if (!util.isValidUsername(player.name))
             {
-                db.setPlayerHUD(player, false);
-                API.triggerClientEvent(player, "createCamera", new Vector3(-1605.505, -1089.018, 30), new Vector3(40, 0, 0));
-                API.triggerClientEvent(player, "showInvalidName");
                 Random randum = new Random();
                 int ran = randum.Next(1, 1000);
                 API.setEntityDimension(player, ran);
-                API.setEntityPosition(player, new Vector3(-1605.505, -1089.018, 13.01836));
+                API.setEntityPosition(player, new Vector3(649.5031, -10.4181, 75));
+                API.freezePlayer(player, true);
+                db.setPlayerHUD(player, false);
+                API.triggerClientEvent(player, "createCamera", new Vector3(649.5031, -10.4181, 450), new Vector3(649.5031, -10.4181, 82.78617));
+                API.triggerClientEvent(player, "showInvalidName");
                 return;
             }
 
             // If the username is valid. Move on.
             db.setPlayerHUD(player, false);
-            API.triggerClientEvent(player, "createCamera", new Vector3(-1605.505, -1089.018, 30), new Vector3(40, 0, 0));
+            API.triggerClientEvent(player, "createCamera", new Vector3(649.5031, -10.4181, 450), new Vector3(649.5031, -10.4181, 82.78617));
             API.triggerClientEvent(player, "showLogin");
             Random random = new Random();
             int r = random.Next(1, 1000);
             API.setEntityDimension(player, r);
-            API.setEntityPosition(player, new Vector3(-1605.505, -1089.018, 13.01836));
+            API.setEntityPosition(player, new Vector3(649.5031, -10.4181, 75));
+            API.freezePlayer(player, true);
         }
 
         private void API_onPlayerDisconnected(Client player, string reason)
@@ -94,7 +96,7 @@ namespace stuykserver.Util
             // Player Client Events
             API.triggerClientEvent(player, "update_money_display", playerInstance.returnPlayerCash());
             API.triggerClientEvent(player, "killPanel");
-            API.triggerClientEvent(player, "endCamera");
+            API.triggerClientEvent(player, "intorpolateCamera", player.position, player.rotation);
 
             // Player Specific Settings
             API.freezePlayer(player, false);

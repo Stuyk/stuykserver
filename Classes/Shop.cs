@@ -1,5 +1,6 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
+using stuykserver.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -30,7 +31,7 @@ namespace stuykserver.Classes
             shopCameraPoint = new Vector3(Convert.ToSingle(row["CamX"]), Convert.ToSingle(row["CamY"]), Convert.ToSingle(row["CamZ"]));
             forSale = Convert.ToBoolean(row["ForSale"]);
             shopPrice = Convert.ToInt32(row["Price"]);
-            range = Convert.ToSingle(row["Range"]);
+            range = Convert.ToSingle(row["Radius"]);
             height = Convert.ToSingle(row["Height"]);
             outsidePlayers = new List<Client>();
             insidePlayers = new Dictionary<Client, NetHandle>();
@@ -40,7 +41,6 @@ namespace stuykserver.Classes
             shopObjects = new List<GTANetworkServer.Object>();
             setupBlip();
             setupCollision();
-            API.consoleOutput("Setup a shop at {0}", collisionPosition);
         }
 
         // SHOP OWNERSHIP PROPERTIES
@@ -75,7 +75,6 @@ namespace stuykserver.Classes
             Coupes,
             Bicycles,
             Helicopters,
-            House,
             Industrial,
             Modification,
             Motorcycles,
@@ -90,31 +89,7 @@ namespace stuykserver.Classes
             Utility,
             Vans,
             Fishing,
-            FishingSale,
-            apa_v_mp_h_01_a,
-            apa_v_mp_h_01_c,
-            apa_v_mp_h_01_b,
-            apa_v_mp_h_02_a,
-            apa_v_mp_h_02_c,
-            apa_v_mp_h_02_b,
-            apa_v_mp_h_03_a,
-            apa_v_mp_h_03_c,
-            apa_v_mp_h_03_b,
-            apa_v_mp_h_04_a,
-            apa_v_mp_h_04_b,
-            apa_v_mp_h_04_c,
-            apa_v_mp_h_05_a,
-            apa_v_mp_h_05_c,
-            apa_v_mp_h_05_b,
-            apa_v_mp_h_06_a,
-            apa_v_mp_h_06_b,
-            apa_v_mp_h_06_c,
-            apa_v_mp_h_07_a,
-            apa_v_mp_h_07_c,
-            apa_v_mp_h_07_b,
-            apa_v_mp_h_08_a,
-            apa_v_mp_h_08_b,
-            apa_v_mp_h_08_c
+            FishingSale
         }
 
         ColShape collisionShape; // Used for the main point.
@@ -345,8 +320,7 @@ namespace stuykserver.Classes
                         API.setBlipColor(collisionBlip, 2);
                         break;
                     case ShopType.Barbershop:
-                        API.setBlipSprite(collisionBlip, 480);
-                        API.setBlipColor(collisionBlip, 9);
+                        API.setBlipSprite(collisionBlip, 71);
                         break;
                     case ShopType.Motorcycles:
                         API.setBlipSprite(collisionBlip, 226);
@@ -389,8 +363,7 @@ namespace stuykserver.Classes
                         API.setBlipColor(collisionBlip, 73);
                         break;
                     case ShopType.Clothing:
-                        API.setBlipSprite(collisionBlip, 366);
-                        API.setBlipColor(collisionBlip, 7);
+                        API.setBlipSprite(collisionBlip, 73);
                         break;
                     case ShopType.FishingSale:
                         API.setBlipSprite(collisionBlip, 431);
@@ -401,8 +374,7 @@ namespace stuykserver.Classes
                         API.setBlipColor(collisionBlip, 42);
                         break;
                     case ShopType.Modification:
-                        API.setBlipSprite(collisionBlip, 402);
-                        API.setBlipColor(collisionBlip, 59);
+                        API.setBlipSprite(collisionBlip, 446);
                         break;
                     default:
                         API.setBlipSprite(collisionBlip, 225);

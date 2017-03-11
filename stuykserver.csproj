@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\CollisionHandler.cs" />
+    <Compile Include="Classes\House.cs" />
     <Compile Include="Classes\OrganizationHandler.cs" />
     <Compile Include="Classes\Player.cs" />
     <Compile Include="Classes\PlayerHandler.cs" />

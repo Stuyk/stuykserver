@@ -22,10 +22,18 @@ namespace stuykserver.Classes
             {
                 Client player = API.getPlayerFromHandle(entity);
                 Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
+                House house = (House)API.call("HouseHandler", "getHouse", colshape);
                 if (shop != null)
                 {
-                    API.setEntityData(player, "Collision", shop.returnShopType());
-                    API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "a");
+                    API.setEntityData(player, "Collision", shop.returnShopType().ToString());
+                    API.setEntityData(player, "ColShape", colshape);
+                    API.triggerClientEvent(player, "triggerUseFunction", shop.returnShopType().ToString());
+                }
+
+                if (house != null)
+                {
+                    API.setEntityData(player, "Collision", house.returnHouseStatus().ToString());
+                    API.triggerClientEvent(player, "triggerUseFunction", house.returnHouseStatus().ToString());
                 }
             }
         }
@@ -35,8 +43,9 @@ namespace stuykserver.Classes
             if (API.getEntityType(entity) == EntityType.Player)
             {
                 Client player = API.getPlayerFromHandle(entity);
-                API.setEntityData(player, "Collision", null);
-                API.triggerClientEvent(API.getPlayerFromHandle(entity), "removeUseFunction");
+                API.setEntityData(player, "Collision", "None");
+                API.setEntityData(player, "ColShape", null);
+                API.triggerClientEvent(player, "removeUseFunction");
             }
         }
     }

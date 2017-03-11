@@ -20,90 +20,125 @@ namespace stuykserver.Util
 
         private void API_onClientEventTrigger(Client player, string eventName, params object[] args)
         {
+            // Controls Vehicle Hood
+            if (eventName == "vehicleHood")
+            {
+                API.call("VehicleHandler", "actionVehicleHood", player);
+                return;
+            }
+
+            // Controls Vehicle Trunk
+            if (eventName == "vehicleTrunk")
+            {
+                API.call("VehicleHandler", "actionVehicleTrunk", player);
+                return;
+            }
+
+            // SHIFT + B FUNCTIONS
             if (eventName == "useSpecial")
             {
-                if (API.getEntitySyncedData(player, "Collision") == null)
+                string currentFunction = Convert.ToString(API.getEntityData(player, "Collision"));
+
+                // If NONE, do nothing.
+                if (currentFunction == "None")
                 {
                     return;
                 }
 
-                Shop.ShopType type = (Shop.ShopType)Enum.Parse(typeof(Shop.ShopType), Convert.ToString(API.getEntityData(player, "Collision")));
-                switch (type)
+                // House Property Panel
+                if (currentFunction == "House")
                 {
-                    case Shop.ShopType.House:
-                        API.call("HouseHandler", "actionHousePropertyPanel", player);
-                        break;
+                    API.call("HouseHandler", "actionHousePropertyPanel", player);
+                    return;
                 }
             }
 
+            // B FUNCTIONS
             if (eventName == "useFunction")
             {
-                if (API.getEntityData(player, "Collision") == null)
+                // Pull Current Function off Player - Assigned by Collision Handler - These are ENUM Types converted to STRINGS.
+                string currentFunction = Convert.ToString(API.getEntityData(player, "Collision"));
+                API.consoleOutput("Function: {0}", currentFunction);
+
+                // If NONE, do nothing.
+                if (currentFunction == "None")
                 {
                     return;
                 }
 
-                Shop.ShopType type = (Shop.ShopType)Enum.Parse(typeof(Shop.ShopType), Convert.ToString(API.getEntityData(player, "Collision")));
-                switch (type)
+                // ON FOOT FUNCTIONS
+                if (!player.isInVehicle)
                 {
-                    case Shop.ShopType.Atm:
+                    // ATM
+                    if (currentFunction == "Atm")
+                    {
                         API.call("BankHandler", "selectATM", player);
-                        break;
-                    case Shop.ShopType.Fishing:
+                        return;
+                    }
+
+                    // FISHING
+                    if (currentFunction == "Fishing")
+                    {
                         API.call("Fishing", "startFishing", player);
-                        break;
-                    case Shop.ShopType.Modification:
-                        API.call("VehicleModificationHandler", "actionEnterShop", player);
-                        break;
-                    case Shop.ShopType.FishingSale:
+                        return;
+                    }
+
+                    // FISHING SALES
+                    if (currentFunction == "FishingSale")
+                    {
                         API.call("Fishing", "sellFish", player);
-                        break;
-                    case Shop.ShopType.Barbershop:
+                        return;
+                    }
+
+                    // BARBERSHOP
+                    if (currentFunction == "Barbershop")
+                    {
                         API.call("BarberShopHandler", "selectBarberShop", player);
-                        break;
-                    case Shop.ShopType.Clothing:
+                        return;
+                    }
+
+                    // CLOTHING SHOP
+                    if (currentFunction == "Clothing")
+                    {
                         API.call("ClothingShopHandler", "selectClothing", player);
-                        break;
-                    case Shop.ShopType.House:
+                        return;
+                    }
+
+                    // ENTER HOUSE
+                    if (currentFunction == "House")
+                    {
                         API.call("HouseHandler", "actionHouseControl", player);
-                        break;
-                    // This has to be done for all Vehicle Types.
-                    case Shop.ShopType.Bicycles:
-                        API.call("VehicleShopHandler", "browseDealership", player);
-                        break;
-                }
+                    }
 
-                /*
-                 * 
-                 * NEED TO DO A NEW VERSION OF THIS FOR UP ABOVE
-                switch (args[0].ToString())
-                {
-
-                    case "Dealership":
-                        
-
-                    case "VehicleEngine":
-                        API.call("VehicleHandler", "actionVehicleEngine", player);
-                        break;
-
-                    case "VehicleLock":
+                    // VEHICLE LOCK
+                    if (currentFunction == "Vehicle")
+                    {
                         API.call("VehicleHandler", "actionLockCar", player);
-                        break;
+                    }
 
-                    case "ActionVehicleHood":
-                        API.call("VehicleHandler", "actionVehicleHood", player);
-                        break;
-
-                    case "ActionVehicleTrunk":
-                        API.call("VehicleHandler", "actionVehicleTrunk", player);
-                        break;
-
-                    case "House":
-                        
-                    case "HouseOwnershipPanel":
-                        
+                    // DEALERSHIP - BOATS TYPE
+                    if (currentFunction == "Boats")
+                    {
+                        API.call("VehicleShopHandler", "browserDealership", player, currentFunction);
+                    }
                 }
-                */
+
+                // VEHICLE FUNCTIONS
+                if (player.isInVehicle)
+                {
+                    // VEHICLE MODIFICATIONS
+                    if (currentFunction == "Modification")
+                    {
+                        API.call("VehicleModificationHandler", "actionEnterShop", player);
+                        return;
+                    }
+
+                    // VEHICLE ENGINE
+                    if (currentFunction == "InVehicle")
+                    {
+                        API.call("VehicleHandler", "actionVehicleEngine", player);
+                    }
+                }
             }
         }
     }

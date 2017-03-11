@@ -13,6 +13,7 @@
  useFunction = null; // KEYPRESS USE BUTTON System
  vehicleSpecialFunction = null; // KEYPRESS USE BUTTON System
  currentCollisionType = null; // KEYPRESS USE BUTTON System
+ camera = null; // Server Camera
 
 // CEF Boilerplate
 class CefHelper {
@@ -66,100 +67,21 @@ API.onResourceStop.connect(function() {
 
 API.onKeyDown.connect(function(player, e) {
 	// SHIFT + B - KEYPRESS HELPER
-	if (!API.isChatOpen() && e.KeyCode == Keys.B && e.Shift) {
-		if (currentCollisionType == "VehicleLock") {
-			showRadialMenu();
-			useFunction = null;
-			vehicleSpecialFunction = null;
-			API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-			return;
-		}
-
-		if (currentCollisionType == "House") {
-			API.triggerServerEvent("useFunction", "HouseOwnershipPanel");
-			useFunction = null;
-			vehicleSpecialFunction = null;
-			API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-			return;
-		}
+	if (!API.isChatOpen() && e.KeyCode == Keys.B && e.Shift && currentCollisionType != null) {
+		API.triggerServerEvent("useSpecial", currentCollisionType);
+		vehicleSpecialFunction = null;
+		useFunction = null;
+		API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
+		return;
 	}
 
 	// B - KEYPRESS HELPER
-	if (!API.isChatOpen() && e.KeyCode == Keys.B) {
-		API.triggerServerEvent("useFunction");
+	if (!API.isChatOpen() && e.KeyCode == Keys.B && currentCollisionType != null) {
+		API.triggerServerEvent("useFunction", currentCollisionType);
+		vehicleSpecialFunction = null;
+		useFunction = null;
+		API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 		return;
-		
-		switch (currentCollisionType) {
-			case "VehicleModificationShop":
-				API.triggerServerEvent("useFunction", "VehicleModificationShop");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-
-			case "Bank":
-				API.triggerServerEvent("useFunction", "Bank");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-
-			case "FishingSpot":
-				API.triggerServerEvent("useFunction", "FishingSpot");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-
-			case "FishingSaleSpot":
-				API.triggerServerEvent("useFunction", "FishingSaleSpot");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-
-			case "BarberShop":
-				API.triggerServerEvent("useFunction", "BarberShop");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-
-			case "Clothing":
-				API.triggerServerEvent("useFunction", "Clothing");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-
-			case "Dealership":
-				API.triggerServerEvent("useFunction", "Dealership");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-
-			case "VehicleEngine":
-				API.triggerServerEvent("useFunction", "VehicleEngine");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-
-			case "VehicleLock":
-				API.triggerServerEvent("useFunction", "VehicleLock");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-
-			case "House":
-				API.triggerServerEvent("useFunction", "House");
-				vehicleSpecialFunction = null;
-				useFunction = null;
-				API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-				break;
-		}
 	}
 });
 
@@ -387,13 +309,22 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		var pos = args[0];
 		var target = args[1];
 
-		var camera = API.createCamera(pos, new Vector3());
+		camera = API.createCamera(pos, new Vector3());
 		API.pointCameraAtPosition(camera, target);
 		API.setActiveCamera(camera);
 	}
 
 	// Destroy a camera.
 	if (eventName == "endCamera") {
+		API.setActiveCamera(null);
+	}
+	
+	// Move to Pass Position Camera
+	if (eventName == "intorpolateCamera") {
+		var tempcamera = API.createCamera(args[0], args[1]);
+		API.pointCameraAtEntity(camera, API.getLocalPlayer(), new Vector3());
+		API.interpolateCameras(camera, tempcamera, 5000, true, true);
+		API.sleep(4500);
 		API.setActiveCamera(null);
 	}
 });
@@ -413,23 +344,23 @@ API.onUpdate.connect(function() {
 	// USE FUNCTION DISPLAYS
 	if (useFunction != null) {
 		switch (currentCollisionType) {
-		case "VehicleModificationShop":
+		case "Modification":
 			API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
 
-		case "Bank":
+		case "Atm":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
 
-		case "FishingSpot":
+		case "Fishing":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
 
-		case "FishingSaleSpot":
+		case "FishingSale":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
 
-		case "BarberShop":
+		case "Barbershop":
 			API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
 
@@ -450,6 +381,10 @@ API.onUpdate.connect(function() {
 			break;
 
 		case "House":
+			API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+			break;
+			
+		case "ForSale":
 			API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 			break;
 		}

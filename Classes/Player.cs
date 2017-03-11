@@ -68,7 +68,16 @@ namespace stuykserver.Classes
 
         public void savePlayer()
         {
-            Vector3 pos = playerClient.position;
+            Vector3 pos;
+
+            if (API.getEntityData(playerClient, "ReturnPosition") == null)
+            {
+                pos = playerClient.position;
+            }
+            else
+            {
+                pos = (Vector3)API.getEntityData(playerClient, "ReturnPosition");
+            }
 
             string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time" };
             string before = "UPDATE Players SET";
@@ -98,11 +107,21 @@ namespace stuykserver.Classes
 
             API.setEntityDimension(playerClient, 0);
             API.setEntityPosition(playerClient, position);
+            API.setEntityData(playerClient, "PlayerID", playerID);
         }
 
         public void savePlayerLogOut()
         {
-            Vector3 pos = playerClient.position;
+            Vector3 pos;
+
+            if (API.getEntityData(playerClient, "ReturnPosition") == null)
+            {
+                pos = playerClient.position;
+            }
+            else
+            {
+                pos = (Vector3)API.getEntityData(playerClient, "ReturnPosition");
+            }
 
             string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "LoggedIn" };
             string before = "UPDATE Players SET";

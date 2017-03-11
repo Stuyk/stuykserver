@@ -43,7 +43,7 @@ namespace stuykserver.Util
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
             if (instance.isAdmin())
             {
-                API.setEntityPosition(player, new Vector3(-1537.53, -942.0224, 12));
+                API.setEntityPosition(player, new Vector3(649.5031, -10.4181, -126.3709));
             }
         }
 

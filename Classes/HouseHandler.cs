@@ -12,31 +12,60 @@ namespace stuykserver.Util
 {
     public class HouseHandler : Script
     {
-        /*
-
-        Dictionary<ColShape, Shop> houseInformation = new Dictionary<ColShape, Shop>();
         DatabaseHandler db = new DatabaseHandler();
-        Util util = new Util();
-
-        int currentDimension = 10;
+        Dictionary<ColShape, House> houseInformation = new Dictionary<ColShape, House>();
 
         public HouseHandler()
         {
-            API.onResourceStart += API_onResourceStart;
-            API.onEntityEnterColShape += API_onEntityEnterColShape;
-            API.onEntityExitColShape += API_onEntityExitColShape;
-            API.onClientEventTrigger += API_onClientEventTrigger;
+            API.consoleOutput("Started: House Handler");
+            initializeHouses();
+            //API.onClientEventTrigger += API_onClientEventTrigger;
         }
 
+        public void initializeHouses()
+        {
+            foreach (ColShape house in houseInformation.Keys)
+            {
+                houseInformation[house].Dispose();
+            }
+
+            houseInformation.Clear();
+
+            string query = "SELECT * FROM PlayerHousing";
+            DataTable result = API.exported.database.executeQueryWithResult(query);
+
+            int i = 0;
+
+            foreach (DataRow row in result.Rows)
+            {
+                House house = new House(row);
+                ColShape shape = house.returnEntryCollision();
+                houseInformation.Add(shape, house);
+                i++;
+            }
+
+            API.consoleOutput("Houses Initialized: {0}", i.ToString());
+        }
+
+        public House getHouse(ColShape collision)
+        {
+            if (houseInformation.ContainsKey(collision))
+            {
+                return houseInformation[collision];
+            }
+            return null;
+        }
+
+        /*
         private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
         {
             if (eventName == "housePricePoint")
             {
                 foreach (ColShape collision in houseInformation.Keys)
                 {
-                    if (houseInformation[collision].returnOutsidePlayers().Contains(player))
+                    if (Convert.ToString(API.getEntityData(player, "Collision")) == "forsale" && player.position.DistanceTo(houseInformation[collision].returnEntryPosition()) <= 2)
                     {
-                        API.triggerClientEvent(player, "passHousePrice", houseInformation[collision].returnShopPrice());
+                        API.triggerClientEvent(player, "passHousePrice", houseInformation[collision].returnHousePrice());
                         break;
                     }
                 }
@@ -44,7 +73,10 @@ namespace stuykserver.Util
 
             if (eventName == "housePurchase")
             {
-                actionPurchaseHouse(player);
+                if (Convert.ToString(API.getEntityData(player, "Collision")) == "forsale")
+                {
+                    actionPurchaseHouse(player);
+                }
             }
 
             if (eventName == "setHouseProperties")
@@ -109,141 +141,6 @@ namespace stuykserver.Util
                     }
                 }
             }
-        }
-
-        private void API_onEntityExitColShape(ColShape colshape, NetHandle entity)
-        {
-            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
-            {
-                Client player = API.getPlayerFromHandle(entity);
-                if (houseInformation.ContainsKey(colshape))
-                {
-                    API.triggerClientEvent(player, "removeUseFunction", "House");
-                    houseInformation[colshape].removeOutsidePlayer(player);
-                }
-            }
-        }
-
-        private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
-        {
-            if (Convert.ToInt32(API.getEntityType(entity)) == 6)
-            {
-                Client player = API.getPlayerFromHandle(entity);
-                if (houseInformation.ContainsKey(colshape) && !player.isInVehicle)
-                {
-                    houseInformation[colshape].addOutsidePlayer(player);
-                    API.triggerClientEvent(player, "triggerUseFunction", "House");
-                    // If they have keys, tell them.
-                    if (houseInformation[colshape].returnShopOwner() == player.name || houseInformation[colshape].returnShopKeys().Contains(player))
-                    {
-                        API.sendNotificationToPlayer(player, "I have keys for this place.");
-                    }
-                    else if (houseInformation[colshape].returnForSale())
-                    {
-                        API.sendNotificationToPlayer(player, "~g~This house is for sale.");
-                    }
-                    
-                }
-                else
-                {
-                    if (player.dimension > 9)
-                    {
-                        foreach (ColShape collision in houseInformation.Keys)
-                        {
-                            if (houseInformation[collision].returnInsidePlayers().ContainsKey(player))
-                            {
-                                API.triggerClientEvent(player, "triggerUseFunction", "House");
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void API_onResourceStart()
-        {
-            initializeHousing();
-        }
-
-        private void initializeHousing()
-        {
-            if (houseInformation.Count > 1)
-            {
-                foreach (ColShape collision in houseInformation.Keys)
-                {
-                    houseInformation[collision].Dispose();
-                }
-                houseInformation.Clear();
-            }
-
-
-            string query = string.Format("SELECT * FROM PlayerHousing");
-            DataTable result = API.exported.database.executeQueryWithResult(query);
-
-            int initialized = 0;
-
-            foreach (DataRow row in result.Rows)
-            {
-                int id = Convert.ToInt32(row["ID"]);
-                string player = row["Owner"].ToString();
-                bool forSale = Convert.ToBoolean(row["ForSale"]);
-                Vector3 position = new Vector3(Convert.ToSingle(row["PosX"]), Convert.ToSingle(row["PosY"]), Convert.ToSingle(row["PosZ"]));
-                Shop.ShopType type = (Shop.ShopType)Enum.Parse(typeof(Shop.ShopType), row["Type"].ToString());
-                int price = Convert.ToInt32(row["Price"]);
-                positionBlips(player, position, id, forSale, type, price);
-                ++initialized;
-            }
-
-            API.consoleOutput("Houses Intialized: " + initialized.ToString());
-        }
-
-        [Command("addhouse")]
-        public void cmdHouseHandlerAddHouse(Client player, int price = 100000, bool forSale = true)
-        {
-            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
-            if (instance.isAdmin())
-            {
-                string[] varNamesTwo = { "PosX", "PosY", "PosZ", "Price", "ForSale" };
-                string tableName = "PlayerHousing";
-                string[] dataTwo = { player.position.X.ToString(), player.position.Y.ToString(), player.position.Z.ToString(), price.ToString(), forSale.ToString() };
-                db.compileInsertQuery(tableName, varNamesTwo, dataTwo);
-                initializeHousing();
-            }
-        }
-
-
-        public void positionBlips(string player, Vector3 position, int id, bool forSale, Shop.ShopType type, int price)
-        {
-            Shop newShop = new Shop();
-            ColShape shape = API.createCylinderColShape(position, 0.5f, 2f);
-
-            var newBlip = API.createBlip(position);
-            if (forSale == false)
-            {
-                API.setBlipSprite(newBlip, 40);
-            }
-            else
-            {
-                API.setBlipSprite(newBlip, 374);
-            }
-            
-            API.setBlipColor(newBlip, 37);
-            API.setBlipShortRange(newBlip, true);
-
-            currentDimension += 1;
-
-            newShop.setBlip(newBlip);
-            newShop.setCollisionID(id);
-            newShop.setCollisionShape(shape);
-            newShop.setShopOwner(player);
-            newShop.setCollisionPosition(position);
-            newShop.setForSale(forSale);
-            newShop.setShopDimension(currentDimension);
-            newShop.setShopPrice(price);
-            newShop.setShopType(type);
-
-            houseInformation.Add(shape, newShop);
         }
 
         public void actionHouseControl(Client player)
