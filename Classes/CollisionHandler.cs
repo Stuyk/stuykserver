@@ -21,8 +21,12 @@ namespace stuykserver.Classes
             if (API.getEntityType(entity) == EntityType.Player)
             {
                 Client player = API.getPlayerFromHandle(entity);
+
+                // All Class Calls
                 Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
                 House house = (House)API.call("HouseHandler", "getHouse", colshape);
+                VehicleClass veh = (VehicleClass)API.call("VehicleHandler", "getVehicle", colshape);
+
                 if (shop != null)
                 {
                     if (shop.returnShopType().ToString() == "Modification" && !player.isInVehicle)
@@ -40,6 +44,13 @@ namespace stuykserver.Classes
                 {
                     API.setEntityData(player, "Collision", house.returnHouseStatus().ToString());
                     API.triggerClientEvent(player, "triggerUseFunction", house.returnHouseStatus().ToString());
+                }
+
+                if (veh != null)
+                {
+                    API.setEntityData(player, "Collision", veh.returnCollisionType());
+                    API.setEntityData(player, "ColShape", veh.returnCollision());
+                    API.triggerClientEvent(player, "triggerUseFunction", veh.returnCollisionType());
                 }
             }
         }

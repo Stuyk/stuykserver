@@ -1,5 +1,6 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
+using stuykserver.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,110 +16,9 @@ namespace stuykserver.Util
         DatabaseHandler db = new DatabaseHandler();
         DateTime startTime;
 
-        Dictionary<NetHandle, VehicleInformation> vehicleInformation = new Dictionary<NetHandle, VehicleInformation>();
+        Dictionary<NetHandle, VehicleClass> vehicleInformation = new Dictionary<NetHandle, VehicleClass>();
+        Dictionary<ColShape, VehicleClass> vehicleColInfo = new Dictionary<ColShape, VehicleClass>();
         List<string> bicycles = new List<string>(new string[] {"Bmx", "Cruiser", "Fixter", "Scorcher", "TriBike" });
-
-        public class VehicleInformation : IDisposable
-        {
-            NetHandle vehicleID;
-            ColShape vehicleCollision;
-            Vector3 vehiclePosition;
-            List<Client> vehicleKeys;
-            Client vehicleOwner;
-            List<Client> playersInVehicle;
-            string vehicleType;
-
-            public void setupVehicle(NetHandle id, ColShape collision, Vector3 collisionPosition, Client owner, string type)
-            {
-                vehicleID = id;
-                vehicleCollision = collision;
-                vehiclePosition = collisionPosition;
-                vehicleOwner = owner;
-                vehicleType = type;
-                vehicleKeys = new List<Client>();
-                playersInVehicle = new List<Client>();
-            }
-
-            public string returnType()
-            {
-                return vehicleType;
-            }
-
-            public void setVehiclePosition(ColShape collision, Vector3 position)
-            {
-                vehicleCollision = collision;
-                vehiclePosition = position;
-            }
-
-            public void vehicleKeysAdd(Client player)
-            {
-                if (!vehicleKeys.Contains(player))
-                {
-                    vehicleKeys.Add(player);
-                }
-            }
-
-            public void vehicleKeysRemove(Client player)
-            {
-                if (vehicleKeys.Contains(player))
-                {
-                    vehicleKeys.Remove(player);
-                }
-            }
-
-            public void playersInVehicleAdd(Client player)
-            {
-                if (!playersInVehicle.Contains(player))
-                {
-                    playersInVehicle.Add(player);
-                }
-            }
-
-            public void playersInVehicleRemove(Client player)
-            {
-                if (playersInVehicle.Contains(player))
-                {
-                    playersInVehicle.Remove(player);
-                }
-            }
-
-            public Vector3 returnPosition()
-            {
-                return vehiclePosition;
-            }
-
-            public ColShape returnCollision()
-            {
-                return vehicleCollision;
-            }
-
-            public List<Client> returnVehicleKeys()
-            {
-                return vehicleKeys;
-            }
-
-            public List<Client> returnPlayersInVehicle()
-            {
-                return playersInVehicle;
-            }
-
-            public Client returnOwner()
-            {
-                return vehicleOwner;
-            }
-
-            public NetHandle returnVehicleID()
-            {
-                return vehicleID;
-            }
-
-            public void Dispose()
-            {
-                GC.SuppressFinalize(this);
-            }
-        }
-
-        
 
         public VehicleHandler()
         {
@@ -139,6 +39,15 @@ namespace stuykserver.Util
             }
         }
 
+        // Return VehicleClass from Collision
+        public VehicleClass getVehicle(ColShape collision)
+        {
+            if (vehicleColInfo.ContainsKey(collision))
+            {
+                return vehicleColInfo[collision];
+            }
+            return null;
+        }
 
         // Update Vehicle Collisions Every 15 Seconds for Unoccupied Spawned Vehicles.
         public void updateVehicleCollisions()
@@ -160,7 +69,8 @@ namespace stuykserver.Util
             {
                 if (!inVehicles.Contains(vehicle))
                 {
-                    vehicleInformation[vehicle].setVehiclePosition(API.createCylinderColShape(API.getEntityPosition(vehicle), 2f, 2f), API.getEntityPosition(vehicle));
+                    API.deleteColShape(vehicleInformation[vehicle].returnCollision());
+                    vehicleInformation[vehicle].setVehiclePosition(API.createCylinderColShape(API.getEntityPosition(vehicle), 3f, 3f), API.getEntityPosition(vehicle));
                 }
             }
         }
@@ -171,7 +81,7 @@ namespace stuykserver.Util
 
             foreach (NetHandle vehicle in vehicles)
             {
-                if (vehicleInformation[vehicle].returnOwner() == player)
+                if (vehicleInformation[vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
                 {
                     vehicleInformation[vehicle].Dispose();
                     vehicleInformation.Remove(vehicle);
@@ -200,7 +110,7 @@ namespace stuykserver.Util
                 {
                     foreach (NetHandle vehicle in vehicleInformation.Keys)
                     {
-                        if (API.getPlayerFromHandle(entity).position.DistanceTo(API.getEntityPosition(vehicle)) <= 5)
+                        if (API.getPlayerFromHandle(entity).position.DistanceTo(API.getEntityPosition(vehicle)) <= 1.5f)
                         {
                             API.triggerClientEvent(API.getPlayerFromHandle(entity), "triggerUseFunction", "VehicleLock");
                             break;
@@ -264,30 +174,30 @@ namespace stuykserver.Util
             }
         }
 
-        public Vehicle actionSetupPurchasedCar(Vector3 position, string model, Client player)
+        public void actionSetupPurchasedCar(Vector3 position, string model, Client player)
         {
-            VehicleHash name = API.vehicleNameToModel(model);
-            Vehicle vehicle = API.createVehicle(name, position, new Vector3(), 0, 0);
-            
-            Vector3 pos = API.getEntityPosition(vehicle);
-            Vector3 rot = API.getEntityRotation(vehicle);
-
-            string[] vars = { "Nametag", "PosX", "PosY", "PosZ", "RotX", "RotY", "RotZ", "VehicleType", "PlayerID" };
-            string[] data = { player.name, pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), rot.X.ToString(), rot.Y.ToString(), rot.Z.ToString(), model, Convert.ToString(API.getEntityData(player, "PlayerID")) };
+            // Push Up
+            string[] vars = { "Nametag", "PosX", "PosY", "PosZ", "VehicleType", "PlayerID" };
+            string[] data = { player.name, position.X.ToString(), position.Y.ToString(), position.Z.ToString(), model, Convert.ToString(API.getEntityData(player, "PlayerID")) };
             db.compileInsertQuery("PlayerVehicles", vars, data);
 
-            handleVehicleSpawn(player, vehicle, position, model);
-            return vehicle;
-        }
+            // Pull Down for Creation
+            string[] varNames = { "PlayerID", "VehicleType" };
+            string before = "SELECT * FROM PlayerVehicles WHERE";
+            object[] dataTwo = { Convert.ToString(API.getEntityData(player, "PlayerID")), model };
+            DataTable result = db.compileSelectQuery(before, varNames, dataTwo);
 
-        public void handleVehicleSpawn(Client player, Vehicle vehicle, Vector3 where, string type)
-        {
-            VehicleInformation newVehicle = new VehicleInformation();
-            ColShape collision = API.createCylinderColShape(where, 2f, 2f);
-            API.setVehicleLocked(vehicle, true);
-            vehicle.engineStatus = false;
-            newVehicle.setupVehicle(vehicle, collision, where, player, type);
-            vehicleInformation.Add(vehicle, newVehicle);
+            if (result.Rows.Count >= 1)
+            {
+                API.consoleOutput("Found More Than 1");
+            }
+            else
+            {
+                API.consoleOutput("Didn't find shit.");
+            }
+            VehicleClass veh = new VehicleClass(result.Rows[0]);
+            vehicleInformation.Add(veh.returnVehicleID(), veh);
+            vehicleColInfo.Add(veh.returnCollision(), veh);
         }
 
         public void actionVehicleEngine(Client player)
@@ -365,41 +275,42 @@ namespace stuykserver.Util
 
         public void actionLockCar(Client player)
         {
-            foreach (NetHandle vehicle in vehicleInformation.Keys)
+            if (API.getEntityData(player, "ColShape") == null)
             {
-                if (player.position.DistanceTo(vehicleInformation[vehicle].returnPosition()) <= 3 && !player.isInVehicle)
-                {
-                    if (vehicleInformation[vehicle].returnOwner() == player || vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
-                    {
-                        if (API.getVehicleLocked(vehicle))
-                        {
-                            API.setVehicleLocked(vehicle, false);
-                            API.setVehicleDoorState(vehicle, 0, true);
-                            API.sendNotificationToPlayer(player, "~g~The vehicle has been unlocked.");
-                            break;
-                        }
-                        else
-                        {
-                            API.setVehicleLocked(vehicle, true);
-                            API.setVehicleDoorState(vehicle, 0, false);
-                            API.setVehicleDoorState(vehicle, 1, false);
-                            API.setVehicleDoorState(vehicle, 2, false);
-                            API.setVehicleDoorState(vehicle, 3, false);
-                            API.sendNotificationToPlayer(player, "~r~The vehicle has been locked.");
-                            if (vehicleInformation[vehicle].returnOwner() == player)
-                            {
-                                Vector3 pos = API.getEntityPosition(vehicle);
-                                Vector3 rot = API.getEntityRotation(vehicle);
-                                string[] varNames = { "PosX", "PosY", "PosZ", "RotX", "RotY", "RotZ" };
-                                string before = "UPDATE PlayerVehicles SET";
-                                object[] data = { pos.X, pos.Y, pos.Z, rot.X, rot.Y, rot.Z };
-                                string after = string.Format("WHERE PlayerID='{0}' AND VehicleType='{1}'", API.getEntitySyncedData(player, "PlayerID"), vehicleInformation[vehicle].returnType());
+                return;
+            }
 
-                                db.compileQuery(before, after, varNames, data);
-                            }
-                            break;
-                        }
-                    }
+            ColShape collision = (ColShape)API.getEntityData(player, "ColShape");
+            VehicleClass vehInfo = getVehicle(collision);
+            NetHandle vehicle = vehInfo.returnVehicleID();
+            int owner = vehInfo.returnOwnerID();
+
+            if (!player.isInVehicle && owner == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+            {
+                if (API.getVehicleLocked(vehicle))
+                {
+                    API.setVehicleLocked(vehicle, false);
+                    API.setVehicleDoorState(vehicle, 0, true);
+                    API.sendNotificationToPlayer(player, "~g~The vehicle has been unlocked.");
+                }
+                else
+                {
+                    API.setVehicleLocked(vehicle, true);
+                    API.setVehicleDoorState(vehicle, 0, false);
+                    API.setVehicleDoorState(vehicle, 1, false);
+                    API.setVehicleDoorState(vehicle, 2, false);
+                    API.setVehicleDoorState(vehicle, 3, false);
+                    API.sendNotificationToPlayer(player, "~r~The vehicle has been locked.");
+
+                    // REPLACE WITH SAVE FEATURE
+                    Vector3 pos = API.getEntityPosition(vehicle);
+                    Vector3 rot = API.getEntityRotation(vehicle);
+                    string[] varNames = { "PosX", "PosY", "PosZ", "RotX", "RotY", "RotZ" };
+                    string before = "UPDATE PlayerVehicles SET";
+                    object[] data = { pos.X, pos.Y, pos.Z, rot.X, rot.Y, rot.Z };
+                    string after = string.Format("WHERE PlayerID='{0}' AND VehicleType='{1}'", API.getEntitySyncedData(player, "PlayerID"), vehicleInformation[vehicle].returnType());
+
+                    db.compileQuery(before, after, varNames, data);
                 }
             }
         }
@@ -416,53 +327,11 @@ namespace stuykserver.Util
                 return;
             }
 
-
             foreach (DataRow row in result.Rows)
             {
-                float posX = Convert.ToSingle(row["PosX"]);
-                float posY = Convert.ToSingle(row["PosY"]);
-                float posZ = Convert.ToSingle(row["PosZ"]);
-                float rotX = Convert.ToSingle(row["RotX"]);
-                float rotY = Convert.ToSingle(row["RotY"]);
-                float rotZ = Convert.ToSingle(row["RotZ"]);
-                VehicleHash type = API.vehicleNameToModel(row["VehicleType"].ToString());
-
-                Vector3 position = new Vector3(posX, posY, posZ);
-                Vector3 rotation = new Vector3(rotX, rotY, rotZ);
-
-                Vehicle vehicle = API.createVehicle(type, position, rotation, 0, 0);
-
-                // Primary RGB
-                int r = Convert.ToInt32(row["Red"]);
-                int g = Convert.ToInt32(row["Green"]);
-                int b = Convert.ToInt32(row["Blue"]);
-
-                API.setVehicleCustomPrimaryColor(vehicle, r, g, b);
-
-                // Secondary RGB
-                int sr = Convert.ToInt32(row["sRed"]);
-                int sg = Convert.ToInt32(row["sGreen"]);
-                int sb = Convert.ToInt32(row["sBlue"]);
-
-                API.setVehicleCustomSecondaryColor(vehicle, sr, sg, sb);
-
-                // Mods
-                API.setVehicleMod(vehicle, 0, Convert.ToInt32(row["Spoilers"])); // Spoilers
-                API.setVehicleMod(vehicle, 1, Convert.ToInt32(row["FrontBumper"])); // Front Bumper
-                API.setVehicleMod(vehicle, 2, Convert.ToInt32(row["RearBumper"])); // Rear Bumper
-                API.setVehicleMod(vehicle, 3, Convert.ToInt32(row["SideSkirt"])); // Side Skirt
-                API.setVehicleMod(vehicle, 4, Convert.ToInt32(row["Exhaust"])); // Exhaust
-                API.setVehicleMod(vehicle, 6, Convert.ToInt32(row["Grille"])); // Grille
-                API.setVehicleMod(vehicle, 7, Convert.ToInt32(row["Hood"])); // Hood
-                API.setVehicleMod(vehicle, 8, Convert.ToInt32(row["Fender"])); // Fender
-                API.setVehicleMod(vehicle, 9, Convert.ToInt32(row["RightFender"])); // Right Fender
-                API.setVehicleMod(vehicle, 10, Convert.ToInt32(row["Roof"])); // Roof
-                API.setVehicleMod(vehicle, 23, Convert.ToInt32(row["FrontWheels"])); // Front Wheels
-                API.setVehicleMod(vehicle, 24, Convert.ToInt32(row["BackWheels"])); // Back Wheels
-                API.setVehicleMod(vehicle, 69, Convert.ToInt32(row["WindowTint"])); // Window Tint
-
-                handleVehicleSpawn(player, vehicle, position, API.getVehicleDisplayName(type));
-
+                VehicleClass veh = new VehicleClass(row);
+                vehicleInformation.Add(veh.returnVehicleID(), veh);
+                vehicleColInfo.Add(veh.returnCollision(), veh);
                 API.consoleOutput("Created vehicle for: " + result.Rows[0]["Nametag"].ToString());
             }
         }

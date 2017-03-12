@@ -61,6 +61,7 @@
     <Compile Include="Classes\PlayerHandler.cs" />
     <Compile Include="Classes\ShopHandler.cs" />
     <Compile Include="Classes\Shop.cs" />
+    <Compile Include="Classes\VehicleClass.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Jobs\Fishing.cs" />
     <Compile Include="Util\ActiveShooter.cs" />
