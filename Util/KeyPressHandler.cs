@@ -45,11 +45,26 @@ namespace stuykserver.Util
                     return;
                 }
 
-                // House Property Panel
-                if (currentFunction == "House")
+                if (!player.isInVehicle)
                 {
-                    API.call("HouseHandler", "actionHousePropertyPanel", player);
-                    return;
+                    // House Property Panel
+                    if (currentFunction == "House")
+                    {
+                        API.call("HouseHandler", "actionHousePropertyPanel", player);
+                        return;
+                    }
+                }
+                
+
+                // VEHICLE FUNCTIONS
+                if (player.isInVehicle)
+                {
+                    // VEHICLE LOCK - SHIFT + B - Version
+                    if (currentFunction == "VehicleEngine")
+                    {
+                        API.call("VehicleHandler", "actionVehicleLock", player);
+                        return;
+                    }
                 }
             }
 

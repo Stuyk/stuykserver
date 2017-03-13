@@ -229,6 +229,111 @@ namespace stuykserver.Util
             return;
         }
 
+        // Action Vehicle Hood
+        public void actionVehicleHood(Client player)
+        {
+            NetHandle vehicle = (NetHandle)API.getEntityData(player, "NearVehicle");
+
+            if (player.position.DistanceTo(API.getEntityPosition(vehicle)) > 3)
+            {
+                API.sendChatMessageToPlayer(player, "~y~Vehicle # ~o~You don't seem to be near a vehicle.");
+                return;
+            }
+
+            // Prevent Local Vehicles from being called.
+            if (!vehicleInformation.ContainsKey(vehicle))
+            {
+                return;
+            }
+
+            // Check for Owner
+            if (vehicleInformation[vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+            {
+                if (API.getVehicleDoorState(vehicle, 4))
+                {
+                    API.setVehicleDoorState(vehicle, 4, false);
+                    return;
+                }
+                else
+                {
+                    API.setVehicleDoorState(vehicle, 4, true);
+                    return;
+                }
+            }
+
+            // Check for Keys
+            if (vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
+            {
+                if (API.getVehicleDoorState(vehicle, 4))
+                {
+                    API.setVehicleDoorState(vehicle, 4, false);
+                    return;
+                }
+                else
+                {
+                    API.setVehicleDoorState(vehicle, 4, true);
+                    return;
+                }
+            }
+
+            // If none of the above, tell the player he has no keys.
+            API.sendChatMessageToPlayer(player, "~y~Vehicle # ~o~You don't have any keys for this vehicle.");
+            return;
+        }
+
+        // Action Vehicle Trunk
+        public void actionVehicleTrunk(Client player)
+        {
+            NetHandle vehicle = (NetHandle)API.getEntityData(player, "NearVehicle");
+
+            if (player.position.DistanceTo(API.getEntityPosition(vehicle)) > 3)
+            {
+                API.sendChatMessageToPlayer(player, "~y~Vehicle # ~o~You don't seem to be near a vehicle.");
+                return;
+            }
+
+            // Prevent Local Vehicles from being called.
+            if (!vehicleInformation.ContainsKey(vehicle))
+            {
+                return;
+            }
+
+            // Check for Owner
+            if (vehicleInformation[vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+            {
+                if (API.getVehicleDoorState(vehicle, 5))
+                {
+                    API.setVehicleDoorState(vehicle, 5, false);
+                    return;
+                }
+                else
+                {
+                    API.setVehicleDoorState(vehicle, 5, true);
+                    return;
+                }
+            }
+
+            // Check for Keys
+            if (vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
+            {
+                if (API.getVehicleDoorState(vehicle, 5))
+                {
+                    API.setVehicleDoorState(vehicle, 5, false);
+                    return;
+                }
+                else
+                {
+                    API.setVehicleDoorState(vehicle, 5, true);
+                    return;
+                }
+            }
+
+            // If none of the above, tell the player he has no keys.
+            API.sendChatMessageToPlayer(player, "~y~Vehicle # ~o~You don't have any keys for this vehicle.");
+            return;
+        }
+
+
         // #########################################
         // VEHICLE SETUPS
         // #########################################

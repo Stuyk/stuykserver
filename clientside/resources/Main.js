@@ -68,6 +68,16 @@ API.onResourceStop.connect(function() {
 API.onKeyDown.connect(function(player, e) {
 	// SHIFT + B - KEYPRESS HELPER
 	if (!API.isChatOpen() && e.KeyCode == Keys.B && e.Shift && currentCollisionType != null) {
+		if (currentCollisionType == "Vehicle")
+		{
+			showRadialMenu();
+			vehicleSpecialFunction = null;
+			useFunction = null;
+			API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
+			return;
+		}
+		
+		
 		API.triggerServerEvent("useSpecial", currentCollisionType);
 		vehicleSpecialFunction = null;
 		useFunction = null;
@@ -156,6 +166,11 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			case "ShowHousePropertyPanel":
 			{
 				showHousePropertyPanel();
+				break;
+			}
+			case "showRadialMenu":
+			{
+				showRadialMenu();
 				break;
 			}
 		}
@@ -583,11 +598,11 @@ function showVehiclePanel() {
 }
 
 function vehicleOpenHood() {
-	API.triggerServerEvent("useFunction", "ActionVehicleHood");
+	API.triggerServerEvent("vehicleHood");
 }
 
 function vehicleOpenTrunk() {
-	API.triggerServerEvent("useFunction", "ActionVehicleTrunk");
+	API.triggerServerEvent("vehicleTrunk");
 }
 
 function showRadialMenu() {
