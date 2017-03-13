@@ -1,5 +1,6 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
+using stuykserver.Util;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,6 +12,8 @@ namespace stuykserver.Classes
 {
     public class VehicleClass : Script, IDisposable
     {
+        DatabaseHandler db = new DatabaseHandler();
+
         public VehicleClass()
         {
             API.consoleOutput("Started: Vehicle Class");
@@ -167,6 +170,21 @@ namespace stuykserver.Classes
         List<int> rgb; // First
         List<int> srgb; // Second
 
+        public NetHandle returnVehicleHandle()
+        {
+            return vehicleID;
+        }
+
+        public void saveVehiclePosition()
+        {
+            string[] varNames = { "PosX", "PosY", "PosZ", "RotX", "RotY", "RotZ" };
+            string before = "UPDATE PlayerVehicles SET";
+            object[] data = { vehiclePosition.X, vehiclePosition.Y, vehiclePosition.Z, vehicleRotation.X, vehicleRotation.Y, vehicleRotation.Z };
+            string after = string.Format("WHERE PlayerID='{0}' AND VehicleType='{1}'", playerID, vehicleType);
+
+            db.compileQuery(before, after, varNames, data);
+        }
+
         public string returnCollisionType()
         {
             return collisionType;
@@ -233,6 +251,11 @@ namespace stuykserver.Classes
         public ColShape returnCollision()
         {
             return vehicleCollision;
+        }
+
+        public void deleteCollision()
+        {
+            API.deleteColShape(vehicleCollision);
         }
 
         public List<Client> returnVehicleKeys()

@@ -372,7 +372,7 @@ API.onUpdate.connect(function() {
 				API.dxDrawTexture("clientside/resources/images/pressbalt.png", new Point(resX / 2 - 25, resY / 2 - 75), new Size(200, 125), 1);
 				break;
 
-			case "VehicleLock":
+			case "Vehicle":
 				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 				break;
 

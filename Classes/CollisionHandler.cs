@@ -22,35 +22,39 @@ namespace stuykserver.Classes
             {
                 Client player = API.getPlayerFromHandle(entity);
 
-                // All Class Calls
-                Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
-                House house = (House)API.call("HouseHandler", "getHouse", colshape);
-                VehicleClass veh = (VehicleClass)API.call("VehicleHandler", "getVehicle", colshape);
-
-                if (shop != null)
+                if (!player.isInVehicle)
                 {
-                    if (shop.returnShopType().ToString() == "Modification" && !player.isInVehicle)
+                    // All Class Calls
+                    Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
+                    House house = (House)API.call("HouseHandler", "getHouse", colshape);
+                    VehicleClass veh = (VehicleClass)API.call("VehicleHandler", "getVehicle", player, colshape);
+
+                    if (shop != null)
                     {
+                        if (shop.returnShopType().ToString() == "Modification" && !player.isInVehicle)
+                        {
+                            return;
+                        }
+
+                        API.setEntityData(player, "Collision", shop.returnShopType().ToString());
+                        API.setEntityData(player, "ColShape", colshape);
+                        API.triggerClientEvent(player, "triggerUseFunction", shop.returnShopType().ToString());
                         return;
                     }
 
-                    API.setEntityData(player, "Collision", shop.returnShopType().ToString());
-                    API.setEntityData(player, "ColShape", colshape);
-                    API.triggerClientEvent(player, "triggerUseFunction", shop.returnShopType().ToString());
-                    return;
-                }
+                    if (house != null)
+                    {
+                        API.setEntityData(player, "Collision", house.returnHouseStatus().ToString());
+                        API.triggerClientEvent(player, "triggerUseFunction", house.returnHouseStatus().ToString());
+                    }
 
-                if (house != null)
-                {
-                    API.setEntityData(player, "Collision", house.returnHouseStatus().ToString());
-                    API.triggerClientEvent(player, "triggerUseFunction", house.returnHouseStatus().ToString());
-                }
-
-                if (veh != null)
-                {
-                    API.setEntityData(player, "Collision", veh.returnCollisionType());
-                    API.setEntityData(player, "ColShape", veh.returnCollision());
-                    API.triggerClientEvent(player, "triggerUseFunction", veh.returnCollisionType());
+                    if (veh != null)
+                    {
+                        API.setEntityData(player, "Collision", veh.returnCollisionType());
+                        API.setEntityData(player, "NearVehicle", veh.returnVehicleID());
+                        API.setEntityData(player, "ColShape", veh.returnCollision());
+                        API.triggerClientEvent(player, "triggerUseFunction", veh.returnCollisionType());
+                    }
                 }
             }
         }
@@ -60,9 +64,19 @@ namespace stuykserver.Classes
             if (API.getEntityType(entity) == EntityType.Player)
             {
                 Client player = API.getPlayerFromHandle(entity);
-                API.setEntityData(player, "Collision", "None");
-                API.setEntityData(player, "ColShape", null);
-                API.triggerClientEvent(player, "removeUseFunction");
+                if (player.isInVehicle)
+                {
+                    return;
+                }
+
+                // Check if matching ColShape
+                if (colshape == (ColShape)API.getEntityData(player, "ColShape"))
+                {
+                    API.setEntityData(player, "Collision", "None");
+                    API.setEntityData(player, "ColShape", null);
+                    API.setEntityData(player, "NearVehicle", null);
+                    API.triggerClientEvent(player, "removeUseFunction");
+                }
             }
         }
     }
