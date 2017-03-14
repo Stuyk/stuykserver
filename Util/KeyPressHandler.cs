@@ -73,7 +73,6 @@ namespace stuykserver.Util
             {
                 // Pull Current Function off Player - Assigned by Collision Handler - These are ENUM Types converted to STRINGS.
                 string currentFunction = Convert.ToString(API.getEntityData(player, "Collision"));
-                API.consoleOutput("Function: {0}", currentFunction);
 
                 // If NONE, do nothing.
                 if (currentFunction == "None")
@@ -122,7 +121,14 @@ namespace stuykserver.Util
                     // ENTER HOUSE
                     if (currentFunction == "House")
                     {
+                        if (API.getEntityData(player, "IsInInterior") == true)
+                        {
+                            API.call("HouseHandler", "actionHouseExit", player);
+                            return;
+                        }
+
                         API.call("HouseHandler", "actionHouseControl", player);
+                        return;
                     }
 
                     // VEHICLE LOCK

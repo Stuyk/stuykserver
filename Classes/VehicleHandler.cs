@@ -52,11 +52,21 @@ namespace stuykserver.Util
         // When a player enters a vehicle. Assign the VehicleEngine function to the player.
         private void API_onPlayerEnterVehicle(Client player, NetHandle vehicle)
         {
+            Client[] playersInCar = API.getVehicleOccupants(vehicle);
+
             // If it's locked, kick them the fuck out.
             if (API.getVehicleLocked(vehicle))
             {
                 API.warpPlayerOutOfVehicle(player, vehicle);
                 API.sendNotificationToPlayer(player, "~r~This vehicle is locked.");
+                foreach (Client playhur in playersInCar)
+                {
+                    if (vehicleInformation[vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(playhur, "PlayerID")) && API.getEntityPosition(vehicleInformation[vehicle].returnVehicleID()).DistanceTo(playhur.position) <= 5)
+                    {
+                        API.setPlayerIntoVehicle(playhur, vehicle, -1);
+                        break;
+                    }
+                }
                 return;
             }
 
@@ -65,6 +75,7 @@ namespace stuykserver.Util
                 // Check if they're in the driver seat. Check if it's not a bicycle.
                 if (API.getPlayerVehicleSeat(player) == -1 && !bicycles.Contains(vehicleInformation[vehicle].returnType()))
                 {
+                    API.setPlayerIntoVehicle(player, vehicle, -1);
                     vehicleInformation[vehicle].deleteCollision();
                     API.triggerClientEvent(player, "triggerUseFunction", "VehicleEngine");
                     API.setEntityData(player, "Collision", "VehicleEngine");
@@ -127,6 +138,11 @@ namespace stuykserver.Util
 
             // Prevent Local Vehicles from being called.
             if (!vehicleInformation.ContainsKey(vehicle))
+            {
+                return;
+            }
+
+            if (vehicle == null)
             {
                 return;
             }
@@ -234,7 +250,7 @@ namespace stuykserver.Util
         {
             NetHandle vehicle = (NetHandle)API.getEntityData(player, "NearVehicle");
 
-            if (player.position.DistanceTo(API.getEntityPosition(vehicle)) > 3)
+            if (player.position.DistanceTo(API.getEntityPosition(vehicle)) > 3 && player.isInVehicle)
             {
                 API.sendChatMessageToPlayer(player, "~y~Vehicle # ~o~You don't seem to be near a vehicle.");
                 return;
@@ -286,7 +302,7 @@ namespace stuykserver.Util
         {
             NetHandle vehicle = (NetHandle)API.getEntityData(player, "NearVehicle");
 
-            if (player.position.DistanceTo(API.getEntityPosition(vehicle)) > 3)
+            if (player.position.DistanceTo(API.getEntityPosition(vehicle)) > 3 && player.isInVehicle)
             {
                 API.sendChatMessageToPlayer(player, "~y~Vehicle # ~o~You don't seem to be near a vehicle.");
                 return;
@@ -349,6 +365,20 @@ namespace stuykserver.Util
                 }
             }
             return null;
+        }
+
+        // Remove Disconnected Vehicles
+        public void removeDisconnectedVehicles(Client player)
+        {
+            List<NetHandle> vehicles = API.getAllVehicles();
+
+            foreach (NetHandle vehicle in vehicles)
+            {
+                if (vehicleInformation[vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+                {
+                    vehicleInformation[vehicle].Dispose();
+                }
+            }
         }
 
         // Used when a vehicle is purchased.

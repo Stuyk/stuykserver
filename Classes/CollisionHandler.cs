@@ -22,38 +22,54 @@ namespace stuykserver.Classes
             {
                 Client player = API.getPlayerFromHandle(entity);
 
-                if (!player.isInVehicle)
+                // All Class Calls
+                Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
+                House house = (House)API.call("HouseHandler", "getHouse", colshape);
+                VehicleClass veh = (VehicleClass)API.call("VehicleHandler", "getVehicle", player, colshape);
+
+                // Shops
+                if (shop != null)
                 {
-                    // All Class Calls
-                    Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
-                    House house = (House)API.call("HouseHandler", "getHouse", colshape);
-                    VehicleClass veh = (VehicleClass)API.call("VehicleHandler", "getVehicle", player, colshape);
-
-                    if (shop != null)
+                    if (shop.returnShopType().ToString() == "Modification" && !player.isInVehicle)
                     {
-                        if (shop.returnShopType().ToString() == "Modification" && !player.isInVehicle)
-                        {
-                            return;
-                        }
-
-                        API.setEntityData(player, "Collision", shop.returnShopType().ToString());
-                        API.setEntityData(player, "ColShape", colshape);
-                        API.triggerClientEvent(player, "triggerUseFunction", shop.returnShopType().ToString());
+                        API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
                         return;
                     }
 
-                    if (house != null)
-                    {
-                        API.setEntityData(player, "Collision", house.returnHouseStatus().ToString());
-                        API.triggerClientEvent(player, "triggerUseFunction", house.returnHouseStatus().ToString());
-                    }
+                    API.setEntityData(player, "Collision", shop.returnShopType().ToString());
+                    API.setEntityData(player, "ColShape", colshape);
+                    API.triggerClientEvent(player, "triggerUseFunction", shop.returnShopType().ToString());
+                    return;
+                }
 
-                    if (veh != null)
+                // Outside House
+                if (house != null)
+                {
+                    API.setEntityData(player, "Collision", house.returnHouseStatus());
+                    API.setEntityData(player, "ColShape", house.returnEntryCollision());
+                    API.triggerClientEvent(player, "triggerUseFunction", house.returnHouseStatus());
+                    return;
+                }
+
+                // Vehicle
+                if (veh != null)
+                {
+                    API.setEntityData(player, "Collision", veh.returnCollisionType());
+                    API.setEntityData(player, "NearVehicle", veh.returnVehicleID());
+                    API.setEntityData(player, "ColShape", veh.returnCollision());
+                    API.triggerClientEvent(player, "triggerUseFunction", veh.returnCollisionType());
+                    return;
+                }
+
+                // Interior for Housing + Whatever Else
+                if (API.getEntityData(player, "IsInInterior") == true)
+                {
+                    House instance = (House)API.getEntityData(player, "InteriorInstance");
+                    if (instance != null)
                     {
-                        API.setEntityData(player, "Collision", veh.returnCollisionType());
-                        API.setEntityData(player, "NearVehicle", veh.returnVehicleID());
-                        API.setEntityData(player, "ColShape", veh.returnCollision());
-                        API.triggerClientEvent(player, "triggerUseFunction", veh.returnCollisionType());
+                        API.setEntityData(player, "Collision", instance.returnHouseStatus());
+                        API.triggerClientEvent(player, "triggerUseFunction", "House");
+                        return;
                     }
                 }
             }
@@ -64,10 +80,6 @@ namespace stuykserver.Classes
             if (API.getEntityType(entity) == EntityType.Player)
             {
                 Client player = API.getPlayerFromHandle(entity);
-                if (player.isInVehicle)
-                {
-                    return;
-                }
 
                 // Check if matching ColShape
                 if (colshape == (ColShape)API.getEntityData(player, "ColShape"))
@@ -75,7 +87,17 @@ namespace stuykserver.Classes
                     API.setEntityData(player, "Collision", "None");
                     API.setEntityData(player, "ColShape", null);
                     API.setEntityData(player, "NearVehicle", null);
+                    API.setEntityData(player, "SelectedHouse", null);
                     API.triggerClientEvent(player, "removeUseFunction");
+                    return;
+                }
+
+                if (API.getEntityData(player, "IsInInterior") == true)
+                {
+                    API.setEntityData(player, "ColShape", null);
+                    API.setEntityData(player, "NearVehicle", null);
+                    API.triggerClientEvent(player, "removeUseFunction");
+                    return;
                 }
             }
         }

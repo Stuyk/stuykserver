@@ -47,6 +47,7 @@ namespace stuykserver.Util
         {
             if (!player.isInVehicle)
             {
+                API.sendNotificationToPlayer(player, "~r~You must have a vehicle to access this.");
                 return;
             }
 

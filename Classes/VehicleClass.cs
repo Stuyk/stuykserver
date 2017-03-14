@@ -280,6 +280,8 @@ namespace stuykserver.Classes
 
         public void Dispose()
         {
+            API.deleteEntity(vehicleID);
+            vehicleKeys.Clear();
             GC.SuppressFinalize(this);
         }
     }

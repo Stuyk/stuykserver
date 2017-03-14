@@ -474,9 +474,6 @@ API.onUpdate.connect(function() {
 	}
 });
 
-
-
-
 // ##########################
 // # HOUSE     FUNCTIONS ####
 // #### WRITTEN BY STUYK ####

@@ -139,5 +139,11 @@ namespace stuykserver.Util
                 }
             }
         }
+
+        [Command("global", GreedyArg = true, Alias = "g")]
+        public void cmdChatGlobal(Client player, string message)
+        {
+            API.sendChatMessageToAll(string.Format("(({0}: {1}))", replaceUnderscore(player.name), message));
+        }
     }
 }
