@@ -13,7 +13,7 @@
 			<div class="col-sm-8 col-sm-offset-2 column-special">
 				<h1 class="header-text">Housing</h1>
 				<h4 class="header-text">Purchase this house?</h4>
-				<h5>$<span id="housePoint">0</span></h5>
+				<h5>$<span id="housePoint"></span></h5>
 				<div class="row space-row">
 					<button class="btn btn-info col-sm-6 col-sm-offset-3" id="submitYes" tabindex="1" type="submit">Yes</button>
 				</div>
@@ -29,7 +29,7 @@
 	<script src="js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			getHousePricePoint();
+			resourceCall("housePriceGet");
 		});
 		
 		$(document).keydown(function(e) {

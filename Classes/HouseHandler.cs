@@ -103,6 +103,80 @@ namespace stuykserver.Util
             }
         }
 
+        [Command("deletehouse")]
+        public void cmdDeleteSelectedHouse(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                if (selectedHouse.ContainsKey(player))
+                {
+                    string query = string.Format("DELETE FROM PlayerHousing WHERE ID='{0}'", selectedHouse[player]);
+                    API.exported.database.executeQuery(query);
+                    initializeHouses();
+                    API.sendNotificationToPlayer(player, "~r~Deleted house.");
+                    return;
+                }
+                else
+                {
+                    API.sendChatMessageToPlayer(player, "~r~You must select a house first. ~w~/selecthouse");
+                    return;
+                }
+            }
+        }
+
+        [Command("lockhouse")]
+        public void cmdForceLockHouse(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                if (selectedHouse.ContainsKey(player))
+                {
+                    ColShape collision = (ColShape)API.getEntityData(player, "ColShape");
+                    houseInformation[collision].setLockStatus(true);
+                    API.sendChatMessageToPlayer(player, "~y~House # ~o~Locked");
+                    return;
+                }
+                else
+                {
+                    API.sendChatMessageToPlayer(player, "~r~You must select a house first. ~w~/selecthouse");
+                    return;
+                }
+            }
+        }
+
+        [Command("unlockhouse")]
+        public void cmdForceUnlockHouse(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                if (selectedHouse.ContainsKey(player))
+                {
+                    ColShape collision = (ColShape)API.getEntityData(player, "ColShape");
+                    houseInformation[collision].setLockStatus(false);
+                    API.sendChatMessageToPlayer(player, "~y~House # ~b~Unlocked");
+                    return;
+                }
+                else
+                {
+                    API.sendChatMessageToPlayer(player, "~r~You must select a house first. ~w~/selecthouse");
+                    return;
+                }
+            }
+        }
+
+        [Command("reloadhouses")]
+        public void cmdReloadHouses(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                initializeHouses();
+            }
+        }
+
         // ################################
         // CLIENT EVENT FUNCTIONS
         // ################################
@@ -119,14 +193,96 @@ namespace stuykserver.Util
                 if (!instance.returnForSale())
                 {
                     API.sendNotificationToPlayer(player, "~r~Seems that house isn't for sale anymore.");
+                    API.triggerClientEvent(player, "killPanel");
                     return;
                 }
 
                 Player playerInstance = (Player)API.call("PlayerHandler", "getPlayer", player);
                 if (playerInstance.returnPlayerCash() >= instance.returnHousePrice())
                 {
-                    // CHANGE HOUSE OWNERSHIP HERE
+                    int houseOwnerID = instance.returnHouseOwner();
+                    string[] varNames = { "ID" };
+                    string before = "SELECT Bank FROM Players WHERE";
+                    object[] data = { houseOwnerID.ToString() };
+                    DataTable result = db.compileSelectQuery(before, varNames, data);
+
+                    if (result.Rows.Count >= 1)
+                    {
+                        int oldBank = Convert.ToInt32(result.Rows[0]["Bank"]);
+                        oldBank += instance.returnHousePrice();
+
+                        string[] varNamesUpdate = { "Bank" };
+                        string beforeUpdate = "UPDATE Players SET";
+                        object[] dataUpdate = { oldBank };
+                        string after = string.Format("WHERE ID='{0}'", houseOwnerID);
+                        db.compileQuery(beforeUpdate, after, varNamesUpdate, dataUpdate);
+                    }
+
+                    playerInstance.removePlayerCash(instance.returnHousePrice());
+                    instance.changeHouseOwnership(player);
+                    playerInstance.savePlayer();
                 }
+            }
+
+            if (eventName == "housePricePoint")
+            {
+                House instance = (House)API.getEntityData(player, "SelectedHouse");
+                if (instance == null)
+                {
+                    API.triggerClientEvent(player, "killPanel");
+                    return;
+                }
+
+                if (!instance.returnForSale())
+                {
+                    API.sendNotificationToPlayer(player, "~r~Seems that house isn't for sale anymore.");
+                    API.triggerClientEvent(player, "killPanel");
+                    return;
+                }
+
+                API.triggerClientEvent(player, "passHousePrice", instance.returnHousePrice());
+                return;
+            }
+
+            if (eventName == "setHouseProperties")
+            {
+                House instance = (House)API.getEntityData(player, "SelectedHouse");
+                if (instance == null)
+                {
+                    return;
+                }
+
+                if (instance.returnHouseOwner() != Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+                {
+                    return;
+                }
+
+                if (Convert.ToBoolean(arguments[0]))
+                {
+                    instance.setupForSale(Convert.ToInt32(arguments[1]));
+                }
+                else
+                {
+                    instance.setForSale(false);
+                }
+            }
+
+            if (eventName == "setHouseLock")
+            {
+                House instance = (House)API.getEntityData(player, "SelectedHouse");
+                if (instance == null)
+                {
+                    return;
+                }
+
+                if (instance.returnHouseOwner() != Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+                {
+                    return;
+                }
+
+                instance.setLockStatus(Convert.ToBoolean(arguments[0]));
+
+                API.sendChatMessageToPlayer(player, string.Format("~y~House # ~b~Lock: ~o~{0}", Convert.ToBoolean(arguments[0]).ToString()));
             }
         }
 
@@ -164,8 +320,7 @@ namespace stuykserver.Util
         // What happens when the house is for sale.
         public void actionHouseIsForSale(Client player, House instance)
         {
-            API.triggerClientEvent(player, "showBuyHousing");
-            API.triggerClientEvent(player, "passHousePrice", instance.returnHousePrice()); // FIX THIS
+            API.triggerClientEvent(player, "showBuyHousing", instance.returnHousePrice());
             API.setEntityData(player, "SelectedHouse", instance);
             return;
         }
@@ -201,6 +356,18 @@ namespace stuykserver.Util
             API.setEntityData(player, "ReturnPosition", null); // Set Return Position
             API.setEntityData(player, "IsInInterior", null); // Set IsInInterior
             API.setEntityData(player, "InteriorInstance", null); // Set House Instance
+        }
+
+        //What happens when a player hits Shift + B
+        public void actionHousePropertyPanel(Client player)
+        {
+            ColShape collision = (ColShape)API.getEntityData(player, "ColShape");
+            if (houseInformation[collision].returnHouseOwner() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+            {
+                API.triggerClientEvent(player, "ShowHousePropertyPanel");
+                API.setEntityData(player, "SelectedHouse", houseInformation[collision]);
+                return;
+            }
         }
     }
 }

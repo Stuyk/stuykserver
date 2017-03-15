@@ -1,5 +1,6 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
+using stuykserver.Util;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,6 +12,8 @@ namespace stuykserver.Classes
 {
     public class House : Script, IDisposable
     {
+        DatabaseHandler db = new DatabaseHandler();
+
         public House()
         {
             // Do nothing.
@@ -133,6 +136,36 @@ namespace stuykserver.Classes
             }
         }
 
+        public void saveHouse()
+        {
+            string[] varNames = { "PlayerID", "ForSale", "Price", "Locked" };
+            string before = "UPDATE PlayerHousing SET";
+            object[] data = { houseOwner, forSale.ToString(), housePrice.ToString(), locked.ToString() };
+            string after = string.Format("WHERE ID='{0}'", houseID);
+
+            // Send all our data to generate the query and run it
+            db.compileQuery(before, after, varNames, data);
+        }
+
+        public void changeHouseOwnership(Client player)
+        {
+            houseOwner = Convert.ToInt32(API.getEntityData(player, "PlayerID"));
+            setForSale(false);
+            housePrice = 10000000;
+
+            saveHouse();
+
+            API.consoleOutput("House ownership changed for HouseID: {0}", houseID);
+        }
+
+        public void setupForSale(int price)
+        {
+            setForSale(true);
+            housePrice = price;
+
+            saveHouse();
+        }
+
         public bool returnLocked()
         {
             return locked;
@@ -205,6 +238,8 @@ namespace stuykserver.Classes
                 API.setBlipSprite(houseBlip, 40);
                 forSale = value;
             }
+
+            saveHouse();
         }
 
         public void setHouseOwner(int id)

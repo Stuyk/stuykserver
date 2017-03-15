@@ -16,6 +16,11 @@
 				<h4 class="header-text">This is your house.</h4>
 				<div class="row space-row">
 					<div class="col-sm-8 col-sm-offset-3">
+						<h5 class="pull-left">Lock:</h5><input class="pull-right" type="checkbox" data-toggle="toggle" id="toggleLock">
+					</div>
+				</div>
+				<div class="row space-row">
+					<div class="col-sm-8 col-sm-offset-3">
 						<h5 class="pull-left">For Sale:</h5><input class="pull-right" type="checkbox" data-toggle="toggle" id="toggleSale">
 					</div>
 				</div>
@@ -40,6 +45,7 @@
 	<script type="text/javascript">
 		$(function() {
 			$('#toggleSale').bootstrapToggle();
+			$('#toggleLock').bootstrapToggle();
 			$('#amountOption').hide();
 		});
 		
@@ -65,6 +71,12 @@
 		});
 		
 		function pushChanges() {
+			if ($('#toggleLock').prop('checked')) {
+				resourceCall("setHouseLock", true);
+			} else {
+				resourceCall("setHouseLock", false);
+			}
+
 			if ($('#toggleSale').prop('checked')) {
 				resourceCall("housePropertyChanges", true, $('#inputAmount').val());
 				resourceCall("killPanel");

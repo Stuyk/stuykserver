@@ -82,6 +82,12 @@ namespace stuykserver.Jobs
 
         public void startFishing(Client player)
         {
+            if (playersFishing.ContainsKey(player))
+            {
+                API.sendNotificationToPlayer(player, "~r~ You're already fishing.");
+                return;
+            }
+
             if (Convert.ToInt32(db.pullDatabase("PlayerInventory", "Fish", "Nametag", player.name)) >= 10)
             {
                 API.sendNotificationToPlayer(player, "~r~ You have too many fish.");

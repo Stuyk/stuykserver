@@ -213,6 +213,7 @@ namespace stuykserver.Classes
         public void removePlayerCash(int amount)
         {
             playerCash -= amount;
+            API.triggerClientEvent(playerClient, "update_money_display", playerCash);
         }
 
         public void removePlayerKarma(int amount)

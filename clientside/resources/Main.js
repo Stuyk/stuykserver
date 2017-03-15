@@ -485,7 +485,6 @@ function housePurchase() {
 function showBuyHouse() {
 	pagePanel = new CefHelper("clientside/resources/buyhousing.html");
 	pagePanel.show();
-	housePriceGet();
 }
 
 function showHousePropertyPanel() {
@@ -505,6 +504,10 @@ function housePropertyChanges(forSale, price) {
 	if (forSale == false) {
 		API.triggerServerEvent("setHouseProperties", false, null);
 	}
+}
+
+function setHouseLock(value) {
+	API.triggerServerEvent("setHouseLock", value);
 }
 
 // ##########################
@@ -1082,7 +1085,7 @@ function clothingPassLocalVariableUpdate(player) {
 
 function changeAccessory(amount) {
 	if (clothingAccessory != null) {
-		clothingAccessory += 1;
+		clothingAccessory = clothingAccessory + amount;
 
 		if (clothingAccessory <= -1) {
 			clothingAccessory = 0;
