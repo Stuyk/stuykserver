@@ -374,9 +374,12 @@ namespace stuykserver.Util
 
             foreach (NetHandle vehicle in vehicles)
             {
-                if (vehicleInformation[vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+                if (vehicleInformation.ContainsKey(vehicle))
                 {
-                    vehicleInformation[vehicle].Dispose();
+                    if (vehicleInformation[vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+                    {
+                        vehicleInformation[vehicle].Dispose();
+                    }
                 }
             }
         }

@@ -14,6 +14,8 @@
  vehicleSpecialFunction = null; // KEYPRESS USE BUTTON System
  currentCollisionType = null; // KEYPRESS USE BUTTON System
  camera = null; // Server Camera
+ repairCost = null;
+ repairPosition =  null;
 
 // CEF Boilerplate
 class CefHelper {
@@ -77,7 +79,6 @@ API.onKeyDown.connect(function(player, e) {
 			return;
 		}
 		
-		
 		API.triggerServerEvent("useSpecial", currentCollisionType);
 		vehicleSpecialFunction = null;
 		useFunction = null;
@@ -105,12 +106,25 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			API.playSoundFrontEnd("Click_Special", "WEB_NAVIGATION_SOUNDS_PHONE");
 			break;
 		}
+		case "triggerSilentUseFunction":
+		{
+			useFunction = true;
+			currentCollisionType = args[0];
+			useFunction = null;
+			break;
+		}
 		case "removeUseFunction":
 		{
 			currentCollisionType = null;
 			vehicleSpecialFunction = null;
 			useFunction = null;
 			API.playSoundFrontEnd("CLICK_BACK", "WEB_NAVIGATION_SOUNDS_PHONE");
+			break;
+		}
+		case "displayRepairCost":
+		{
+			repairPosition = args[0];
+			repairCost = args[1];
 			break;
 		}
 	}
@@ -354,12 +368,21 @@ API.onUpdate.connect(function() {
 		if (karmaDisplay != null) {
 			API.drawText(karmaDisplay, resX - 25, resY - 100, 1, 244, 244, 66, 255, 4, 2, false, true, 0);
 		}
+		
+		if (repairPosition != null && repairCost != null) {
+			var worldPos = API.worldToScreen(repairPosition);
+			API.drawText(repairCost, worldPos.X, worldPos.Y, 1, 0, 255, 0, 255, 4, 2, false, true, 0);
+		}
 	}
 
 	// USE FUNCTION DISPLAYS
 	if (useFunction != null) {
 		switch (currentCollisionType) {
 			case "Modification":
+				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "Repair":
 				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 				break;
 

@@ -203,22 +203,31 @@ namespace stuykserver.Classes
         public void addPlayerKarma(int amount)
         {
             playerKarma += amount;
+            API.sendNotificationToPlayer(playerClient, string.Format("~g~Added Karma"));
+            savePlayer();
         }
 
         public void addPlayerCash(int amount)
         {
             playerCash += amount;
+            API.triggerClientEvent(playerClient, "update_money_display", playerCash);
+            API.sendNotificationToPlayer(playerClient, string.Format("~g~$ +{0}", amount));
+            savePlayer();
         }
 
         public void removePlayerCash(int amount)
         {
             playerCash -= amount;
             API.triggerClientEvent(playerClient, "update_money_display", playerCash);
+            API.sendNotificationToPlayer(playerClient, string.Format("~g~$ ~r~-{0}", amount));
+            savePlayer();
         }
 
         public void removePlayerKarma(int amount)
         {
             playerKarma -= amount;
+            API.sendNotificationToPlayer(playerClient, string.Format("~r~Removed Karma"));
+            savePlayer();
         }
 
         public void setPlayerHealth(int amount)

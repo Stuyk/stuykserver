@@ -36,6 +36,18 @@ namespace stuykserver.Classes
                         return;
                     }
 
+                    if (shop.returnShopType().ToString() == "Repair" && !player.isInVehicle)
+                    {
+                        API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
+                        return;
+                    }
+
+                    if (shop.returnShopType().ToString() == "Repair" && player.isInVehicle)
+                    {
+                        API.call("RepairShopHandler", "actionDisplayCost", player);
+                    }
+
+                    API.setEntityData(player, "ShopInstance", shop);
                     API.setEntityData(player, "Collision", shop.returnShopType().ToString());
                     API.setEntityData(player, "ColShape", colshape);
                     API.triggerClientEvent(player, "triggerUseFunction", shop.returnShopType().ToString());
@@ -86,9 +98,16 @@ namespace stuykserver.Classes
                 {
                     API.setEntityData(player, "Collision", "None");
                     API.setEntityData(player, "ColShape", null);
-                    API.setEntityData(player, "NearVehicle", null);
                     API.setEntityData(player, "SelectedHouse", null);
+                    API.setEntityData(player, "ShopInstance", null);
                     API.triggerClientEvent(player, "removeUseFunction");
+                    if (player.isInVehicle)
+                    {
+                        API.triggerClientEvent(player, "triggerSilentUseFunction", "VehicleEngine");
+                        API.setEntityData(player, "Collision", "VehicleEngine");
+                        return;
+                    }
+                    API.setEntityData(player, "NearVehicle", null);
                     return;
                 }
 

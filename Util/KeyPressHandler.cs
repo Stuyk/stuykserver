@@ -135,6 +135,7 @@ namespace stuykserver.Util
                     if (currentFunction == "Vehicle")
                     {
                         API.call("VehicleHandler", "actionVehicleLock", player);
+                        return;
                     }
 
                     // Dealership Switch
@@ -211,6 +212,13 @@ namespace stuykserver.Util
                     if (currentFunction == "VehicleEngine")
                     {
                         API.call("VehicleHandler", "actionVehicleEngine", player);
+                        return;
+                    }
+
+                    if (currentFunction == "Repair")
+                    {
+                        API.call("RepairShopHandler", "actionRepair", player);
+                        return;
                     }
                 }
             }
