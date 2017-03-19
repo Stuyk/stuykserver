@@ -47,6 +47,15 @@ namespace stuykserver.Util
             {
                 vehicleInformation[vehicle].setVehiclePosition(API.createCylinderColShape(API.getEntityPosition(vehicle), 3f, 3f), API.getEntityPosition(vehicle));
             }
+
+            // Mainly for Anti-cheat. Prevent a false-positive.
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance == null)
+            {
+                return;
+            }
+
+            instance.setLastPosition(player);
         }
 
         // When a player enters a vehicle. Assign the VehicleEngine function to the player.
@@ -130,7 +139,13 @@ namespace stuykserver.Util
         // Start + Stop Vehicle
         public void actionVehicleEngine(Client player)
         {
+            if (API.getEntityData(player, "NearVehicle") == null)
+            {
+                return;
+            }
+
             NetHandle vehicle = (NetHandle)API.getEntityData(player, "NearVehicle");
+
             if (!player.isInVehicle)
             {
                 return;
@@ -138,11 +153,6 @@ namespace stuykserver.Util
 
             // Prevent Local Vehicles from being called.
             if (!vehicleInformation.ContainsKey(vehicle))
-            {
-                return;
-            }
-
-            if (vehicle == null)
             {
                 return;
             }
@@ -189,6 +199,11 @@ namespace stuykserver.Util
         // Lock + Unlock Vehicle
         public void actionVehicleLock(Client player)
         {
+            if (API.getEntityData(player, "NearVehicle") == null)
+            {
+                return;
+            }
+
             NetHandle vehicle = (NetHandle)API.getEntityData(player, "NearVehicle");
 
             // Distance check for the sake of it.
@@ -248,6 +263,11 @@ namespace stuykserver.Util
         // Action Vehicle Hood
         public void actionVehicleHood(Client player)
         {
+            if (API.getEntityData(player, "NearVehicle") ==  null)
+            {
+                return;
+            }
+
             NetHandle vehicle = (NetHandle)API.getEntityData(player, "NearVehicle");
 
             if (player.position.DistanceTo(API.getEntityPosition(vehicle)) > 3 && player.isInVehicle)
@@ -300,6 +320,11 @@ namespace stuykserver.Util
         // Action Vehicle Trunk
         public void actionVehicleTrunk(Client player)
         {
+            if (API.getEntityData(player, "NearVehicle") == null)
+            {
+                return;
+            }
+
             NetHandle vehicle = (NetHandle)API.getEntityData(player, "NearVehicle");
 
             if (player.position.DistanceTo(API.getEntityPosition(vehicle)) > 3 && player.isInVehicle)
@@ -436,9 +461,14 @@ namespace stuykserver.Util
         {
             if (player.isInVehicle)
             {
+                if (!vehicleInformation.ContainsKey(player.vehicle))
+                {
+                    return;
+                }
+
                 string[] varNames = { "ID" };
                 string before = "SELECT * FROM PlayerVehicles WHERE";
-                object[] data = { Convert.ToString(API.getEntityData(player, "PlayerID")) };
+                object[] data = { vehicleInformation[player.vehicle].returnVehicleIDNumber().ToString() };
                 DataTable result = db.compileSelectQuery(before, varNames, data);
 
                 Vehicle vehicle = player.vehicle;

@@ -75,7 +75,14 @@ namespace stuykserver.Jobs
                 return;
             }
 
-            db.setPlayerMoney(player, 7 * fish);
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance == null)
+            {
+                API.sendNotificationToPlayer(player, "~r~Something went wrong.");
+                return;
+            }
+
+            instance.addPlayerCash(7 * fish);
             db.updateDatabase("PlayerInventory", "Fish", 0.ToString(), "Nametag", player.name);
             API.sendNotificationToPlayer(player, string.Format("~b~You sold ~g~{0} ~b~fish.", fish));
         }

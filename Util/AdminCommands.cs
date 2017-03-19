@@ -85,7 +85,7 @@ namespace stuykserver.Util
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
             if (instance.isAdmin())
             {
-                db.setPlayerMoney(player, amount);
+                instance.addPlayerCash(amount);
             }
         }
 
@@ -185,6 +185,12 @@ namespace stuykserver.Util
                 API.sendChatMessageToPlayer(player, "~g~SSSSCCHHHWWWIIIIIING!");
                 return;
             }
+        }
+
+        [Command("kill")]
+        public void cmdKillPlayer(Client player)
+        {
+            API.setPlayerHealth(player, -1);
         }
     }
 }

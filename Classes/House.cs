@@ -264,7 +264,9 @@ namespace stuykserver.Classes
 
         public void Dispose()
         {
-            //Dispose Code
+            API.deleteEntity(houseBlip);
+            API.deleteColShape(houseEntryCollision);
+            API.deleteColShape(houseExitCollision);
             GC.SuppressFinalize(this);
         }
     }

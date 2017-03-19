@@ -31,7 +31,7 @@ namespace stuykserver.Util
                 string after = string.Format("WHERE PlayerID='{0}' AND VehicleType='{1}'", Convert.ToString(API.getEntityData(player, "PlayerID")), API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
 
                 // Send all our data to generate the query and run it
-                this.db.compileQuery(before, after, varNames, args);
+                db.compileQuery(before, after, varNames, args);
 
                 actionExitShop(player);
             }

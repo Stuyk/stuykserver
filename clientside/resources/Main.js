@@ -461,7 +461,11 @@ API.onUpdate.connect(function() {
 			case "OffRoad":
 				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 				break;
-				
+			
+			case "Muscle":
+				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+			
 			case "Planes":
 				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 				break;

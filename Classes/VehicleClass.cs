@@ -26,6 +26,8 @@ namespace stuykserver.Classes
             vehicleType = Convert.ToString(row["VehicleType"]);
             vehiclePosition = new Vector3(Convert.ToSingle(row["PosX"]), Convert.ToSingle(row["PosY"]), Convert.ToSingle(row["PosZ"]));
             vehicleRotation = new Vector3(Convert.ToSingle(row["RotX"]), Convert.ToSingle(row["RotY"]), Convert.ToSingle(row["RotZ"]));
+            vehicleOwner = API.getPlayerFromName(Convert.ToString(row["Nametag"]));
+            vehicleIDNumber = Convert.ToInt32(row["ID"]);
             vehicle = API.createVehicle(API.vehicleNameToModel(vehicleType), vehiclePosition, vehicleRotation, 0, 0);
             vehicleID = vehicle;
 
@@ -63,6 +65,7 @@ namespace stuykserver.Classes
             Plate = Convert.ToInt32(row["Plate"]);
             WindowTint = Convert.ToInt32(row["WindowTint"]);
             playerID = Convert.ToInt32(row["PlayerID"]);
+
             
             rgb = new List<int> {
                 Convert.ToInt32(row["Red"]), 
@@ -118,10 +121,14 @@ namespace stuykserver.Classes
 
             vehicleKeys = new List<Client>();
             playersInVehicle = new List<Client>();
+
+            API.setEntityRotation(vehicle, vehicleRotation);
+            API.setEntityPosition(vehicle, vehiclePosition);
         }
 
         Vehicle vehicle;
         NetHandle vehicleID;
+        int vehicleIDNumber;
         ColShape vehicleCollision;
         Vector3 vehiclePosition;
         Vector3 vehicleRotation;
@@ -179,10 +186,17 @@ namespace stuykserver.Classes
         {
             string[] varNames = { "PosX", "PosY", "PosZ", "RotX", "RotY", "RotZ" };
             string before = "UPDATE PlayerVehicles SET";
-            object[] data = { vehiclePosition.X, vehiclePosition.Y, vehiclePosition.Z, vehicleRotation.X, vehicleRotation.Y, vehicleRotation.Z };
+            object[] data = { API.getEntityPosition(vehicleID).X, API.getEntityPosition(vehicleID).Y, API.getEntityPosition(vehicleID).Z, API.getEntityRotation(vehicleID).X, API.getEntityRotation(vehicleID).Y, API.getEntityRotation(vehicleID).Z };
             string after = string.Format("WHERE PlayerID='{0}' AND VehicleType='{1}'", playerID, vehicleType);
 
             db.compileQuery(before, after, varNames, data);
+
+            API.sendNotificationToPlayer(vehicleOwner, "~o~Vehicle Position Saved");
+        }
+
+        public int returnVehicleIDNumber()
+        {
+            return vehicleIDNumber;
         }
 
         public string returnCollisionType()

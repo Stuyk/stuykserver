@@ -15,6 +15,24 @@ namespace stuykserver.Classes
         public PlayerHandler()
         {
             API.consoleOutput("Started: Player Handler");
+            API.onPlayerHealthChange += API_onPlayerHealthChange;
+            API.onPlayerArmorChange += API_onPlayerArmorChange;
+        }
+
+        private void API_onPlayerArmorChange(Client player, int oldValue)
+        {
+            if (oldValue > player.health)
+            {
+                playerInformation[player].setPlayerArmor(player.armor);
+            }
+        }
+
+        private void API_onPlayerHealthChange(Client player, int oldValue)
+        {
+            if (oldValue > player.health)
+            {
+                playerInformation[player].setPlayerHealth(player.health);
+            }
         }
 
         public Player createPlayer(DataRow row, Client sender)

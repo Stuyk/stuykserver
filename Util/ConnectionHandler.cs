@@ -73,6 +73,13 @@ namespace stuykserver.Util
 
         private void API_onPlayerDisconnected(Client player, string reason)
         {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance != null)
+            {
+                instance.savePlayerLogOut();
+            }
+
+
             API.call("PlayerHandler", "cleanupPlayer", player);
             API.call("VehicleHandler", "removeDisconnectedVehicles", player);
         }
@@ -120,6 +127,8 @@ namespace stuykserver.Util
                 API.sendChatMessageToPlayer(player, "~r~/tapout");
                 API.playPlayerAnimation(player, (int)(AnimationFlags.StopOnLastFrame), "combat@death@from_writhe", "death_c");
             }
+
+            playerInstance.setPlayerModel(player.model);
         }
 
         [Flags]

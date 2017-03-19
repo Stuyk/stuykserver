@@ -31,14 +31,16 @@ namespace stuykserver.Util
 
             if (eventName == "withdrawATM_Server")
             {
+                
                 int input = Convert.ToInt32(arguments[0]);
                 if (input > 0)
                 {
-                    int atmMoney = db.getPlayerAtmMoney(player);
+                    Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+                    int atmMoney = instance.returnPlayerBank();
                     if (atmMoney > 0 && input <= atmMoney)
                     {
-                        db.setPlayerMoney(player, +input);
-                        db.setPlayerAtmMoney(player, -input);
+                        instance.addPlayerCash(input);
+                        instance.removePlayerBank(input);
                         updateATMDisplay(player);
                         API.triggerClientEvent(player, "displayWithdrawSuccess");
                     }
@@ -59,11 +61,12 @@ namespace stuykserver.Util
                 int input = Convert.ToInt32(arguments[0]);
                 if (input > 0)
                 {
-                    int playerMoney = db.getPlayerMoney(player);
+                    Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+                    int playerMoney = instance.returnPlayerCash();
                     if (playerMoney > 0 && input <= playerMoney)
                     {
-                        db.setPlayerMoney(player, -input);
-                        db.setPlayerAtmMoney(player, +input);
+                        instance.removePlayerCash(input);
+                        instance.addPlayerBank(input);
                         updateATMDisplay(player);
                         API.triggerClientEvent(player, "depositAlertSuccess");
                     }
@@ -77,15 +80,30 @@ namespace stuykserver.Util
 
         public void updateATMDisplay(Client player)
         {
-            int atmMoney = db.getPlayerAtmMoney(player);
-            int playerMoney = db.getPlayerMoney(player);
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+
+            if (instance == null)
+            {
+                API.triggerClientEvent(player, "killPanel");
+                API.sendNotificationToPlayer(player, "~r~Something went wrong.");
+                return;
+            }
+
+            int atmMoney = instance.returnPlayerBank();
+            int playerMoney = instance.returnPlayerCash();
 
             API.triggerClientEvent(player, "refreshATM", atmMoney, playerMoney);
         }
 
         public void selectATM(Client player)
         {
-            API.triggerClientEvent(player, "loadATM", db.getPlayerAtmMoney(player));
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance == null)
+            {
+                return;
+            }
+
+            API.triggerClientEvent(player, "loadATM", instance.returnPlayerCash());
         }
     }
 }

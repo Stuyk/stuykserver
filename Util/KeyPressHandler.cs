@@ -168,6 +168,9 @@ namespace stuykserver.Util
                         case "Motorcycles":
                             pushDealership(player, currentFunction);
                             break;
+                        case "Muscle":
+                            pushDealership(player, currentFunction);
+                            break;
                         case "OffRoad":
                             pushDealership(player, currentFunction);
                             break;

@@ -64,7 +64,9 @@ namespace stuykserver.Classes
         int playerArmor; // Player Armor
         int playerOrganization; // Player Organization by INT ID
         int playerBusiness; // Player Business by INT ID
+        int playerModel;
         Dictionary<WeaponHash, int> playerWeapons; // Weapon + Ammo
+        Vector3 lastKnownPosition;
 
         public void savePlayer()
         {
@@ -79,9 +81,9 @@ namespace stuykserver.Classes
                 pos = (Vector3)API.getEntityData(playerClient, "ReturnPosition");
             }
 
-            string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time" };
+            string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "Dead" };
             string before = "UPDATE Players SET";
-            object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString() };
+            object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), dead.ToString() };
             string after = string.Format("WHERE ID='{0}'", playerID);
 
             // Send all our data to generate the query and run it
@@ -123,18 +125,29 @@ namespace stuykserver.Classes
                 pos = (Vector3)API.getEntityData(playerClient, "ReturnPosition");
             }
 
-            string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "LoggedIn" };
+            string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "LoggedIn", "Dead" };
             string before = "UPDATE Players SET";
-            object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), "0" };
+            object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), "0", dead.ToString() };
             string after = string.Format("WHERE ID='{0}'", playerID);
 
             // Send all our data to generate the query and run it
             db.compileQuery(before, after, varNames, data);
         }
 
+        public void setPlayerModel(int model)
+        {
+            playerModel = model;
+        }
+
+        public int returnPlayerModel()
+        {
+            return playerModel;
+        }
+
         public void setDead(bool value)
         {
             dead = value;
+            savePlayer();
         }
 
         public bool isDead()
@@ -207,6 +220,18 @@ namespace stuykserver.Classes
             savePlayer();
         }
 
+        public void addPlayerBank(int amount)
+        {
+            playerBank += amount;
+            savePlayer();
+        }
+
+        public void removePlayerBank(int amount)
+        {
+            playerBank -= amount;
+            savePlayer();
+        }
+
         public void addPlayerCash(int amount)
         {
             playerCash += amount;
@@ -228,6 +253,11 @@ namespace stuykserver.Classes
             playerKarma -= amount;
             API.sendNotificationToPlayer(playerClient, string.Format("~r~Removed Karma"));
             savePlayer();
+        }
+
+        public int returnPlayerBank()
+        {
+            return playerBank;
         }
 
         public void setPlayerHealth(int amount)
@@ -283,6 +313,16 @@ namespace stuykserver.Classes
         public Dictionary<WeaponHash, int> returnPlayerWeaponAndAmmo()
         {
             return playerWeapons;
+        }
+
+        public void setLastPosition(Client player)
+        {
+            lastKnownPosition = player.position;
+        }
+
+        public Vector3 returnLastPosition()
+        {
+            return lastKnownPosition;
         }
 
         public void Dispose()

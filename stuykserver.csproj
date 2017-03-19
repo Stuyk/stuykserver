@@ -54,11 +54,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Anticheat.cs" />
     <Compile Include="Classes\CollisionHandler.cs" />
     <Compile Include="Classes\House.cs" />
     <Compile Include="Classes\OrganizationHandler.cs" />
     <Compile Include="Classes\Player.cs" />
     <Compile Include="Classes\PlayerHandler.cs" />
+    <Compile Include="Classes\PointTest.cs" />
     <Compile Include="Classes\RepairShopHandler.cs" />
     <Compile Include="Classes\ShopHandler.cs" />
     <Compile Include="Classes\Shop.cs" />
@@ -74,7 +76,7 @@
     <Compile Include="Classes\ClothingShopHandler.cs" />
     <Compile Include="Util\ConnectionHandler.cs" />
     <Compile Include="Util\DatabaseHandler.cs" />
-    <Compile Include="Util\DeathHandler.cs" />
+    <Compile Include="Classes\DeathHandler.cs" />
     <Compile Include="Classes\HouseHandler.cs" />
     <Compile Include="Classes\KarmaHandler.cs" />
     <Compile Include="Util\KeyPressHandler.cs" />
