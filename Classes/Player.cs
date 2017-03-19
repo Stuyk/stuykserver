@@ -64,7 +64,7 @@ namespace stuykserver.Classes
         int playerArmor; // Player Armor
         int playerOrganization; // Player Organization by INT ID
         int playerBusiness; // Player Business by INT ID
-        int playerModel;
+        int playerModel; // INT ID of Player Model
         Dictionary<WeaponHash, int> playerWeapons; // Weapon + Ammo
         Vector3 lastKnownPosition;
 
