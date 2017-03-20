@@ -63,6 +63,8 @@ namespace stuykserver.Util
         {
             Client[] playersInCar = API.getVehicleOccupants(vehicle);
 
+            API.sendNativeToPlayer(player, (ulong)Hash.SET_VEHICLE_RADIO_ENABLED, vehicle, false);
+
             // If it's locked, kick them the fuck out.
             if (API.getVehicleLocked(vehicle))
             {

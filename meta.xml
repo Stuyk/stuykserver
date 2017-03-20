@@ -77,7 +77,7 @@
 	
 	<include resource="database"/>
 	<include resource="gtaocharacter" />
-	
+
 	<assembly ref="System.Data.dll"/>
 	<assembly ref="System.Xml.dll"/>
 </meta>

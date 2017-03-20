@@ -57,7 +57,7 @@ namespace stuykserver.Util
             string[] varNames = { "skinShapeFirst", "skinShapeSecond", "skinSkinFirst", "skinSkinSecond", "skinShapeMix", "skinSkinMix", "skinHairstyle", "skinHairstyleColor",
                     "skinHairstyleHighlight", "skinHairstyleTexture", "NoseWidth", "NoseHeight", "NoseLength", "NoseBridge", "NoseTip", "NoseBridgeDepth", "EyebrowHeight", "EyebrowDepth",
                     "CheekboneHeight", "CheekboneDepth", "CheekboneWidth", "Eyelids", "Lips", "JawWidth", "JawDepth", "JawLength", "ChinFullness", "ChinWidth", "NeckWidth", "FacialHair",
-                    "FacialHairColor", "FacialHairColor2", "Ageing", "Complexion", "Moles" };
+                    "FacialHairColor", "FacialHairColor2", "Ageing", "Complexion", "Moles", "skinGender" };
             string before = "UPDATE PlayerSkins SET";
             string after = string.Format("WHERE PlayerID='{0}'", Convert.ToString(API.getEntityData(player, "PlayerID")));
 
@@ -75,10 +75,12 @@ namespace stuykserver.Util
             if (gender == 0)
             {
                 API.setPlayerSkin(player, PedHash.FreemodeMale01);
+                API.setEntitySyncedData(player.handle, "GTAO_GENDER", 0);
             }
             else
             {
                 API.setPlayerSkin(player, PedHash.FreemodeFemale01);
+                API.setEntitySyncedData(player.handle, "GTAO_GENDER", 1);
             }
 
             API.exported.gtaocharacter.initializePedFace(player.handle);

@@ -320,87 +320,86 @@ namespace stuykserver.Classes
                     case ShopType.Atm:
                         API.setBlipSprite(collisionBlip, 108);
                         API.setBlipColor(collisionBlip, 2);
-                        textLabel = API.createTextLabel(shopType.ToString(), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(shopType.ToString(), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Barbershop:
                         API.setBlipSprite(collisionBlip, 71);
-                        textLabel = API.createTextLabel(shopType.ToString(), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(shopType.ToString(), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Motorcycles:
                         API.setBlipSprite(collisionBlip, 226);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Helicopters:
                         API.setBlipSprite(collisionBlip, 43);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Industrial:
                         API.setBlipSprite(collisionBlip, 318);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, false);
                         break;
                     case ShopType.Commercial:
                         API.setBlipSprite(collisionBlip, 477);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Planes:
                         API.setBlipSprite(collisionBlip, 251);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Super:
                         API.setBlipSprite(collisionBlip, 147);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Boats:
                         API.setBlipSprite(collisionBlip, 455);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.OffRoad:
                         API.setBlipSprite(collisionBlip, 512);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Vans:
                         API.setBlipSprite(collisionBlip, 67);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Bicycles:
                         API.setBlipSprite(collisionBlip, 348);
                         API.setBlipColor(collisionBlip, 73);
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Clothing:
                         API.setBlipSprite(collisionBlip, 73);
-                        textLabel = API.createTextLabel(shopType.ToString(), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(shopType.ToString(), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.FishingSale:
                         API.setBlipSprite(collisionBlip, 431);
                         API.setBlipColor(collisionBlip, 42);
-                        textLabel = API.createTextLabel("The cooks are looking for fresh fish.", collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel("The cooks are looking for fresh fish.", collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Fishing:
                         API.setBlipSprite(collisionBlip, 68);
                         API.setBlipColor(collisionBlip, 42);
-
                         break;
                     case ShopType.Modification:
                         API.setBlipSprite(collisionBlip, 446);
-                        textLabel = API.createTextLabel(string.Format("Vehicle {0}s", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Vehicle {0}s", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Repair:
                         API.setBlipSprite(collisionBlip, 402);
                         API.setBlipColor(collisionBlip, 11);
-                        textLabel = API.createTextLabel(string.Format("Vehicle {0}s", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Vehicle {0}s", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     default:
-                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, true);
+                        textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         API.setBlipSprite(collisionBlip, 225);
                         API.setBlipColor(collisionBlip, 73);
                         break;

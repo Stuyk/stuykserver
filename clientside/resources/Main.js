@@ -687,6 +687,7 @@ function showModelMenu(player) {
 	pagePanel = new CefHelper("clientside/resources/skinchanger.html");
 	pagePanel.show();
 	
+	faceGender = Number(API.getEntitySyncedData(player, "GTAO_GENDER"));
 	faceShapeOne = Number(API.getEntitySyncedData(player, "GTAO_SHAPE_FIRST_ID"));
 	faceShapeTwo = Number(API.getEntitySyncedData(player, "GTAO_SHAPE_SECOND_ID"));
 	faceSkinOne = Number(API.getEntitySyncedData(player, "GTAO_SKIN_FIRST_ID"));
@@ -737,7 +738,7 @@ function updateFaceProperties() {
 }
 
 function changeFaceSave() {
-	API.triggerServerEvent("saveFace", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture, intToFloat(faceNoseWidth), intToFloat(faceNoseHeight), intToFloat(faceNoseLength), intToFloat(faceNoseBridge), intToFloat(faceNoseTip), intToFloat(faceNoseBridgeDepth), intToFloat(faceEyebrowHeight), intToFloat(faceEyebrowDepth), intToFloat(faceCheekboneHeight), intToFloat(faceCheekboneDepth), intToFloat(faceCheekboneWidth), intToFloat(faceEyelids), intToFloat(faceLips), intToFloat(faceJawWidth), intToFloat(faceJawDepth), intToFloat(faceJawLength), intToFloat(faceChinFullness), intToFloat(faceChinWidth), intToFloat(faceNeckWidth), faceFacialHair, faceFacialHairColor, faceFacialHairColorTwo, faceAgeing, faceComplexion, faceMoles);
+	API.triggerServerEvent("saveFace", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceHairstyle, faceHairstyleColor, faceHairstyleHighlight, faceHairstyleTexture, intToFloat(faceNoseWidth), intToFloat(faceNoseHeight), intToFloat(faceNoseLength), intToFloat(faceNoseBridge), intToFloat(faceNoseTip), intToFloat(faceNoseBridgeDepth), intToFloat(faceEyebrowHeight), intToFloat(faceEyebrowDepth), intToFloat(faceCheekboneHeight), intToFloat(faceCheekboneDepth), intToFloat(faceCheekboneWidth), intToFloat(faceEyelids), intToFloat(faceLips), intToFloat(faceJawWidth), intToFloat(faceJawDepth), intToFloat(faceJawLength), intToFloat(faceChinFullness), intToFloat(faceChinWidth), intToFloat(faceNeckWidth), faceFacialHair, faceFacialHairColor, faceFacialHairColorTwo, faceAgeing, faceComplexion, faceMoles, faceGender);
 	faceShapeOne = null;
 	faceShapeTwo = null;
 	faceSkinOne = null;
@@ -862,8 +863,8 @@ function changeFacialFeature(type, amount) {
 function changeFaceHair(amount) {
 	faceFacialHair += amount;
 
-	if (faceFacialHair <= -1) {
-		faceFacialHair = 0;
+	if (faceFacialHair < -1) {
+		faceFacialHair = -1;
 	}
 
 	changeUpdateFace();
@@ -872,8 +873,8 @@ function changeFaceHair(amount) {
 function changeFaceHairColor(amount) {
 	faceFacialHairColor += amount;
 
-	if (faceFacialHairColor <= -1) {
-		faceFacialHairColor = 0;
+	if (faceFacialHairColor < -1) {
+		faceFacialHairColor = -1;
 	}
 
 	changeUpdateFace();
@@ -883,7 +884,7 @@ function changeFaceHairColorTwo(amount) {
 	faceFacialHairColorTwo += amount;
 
 	if (faceFacialHairColorTwo <= -1) {
-		faceFacialHairColorTwo = 0;
+		faceFacialHairColorTwo = -1;
 	}
 
 	changeUpdateFace();
@@ -892,8 +893,8 @@ function changeFaceHairColorTwo(amount) {
 function changeFaceAgeing(amount) {
 	faceAgeing += amount;
 
-	if (faceAgeing <= -1) {
-		faceAgeing = 0;
+	if (faceAgeing < -1) {
+		faceAgeing = -1;
 	}
 
 	changeUpdateFace();
@@ -902,8 +903,8 @@ function changeFaceAgeing(amount) {
 function changeFaceComplexion(amount) {
 	faceComplexion += amount;
 
-	if (faceComplexion <= -1) {
-		faceComplexion = 0;
+	if (faceComplexion < -1) {
+		faceComplexion = -1;
 	}
 
 	changeUpdateFace();
@@ -924,12 +925,18 @@ function changeFaceGender(amount) {
 		API.setPlayerSkin(1885233650); // Set to Male
 		faceShapeMix = 0.9;
 		faceSkinMix = 0.9;
+		faceGender = 0;
+		faceHairstyle = 0;
 	}
 
 	if (amount == 1) {
 		API.setPlayerSkin(-1667301416); // Set to Female
+		faceShapeOne = 21;
+		faceShapeTwo = 27;
 		faceShapeMix = 0.1;
 		faceSkinMix = 0.1;
+		faceGender = 1;
+		faceHairstyle = 0;
 	}
 }
 
@@ -1114,7 +1121,13 @@ function changeAccessory(amount) {
 	if (clothingAccessory != null) {
 		clothingAccessory = clothingAccessory + amount;
 
-		if (clothingAccessory <= -1) {
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 7);
+		
+		if (clothingAccessory < 0) {
+			clothingAccessory = maxComponent;
+		}
+		
+		if (clothingAccessory > maxComponent) {
 			clothingAccessory = 0;
 		}
 
@@ -1126,8 +1139,14 @@ function changeAccessory(amount) {
 function changeClothingTorso(amount) { // Torso Changer
 	if (clothingTorsoNum != null) {
 		clothingTorsoNum = clothingTorsoNum + amount;
+		
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 3);
+		
+		if (clothingTorsoNum < 0) {
+			clothingTorsoNum = maxComponent;
+		}
 
-		if (clothingTorsoNum <= -1) {
+		if (clothingTorsoNum > maxComponent) {
 			clothingTorsoNum = 0;
 		}
 
@@ -1140,11 +1159,14 @@ function changeClothingTop(amount) { // Top Changer
 	if (clothingTopNum != null) {
 		clothingTopNum = clothingTopNum + amount;
 
-		if (clothingTopNum <= -1) {
-			clothingTopNum = 0;
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 11);
+		clothingTopColorNum = 0; // SET TO ZERO to prevent invisibles.
+		
+		if (clothingTopNum < 0) {
+			clothingTopNum = maxComponent;
 		}
 
-		if (clothingTopNum >= 206) {
+		if (clothingTopNum > maxComponent) {
 			clothingTopNum = 0;
 		}
 
@@ -1157,7 +1179,13 @@ function changeClothingTopColor(amount) { // Top Color Changer
 	if (clothingTopColorNum != null) {
 		clothingTopColorNum = clothingTopColorNum + amount;
 
-		if (clothingTopColorNum <= -1) {
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", 0, API.getLocalPlayer(), 11, clothingTopNum) - 1;
+		
+		if (clothingTopColorNum < 0) {
+			clothingTopColorNum = maxComponent;
+		}
+		
+		if (clothingTopColorNum > maxComponent) {
 			clothingTopColorNum = 0;
 		}
 
@@ -1170,11 +1198,14 @@ function changeClothingUndershirt(amount) { // Undershirt Changer
 	if (clothingUndershirtNum != null) {
 		clothingUndershirtNum = clothingUndershirtNum + amount;
 
-		if (clothingUndershirtNum <= -1) {
-			clothingUndershirtNum = 96;
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 8);
+		clothingUndershirtColorNum = 0; // SET TO ZERO to prevent invisibles.
+		
+		if (clothingUndershirtNum < 0) {
+			clothingUndershirtNum = maxComponent;
 		}
 
-		if (clothingUndershirtNum >= 97) {
+		if (clothingUndershirtNum > maxComponent) {
 			clothingUndershirtNum = 0;
 		}
 
@@ -1187,10 +1218,17 @@ function changeClothingUndershirtColor(amount) { // Undershirt Color Changer
 	if (clothingUndershirtColorNum != null) {
 		clothingUndershirtColorNum = clothingUndershirtColorNum + amount;
 
-		if (clothingUndershirtColorNum <= -1) {
-			clothingUndershirtColorNum = 0;
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", 0, API.getLocalPlayer(), 8, clothingUndershirtNum) - 1;
+		
+		if (clothingUndershirtColorNum < 0) {
+			clothingUndershirtColorNum = maxComponent;
 		}
 
+		if (clothingUndershirtColor > maxComponent)
+		{
+			clothingUndershirtColorNum = 0;
+		}
+		
 		API.setPlayerClothes(API.getLocalPlayer(), 8, clothingUndershirtNum, clothingUndershirtColorNum);
 		updateClothingProperties();
 	}
@@ -1199,8 +1237,15 @@ function changeClothingUndershirtColor(amount) { // Undershirt Color Changer
 function changeClothingLegs(amount) { // Legs Changer
 	if (clothingLegsNum != null) {
 		clothingLegsNum = clothingLegsNum + amount;
+		
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 4);
+		clothingLegsColorNum = 0; // SET TO ZERO to prevent invisibles.
 
-		if (clothingLegsNum <= -1) {
+		if (clothingLegsNum < 0) {
+			clothingLegsNum = maxComponent;
+		}
+		
+		if (clothingLegsNum > maxComponent) {
 			clothingLegsNum = 0;
 		}
 
@@ -1213,7 +1258,13 @@ function changeClothingLegsColor(amount) { // Legs Color Changer
 	if (clothingLegsColorNum != null) {
 		clothingLegsColorNum = clothingLegsColorNum + amount;
 
-		if (clothingLegsColorNum <= -1) {
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", 0, API.getLocalPlayer(), 4, clothingLegsNum) - 1;
+		
+		if (clothingLegsColorNum < 0) {
+			clothingLegsColorNum = maxComponent;
+		}
+		
+		if (clothingLegsColorNum > maxComponent) {
 			clothingLegsColorNum = 0;
 		}
 
@@ -1226,7 +1277,14 @@ function changeClothingShoes(amount) { // Shoes Changer
 	if (clothingShoesNum != null) {
 		clothingShoesNum = clothingShoesNum + amount;
 
-		if (clothingShoesNum <= -1) {
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 6);
+		clothingShoesColorNum = 0; // SET TO ZERO to prevent invisibles.
+		
+		if (clothingShoesNum < 0) {
+			clothingShoesNum = maxComponent;
+		}
+		
+		if (clothingShoesNum > maxComponent) {
 			clothingShoesNum = 0;
 		}
 
@@ -1238,8 +1296,14 @@ function changeClothingShoes(amount) { // Shoes Changer
 function changeClothingShoesColor(amount) { // Shoes Color Changer
 	if (clothingShoesColorNum != null) {
 		clothingShoesColorNum = clothingShoesColorNum + amount;
+		
+		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", 0, API.getLocalPlayer(), 4, clothingShoesNum) - 1;
 
-		if (clothingShoesColorNum <= -1) {
+		if (clothingShoesColorNum < 0) {
+			clothingShoesColorNum = maxComponent;
+		}
+		
+		if (clothingShoesColorNum > maxComponent) {
 			clothingShoesColorNum = 0;
 		}
 
@@ -1309,6 +1373,7 @@ var modL = -1; // Back Wheels
 var modM = -1; // Window Tint
 var modN = -1;
 var modO = -1;
+var currentVehicle;
 
 function updateVehicleVariables(r, g, b, sr, sg, sb, spoiler, frontbumper, rearbumper, sideskirt, exhaust, grille, hood, fender, rightfender, roof, frontwheels, backwheels, windowtint) {
   bodyColorOneR = r;
@@ -1330,6 +1395,7 @@ function updateVehicleVariables(r, g, b, sr, sg, sb, spoiler, frontbumper, rearb
   modK = frontwheels; // Front Wheels
   modL = backwheels; // Back Wheels
   modM = windowtint; // Window Tint
+  currentVehicle = API.getPlayerVehicle(API.getLocalPlayeR());
   pushVehicleVariableChanges();
 }
 
@@ -1460,56 +1526,134 @@ function pushLocalUpdate(modvar, value) {
 
 function updateVehicleMod(modtype, value) {
 	var playerVehicle = API.getPlayerVehicle(API.getLocalPlayer());
-
+	
 	if (modtype == 0) { // Spoilers
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 0);
+		if (value > modMax) 
+		{
+			modA = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 0, value);
 	}
 
 	if (modtype == 1) { // Front Bumper
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 1);
+		if (value > modMax) 
+		{
+			modB = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 1, value);
 	}
 
 	if (modtype == 2) { // Rear Bumper
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 2);
+		if (value > modMax) 
+		{
+			modC = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 2, value);
 	}
 
 	if (modtype == 3) { // Side Skirt
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 3);
+		if (value > modMax) 
+		{
+			modD = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 3, value);
 	}
 
 	if (modtype == 4) { // Exhaust
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 4);
+		if (value > modMax) 
+		{
+			modE = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 4, value);
 	}
 
 	if (modtype == 6) { // Grille
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 6);
+		if (value > modMax) 
+		{
+			modF = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 6, value);
 	}
 
 	if (modtype == 7) { // Hood
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 7);
+		if (value > modMax) 
+		{
+			modG = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 7, value);
 	}
 
 	if (modtype == 8) { // Fender
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 8);
+		if (value > modMax) 
+		{
+			modH = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 8, value);
 	}
 
 	if (modtype == 9) { // Right Fender
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 9);
+		if (value > modMax) 
+		{
+			modI = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 9, value);
 	}
 
 	if (modtype == 10) { // Roof
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 10);
+		if (value > modMax) 
+		{
+			modJ = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 10, value);
 	}
 
 	if (modtype == 23) { // Front Wheels
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 23);
+		if (value > modMax) 
+		{
+			modK = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 23, value);
 	}
 
 	if (modtype == 24) { // Back Wheels
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 24);
+		if (value > modMax) 
+		{
+			modL = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 24, value);
 	}
 
 	if (modtype == 69) { // Window Tint
+		var modMax = API.returnNative("GET_NUM_VEHICLE_MODS", 0, playerVehicle, 69);
+		if (value > modMax) 
+		{
+			modM = -1;
+			value = -1;
+		}
 		API.setVehicleMod(playerVehicle, 69, value);
 	}
 

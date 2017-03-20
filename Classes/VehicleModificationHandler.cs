@@ -52,6 +52,7 @@ namespace stuykserver.Util
             }
 
             NetHandle playerVehicle = API.getPlayerVehicle(player);
+            API.setEntityData(player, "AttachedVehicle", API.getPlayerVehicle(player));
 
             db.setPlayerHUD(player, false);
             API.setEntityData(player, "ReturnPosition", player.position);
@@ -62,7 +63,7 @@ namespace stuykserver.Util
             Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
             // Temporary Holding Collision
             API.setEntityData(player, "ExitPoint", shop.returnExitPoint());
-
+            
             // Custom
             if (shop.returnCameraCenterPoint() != new Vector3(0, 0, 0) && shop.returnCameraPoint() != new Vector3(0, 0, 0))
             {
@@ -75,9 +76,20 @@ namespace stuykserver.Util
             }
 
             // Default
-            API.setEntityPosition(player.vehicle, new Vector3(-1156.071, -2005.241, 13.18026));
+            //API.setEntityPosition(player.vehicle, new Vector3(-1156.071, -2005.241, 13.18026));
             API.setPlayerIntoVehicle(player, playerVehicle, -1);
-            API.triggerClientEvent(player, "createCamera", new Vector3(-1149.901, -2006.942, 14.14681), player.vehicle.position);
+            API.setEntityRotation(playerVehicle, new Vector3(0, 0, -80));
+
+            API.sendNativeToPlayer(player, (ulong)Hash.SET_STATE_OF_CLOSEST_DOOR_OF_TYPE, -550347177, -356.0905, -134.7714, 40.01295, true, 1.0f, false);
+            API.sendNativeToPlayer(player, (ulong)Hash.TASK_VEHICLE_PARK, player, playerVehicle, -338.1668, -137.8585, 39.00962, -80f, 0, 100f, false);
+
+            API.triggerClientEvent(player, "createCamera", new Vector3(-333.9861, -137, 40), new Vector3(-338.1668, -137.8585, 39.00962));
+            while (API.getEntityPosition(playerVehicle).DistanceTo(new Vector3(-338.1668, -137.8585, 39.00962)) > 2f)
+            {
+                // ONLY UNCOMMENT FOR POSITIONING IN CONSOLE
+                //API.consoleOutput(API.getEntityPosition(playerVehicle).ToString());
+            }
+            API.setVehicleEngineStatus(playerVehicle, false);
             API.triggerClientEvent(player, "openCarPanel");
             parseVehicleMods(player); // Setup Mods for Variable User
             return;
