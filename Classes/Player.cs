@@ -83,7 +83,7 @@ namespace stuykserver.Classes
 
             string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "Dead" };
             string before = "UPDATE Players SET";
-            object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), dead.ToString() };
+            object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), Convert.ToInt32(dead) };
             string after = string.Format("WHERE ID='{0}'", playerID);
 
             // Send all our data to generate the query and run it
@@ -127,7 +127,7 @@ namespace stuykserver.Classes
 
             string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "LoggedIn", "Dead" };
             string before = "UPDATE Players SET";
-            object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), "0", dead.ToString() };
+            object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), "0", Convert.ToInt32(dead) };
             string after = string.Format("WHERE ID='{0}'", playerID);
 
             // Send all our data to generate the query and run it
@@ -331,6 +331,10 @@ namespace stuykserver.Classes
             playerName = null;
             playerNameTag = null;
             playerID = -1;
+            if (API.getEntityData(playerClient, "DeathText") != null)
+            {
+                API.deleteEntity(API.getEntityData(playerClient, "DeathText"));
+            }
             playerClient = null;
             playerSocialClub = null;
             playerKarma = -1;
@@ -342,6 +346,7 @@ namespace stuykserver.Classes
             playerWeapons.Clear();
             admin = false;
             playerOldTime = -1;
+            
             GC.SuppressFinalize(this);
         }
     }

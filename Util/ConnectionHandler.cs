@@ -122,10 +122,7 @@ namespace stuykserver.Util
             // Death Handling
             if (playerInstance.isDead())
             {
-                API.sendNotificationToPlayer(player, "~r~You have died.");
-                API.sendChatMessageToPlayer(player, "~g~/service EMS");
-                API.sendChatMessageToPlayer(player, "~r~/tapout");
-                API.playPlayerAnimation(player, (int)(AnimationFlags.StopOnLastFrame), "combat@death@from_writhe", "death_c");
+                API.call("DeathHandler", "actionSendToHospital", player);
             }
 
             playerInstance.setPlayerModel(player.model);
