@@ -18,7 +18,6 @@ namespace stuykserver.Util
         DatabaseHandler db = new DatabaseHandler();
         SkinHandler skinHandler = new SkinHandler();
         ClothingHandler clothingHandler = new ClothingHandler();
-        KarmaHandler kh = new KarmaHandler();
         Util util = new Util();
 
         public ConnectionHandler()
@@ -96,7 +95,6 @@ namespace stuykserver.Util
             // Player Setup Calls
             API.call("SkinHandler", "loadCurrentFace", player);
             API.call("ClothingHandler", "updateClothingForPlayer", player);
-            API.call("KarmaHandler", "updateKarma", player);
             API.call("VehicleHandler", "SpawnPlayerCars", player);
             API.exported.gtaocharacter.updatePlayerFace(player.handle);
 

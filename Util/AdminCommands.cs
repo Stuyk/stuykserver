@@ -37,6 +37,53 @@ namespace stuykserver.Util
             }
         }
 
+        [Command("dropcamera")]
+        public void cmdDropCamera(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                API.triggerClientEvent(player, "createEntityCamera", player.position, player);
+            }
+        }
+
+        [Command("killcamera")]
+        public void cmdKillCamera(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                API.triggerClientEvent(player, "endCamera");
+            }
+        }
+
+        [Command("setautorunposition")]
+        public void cmdAutoRunPosition(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                API.setEntityData(player, "AutoRunPos", player.position);
+            }
+        }
+
+        [Command("runtoposition")]
+        public void cmdRunToPosition(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                Vector3 pos = API.getEntityData(player, "AutoRunPos");
+                API.sendNativeToPlayer(player, (ulong)Hash.TASK_GO_STRAIGHT_TO_COORD, player, pos.X, pos.Y, pos.Z, 10f, -1, 0f, 0f);
+            }
+        }
+
+        [Command("killtask")]
+        public void cmdKillTask(Client player)
+        {
+            API.sendNativeToPlayer(player, (ulong)Hash.CLEAR_PED_TASKS_IMMEDIATELY, player);
+        }
+
         [Command("spawn")] //Temporary
         public void cmdSpawn(Client player)
         {
@@ -131,33 +178,34 @@ namespace stuykserver.Util
             }
         }
 
-        [Command("addKarma")]
-        public void cmdAdminAddKarma(Client player, string target, int amount)
+        [Command("addKarma")] // Only for Self
+        public void cmdAdminAddKarma(Client player, int amount)
         {
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
             if (instance.isAdmin())
             {
-                API.call("KarmaHandler", "addKarma", API.getPlayerFromName(target), amount);
+                instance.addPlayerKarma(amount);
             }
         }
 
-        [Command("removeKarma")]
-        public void cmdAdminRemoveKarma(Client player, string target, int amount)
+        [Command("removeKarma")] // Only for Self
+        public void cmdAdminRemoveKarma(Client player, int amount)
         {
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+
             if (instance.isAdmin())
             {
-                API.call("KarmaHandler", "removeKarma", API.getPlayerFromName(target), amount);
+                instance.removePlayerKarma(amount);
             }
         }
 
-        [Command("getKarma")]
-        public void cmdAdminGetKarma(Client player, string target)
+        [Command("getKarma")] // Only for Self
+        public void cmdAdminGetKarma(Client player)
         {
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
             if (instance.isAdmin())
             {
-                API.sendNotificationToPlayer(player, string.Format("{0}'s Karma Is: {1}", target, API.getEntitySyncedData(API.getPlayerFromName(target), "Karma")));
+                API.sendNotificationToPlayer(player, string.Format("{0}'s Karma Is: {1}", player.name, instance.returnPlayerKarma()));
             }
         }
 

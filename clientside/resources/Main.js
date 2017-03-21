@@ -132,6 +132,12 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	// CEF REQUEST PANEL EVENTS
 	if (pagePanel == null) {
 		switch(eventName) {
+			case "openRadio":
+			{
+				pagePanel = new CefHelper("clientside/resources/radio.html");
+				pagePanel.show();
+				break;
+			}
 			case "showLogin":
 			{
 				showLoginScreen();
@@ -340,6 +346,15 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 
 		camera = API.createCamera(pos, new Vector3());
 		API.pointCameraAtPosition(camera, target);
+		API.setActiveCamera(camera);
+	}
+	
+	if (eventName == "createEntityCamera") {
+		var pos = args[0];
+		var target = args[1];
+		
+		camera = API.createCamera(pos, new Vector3());
+		API.pointCameraAtEntity(camera, API.getLocalPlayer(), new Vector3());
 		API.setActiveCamera(camera);
 	}
 

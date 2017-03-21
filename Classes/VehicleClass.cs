@@ -187,7 +187,7 @@ namespace stuykserver.Classes
             string[] varNames = { "PosX", "PosY", "PosZ", "RotX", "RotY", "RotZ" };
             string before = "UPDATE PlayerVehicles SET";
             object[] data = { API.getEntityPosition(vehicleID).X, API.getEntityPosition(vehicleID).Y, API.getEntityPosition(vehicleID).Z, API.getEntityRotation(vehicleID).X, API.getEntityRotation(vehicleID).Y, API.getEntityRotation(vehicleID).Z };
-            string after = string.Format("WHERE PlayerID='{0}' AND VehicleType='{1}'", playerID, vehicleType);
+            string after = string.Format("WHERE ID='{0}'", vehicleIDNumber);
 
             db.compileQuery(before, after, varNames, data);
 

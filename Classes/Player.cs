@@ -44,6 +44,7 @@ namespace stuykserver.Classes
             Vector3 position = new Vector3(Convert.ToSingle(row["LASTX"]), Convert.ToSingle(row["LASTY"]), Convert.ToSingle(row["LASTZ"]));
             playerWeapons = new Dictionary<WeaponHash, int>();
             loadPlayer(position);
+            updateKarma();
             // WEAPONS
         }
 
@@ -134,6 +135,62 @@ namespace stuykserver.Classes
             db.compileQuery(before, after, varNames, data);
         }
 
+        public void updateKarma()
+        {
+            if (playerKarma == 0)
+            {
+                string displayText = "~w~Pure Neutral";
+                API.triggerClientEvent(playerClient, "updateKarma", displayText);
+            }
+            if (playerKarma > 0 && playerKarma < 25)
+            {
+                string displayText = "~b~Good";
+                API.triggerClientEvent(playerClient, "updateKarma", displayText);
+            }
+
+            if (playerKarma > 25 && playerKarma < 90)
+            {
+                string displayText = "~g~Great";
+                API.triggerClientEvent(playerClient, "updateKarma", displayText);
+            }
+
+            if (playerKarma > 90 && playerKarma <= 250)
+            {
+                string displayText = "~p~Perfect";
+                API.triggerClientEvent(playerClient, "updateKarma", displayText);
+            }
+
+            if (playerKarma >= 500)
+            {
+                string displayText = "~p~Lawful";
+                API.triggerClientEvent(playerClient, "updateKarma", displayText);
+            }
+
+            if (playerKarma < 0 && playerKarma > -25)
+            {
+                string displayText = "~y~Scum";
+                API.triggerClientEvent(playerClient, "updateKarma", displayText);
+            }
+
+            if (playerKarma < -25 && playerKarma > -95)
+            {
+                string displayText = "~o~Terrible";
+                API.triggerClientEvent(playerClient, "updateKarma", displayText);
+            }
+
+            if (playerKarma < -90 && playerKarma >= -250)
+            {
+                string displayText = "~r~Feared";
+                API.triggerClientEvent(playerClient, "updateKarma", displayText);
+            }
+
+            if (playerKarma >= -500 && playerKarma <= -251)
+            {
+                string displayText = "~r~Chaotic";
+                API.triggerClientEvent(playerClient, "updateKarma", displayText);
+            }
+        }
+
         public void setPlayerModel(int model)
         {
             playerModel = model;
@@ -217,6 +274,7 @@ namespace stuykserver.Classes
         {
             playerKarma += amount;
             API.sendNotificationToPlayer(playerClient, string.Format("~g~Added Karma"));
+            updateKarma();
             savePlayer();
         }
 
@@ -252,6 +310,7 @@ namespace stuykserver.Classes
         {
             playerKarma -= amount;
             API.sendNotificationToPlayer(playerClient, string.Format("~r~Removed Karma"));
+            updateKarma();
             savePlayer();
         }
 

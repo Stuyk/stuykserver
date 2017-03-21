@@ -12,30 +12,77 @@ namespace stuykserver.Util
 {
     public class DeathHandler : Script
     {
+        [Flags]
+        public enum AnimationFlags
+        {
+            Loop = 1 << 0,
+            StopOnLastFrame = 1 << 1,
+            OnlyAnimateUpperBody = 1 << 4,
+            AllowPlayerControl = 1 << 5,
+            Cancellable = 1 << 7
+        }
+
         DateTime deathScanTime; // Time since last Death Scan.
-        Dictionary<Client, DateTime> deadPlayers; // Player and Time of Death.
-        List<Client> queueRemove = new List<Client>();
+        Dictionary<Client, int> deadPlayers; // Player and Time to Wait.
 
         public DeathHandler()
         {
             API.onPlayerDeath += API_onPlayerDeath;
             API.onPlayerRespawn += API_onPlayerRespawn;
             API.onResourceStart += API_onResourceStart;
-            API.onUpdate += API_onUpdate;
-        }
-
-        private void API_onUpdate()
-        {
-            if (DateTime.Now > deathScanTime.AddSeconds(10))
-            {
-                actionScanDeaths();
-            }
         }
 
         private void API_onResourceStart()
         {
             deathScanTime = DateTime.Now;
-            deadPlayers = new Dictionary<Client, DateTime>();
+            deadPlayers = new Dictionary<Client, int>();
+
+            Timer timer = new Timer();
+            timer.Elapsed += new ElapsedEventHandler(checkDeaths);
+            timer.Interval = 1000; // 1 Second
+            timer.Enabled = true; // Enable the timer
+        }
+
+        public void checkDeaths(object source, ElapsedEventArgs e)
+        {
+            foreach (Client player in deadPlayers.Keys)
+            {
+                API.sendNativeToAllPlayers((ulong)Hash.SET_PED_TO_RAGDOLL, player, -1, -1, 0, true, true, true);
+
+                if (player.position.DistanceTo(API.getEntityData(player, "DeathPosition")) > 1f)
+                {
+                    API.setEntityPosition(player, API.getEntityData(player, "DeathPosition"));
+                }
+
+                // Check if the player has decided to bleed out or not.
+                if (Convert.ToBoolean(API.getEntityData(player, "Bleedingout")))
+                {
+                    deadPlayers[player] = deadPlayers[player] - 1;
+                    API.setTextLabelText(API.getEntityData(player, "DeathText"), string.Format("~o~Dead: ~b~{0}s", deadPlayers[player]));
+                    API.setEntityPosition(API.getEntityData(player, "DeathText"), player.position);
+                }
+                else
+                {
+                    deadPlayers[player] = deadPlayers[player] - 1;
+                    API.setTextLabelText(API.getEntityData(player, "DeathText"), string.Format("~r~Bleedout: ~b~{0}s", deadPlayers[player]));
+                    API.setEntityPosition(API.getEntityData(player, "DeathText"), player.position);
+                }
+
+                // If the players timer is 0 send them to the hospital.
+                if (deadPlayers[player] < 0)
+                {
+                    actionSendToHospital(player);
+                    return;
+                }
+
+                // If the players health is less than 10, force them to the hospital.
+                // This makes double tap a lot easier.
+                if (player.health < 10)
+                {
+                    actionSendToHospital(player);
+                    return;
+                }
+            }
         }
 
         // When the player dies set their player instance to dead and update the database incase of logout.
@@ -64,6 +111,8 @@ namespace stuykserver.Util
         // Also setup a date when they died and add it to the dead player list.
         private void API_onPlayerRespawn(Client player)
         {
+            API.setPlayerHealth(player, 100);
+
             if (API.getEntityData(player, "DeathPosition") == null)
             {
                 return;
@@ -71,37 +120,23 @@ namespace stuykserver.Util
 
             if (!deadPlayers.ContainsKey(player))
             {
-                deadPlayers.Add(player, DateTime.Now);
+                deadPlayers.Add(player, 300);
             }
 
+            // Set the player to their death position.
             Vector3 position = (Vector3)API.getEntityData(player, "DeathPosition");
             API.setEntityPosition(player, position);
+
+            // Set bleedingout to null for later usage.
+            API.setEntityData(player, "Bleedingout", null);
+
+            TextLabel label = API.createTextLabel(string.Format("~r~Bleedout: {0}s", deadPlayers[player]), player.position, 10f, 1.0f, true);
+            API.setEntityData(player, "DeathText", label);
+
+            // Send some chat messages.
             API.sendChatMessageToPlayer(player, "~y~You have died. You may ~r~/bleedout ~y~ at any time.");
             API.sendChatMessageToPlayer(player, "~y~Bleeding out will ~r~remove all ~y~of your weapons.");
             API.sendChatMessageToPlayer(player, "~y~You may also wait for an ~b~EMT ~y~ to rescue you.");
-            API.sendNativeToPlayer(player, (ulong)Hash.SET_PED_TO_RAGDOLL, player, -1, -1, 0, true, true, true);
-            API.setEntityData(player, "Bleedingout", null);
-            TimeSpan newDate = (deadPlayers[player].AddMinutes(5) - DateTime.Now);
-            TextLabel label = API.createTextLabel(string.Format("~r~Bleedout: ~b~{0}m {1}s", newDate.Minutes, newDate.Seconds), player.position, 10f, 1.0f, true);
-            API.setEntityData(player, "DeathText", label);
-            return;
-        }
-
-        public void actionSpawnAsDead(Client player)
-        {
-            if (!deadPlayers.ContainsKey(player))
-            {
-                deadPlayers.Add(player, DateTime.Now);
-            }
-
-            API.sendChatMessageToPlayer(player, "~y~You have died. You may ~r~/bleedout ~y~ at any time.");
-            API.sendChatMessageToPlayer(player, "~y~Bleeding out will ~r~remove all ~y~of your weapons.");
-            API.sendChatMessageToPlayer(player, "~y~You may also wait for an ~b~EMT ~y~ to rescue you.");
-            API.sendNativeToPlayer(player, (ulong)Hash.SET_PED_TO_RAGDOLL, player, -1, -1, 0, true, true, true);
-            API.setEntityData(player, "Bleedingout", null);
-            TimeSpan newDate = (deadPlayers[player].AddMinutes(5) - DateTime.Now);
-            TextLabel label = API.createTextLabel(string.Format("~r~Bleedout: ~b~{0}m {1}s", newDate.Minutes, newDate.Seconds), player.position, 10f, 1.0f, true);
-            API.setEntityData(player, "DeathText", label);
             return;
         }
 
@@ -115,59 +150,20 @@ namespace stuykserver.Util
 
             if (deadPlayers.ContainsKey(player))
             {
-                deadPlayers[player] = deadPlayers[player].Add(new TimeSpan(0, 0, -240));
+                deadPlayers[player] = deadPlayers[player] - 240;
                 API.sendChatMessageToPlayer(player, "~o~You have chosen to bleed out.");
                 API.sendChatMessageToPlayer(player, "~b~You will respawn momentarily");
                 API.setEntityData(player, "Bleedingout", true);
             }
         }
 
-        public void actionScanDeaths()
-        {
-            if (deadPlayers.Count < 1)
-            {
-                return;
-            }
-
-            foreach (Client player in deadPlayers.Keys)
-            {
-                API.sendNativeToPlayer(player, (ulong)Hash.SET_PED_TO_RAGDOLL, player, -1, -1, 0, true, true, true);
-
-                if (Convert.ToBoolean(API.getEntityData(player, "Bleedingout")))
-                {
-                    TimeSpan newDate = (deadPlayers[player].AddMinutes(5) - DateTime.Now);
-                    API.setTextLabelText(API.getEntityData(player, "DeathText"), string.Format("~o~Dead: ~b~{0}m {1}s", newDate.Minutes, newDate.Seconds));
-                    API.setEntityPosition(API.getEntityData(player, "DeathText"), player.position);
-                }
-                else
-                {
-                    TimeSpan newDate = (deadPlayers[player].AddMinutes(5) - DateTime.Now);
-                    API.setTextLabelText(API.getEntityData(player, "DeathText"), string.Format("~r~Bleedout: ~b~{0}m {1}s", newDate.Minutes, newDate.Seconds));
-                    API.setEntityPosition(API.getEntityData(player, "DeathText"), player.position);
-                }
-
-                if (DateTime.Now > deadPlayers[player].AddMinutes(5))
-                {
-                    queueRemove.Add(player);
-                    actionSendToHospital(player);
-                }
-            }
-
-            foreach (Client player in queueRemove)
-            {
-                API.sendNativeToPlayer(player, (ulong)Hash.RESET_PED_RAGDOLL_TIMER, player);
-                if (deadPlayers.ContainsKey(player))
-                {
-                    deadPlayers.Remove(player);
-                }
-            }
-
-            queueRemove.Clear();
-            return;
-        }
-
         public void actionSendToHospital(Client player)
         {
+            if (deadPlayers.ContainsKey(player))
+            {
+                deadPlayers.Remove(player);
+            }
+
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
             if (instance == null)
             {
@@ -175,31 +171,20 @@ namespace stuykserver.Util
             }
 
             // Cleanup List
-            if (deadPlayers.ContainsKey(player))
+            if (API.getEntityData(player, "DeathText") != null)
             {
-                deadPlayers.Remove(player);
+                API.deleteEntity((TextLabel)API.getEntityData(player, "DeathText"));
             }
-
-            DateTime hospitalCallTime = DateTime.Now;
-            bool respawnTimePassed = false;
-            while (respawnTimePassed == false)
-            {
-                // Wait for timeout or when the player arrives at position.
-                if (DateTime.Now > hospitalCallTime.AddSeconds(8))
-                {
-                    break;
-                }
-            }
-
-            API.deleteEntity(API.getEntityData(player, "DeathText"));
+            
             API.setEntityPosition(player, new Vector3(-449.3315, -341.0768, 34.50172));
-            instance.setDead(false);
-            instance.removePlayerCash(150);
             API.setEntityData(player, "Bleedingout", null);
             API.setEntityData(player, "DeathText", null);
             API.setEntityData(player, "DeathPosition", null);
+            API.setPlayerHealth(player, 100);
             API.sendNativeToPlayer(player, (ulong)Hash.RESET_PED_RAGDOLL_TIMER, player);
             API.sendNotificationToPlayer(player, "~b~You have respawned at the hospital.");
+            instance.setDead(false);
+            instance.removePlayerCash(150);
             return;
         }
     }

@@ -64,6 +64,7 @@
     <Compile Include="Classes\ShopHandler.cs" />
     <Compile Include="Classes\Shop.cs" />
     <Compile Include="Classes\VehicleClass.cs" />
+    <Compile Include="Jobs\EMT.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Jobs\Fishing.cs" />
     <Compile Include="Util\ActiveShooter.cs" />
@@ -77,7 +78,6 @@
     <Compile Include="Util\DatabaseHandler.cs" />
     <Compile Include="Classes\DeathHandler.cs" />
     <Compile Include="Classes\HouseHandler.cs" />
-    <Compile Include="Classes\KarmaHandler.cs" />
     <Compile Include="Util\KeyPressHandler.cs" />
     <Compile Include="Util\LoginHandler.cs" />
     <Compile Include="Classes\Organization.cs" />
