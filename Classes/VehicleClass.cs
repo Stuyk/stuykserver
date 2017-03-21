@@ -124,6 +124,7 @@ namespace stuykserver.Classes
 
             API.setEntityRotation(vehicle, vehicleRotation);
             API.setEntityPosition(vehicle, vehiclePosition);
+            API.setEntityData(vehicle, "VehicleID", vehicleIDNumber);
         }
 
         Vehicle vehicle;

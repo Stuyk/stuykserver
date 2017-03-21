@@ -28,7 +28,7 @@ namespace stuykserver.Util
                 // Gather all our data
                 string[] varNames = { "Red", "Green", "Blue", "sRed", "sGreen", "sBlue", "Spoilers", "FrontBumper", "RearBumper", "SideSkirt", "Exhaust", "Grille", "Hood", "Fender", "RightFender", "Roof", "FrontWheels", "BackWheels", "WindowTint" };
                 string before = "UPDATE PlayerVehicles SET";
-                string after = string.Format("WHERE PlayerID='{0}' AND VehicleType='{1}'", Convert.ToString(API.getEntityData(player, "PlayerID")), API.getVehicleDisplayName((VehicleHash)player.vehicle.model));
+                string after = string.Format("WHERE ID='{0}'", API.getEntityData(player.vehicle, "VehicleID"));
 
                 // Send all our data to generate the query and run it
                 db.compileQuery(before, after, varNames, args);
@@ -87,18 +87,24 @@ namespace stuykserver.Util
 
             API.triggerClientEvent(player, "createCamera", new Vector3(-333.9861, -137, 40), new Vector3(-338.1668, -137.8585, 39.00962));
 
+            API.sendNativeToPlayer(player, (ulong)Hash.DISABLE_ALL_CONTROL_ACTIONS, 0);
+
             DateTime enterTime = DateTime.Now;
             while (API.getEntityPosition(playerVehicle).DistanceTo(new Vector3(-338.1668, -137.8585, 39.00962)) > 2f)
             {
-                if (DateTime.Now > enterTime.AddSeconds(10))
+                if (DateTime.Now > enterTime.AddSeconds(15))
                 {
                     API.setEntityPosition(playerVehicle, new Vector3(-338.1668, -137.8585, 39.00962));
+                    API.setPlayerIntoVehicle(player, playerVehicle, -1);
                     break;
                 }
+
+                
                 // ONLY UNCOMMENT FOR POSITIONING IN CONSOLE
                 //API.consoleOutput(API.getEntityPosition(playerVehicle).ToString());
             }
-            API.sendNativeToPlayer(player, (ulong)Hash.CLEAR_PED_TASKS_IMMEDIATELY, player);
+
+            API.setPlayerIntoVehicle(player, playerVehicle, -1);
 
             // Check to make sure the player isn't being an asshat and trying to jump out of the car and get stuck inside.
             if (player.isInVehicle)
@@ -106,11 +112,13 @@ namespace stuykserver.Util
                 API.setVehicleEngineStatus(playerVehicle, false);
                 API.triggerClientEvent(player, "openCarPanel");
                 parseVehicleMods(player); // Setup Mods for Variable User
+                API.sendNativeToPlayer(player, (ulong)Hash.ENABLE_ALL_CONTROL_ACTIONS, 0);
                 return;
             }
 
             // If they are being an asshat, kick them out of the shop.
             actionForceOutOfShop(player);
+            API.sendNativeToPlayer(player, (ulong)Hash.ENABLE_ALL_CONTROL_ACTIONS, 0);
             return;
         }
 
@@ -140,8 +148,8 @@ namespace stuykserver.Util
                 API.setEntityDimension(player.vehicle, 0);
                 API.setEntityDimension(player, 0);
                 API.setPlayerIntoVehicle(player, playerVehicle, -1);
-                API.call("VehicleHandler", "initializeVehicleMods", player);
                 API.resetEntityData(player, "ReturnPosition");
+                API.call("VehicleHandler", "initializeVehicleMods", player);
                 return;
             }
 
@@ -150,8 +158,8 @@ namespace stuykserver.Util
             API.setEntityDimension(player.vehicle, 0);
             API.setEntityDimension(player, 0);
             API.setPlayerIntoVehicle(player, playerVehicle, -1);
-            API.call("VehicleHandler", "initializeVehicleMods", player);
             API.resetEntityData(player, "ReturnPosition");
+            API.call("VehicleHandler", "initializeVehicleMods", player);
         }
 
         // VEHICLE MOD HELPER

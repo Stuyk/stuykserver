@@ -365,10 +365,14 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	
 	// Move to Pass Position Camera
 	if (eventName == "intorpolateCamera") {
-		var tempcamera = API.createCamera(args[0], args[1]);
-		API.pointCameraAtEntity(camera, API.getLocalPlayer(), new Vector3());
-		API.interpolateCameras(camera, tempcamera, 5000, true, true);
-		API.sleep(4500);
+		var tempcamera = API.createCamera(new Vector3(args[0].X, args[0].Y, 450), args[1]);
+		API.pointCameraAtEntity(tempcamera, API.getLocalPlayer(), new Vector3());
+		API.interpolateCameras(API.getActiveCamera(), tempcamera, 5000, true, true);
+		API.sleep(5000);
+		var newtempcamera = API.createCamera(new Vector3(args[0].X, args[0].Y, args[0].Z + 5), new Vector3());
+		API.pointCameraAtEntity(newtempcamera, API.getLocalPlayer(), new Vector3());
+		API.interpolateCameras(API.getActiveCamera(), newtempcamera, 5000, true, true);
+		API.sleep(5000);
 		API.setActiveCamera(null);
 	}
 });
@@ -1239,7 +1243,7 @@ function changeClothingUndershirtColor(amount) { // Undershirt Color Changer
 			clothingUndershirtColorNum = maxComponent;
 		}
 
-		if (clothingUndershirtColor > maxComponent)
+		if (clothingUndershirtColorNum > maxComponent)
 		{
 			clothingUndershirtColorNum = 0;
 		}

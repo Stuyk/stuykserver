@@ -391,7 +391,6 @@ namespace stuykserver.Classes
                         break;
                     case ShopType.Modification:
                         API.setBlipSprite(collisionBlip, 446);
-                        textLabel = API.createTextLabel(string.Format("Vehicle {0}s", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
                     case ShopType.Repair:
                         API.setBlipSprite(collisionBlip, 402);

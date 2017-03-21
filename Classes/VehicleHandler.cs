@@ -463,14 +463,9 @@ namespace stuykserver.Util
         {
             if (player.isInVehicle)
             {
-                if (!vehicleInformation.ContainsKey(player.vehicle))
-                {
-                    return;
-                }
-
                 string[] varNames = { "ID" };
                 string before = "SELECT * FROM PlayerVehicles WHERE";
-                object[] data = { vehicleInformation[player.vehicle].returnVehicleIDNumber().ToString() };
+                object[] data = { API.getEntityData(player.vehicle, "VehicleID") };
                 DataTable result = db.compileSelectQuery(before, varNames, data);
 
                 Vehicle vehicle = player.vehicle;
