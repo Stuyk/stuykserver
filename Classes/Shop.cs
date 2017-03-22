@@ -120,7 +120,7 @@ namespace stuykserver.Classes
         public void saveShop()
         {
             string[] varNames = { "PlayerID", "Units", "Money", "ForSale", "Price" };
-            string before = "UPDATE Players SET";
+            string before = "UPDATE Shops SET";
             object[] data = { shopOwner, shopUnits, shopBalance, forSale, shopPrice };
             string after = string.Format("WHERE ID='{0}'", shopID);
 
