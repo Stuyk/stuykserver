@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace stuykserver.Classes
 {
@@ -65,7 +66,7 @@ namespace stuykserver.Classes
             Plate = Convert.ToInt32(row["Plate"]);
             WindowTint = Convert.ToInt32(row["WindowTint"]);
             playerID = Convert.ToInt32(row["PlayerID"]);
-
+            vehicleFuel = Convert.ToInt32(row["Fuel"]);
             
             rgb = new List<int> {
                 Convert.ToInt32(row["Red"]), 
@@ -125,6 +126,47 @@ namespace stuykserver.Classes
             API.setEntityRotation(vehicle, vehicleRotation);
             API.setEntityPosition(vehicle, vehiclePosition);
             API.setEntityData(vehicle, "VehicleID", vehicleIDNumber);
+
+            Timer fuelTimer = new Timer();
+            fuelTimer.Interval = 10000;
+            fuelTimer.Enabled = true;
+            fuelTimer.Elapsed += FuelTimer_Elapsed;
+        }
+
+        private void FuelTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (!vehicle.engineStatus)
+            {
+                return;
+            }
+
+            if (vehicleFuel <= 0)
+            {
+                vehicle.engineStatus = false;
+                return;
+            }
+
+            if (vehicle.position.DistanceTo(vehiclePosition) < 5f)
+            {
+                vehiclePosition = vehicle.position;
+                vehicleFuel -= 0.08;
+            }
+            else
+            {
+                vehiclePosition = vehicle.position;
+                vehicleFuel -= 0.1;
+            }
+
+            Client[] occupants = API.getVehicleOccupants(vehicle);
+            
+            foreach (Client occupant in occupants)
+            {
+                if (API.getPlayerVehicleSeat(occupant) == -1)
+                {
+                    API.triggerClientEvent(occupant, "updateFuel", vehicleFuel);
+                    break;
+                }
+            }
         }
 
         Vehicle vehicle;
@@ -136,6 +178,7 @@ namespace stuykserver.Classes
         List<Client> vehicleKeys;
         Client vehicleOwner;
         int playerID; // Vehicle Owner
+        double vehicleFuel;
         List<Client> playersInVehicle; // Probably don't need this.
         string vehicleType;
         string collisionType;
@@ -185,9 +228,9 @@ namespace stuykserver.Classes
 
         public void saveVehiclePosition()
         {
-            string[] varNames = { "PosX", "PosY", "PosZ", "RotX", "RotY", "RotZ" };
+            string[] varNames = { "PosX", "PosY", "PosZ", "RotX", "RotY", "RotZ", "Fuel" };
             string before = "UPDATE PlayerVehicles SET";
-            object[] data = { API.getEntityPosition(vehicleID).X, API.getEntityPosition(vehicleID).Y, API.getEntityPosition(vehicleID).Z, API.getEntityRotation(vehicleID).X, API.getEntityRotation(vehicleID).Y, API.getEntityRotation(vehicleID).Z };
+            object[] data = { API.getEntityPosition(vehicleID).X, API.getEntityPosition(vehicleID).Y, API.getEntityPosition(vehicleID).Z, API.getEntityRotation(vehicleID).X, API.getEntityRotation(vehicleID).Y, API.getEntityRotation(vehicleID).Z, vehicleFuel };
             string after = string.Format("WHERE ID='{0}'", vehicleIDNumber);
 
             db.compileQuery(before, after, varNames, data);
@@ -218,6 +261,21 @@ namespace stuykserver.Classes
         public void setOwnerID(int i)
         {
             playerID = i;
+        }
+
+        public double returnFuel()
+        {
+            return vehicleFuel;
+        }
+
+        public void addFuel(int amount)
+        {
+            vehicleFuel += amount;
+
+            if (vehicleFuel >= 100)
+            {
+                vehicleFuel = 100;
+            }
         }
 
         public void setVehiclePosition(ColShape collision, Vector3 position)
@@ -295,6 +353,9 @@ namespace stuykserver.Classes
 
         public void Dispose()
         {
+            saveVehiclePosition();
+
+
             API.deleteEntity(vehicleID);
             vehicleKeys.Clear();
             GC.SuppressFinalize(this);

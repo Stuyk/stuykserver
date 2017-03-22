@@ -1,6 +1,7 @@
 ﻿using GTANetworkServer;
 using GTANetworkShared;
 using stuykserver.Classes;
+using stuykserver.Util;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,6 +13,8 @@ namespace stuykserver.Classes
 {
     public class Shop : Script, IDisposable
     {
+        DatabaseHandler db = new DatabaseHandler();
+
         public Shop()
         {
             // Unused
@@ -22,7 +25,7 @@ namespace stuykserver.Classes
             shopID = Convert.ToInt32(row["ID"]);
             collisionID = shopID;
             shopOwner = Convert.ToInt32(row["PlayerID"]);
-            shopUnits = Convert.ToInt32(row["Units"]);
+            setShopUnits(Convert.ToInt32(row["Units"]));
             shopBalance = Convert.ToInt32(row["Money"]);
             shopType = (ShopType)row["Type"];
             collisionPosition = new Vector3(Convert.ToSingle(row["PosX"]), Convert.ToSingle(row["PosY"]), Convert.ToSingle(row["PosZ"]));
@@ -91,7 +94,8 @@ namespace stuykserver.Classes
             Vans,
             Fishing,
             FishingSale,
-            Repair
+            Repair,
+            FuelPump
         }
 
         ColShape collisionShape; // Used for the main point.
@@ -112,6 +116,17 @@ namespace stuykserver.Classes
         bool forSale; // Mostly used for HOUSING.
         int shopPrice; // Mostly used for HOUSING.
         int shopDimension; // Mostly used for HOUSING.
+
+        public void saveShop()
+        {
+            string[] varNames = { "PlayerID", "Units", "Money", "ForSale", "Price" };
+            string before = "UPDATE Players SET";
+            object[] data = { shopOwner, shopUnits, shopBalance, forSale, shopPrice };
+            string after = string.Format("WHERE ID='{0}'", shopID);
+
+            // Send all our data to generate the query and run it
+            db.compileQuery(before, after, varNames, data);
+        }
 
         // Setup Collision
         public void setupCollision()
@@ -397,6 +412,11 @@ namespace stuykserver.Classes
                         API.setBlipColor(collisionBlip, 11);
                         textLabel = API.createTextLabel(string.Format("Vehicle {0}s", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         break;
+                    case ShopType.FuelPump:
+                        API.setBlipSprite(collisionBlip, 361);
+                        API.setBlipColor(collisionBlip, 59);
+                        textLabel = API.createTextLabel(string.Format("~b~Pump: ~b~{0}/5000 Units", shopUnits), collisionPosition, 10f, 0.8f, true);
+                        break;
                     default:
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         API.setBlipSprite(collisionBlip, 225);
@@ -536,15 +556,16 @@ namespace stuykserver.Classes
         // For Sale
         public void setForSale(bool value)
         {
-            if (value == true)
+            switch (value)
             {
-                API.setBlipSprite(collisionBlip, 374);
-                forSale = true;
-            }
-            else
-            {
-                API.setBlipSprite(collisionBlip, 40);
-                forSale = false;
+                case true:
+                    API.setBlipSprite(collisionBlip, 374);
+                    forSale = true;
+                    break;
+                case false:
+                    API.setBlipSprite(collisionBlip, 40);
+                    forSale = false;
+                    break;
             }
         }
 
@@ -577,6 +598,10 @@ namespace stuykserver.Classes
 
         public void Dispose()
         {
+            if (textLabel != null)
+            {
+                 API.deleteEntity(textLabel);
+            }
             collisionID = -1;
             collisionPosition = null;
             API.deleteEntity(collisionBlip);
@@ -607,16 +632,62 @@ namespace stuykserver.Classes
         public void setShopUnits(int value)
         {
             shopUnits = value;
+
+            if (shopUnits >= 5000)
+            {
+                shopUnits = 5000;
+            }
+
+            if (shopUnits <= 0)
+            {
+                shopUnits = 0;
+            }
+
+            if (shopType == ShopType.FuelPump)
+            {
+                textLabel.text = string.Format("~b~Pump: ~b~{0}/5000 Units", shopUnits);
+            }
         }
 
         public void addShopUnits(int value)
         {
             shopUnits += value;
+
+            if (shopUnits >= 5000)
+            {
+                shopUnits = 5000;
+            }
+
+            if (shopType == ShopType.FuelPump)
+            {
+                textLabel.text = string.Format("~b~Pump: ~b~{0}/5000 Units", shopUnits);
+            }
         }
 
         public void removeShopUnits(int value)
         {
+            if (shopUnits <= 0)
+            {
+                if (shopType == ShopType.FuelPump)
+                {
+                    textLabel.text = string.Format("~b~Pump: ~b~{0}/5000 Units", shopUnits);
+                }
+
+                shopUnits = 0;
+                return;
+            }
+
             shopUnits -= value;
+
+            if (shopType == ShopType.FuelPump)
+            {
+                textLabel.text = string.Format("~b~Pump: ~b~{0}/5000 Units", shopUnits);
+            }
+        }
+
+        public int returnShopUnits()
+        {
+            return shopUnits;
         }
     }
 }

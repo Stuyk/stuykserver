@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace stuykserver.Classes
 {
@@ -19,7 +20,26 @@ namespace stuykserver.Classes
         public ShopHandler()
         {
             API.consoleOutput("Started: Shop Handler");
+            API.onResourceStart += API_onResourceStart;
             initializeShops();
+        }
+
+        private void API_onResourceStart()
+        {
+            Timer timer = new Timer();
+            timer.Interval = 300000;
+            timer.Enabled = true;
+            timer.Elapsed += SaveAllShops;
+        }
+
+        private void SaveAllShops(object sender, ElapsedEventArgs e)
+        {
+            foreach (Shop shop in shopInfo.Values)
+            {
+                shop.saveShop();
+            }
+
+            API.consoleOutput("Saved All Shops");
         }
 
         private void initializeShops()

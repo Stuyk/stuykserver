@@ -30,21 +30,20 @@ namespace stuykserver.Classes
                 // Shops
                 if (shop != null)
                 {
-                    if (shop.returnShopType().ToString() == "Modification" && !player.isInVehicle)
+                    if (!player.isInVehicle)
                     {
-                        API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
-                        return;
-                    }
-
-                    if (shop.returnShopType().ToString() == "Repair" && !player.isInVehicle)
-                    {
-                        API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
-                        return;
-                    }
-
-                    if (shop.returnShopType().ToString() == "Repair" && player.isInVehicle)
-                    {
-                        API.call("RepairShopHandler", "actionDisplayCost", player);
+                        switch (shop.returnShopType().ToString())
+                        {
+                            case "Modification":
+                                API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
+                                return;
+                            case "Repair":
+                                API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
+                                return;
+                            case "FuelPump":
+                                API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
+                                return;
+                        }
                     }
 
                     API.setEntityData(player, "ShopInstance", shop);

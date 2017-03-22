@@ -204,24 +204,20 @@ namespace stuykserver.Util
                 // VEHICLE FUNCTIONS
                 if (player.isInVehicle)
                 {
-                    // VEHICLE MODIFICATIONS
-                    if (currentFunction == "Modification")
+                    switch (currentFunction)
                     {
-                        API.call("VehicleModificationHandler", "actionEnterShop", player);
-                        return;
-                    }
-
-                    // VEHICLE ENGINE
-                    if (currentFunction == "VehicleEngine")
-                    {
-                        API.call("VehicleHandler", "actionVehicleEngine", player);
-                        return;
-                    }
-
-                    if (currentFunction == "Repair")
-                    {
-                        API.call("RepairShopHandler", "actionRepair", player);
-                        return;
+                        case "Modification":
+                            API.call("VehicleModificationHandler", "actionEnterShop", player);
+                            return;
+                        case "VehicleEngine":
+                            API.call("VehicleHandler", "actionVehicleEngine", player);
+                            return;
+                        case "Repair":
+                            API.call("RepairShopHandler", "actionRepair", player);
+                            return;
+                        case "FuelPump":
+                            API.call("FuelPumpHandler", "actionUseFuel", player);
+                            return;
                     }
                 }
             }

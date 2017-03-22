@@ -45,25 +45,37 @@ namespace stuykserver.Util
 
         public void checkDeaths(object source, ElapsedEventArgs e)
         {
+            List<Client> players = new List<Client>();
+
+            // Add all of our client info here.
+            foreach (Client player in deadPlayers.Keys)
+            {
+                players.Add(player);
+            }
+
+            // Subtract our values before going into the real edit.
+            foreach (Client player in players)
+            {
+                if (deadPlayers.ContainsKey(player))
+                {
+                    deadPlayers[player] = deadPlayers[player] - 1;
+                }
+            }
+
+            players.Clear();
+
             foreach (Client player in deadPlayers.Keys)
             {
                 API.sendNativeToPlayer(player, (ulong)Hash.SET_PED_TO_RAGDOLL, player, -1, -1, 0, true, true, true);
 
-                if (player.position.DistanceTo(API.getEntityData(player, "DeathPosition")) > 1f)
-                {
-                    API.setEntityPosition(player, API.getEntityData(player, "DeathPosition"));
-                }
-
                 // Check if the player has decided to bleed out or not.
                 if (Convert.ToBoolean(API.getEntityData(player, "Bleedingout")))
                 {
-                    deadPlayers[player] = deadPlayers[player] - 1;
                     API.setTextLabelText(API.getEntityData(player, "DeathText"), string.Format("~o~Dead: ~b~{0}s", deadPlayers[player]));
                     API.setEntityPosition(API.getEntityData(player, "DeathText"), player.position);
                 }
                 else
                 {
-                    deadPlayers[player] = deadPlayers[player] - 1;
                     API.setTextLabelText(API.getEntityData(player, "DeathText"), string.Format("~r~Bleedout: ~b~{0}s", deadPlayers[player]));
                     API.setEntityPosition(API.getEntityData(player, "DeathText"), player.position);
                 }
@@ -122,11 +134,6 @@ namespace stuykserver.Util
                 return;
             }
 
-            if (!deadPlayers.ContainsKey(player))
-            {
-                deadPlayers.Add(player, 300);
-            }
-
             // Set the player to their death position.
             Vector3 position = (Vector3)API.getEntityData(player, "DeathPosition");
             API.setEntityPosition(player, position);
@@ -134,13 +141,19 @@ namespace stuykserver.Util
             // Set bleedingout to null for later usage.
             API.setEntityData(player, "Bleedingout", null);
 
-            TextLabel label = API.createTextLabel(string.Format("~r~Bleedout: {0}s", deadPlayers[player]), player.position, 10f, 1.0f, true);
-            API.setEntityData(player, "DeathText", label);
-
             // Send some chat messages.
             API.sendChatMessageToPlayer(player, "~y~You have died. You may ~r~/bleedout ~y~ at any time.");
             API.sendChatMessageToPlayer(player, "~y~Bleeding out will ~r~remove all ~y~of your weapons.");
             API.sendChatMessageToPlayer(player, "~y~You may also wait for an ~b~EMT ~y~ to rescue you.");
+
+            // Add them to the list and force them into ragdoll mode.
+            if (!deadPlayers.ContainsKey(player))
+            {
+                deadPlayers.Add(player, 300);
+            }
+
+            TextLabel label = API.createTextLabel(string.Format("~r~Bleedout: {0}s", deadPlayers[player]), player.position, 10f, 1.0f, true);
+            API.setEntityData(player, "DeathText", label);
             return;
         }
 

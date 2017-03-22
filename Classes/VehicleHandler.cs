@@ -141,53 +141,60 @@ namespace stuykserver.Util
         // Start + Stop Vehicle
         public void actionVehicleEngine(Client player)
         {
-            if (API.getEntityData(player, "NearVehicle") == null)
-            {
-                return;
-            }
-
-            NetHandle vehicle = (NetHandle)API.getEntityData(player, "NearVehicle");
-
+            // Check if they're in a a vehicle.
             if (!player.isInVehicle)
             {
                 return;
             }
 
             // Prevent Local Vehicles from being called.
-            if (!vehicleInformation.ContainsKey(vehicle))
+            if (!vehicleInformation.ContainsKey(player.vehicle))
             {
                 return;
             }
 
             // Check if Owner
-            if (vehicleInformation[vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+            if (vehicleInformation[player.vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
             {
-                if (API.getVehicleEngineStatus(vehicle))
+                if (vehicleInformation[player.vehicle].returnFuel() <= 0)
                 {
-                    API.setVehicleEngineStatus(vehicle, false);
+                    API.sendChatMessageToPlayer(player, "~y~Vehicle # ~r~Out of fuel.");
+                    return;
+                }
+
+                if (API.getVehicleEngineStatus(player.vehicle))
+                {
+                    API.setVehicleEngineStatus(player.vehicle, false);
                     API.sendChatMessageToPlayer(player, "~y~Vehicle # ~o~Engine Off");
                     return;
                 }
                 else
                 {
-                    API.setVehicleEngineStatus(vehicle, true);
+                    API.setVehicleEngineStatus(player.vehicle, true);
                     API.sendChatMessageToPlayer(player, "~y~Vehicle # ~b~Engine On");
+                    API.triggerClientEvent(player, "updateFuel", vehicleInformation[player.vehicle].returnFuel());
                     return;
                 }
             }
 
             // Check for Keys
-            if (vehicleInformation[vehicle].returnVehicleKeys().Contains(player))
+            if (vehicleInformation[player.vehicle].returnVehicleKeys().Contains(player))
             {
-                if (API.getVehicleEngineStatus(vehicle))
+                if (vehicleInformation[player.vehicle].returnFuel() <= 0)
                 {
-                    API.setVehicleEngineStatus(vehicle, false);
+                    API.sendChatMessageToPlayer(player, "~y~Vehicle # ~r~Out of fuel.");
+                    return;
+                }
+
+                if (API.getVehicleEngineStatus(player.vehicle))
+                {
+                    API.setVehicleEngineStatus(player.vehicle, false);
                     API.sendChatMessageToPlayer(player, "~y~Vehicle # ~o~Engine Off");
                     return;
                 }
                 else
                 {
-                    API.setVehicleEngineStatus(vehicle, true);
+                    API.setVehicleEngineStatus(player.vehicle, true);
                     API.sendChatMessageToPlayer(player, "~y~Vehicle # ~b~Engine On");
                     return;
                 }
@@ -390,6 +397,15 @@ namespace stuykserver.Util
                 {
                     return vehicleInformation[vehicle];
                 }
+            }
+            return null;
+        }
+
+        public VehicleClass getVehicleByPlayer(Client player)
+        {
+            if (vehicleInformation.ContainsKey(player.vehicle))
+            {
+                return vehicleInformation[player.vehicle];
             }
             return null;
         }

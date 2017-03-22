@@ -15,7 +15,8 @@
  currentCollisionType = null; // KEYPRESS USE BUTTON System
  camera = null; // Server Camera
  repairCost = null;
- repairPosition =  null;
+ repairPosition = null;
+ vehicleFuel = "Loading..."; // Used for VehicleFuel Display
 
 // CEF Boilerplate
 class CefHelper {
@@ -264,7 +265,12 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		}
 
 	}
-
+	
+	if (eventName == "updateFuel")
+	{
+		vehicleFuel = args[0];
+	}
+	
 	// EVENT NAMES THAT CAN'T GO ANYWHERE
 	if (eventName == "killPanel") {
 		if (pagePanel != null) {
@@ -365,14 +371,14 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	
 	// Move to Pass Position Camera
 	if (eventName == "intorpolateCamera") {
-		var tempcamera = API.createCamera(new Vector3(args[0].X, args[0].Y, 450), args[1]);
+		var tempcamera = API.createCamera(new Vector3(args[0].X, args[0].Y, 1500), args[1]);
 		API.pointCameraAtEntity(tempcamera, API.getLocalPlayer(), new Vector3());
-		API.interpolateCameras(API.getActiveCamera(), tempcamera, 5000, true, true);
-		API.sleep(5000);
+		API.interpolateCameras(API.getActiveCamera(), tempcamera, 3000, true, true);
+		API.sleep(3000);
 		var newtempcamera = API.createCamera(new Vector3(args[0].X, args[0].Y, args[0].Z + 5), new Vector3());
 		API.pointCameraAtEntity(newtempcamera, API.getLocalPlayer(), new Vector3());
-		API.interpolateCameras(API.getActiveCamera(), newtempcamera, 5000, true, true);
-		API.sleep(5000);
+		API.interpolateCameras(API.getActiveCamera(), newtempcamera, 3000, true, true);
+		API.sleep(3000);
 		API.setActiveCamera(null);
 	}
 });
@@ -381,16 +387,28 @@ API.onUpdate.connect(function() {
 	// SCREEN OVERLAYS
     if (pagePanel == null) {
 		if (currentMoney != null) {
-			API.drawText("$" + currentMoney, resX - 25, 25, 1, 50, 211, 82, 255, 4, 2, false, true, 0);
+			API.drawText("$" + currentMoney, 310, resY - 50, 0.5, 50, 211, 82, 255, 4, 0, false, true, 0);
 		}
 
 		if (karmaDisplay != null) {
-			API.drawText(karmaDisplay, resX - 25, resY - 100, 1, 244, 244, 66, 255, 4, 2, false, true, 0);
+			API.drawText("~w~Karma: " + karmaDisplay, 310, resY - 85, 0.5, 244, 244, 66, 255, 4, 0, false, true, 0);
 		}
 		
-		if (repairPosition != null && repairCost != null) {
-			var worldPos = API.worldToScreen(repairPosition);
-			API.drawText(repairCost, worldPos.X, worldPos.Y, 1, 0, 255, 0, 255, 4, 2, false, true, 0);
+		if (API.isPlayerInAnyVehicle(API.getLocalPlayer()))
+		{
+			API.drawText("~b~Fuel: ~w~" + Math.round(vehicleFuel * 100) / 100, 310, resY - 120, 0.5, 255, 255, 255, 255, 4, 0, false, true, 0);
+		}
+		
+		if (API.isPlayerInAnyVehicle(API.getLocalPlayer()))
+		{
+			var velocity = API.getEntityVelocity(API.getPlayerVehicle(API.getLocalPlayer()));
+			var speed = Math.sqrt(
+				velocity.X * velocity.X +
+				velocity.Y * velocity.Y +
+				velocity.Z * velocity.Z
+				) / 0.44704;
+				
+			API.drawText("~b~Speed: ~w~" + Math.round(speed * 100) / 100, 310, resY - 155, 0.5, 255, 255, 255, 255, 4, 0, false, true, 0);	
 		}
 	}
 
@@ -398,6 +416,10 @@ API.onUpdate.connect(function() {
 	if (useFunction != null) {
 		switch (currentCollisionType) {
 			case "Modification":
+				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				break;
+				
+			case "FuelPump":
 				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
 				break;
 				
