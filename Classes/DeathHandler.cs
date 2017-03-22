@@ -47,7 +47,7 @@ namespace stuykserver.Util
         {
             foreach (Client player in deadPlayers.Keys)
             {
-                API.sendNativeToAllPlayers((ulong)Hash.SET_PED_TO_RAGDOLL, player, -1, -1, 0, true, true, true);
+                API.sendNativeToPlayer(player, (ulong)Hash.SET_PED_TO_RAGDOLL, player, -1, -1, 0, true, true, true);
 
                 if (player.position.DistanceTo(API.getEntityData(player, "DeathPosition")) > 1f)
                 {
@@ -72,15 +72,13 @@ namespace stuykserver.Util
                 if (deadPlayers[player] < 0)
                 {
                     actionSendToHospital(player);
-                    return;
                 }
 
                 // If the players health is less than 10, force them to the hospital.
                 // This makes double tap a lot easier.
                 if (player.health < 10)
                 {
-                    actionSendToHospital(player);
-                    return;
+                    API.setEntityData(player, "AlreadyDied", true);
                 }
             }
         }
@@ -111,6 +109,12 @@ namespace stuykserver.Util
         // Also setup a date when they died and add it to the dead player list.
         private void API_onPlayerRespawn(Client player)
         {
+            if (API.getEntityData(player, "AlreadyDied"))
+            {
+                actionSendToHospital(player);
+                return;
+            }
+
             API.setPlayerHealth(player, 100);
 
             if (API.getEntityData(player, "DeathPosition") == null)
@@ -175,16 +179,18 @@ namespace stuykserver.Util
             {
                 API.deleteEntity((TextLabel)API.getEntityData(player, "DeathText"));
             }
-            
-            API.setEntityPosition(player, new Vector3(-449.3315, -341.0768, 34.50172));
+
             API.setEntityData(player, "Bleedingout", null);
             API.setEntityData(player, "DeathText", null);
             API.setEntityData(player, "DeathPosition", null);
-            API.setPlayerHealth(player, 100);
-            API.sendNativeToPlayer(player, (ulong)Hash.RESET_PED_RAGDOLL_TIMER, player);
+            API.setEntityData(player, "AlreadyDied", false);
+            
             API.sendNotificationToPlayer(player, "~b~You have respawned at the hospital.");
             instance.setDead(false);
             instance.removePlayerCash(150);
+
+            API.sendNativeToPlayer(player, (ulong)Hash.RESET_PED_RAGDOLL_TIMER, player);
+            API.setEntityPosition(player, new Vector3(-449.3315, -341.0768, 34.50172));
             return;
         }
     }

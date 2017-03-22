@@ -111,6 +111,7 @@ namespace stuykserver.Classes
             API.setEntityDimension(playerClient, 0);
             API.setEntityPosition(playerClient, position);
             API.setEntityData(playerClient, "PlayerID", playerID);
+            API.setEntityData(playerClient, "AlreadyDied", false);
         }
 
         public void savePlayerLogOut()
