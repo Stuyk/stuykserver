@@ -95,113 +95,47 @@ namespace stuykserver.Util
             }
         }
 
+        private void actionKarmaRemove(Client killer)
+        {
+            Player killerInstance = (Player)API.call("PlayerHandler", "getPlayer", killer);
+
+            // If above 0, remove Karma.
+            if (killerInstance.returnPlayerKarma() > 0)
+            {
+                killerInstance.removePlayerKarma(25);
+                // Set to 0 if they drop below.
+                if (killerInstance.returnPlayerKarma() <= 0)
+                {
+                    killerInstance.setPlayerKarma(0);
+                }
+            }
+
+            // If below 0, add Karma.
+            if (killerInstance.returnPlayerKarma() < 0)
+            {
+                killerInstance.addPlayerKarma(25);
+
+                // Set to 0 if they go above.
+                if (killerInstance.returnPlayerKarma() >= 0)
+                {
+                    killerInstance.setPlayerKarma(0);
+                }
+            }
+        }
+
         // When the player dies set their player instance to dead and update the database incase of logout.
         private void API_onPlayerDeath(Client player, NetHandle entityKiller, int weapon)
         {
             API.setEntityData(player, "DeathPosition", player.position);
 
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
-            if (instance == null)
-            {
-                return;
-            }
+            instance.setDead(true);
 
             // Check if the player who died is an active shooter. If they aren't, remove Karma from the killer.
-            if (API.getEntityData(player, "ActiveShooter") != true)
+            if (API.getEntityData(player, "ActiveShooter") == false)
             {
-                // Get that fucker if he's a player.
-                if (API.getEntityType(entityKiller) == EntityType.Player)
-                {
-                    Client killer = API.getPlayerFromHandle(entityKiller);
-                    Player killerInstance = (Player)API.call("PlayerHandler", "getPlayer", killer);
-
-                    // If above 0, remove Karma.
-                    if (killerInstance.returnPlayerKarma() > 0)
-                    {
-                        killerInstance.removePlayerKarma(25);
-                        // Set to 0 if they drop below.
-                        if (killerInstance.returnPlayerKarma() <= 0)
-                        {
-                            killerInstance.setPlayerKarma(0);
-                        }
-                        API.call("DeathHandler", "addActiveShooter", killer);
-                        return;
-                    }
-
-                    // If below 0, add Karma.
-                    if (killerInstance.returnPlayerKarma() < 0)
-                    {
-                        killerInstance.addPlayerKarma(25);
-
-                        // Set to 0 if they go above.
-                        if (killerInstance.returnPlayerKarma() >= 0)
-                        {
-                            killerInstance.setPlayerKarma(0);
-                        }
-                        API.call("DeathHandler", "addActiveShooter", killer);
-                        return;
-                    }
-                }
-
-                // Get that fucker's car.
-                if (API.getEntityType(entityKiller) == EntityType.Vehicle)
-                {
-                    Client[] occupants = API.getVehicleOccupants(entityKiller);
-
-                    Client killer = null;
-                    foreach (Client p in occupants)
-                    {
-                       if (API.getPlayerVehicleSeat(p) == -1)
-                       {
-                            killer = p;
-                            break;
-                       }
-                    }
-
-                    // Check if Null or whatever.
-                    if (killer == null)
-                    {
-                        return;
-                    }
-
-                    Player killerInstance = (Player)API.call("PlayerHandler", "getPlayer", killer);
-                    // If above 0, remove Karma.
-                    if (killerInstance.returnPlayerKarma() > 0)
-                    {
-                        killerInstance.removePlayerKarma(25);
-                        // Set to 0 if they drop below.
-                        if (killerInstance.returnPlayerKarma() <= 0)
-                        {
-                            killerInstance.setPlayerKarma(0);
-                        }
-                        API.call("DeathHandler", "addActiveShooter", killer);
-                        return;
-                    }
-
-                    // If below 0, add Karma.
-                    if (killerInstance.returnPlayerKarma() < 0)
-                    {
-                        killerInstance.addPlayerKarma(25);
-
-                        // Set to 0 if they go above.
-                        if (killerInstance.returnPlayerKarma() >= 0)
-                        {
-                            killerInstance.setPlayerKarma(0);
-                        }
-                        API.call("DeathHandler", "addActiveShooter", killer);
-                        return;
-                    }
-                }
-            }
-            
-            if (!instance.isDead())
-            {
-                instance.setDead(true);
-            }
-            else
-            {
-                actionSendToHospital(player);
-                return;
+                Client killer = API.getPlayerFromHandle(entityKiller);
+                actionKarmaRemove(killer);
             }
         }
 

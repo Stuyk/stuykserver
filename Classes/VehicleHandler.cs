@@ -7,6 +7,8 @@ using System.Data;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
+using System.Timers;
 
 namespace stuykserver.Util
 {
@@ -14,17 +16,71 @@ namespace stuykserver.Util
     {
         ChatHandler ch = new ChatHandler();
         DatabaseHandler db = new DatabaseHandler();
-        DateTime startTime;
 
         Dictionary<NetHandle, VehicleClass> vehicleInformation = new Dictionary<NetHandle, VehicleClass>();
+        Dictionary<NetHandle, double> vehicleDeath = new Dictionary<NetHandle, double>();
+
         List<string> bicycles = new List<string>(new string[] {"Bmx", "Cruiser", "Fixter", "Scorcher", "TriBike" });
 
         public VehicleHandler()
         {
-            API.onUpdate += API_onUpdate;
             API.onPlayerEnterVehicle += API_onPlayerEnterVehicle;
             API.onPlayerExitVehicle += API_onPlayerExitVehicle;
-            startTime = DateTime.Now; // Start Timer on Resource Start for vehicle updates.
+            API.onResourceStart += API_onResourceStart;
+            API.onVehicleDeath += API_onVehicleDeath;
+        }
+
+        private void API_onVehicleDeath(NetHandle entity)
+        {
+            if (API.getEntityType(entity) == EntityType.Vehicle)
+            {
+                if (vehicleInformation.ContainsKey(entity))
+                {
+                    int vehicleID = vehicleInformation[entity].returnVehicleIDNumber();
+                    Client owner = vehicleInformation[entity].returnOwner();
+                    API.sendChatMessageToPlayer(owner, "~y~Vehicle # ~o~Your vehicle has been destroyed it will respawn momentarily");
+
+                    API.delay(120000, true, () =>
+                    {
+                        vehicleInformation[entity].Dispose();
+
+                        if (owner == null)
+                        {
+                            return;
+                        }
+
+                        string[] varNames = { "ID" };
+                        string before = "SELECT * FROM PlayerVehicles WHERE";
+                        object[] data = { vehicleID };
+                        DataTable result = db.compileSelectQuery(before, varNames, data);
+
+                        if (result.Rows.Count < 1)
+                        {
+                            return;
+                        }
+
+                        VehicleClass veh = new VehicleClass(result.Rows[0]);
+                        vehicleInformation.Add(veh.returnVehicleID(), veh);
+
+                        API.setEntityRotation(veh.returnVehicleHandle(), new Vector3());
+
+                        API.sendChatMessageToPlayer(owner, "~y~Vehicle # ~b~Your vehicle has been respawned.");
+                    });
+                }
+            }
+        }
+
+        private void API_onResourceStart()
+        {
+            Timer timer = new Timer();
+            timer.Interval = 10000; // 10 Seconds
+            timer.Elapsed += VehicleTimer;
+            timer.Enabled = true;
+        }
+
+        private void VehicleTimer(object sender, ElapsedEventArgs e)
+        {
+            updateVehicleCollisions();
         }
 
         // When the player exits a vehicle. Assign a collision to the vehicle.
@@ -97,15 +153,6 @@ namespace stuykserver.Util
         // #########################################
         // PRIMARILY ON UPDATE METHODS FOR VEHICLES
         // #########################################
-        private void API_onUpdate()
-        {
-            // Every 10 seconds, update vehicle collision.
-            if (DateTime.Now > startTime.AddSeconds(10))
-            {
-                startTime = DateTime.Now;
-                updateVehicleCollisions();
-            }
-        }
 
         // Update Vehicle Collisions Every 15 Seconds for Unoccupied Spawned Vehicles.
         public void updateVehicleCollisions()

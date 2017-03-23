@@ -127,7 +127,7 @@ namespace stuykserver.Classes
             API.setEntityPosition(vehicle, vehiclePosition);
             API.setEntityData(vehicle, "VehicleID", vehicleIDNumber);
 
-            Timer fuelTimer = new Timer();
+            fuelTimer = new Timer();
             fuelTimer.Interval = 10000;
             fuelTimer.Enabled = true;
             fuelTimer.Elapsed += FuelTimer_Elapsed;
@@ -169,6 +169,7 @@ namespace stuykserver.Classes
             }
         }
 
+        Timer fuelTimer;
         Vehicle vehicle;
         NetHandle vehicleID;
         int vehicleIDNumber;
@@ -182,6 +183,7 @@ namespace stuykserver.Classes
         List<Client> playersInVehicle; // Probably don't need this.
         string vehicleType;
         string collisionType;
+        Timer deathTimer;
 
         // Vehicle Mods
         int Spoilers; // 0
@@ -353,9 +355,8 @@ namespace stuykserver.Classes
 
         public void Dispose()
         {
+            fuelTimer.Dispose();
             saveVehiclePosition();
-
-
             API.deleteEntity(vehicleID);
             vehicleKeys.Clear();
             GC.SuppressFinalize(this);
