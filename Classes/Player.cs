@@ -271,6 +271,11 @@ namespace stuykserver.Classes
             return playerCash;
         }
 
+        public void setPlayerKarma(int amount)
+        {
+            playerKarma = amount;
+        }
+
         public void addPlayerKarma(int amount)
         {
             playerKarma += amount;

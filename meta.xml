@@ -4,8 +4,6 @@
 	<script src="stuykserver.dll" type="server" lang="compiled" />
 
 	<script src="clientside/resources/Main.js" type="client" lang="javascript" />
-	<script src="clientside/resources/ActiveShooter.js" type="client" lang="javascript" />
-	<script src="clientside/resources/PaperBoy.js" type="client" lang="javascript" />
 	<script src="clientside/resources/Fishing.js" type="client" lang="javascript" />
 
 	<file src="clientside/resources/invalidname.html"/>

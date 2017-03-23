@@ -17,6 +17,7 @@
  repairCost = null;
  repairPosition = null;
  vehicleFuel = "Loading..."; // Used for VehicleFuel Display
+ activeShooter = false;
 
 // CEF Boilerplate
 class CefHelper {
@@ -127,6 +128,10 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 			repairPosition = args[0];
 			repairCost = args[1];
 			break;
+		}
+		case "setActiveShooter":
+		{
+			activeShooter = args[0];
 		}
 	}
 
@@ -384,6 +389,11 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 });
 
 API.onUpdate.connect(function() {
+	if (API.returnNative("IS_PED_SHOOTING", 8, API.getLocalPlayer()))
+	{
+		API.triggerServerEvent("PedIsShooting");
+	}
+	
 	// SCREEN OVERLAYS
     if (pagePanel == null) {
 		if (currentMoney != null) {
@@ -409,6 +419,10 @@ API.onUpdate.connect(function() {
 				) / 0.44704;
 				
 			API.drawText("~b~Speed: ~w~" + Math.round(speed * 100) / 100, 310, resY - 155, 0.5, 255, 255, 255, 255, 4, 0, false, true, 0);	
+		}
+		
+		if (activeShooter == true) {
+			API.drawText("~r~ACTIVE SHOOTER", 310, resY - 190, 0.5, 255, 255, 255, 255, 4, 0, false, true, 0);
 		}
 	}
 
