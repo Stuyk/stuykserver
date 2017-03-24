@@ -41,6 +41,7 @@ namespace stuykserver
         [Command("goto")]
         public void cmdGoTo(Client player, string target)
         {
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             player.position = API.getPlayerFromName(target).position;
         }
 

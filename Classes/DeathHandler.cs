@@ -103,6 +103,7 @@ namespace stuykserver.Util
             if (killerInstance.returnPlayerKarma() > 0)
             {
                 killerInstance.removePlayerKarma(25);
+                API.sendChatMessageToPlayer(killer, "~y~Karma # ~r~You have lost some Karma.");
                 // Set to 0 if they drop below.
                 if (killerInstance.returnPlayerKarma() <= 0)
                 {
@@ -114,12 +115,18 @@ namespace stuykserver.Util
             if (killerInstance.returnPlayerKarma() < 0)
             {
                 killerInstance.addPlayerKarma(25);
+                API.sendChatMessageToPlayer(killer, "~y~Karma # ~r~You have lost some Karma.");
 
                 // Set to 0 if they go above.
                 if (killerInstance.returnPlayerKarma() >= 0)
                 {
                     killerInstance.setPlayerKarma(0);
                 }
+            }
+
+            if (killerInstance.returnPlayerKarma() == 0)
+            {
+                API.sendChatMessageToPlayer(killer, "~y~Karma # ~o~You cannot go any lower on the Karma spectrum.");
             }
         }
 
@@ -134,8 +141,12 @@ namespace stuykserver.Util
             // Check if the player who died is an active shooter. If they aren't, remove Karma from the killer.
             if (API.getEntityData(player, "ActiveShooter") == false)
             {
-                Client killer = API.getPlayerFromHandle(entityKiller);
-                actionKarmaRemove(killer);
+                if (API.getEntityType(entityKiller) == EntityType.Player)
+                {
+                    Client killer = API.getPlayerFromHandle(entityKiller);
+                    actionKarmaRemove(killer);
+                    API.sendChatMessageToPlayer(player, "~y~Karma # ~b~The other party was considered an active shooter. He has lost Karma.");
+                }
             }
         }
 
@@ -149,14 +160,22 @@ namespace stuykserver.Util
                 return;
             }
 
-            API.setPlayerHealth(player, 100);
-
             if (API.getEntityData(player, "DeathPosition") == null)
             {
                 return;
             }
 
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance == null)
+            {
+                return;
+            }
+
+            instance.setPlayerHealth(100);
+            instance.setPlayerArmor(0);
+
             // Set the player to their death position.
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             Vector3 position = (Vector3)API.getEntityData(player, "DeathPosition");
             API.setEntityPosition(player, position);
 
@@ -223,7 +242,10 @@ namespace stuykserver.Util
             API.sendNotificationToPlayer(player, "~b~You have respawned at the hospital.");
             instance.setDead(false);
             instance.removePlayerCash(150);
+            instance.setPlayerHealth(100);
+            instance.setPlayerArmor(0);
 
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             API.sendNativeToPlayer(player, (ulong)Hash.RESET_PED_RAGDOLL_TIMER, player);
             API.setEntityPosition(player, new Vector3(-449.3315, -341.0768, 34.50172));
             return;

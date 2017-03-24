@@ -113,6 +113,9 @@ namespace stuykserver.Classes
             API.setEntityData(playerClient, "PlayerID", playerID);
             API.setEntityData(playerClient, "AlreadyDied", false);
             API.setEntityData(playerClient, "ActiveShooter", false);
+            API.setEntityData(playerClient, "CHEAT_ALLOW_TELEPORT", false);
+            API.setEntityData(playerClient, "CHEAT_HEALTH", playerClient.health);
+            API.setEntityData(playerClient, "CHEAT_ARMOR", playerClient.armor);
         }
 
         public void savePlayerLogOut()
@@ -329,11 +332,13 @@ namespace stuykserver.Classes
         public void setPlayerHealth(int amount)
         {
             API.setPlayerHealth(playerClient, amount);
+            API.setEntityData(playerClient, "CHEAT_HEALTH", amount);
         }
 
         public void setPlayerArmor(int amount)
         {
             API.setPlayerArmor(playerClient, amount);
+            API.setEntityData(playerClient, "CHEAT_ARMOR", amount);
         }
 
         public int returnPlayerHealth()

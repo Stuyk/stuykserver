@@ -42,8 +42,12 @@ namespace stuykserver.Util
 
                     API.delay(120000, true, () =>
                     {
-                        vehicleInformation[entity].Dispose();
-
+                        if (vehicleInformation.ContainsKey(entity))
+                        {
+                            vehicleInformation[entity].Dispose();
+                            vehicleInformation.Remove(entity);
+                        }
+                        
                         if (owner == null)
                         {
                             return;
@@ -73,7 +77,7 @@ namespace stuykserver.Util
         private void API_onResourceStart()
         {
             Timer timer = new Timer();
-            timer.Interval = 10000; // 10 Seconds
+            timer.Interval = 5000; // 5 Seconds
             timer.Elapsed += VehicleTimer;
             timer.Enabled = true;
         }
@@ -81,6 +85,15 @@ namespace stuykserver.Util
         private void VehicleTimer(object sender, ElapsedEventArgs e)
         {
             updateVehicleCollisions();
+            updateVehicleHealth();
+        }
+
+        public void updateVehicleHealth()
+        {
+            foreach (NetHandle vehicle in vehicleInformation.Keys)
+            {
+                vehicleInformation[vehicle].updateVehicleHealth();
+            }
         }
 
         // When the player exits a vehicle. Assign a collision to the vehicle.
@@ -530,6 +543,11 @@ namespace stuykserver.Util
                 string before = "SELECT * FROM PlayerVehicles WHERE";
                 object[] data = { API.getEntityData(player.vehicle, "VehicleID") };
                 DataTable result = db.compileSelectQuery(before, varNames, data);
+
+                if (result.Rows.Count == 0)
+                {
+                    return;
+                }
 
                 Vehicle vehicle = player.vehicle;
 

@@ -102,6 +102,7 @@ namespace stuykserver.Util
             API.triggerClientEvent(player, "update_money_display", playerInstance.returnPlayerCash());
             API.triggerClientEvent(player, "killPanel");
             API.triggerClientEvent(player, "intorpolateCamera", player.position, player.rotation);
+            API.setEntityData(player, "CHEAT_MODEL", player.model);
 
             // Player Specific Settings
             API.freezePlayer(player, false);

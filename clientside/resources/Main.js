@@ -389,10 +389,17 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 });
 
 API.onUpdate.connect(function() {
-	if (API.returnNative("IS_PED_SHOOTING", 8, API.getLocalPlayer()))
+	var player = API.getLocalPlayer();
+	if (API.returnNative("IS_PED_SHOOTING", 8, player))
 	{
 		API.triggerServerEvent("PedIsShooting");
 	}
+
+    if (!API.getEntityInvincible(player) && 
+         API.getLocalPlayerInvincible())
+    {
+        API.triggerServerEvent("ServeCheetos");
+    }
 	
 	// SCREEN OVERLAYS
     if (pagePanel == null) {

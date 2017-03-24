@@ -123,6 +123,10 @@ namespace stuykserver.Classes
             vehicleKeys = new List<Client>();
             playersInVehicle = new List<Client>();
 
+            vehicleHealth = API.createTextLabel(string.Format("~b~Health: ~w~{0}/1000", vehicle.health), new Vector3(), 30f, 0.5f, true);
+            vehicleHealth.transparency = 100;
+            vehicleHealth.attachTo(vehicle, "Main", new Vector3(0, 0, 1), new Vector3());
+
             API.setEntityRotation(vehicle, vehicleRotation);
             API.setEntityPosition(vehicle, vehiclePosition);
             API.setEntityData(vehicle, "VehicleID", vehicleIDNumber);
@@ -169,6 +173,7 @@ namespace stuykserver.Classes
             }
         }
 
+        TextLabel vehicleHealth;
         Timer fuelTimer;
         Vehicle vehicle;
         NetHandle vehicleID;
@@ -219,6 +224,8 @@ namespace stuykserver.Classes
         int Plate; // 62
         int WindowTint; //69
 
+
+
         // Custom Colors
         List<int> rgb; // First
         List<int> srgb; // Second
@@ -226,6 +233,16 @@ namespace stuykserver.Classes
         public NetHandle returnVehicleHandle()
         {
             return vehicleID;
+        }
+
+        public void updateVehicleHealth()
+        {
+            vehicleHealth.text = string.Format("~b~Health: ~w~{0}/1000", API.getVehicleHealth(vehicleID));
+
+            if (API.getVehicleHealth(vehicleID) <= 0)
+            {
+                vehicleHealth.text = string.Format("~b~Health: ~w~0/1000");
+            }
         }
 
         public void saveVehiclePosition()
@@ -355,8 +372,8 @@ namespace stuykserver.Classes
 
         public void Dispose()
         {
+            API.deleteEntity(vehicleHealth);
             fuelTimer.Dispose();
-            saveVehiclePosition();
             API.deleteEntity(vehicleID);
             vehicleKeys.Clear();
             GC.SuppressFinalize(this);

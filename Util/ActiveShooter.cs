@@ -11,7 +11,6 @@ namespace stuykserver.Util
     public class ActiveShooter : Script
     {
         Dictionary<Client, double> activeShooters = new Dictionary<Client, double>();
-        Dictionary<Client, TextLabel> activeShootersLabel = new Dictionary<Client, TextLabel>();
         List<Client> dummyShooters = new List<Client>();
 
         public ActiveShooter()
@@ -49,9 +48,6 @@ namespace stuykserver.Util
             }
 
             activeShooters.Add(player, 300);
-            TextLabel text = API.createTextLabel("~r~ACTIVE SHOOTER", player.position, 10f, 0.5f, true);
-            text.attachTo(player, "IK_Head", new Vector3(0, 0, 1f), new Vector3());
-            activeShootersLabel.Add(player, text);
             API.triggerClientEvent(player, "setActiveShooter", true);
         }
 
@@ -79,19 +75,10 @@ namespace stuykserver.Util
                     API.triggerClientEvent(player, "setActiveShooter", true);
                     API.setEntityData(player, "ActiveShooter", true);
 
-                    if (!activeShootersLabel.ContainsKey(player))
-                    {
-                        TextLabel text = API.createTextLabel("~r~ACTIVE SHOOTER", player.position, 15f, 0.5f, true);
-                        text.attachTo(player, "IK_Head", new Vector3(0, 0, 1f), new Vector3());
-                        activeShootersLabel.Add(player, text);
-                        API.triggerClientEvent(player, "setActiveShooter", true);
-                    }
-
                     // If the players shooting time is zero.
                     if (activeShooters[player] <= 0)
                     {
                         activeShooters.Remove(player);
-                        API.deleteEntity(activeShootersLabel[player]);
                         API.triggerClientEvent(player, "setActiveShooter", false);
                         API.setEntityData(player, "ActiveShooter", false);
                     }

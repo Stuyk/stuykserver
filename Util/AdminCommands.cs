@@ -126,6 +126,12 @@ namespace stuykserver.Util
             }
         }
 
+        [Command("getweapon")] // Temporary
+        public void WeaponCommandGet(Client player, WeaponHash hash)
+        {
+            API.givePlayerWeapon(player, hash, 500, true, true);
+        }
+
         [Command("giveadminmoney")] // Admin Command
         public void cmdGiveMoney(Client player, int amount)
         {
@@ -232,6 +238,16 @@ namespace stuykserver.Util
                 API.setEntityPosition(player, pos);
                 API.sendChatMessageToPlayer(player, "~g~SSSSCCHHHWWWIIIIIING!");
                 return;
+            }
+        }
+
+        [Command("wandervehicle")]
+        public void cmdCommandWander(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (instance.isAdmin())
+            {
+                API.sendNativeToPlayer(player, (ulong)Hash.TASK_VEHICLE_DRIVE_WANDER, player, player.vehicle, 40f, 1074528293);
             }
         }
 
