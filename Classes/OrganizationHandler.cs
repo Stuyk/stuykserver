@@ -40,6 +40,15 @@ namespace stuykserver.Classes
             }
         }
 
+        public Organization returnOrganization(int id)
+        {
+            if (organizationList.ContainsKey(id))
+            {
+                return organizationList[id];
+            }
+            return null;
+        }
+
         public string fetchOrgMessage(int id)
         {
             if (organizationList.ContainsKey(id))

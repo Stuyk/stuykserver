@@ -443,6 +443,22 @@ namespace stuykserver.Util
             return;
         }
 
+        [Command("findvehicles")]
+        public void cmdFindMyVehicles(Client player)
+        {
+            int found = 0;
+            foreach (NetHandle vehicle in vehicleInformation.Keys)
+            {
+                if (vehicleInformation[vehicle].returnOwnerID() == Convert.ToInt32(API.getEntityData(player, "PlayerID")))
+                {
+                    API.triggerClientEvent(player, "pushBlip", API.getEntityPosition(vehicle), 59, 1); // Position, Color, Sprite.
+                    found++;
+                }
+            }
+            API.sendChatMessageToPlayer(player, string.Format("~y~Tracker # ~b~Found ~o~{0} ~b~ vehicles.", found));
+            return;
+        }
+
 
         // #########################################
         // VEHICLE SETUPS

@@ -65,7 +65,9 @@
     <Compile Include="Classes\ShopHandler.cs" />
     <Compile Include="Classes\Shop.cs" />
     <Compile Include="Classes\VehicleClass.cs" />
+    <Compile Include="Jobs\BodyGuard.cs" />
     <Compile Include="Jobs\EMT.cs" />
+    <Compile Include="Jobs\TradeHandler.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Jobs\Fishing.cs" />
     <Compile Include="Util\ActiveShooter.cs" />

@@ -9,6 +9,8 @@ namespace stuykserver.Util
 {
     public class Organization : Script, IDisposable
     {
+        DatabaseHandler db = new DatabaseHandler();
+
         public Organization()
         {
             API.consoleOutput("Started: Organization");
@@ -112,6 +114,7 @@ namespace stuykserver.Util
         public void setOrganizationBank(int value)
         {
             organizationBank = value;
+            saveOrganization();
         }
 
         public void addOrganizationBank(int value)
@@ -119,6 +122,7 @@ namespace stuykserver.Util
             if (value > 0)
             {
                 organizationBank += value;
+                saveOrganization();
             }
         }
 
@@ -127,6 +131,7 @@ namespace stuykserver.Util
             if (value > 0)
             {
                 organizationBank -= value;
+                saveOrganization();
             }
         }
 
@@ -139,6 +144,7 @@ namespace stuykserver.Util
         public void setOrganizationUnits(int value)
         {
             organizationUnits = value;
+            saveOrganization();
         }
 
         public void addOrganizationUnits(int value)
@@ -146,6 +152,7 @@ namespace stuykserver.Util
             if (value > 0)
             {
                 organizationUnits += value;
+                saveOrganization();
             }
         }
 
@@ -154,6 +161,7 @@ namespace stuykserver.Util
             if (value > 0)
             {
                 organizationUnits -= value;
+                saveOrganization();
             }
         }
 
@@ -166,6 +174,7 @@ namespace stuykserver.Util
         public void setOrganizationKarma(int value)
         {
             organizationKarma = value;
+            saveOrganization();
         }
 
         public void addOrganizationKarma(int value)
@@ -173,6 +182,7 @@ namespace stuykserver.Util
             if (value > 0)
             {
                 organizationKarma += value;
+                saveOrganization();
             }
         }
 
@@ -181,6 +191,7 @@ namespace stuykserver.Util
             if (value > 0)
             {
                 organizationKarma -= value;
+                saveOrganization();
             }
         }
 
@@ -376,7 +387,8 @@ namespace stuykserver.Util
             Hooker = 17, // Because why not? [Neutral]
             Farming = 18, // Do some crop stuff. [+Karma]
             Lumberjack = 19, // Do some woodsman stuff. [+Karma]
-            Hunting = 20 // PVP - Hunter vs. Animals (You Guys) [Neutral]
+            Hunting = 20, // PVP - Hunter vs. Animals (You Guys) [Neutral]
+            BodyGuard = 21 // Guard
         }
 
         List<JobAddons> primaryJobAddons;
@@ -439,6 +451,17 @@ namespace stuykserver.Util
         public List<ModularAddons> returnPrimaryModularAddons()
         {
             return primaryModularAddons;
+        }
+
+        public void saveOrganization()
+        {
+            string[] varNames = { "Units", "Bank", "Karma", "Message" };
+            string before = "UPDATE Organization SET";
+            object[] data = { organizationUnits, organizationBank, organizationKarma, organizationMessage };
+            string after = string.Format("WHERE ID='{0}'", organizationID);
+
+            // Send all our data to generate the query and run it
+            db.compileQuery(before, after, varNames, data);
         }
 
         public void Dispose()

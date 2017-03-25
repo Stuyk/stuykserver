@@ -1,23 +1,37 @@
- pagePanel = null; // CEF
- cashDisplay = null;
- res = API.getScreenResolution();
- currentMoney = null; // Cash Display
- resX = API.getScreenResolutionMantainRatio().Width;
- resY = API.getScreenResolutionMantainRatio().Height;
- currentjob = null;
- karmaDisplay = null; // Karma Display
- playerAccountBalance = null; // Player Account Balance
- email = ""; // Registration System
- password = ""; // Registration System
- page = ""; // CEF? Probably unused.
- useFunction = null; // KEYPRESS USE BUTTON System
- vehicleSpecialFunction = null; // KEYPRESS USE BUTTON System
- currentCollisionType = null; // KEYPRESS USE BUTTON System
- camera = null; // Server Camera
- repairCost = null;
- repairPosition = null;
- vehicleFuel = "Loading..."; // Used for VehicleFuel Display
- activeShooter = false;
+pagePanel = null; // CEF
+cashDisplay = null;
+res = API.getScreenResolution();
+currentMoney = null; // Cash Display
+resX = API.getScreenResolutionMantainRatio().Width;
+resY = API.getScreenResolutionMantainRatio().Height;
+currentjob = null;
+karmaDisplay = null; // Karma Display
+playerAccountBalance = null; // Player Account Balance
+email = ""; // Registration System
+password = ""; // Registration System
+page = ""; // CEF? Probably unused.
+useFunction = null; // KEYPRESS USE BUTTON System
+vehicleSpecialFunction = null; // KEYPRESS USE BUTTON System
+currentCollisionType = null; // KEYPRESS USE BUTTON System
+camera = null; // Server Camera
+repairCost = null;
+repairPosition = null;
+vehicleFuel = "Loading..."; // Used for VehicleFuel Display
+activeShooter = false;
+
+// ################
+// BLIP HANDLER
+// ################
+var activeBlips = [];
+class blipHandler {
+	constructor (position, color, sprite)
+	{
+		var blip = API.createBlip(position);
+		API.setBlipSprite(blip, sprite);
+		API.setBlipColor(blip, color);
+		activeBlips.push(blip);
+	}
+}
 
 // CEF Boilerplate
 class CefHelper {
@@ -138,12 +152,6 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	// CEF REQUEST PANEL EVENTS
 	if (pagePanel == null) {
 		switch(eventName) {
-			case "openRadio":
-			{
-				pagePanel = new CefHelper("clientside/resources/radio.html");
-				pagePanel.show();
-				break;
-			}
 			case "showLogin":
 			{
 				showLoginScreen();
@@ -269,6 +277,18 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 
 		}
 
+	}
+	
+	if (eventName == "pushBlip") {
+		var newHandler = new blipHandler(args[0], args[1], args[2]);
+	}
+	
+	if (eventName == "removeBlips") {
+		for (i = 0; i < activeBlips.length; i++) {
+			API.deleteEntity(activeBlips[i]);
+		}
+		
+		activeBlips = [];
 	}
 	
 	if (eventName == "updateFuel")

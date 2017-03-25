@@ -45,6 +45,8 @@ namespace stuykserver.Classes
             playerWeapons = new Dictionary<WeaponHash, int>();
             loadPlayer(position);
             updateKarma();
+            setPlayerHealth(playerHealth);
+            setPlayerArmor(playerArmor);
             // WEAPONS
         }
 
@@ -93,8 +95,6 @@ namespace stuykserver.Classes
 
         public void loadPlayer(Vector3 position)
         {
-            playerClient.health = playerHealth;
-            playerClient.armor = playerArmor;
             playerClient.nametagVisible = nametagVisible;
             playerClient.name = playerName;
             playerClient.nametag = playerNameTag;
@@ -114,8 +114,7 @@ namespace stuykserver.Classes
             API.setEntityData(playerClient, "AlreadyDied", false);
             API.setEntityData(playerClient, "ActiveShooter", false);
             API.setEntityData(playerClient, "CHEAT_ALLOW_TELEPORT", false);
-            API.setEntityData(playerClient, "CHEAT_HEALTH", playerClient.health);
-            API.setEntityData(playerClient, "CHEAT_ARMOR", playerClient.armor);
+            
         }
 
         public void savePlayerLogOut()
@@ -283,21 +282,17 @@ namespace stuykserver.Classes
         public void addPlayerKarma(int amount)
         {
             playerKarma += amount;
-            API.sendNotificationToPlayer(playerClient, string.Format("~g~Added Karma"));
             updateKarma();
-            savePlayer();
         }
 
         public void addPlayerBank(int amount)
         {
             playerBank += amount;
-            savePlayer();
         }
 
         public void removePlayerBank(int amount)
         {
             playerBank -= amount;
-            savePlayer();
         }
 
         public void addPlayerCash(int amount)
@@ -305,7 +300,6 @@ namespace stuykserver.Classes
             playerCash += amount;
             API.triggerClientEvent(playerClient, "update_money_display", playerCash);
             API.sendNotificationToPlayer(playerClient, string.Format("~g~$ +{0}", amount));
-            savePlayer();
         }
 
         public void removePlayerCash(int amount)
@@ -313,15 +307,12 @@ namespace stuykserver.Classes
             playerCash -= amount;
             API.triggerClientEvent(playerClient, "update_money_display", playerCash);
             API.sendNotificationToPlayer(playerClient, string.Format("~g~$ ~r~-{0}", amount));
-            savePlayer();
         }
 
         public void removePlayerKarma(int amount)
         {
             playerKarma -= amount;
-            API.sendNotificationToPlayer(playerClient, string.Format("~r~Removed Karma"));
             updateKarma();
-            savePlayer();
         }
 
         public int returnPlayerBank()
@@ -331,14 +322,16 @@ namespace stuykserver.Classes
 
         public void setPlayerHealth(int amount)
         {
-            API.setPlayerHealth(playerClient, amount);
             API.setEntityData(playerClient, "CHEAT_HEALTH", amount);
+            API.setPlayerHealth(playerClient, amount);
+            playerClient.health = amount;
         }
 
         public void setPlayerArmor(int amount)
         {
-            API.setPlayerArmor(playerClient, amount);
             API.setEntityData(playerClient, "CHEAT_ARMOR", amount);
+            API.setPlayerArmor(playerClient, amount);
+            playerClient.armor = amount;
         }
 
         public int returnPlayerHealth()

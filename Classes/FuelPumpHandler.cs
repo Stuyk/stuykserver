@@ -88,6 +88,7 @@ namespace stuykserver.Classes
                 if (API.getEntityData(player, "Collision") == "None")
                 {
                     addToFuelStop(player);
+                    continue;
                 }
 
                 if (instance.returnPlayerCash() <= 0)
@@ -95,6 +96,7 @@ namespace stuykserver.Classes
                     addToFuelStop(player);
                     API.sendChatMessageToPlayer(player, "~b~FuelPump: ~o~You don't have enough money.");
                     API.setVehicleEngineStatus(player.vehicle, true);
+                    continue;
                 }
 
                 instance.removePlayerCash(3);
@@ -103,6 +105,7 @@ namespace stuykserver.Classes
                 {
                     addToFuelStop(player);
                     API.setVehicleEngineStatus(player.vehicle, true);
+                    continue;
                 }
 
                 VehicleClass vehicle = (VehicleClass)API.call("VehicleHandler", "getVehicleByPlayer", player);
@@ -114,6 +117,7 @@ namespace stuykserver.Classes
                 if (colshape == null)
                 {
                     addToFuelStop(player);
+                    continue;
                 }
 
                 Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
@@ -121,12 +125,14 @@ namespace stuykserver.Classes
                 if (shop == null)
                 {
                     addToFuelStop(player);
+                    continue;
                 }
 
                 if (shop.returnShopUnits() <= 0)
                 {
                     addToFuelStop(player);
                     API.sendNotificationToPlayer(player, "~b~FuelPump: ~o~Has run out of fuel.");
+                    continue;
                 }
 
                 shop.removeShopUnits(5);
@@ -137,6 +143,7 @@ namespace stuykserver.Classes
                 {
                     addToFuelStop(player);
                     API.sendNotificationToPlayer(player, "~b~FuelPump: ~o~Your tank is full.");
+                    continue;
                 }
             }
 

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Timers;
 
 namespace stuykserver.Util
 {
@@ -249,12 +250,6 @@ namespace stuykserver.Util
             {
                 API.sendNativeToPlayer(player, (ulong)Hash.TASK_VEHICLE_DRIVE_WANDER, player, player.vehicle, 40f, 1074528293);
             }
-        }
-
-        [Command("kill")]
-        public void cmdKillPlayer(Client player)
-        {
-            API.setPlayerHealth(player, -1);
         }
     }
 }

@@ -16,7 +16,6 @@ namespace stuykserver
 
         public Main()
         {
-            API.onPlayerHealthChange += API_onPlayerHealthChange;
             API.onResourceStart += API_onResourceStart;
         }
 
@@ -24,12 +23,6 @@ namespace stuykserver
         {
             API.setGamemodeName("~r~Stuyk ~w~Premier ~b~Roleplay");
             API.consoleOutput("Started: Main");
-        }
-
-
-        private void API_onPlayerHealthChange(Client player, int oldValue)
-        {
-            db.updateDatabase("Players", "Health", player.health.ToString(), "Nametag", player.name);
         }
 
         [Command("resetdimension")]
@@ -59,14 +52,11 @@ namespace stuykserver
             return;
         }
 
-        [Command("inventory")]
-        public void cmdInventory(Client player)
+        // Removes current active checkpoints, blips, etc.
+        [Command("clear")]
+        public void cmdClearBlips(Client player)
         {
-            if (db.isPlayerLoggedIn(player))
-            {
-                API.triggerClientEvent(player, "openInventory", player.name);
-                return;
-            }
+            API.triggerClientEvent(player, "removeBlips");
         }
 
         // Modified send notificaiton with clientside noise.

@@ -208,7 +208,7 @@ namespace stuykserver.Util
 
             if (deadPlayers.ContainsKey(player))
             {
-                deadPlayers[player] = deadPlayers[player] - 240;
+                deadPlayers[player] = deadPlayers[player] - 500; // Normally 240
                 API.sendChatMessageToPlayer(player, "~o~You have chosen to bleed out.");
                 API.sendChatMessageToPlayer(player, "~b~You will respawn momentarily");
                 API.setEntityData(player, "Bleedingout", true);

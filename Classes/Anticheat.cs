@@ -23,7 +23,23 @@ namespace stuykserver.Classes
             API.onPlayerHealthChange += API_onPlayerHealthChange;
             API.onPlayerArmorChange += API_onPlayerArmorChange;
             API.onPlayerExitVehicle += API_onPlayerExitVehicle;
+            API.onPlayerEnterVehicle += API_onPlayerEnterVehicle;
             API.onClientEventTrigger += API_onClientEventTrigger;
+        }
+
+        private void API_onPlayerEnterVehicle(Client player, NetHandle vehicle)
+        {
+            if (!API.hasEntityData(player, "CHEAT_LAST_POS"))
+            {
+                return;
+            }
+
+            Vector3 lastPos = (Vector3)API.getEntityData(player, "CHEAT_LAST_POS");
+            if (lastPos.DistanceTo(API.getEntityPosition(vehicle)) >= 3f)
+            {
+                API.kickPlayer(player, msgTeleportHacks);
+                return;
+            }
         }
 
         private void API_onClientEventTrigger(Client sender, string eventName, params object[] arguments)
@@ -37,35 +53,50 @@ namespace stuykserver.Classes
         private void API_onPlayerExitVehicle(Client player, NetHandle vehicle)
         {
             API.setEntityData(player, "CHEAT_LAST_POS", player.position);
+
+            Vector3 velocity = API.getPlayerVelocity(player);
+            float squaredSpeed = Convert.ToSingle(Math.Sqrt((velocity.X * velocity.X) + (velocity.Y * velocity.Y) + (velocity.Z * velocity.Z)));
+            if (squaredSpeed > 10)
+            {
+                API.setEntityData(player, "CHEAT_ROLLING_OUT", true);
+            }
         }
 
         private void API_onPlayerArmorChange(Client player, int oldValue)
         {
-            if (API.hasEntityData(player, "CHEAT_ARMOR"))
+            if (API.hasEntityData(player, "PlayerID"))
             {
-                if (player.armor > Convert.ToInt32(API.getEntityData(player, "CHEAT_ARMOR")))
+                if (API.hasEntityData(player, "CHEAT_ARMOR"))
                 {
-                    API.setPlayerArmor(player, Convert.ToInt32(API.getEntityData(player, "CHEAT_ARMOR")));
-                    return;
-                }
+                    if (API.getPlayerArmor(player) > Convert.ToInt32(API.getEntityData(player, "CHEAT_ARMOR")))
+                    {
+                        API.setPlayerArmor(player, Convert.ToInt32(API.getEntityData(player, "CHEAT_ARMOR")));
+                        API.setEntityData(player, "CHEAT_ARMOR", player.armor);
+                        API.consoleOutput("Possible Armor Hack at {0}", player.name);
+                        return;
+                    }
 
-                API.setEntityData(player, "CHEAT_ARMOR", player.armor);
-                API.sendNativeToPlayer(player, (long)Hash.SET_ENTITY_INVINCIBLE, player, false);
+                    API.setEntityData(player, "CHEAT_ARMOR", player.armor);
+                }
             }
         }
 
         private void API_onPlayerHealthChange(Client player, int oldValue)
         {
-            if (API.hasEntityData(player, "CHEAT_HEALTH"))
+            if (API.hasEntityData(player, "PlayerID"))
             {
-                if (player.health > Convert.ToInt32(API.getEntityData(player, "CHEAT_HEALTH")))
+                if (API.hasEntityData(player, "CHEAT_HEALTH"))
                 {
-                    API.setPlayerHealth(player, Convert.ToInt32(API.getEntityData(player, "CHEAT_HEALTH")));
-                    return;
-                }
+                    if (API.getPlayerHealth(player) > Convert.ToInt32(API.getEntityData(player, "CHEAT_HEALTH")))
+                    {
+                        API.setPlayerHealth(player, Convert.ToInt32(API.getEntityData(player, "CHEAT_HEALTH")));
+                        API.setEntityData(player, "CHEAT_HEALTH", player.health);
+                        API.consoleOutput("Possible Health Hack at {0}", player.name);
+                        return;
+                    }
 
-                API.setEntityData(player, "CHEAT_HEALTH", player.health);
-                API.sendNativeToPlayer(player, (long)Hash.SET_ENTITY_INVINCIBLE, player, false);
+                    API.setEntityData(player, "CHEAT_HEALTH", player.health);
+                }
             }
         }
 
@@ -83,13 +114,16 @@ namespace stuykserver.Classes
             List<Client> players = API.getAllPlayers();
             foreach (Client player in players)
             {
-                scanTeleportChanges(player);
-                scanVelocity(player);
-                scanModelChanges(player);
-                
-                if (player.isInVehicle)
+                if (API.hasEntityData(player, "PlayerID"))
                 {
-                    scanHighVehicleHealth(player);
+                    scanTeleportChanges(player);
+                    scanVelocity(player);
+                    scanModelChanges(player);
+
+                    if (player.isInVehicle)
+                    {
+                        scanHighVehicleHealth(player);
+                    }
                 }
             }
         }
@@ -132,28 +166,24 @@ namespace stuykserver.Classes
                 }
             }
 
-            if (!player.isInVehicle)
+            if (!player.isInVehicle && !API.isPlayerParachuting(player) && !API.isPlayerInFreefall(player))
             {
                 Vector3 velocity = API.getPlayerVelocity(player);
+                float squaredSpeed = Convert.ToSingle(Math.Sqrt((velocity.X * velocity.X) + (velocity.Y * velocity.Y) + (velocity.Z * velocity.Z)));
 
-                if (velocity.X > 10f)
+                if (API.hasEntityData(player, "CHEAT_ROLLING_OUT"))
                 {
-                    Vector3 lastPos = API.getEntityData(player, "CHEAT_LAST_POS");
-                    API.setEntityPosition(player, lastPos);
-                    return;
+                    if (API.getEntityData(player, "CHEAT_ROLLING_OUT"))
+                    {
+                        API.setEntityData(player, "CHEAT_ROLLING_OUT", false);
+                        return;
+                    }
                 }
-
-                if (velocity.Y > 10f)
+                
+                if (squaredSpeed > 7.2)
                 {
-                    Vector3 lastPos = API.getEntityData(player, "CHEAT_LAST_POS");
-                    API.setEntityPosition(player, lastPos);
-                    return;
-                }
-
-                if (velocity.Z > 10f)
-                {
-                    Vector3 lastPos = API.getEntityData(player, "CHEAT_LAST_POS");
-                    API.setEntityPosition(player, lastPos);
+                    Vector3 pos = API.getEntityData(player, "CHEAT_LAST_POS");
+                    API.setEntityPosition(player, pos);
                     return;
                 }
             }
