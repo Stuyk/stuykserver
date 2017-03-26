@@ -58,6 +58,7 @@ namespace stuykserver.Util
                 // Custom Camera
                 if (shop.returnCameraCenterPoint() != new Vector3(0, 0, 0) && shop.returnCameraPoint() != new Vector3(0, 0, 0))
                 {
+                    API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                     API.setEntityPosition(player, shop.returnCameraCenterPoint());
                     API.triggerClientEvent(player, "startBrowsing", Convert.ToString(API.getEntityData(player, "Collision")), Convert.ToInt32(API.getEntityData(player, "PlayerID")), shop.returnCameraCenterPoint());
                     API.triggerClientEvent(player, "createCamera", shop.returnCameraPoint(), shop.returnCameraCenterPoint());
@@ -65,6 +66,7 @@ namespace stuykserver.Util
                 }
 
                 // Default Camera
+                API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.setEntityPosition(player, new Vector3(198.9816, -1000.94, -98));
                 API.triggerClientEvent(player, "startBrowsing", Convert.ToString(API.getEntityData(player, "Collision")), Convert.ToInt32(API.getEntityData(player, "PlayerID")), new Vector3(198.9816, -1000.94, -98));
                 API.triggerClientEvent(player, "createCamera", new Vector3(206.339, -1000.967, -98.5), new Vector3(198.9816, -1000.94, -98));
@@ -85,6 +87,7 @@ namespace stuykserver.Util
         {
             Vector3 returnPosition = (Vector3)API.getEntityData(player, "ReturnPosition");
             db.setPlayerHUD(player, true);
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             API.setEntityPosition(player, returnPosition);
             API.setEntityDimension(player, 0);
             API.stopPlayerAnimation(player);

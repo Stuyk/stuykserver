@@ -36,6 +36,13 @@ namespace stuykserver.Util
             }
 
             addActiveShooter(player);
+
+            List<Client> victims = API.getPlayersInRadiusOfPlayer(50f, player);
+            foreach (Client victim in victims)
+            {
+                API.triggerClientEvent(player, "pushShooterBlip", API.getEntityPosition(player), 23, 84); // Position, Color, Sprite.
+            }
+            
         }
 
         public void addActiveShooter(Client player)

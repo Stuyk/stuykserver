@@ -67,6 +67,7 @@ namespace stuykserver.Util
             // Custom
             if (shop.returnCameraCenterPoint() != new Vector3(0, 0, 0) && shop.returnCameraPoint() != new Vector3(0, 0, 0))
             {
+                API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.setEntityPosition(player.vehicle, shop.returnCameraCenterPoint());
                 API.setPlayerIntoVehicle(player, playerVehicle, -1);
                 API.triggerClientEvent(player, "createCamera", shop.returnCameraPoint(), shop.returnCameraCenterPoint());
@@ -77,6 +78,7 @@ namespace stuykserver.Util
 
             // Default
             //API.setEntityPosition(player.vehicle, new Vector3(-1156.071, -2005.241, 13.18026));
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             API.setPlayerIntoVehicle(player, playerVehicle, -1);
             API.setEntityRotation(playerVehicle, new Vector3(0, 0, -112));
             API.setEntityPosition(playerVehicle, new Vector3(-362.5943, -132.8663, 38.68052));
@@ -124,6 +126,7 @@ namespace stuykserver.Util
 
         public void actionForceOutOfShop(Client player)
         {
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             Vector3 returnPoint = (Vector3)API.getEntityData(player, "ReturnPosition");
             API.setEntityPosition(player, returnPoint);
             API.setEntityDimension(player, 0);
@@ -144,6 +147,7 @@ namespace stuykserver.Util
             if (API.getEntityData(player, "ExitPoint") != null)
             {
                 Vector3 exitPoint = (Vector3)API.getEntityData(player, "ExitPoint");
+                API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.setEntityPosition(player.vehicle, exitPoint);
                 API.setEntityDimension(player.vehicle, 0);
                 API.setEntityDimension(player, 0);
@@ -154,6 +158,7 @@ namespace stuykserver.Util
             }
 
             Vector3 returnPoint = (Vector3)API.getEntityData(player, "ReturnPosition");
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             API.setEntityPosition(player.vehicle, returnPoint);
             API.setEntityDimension(player.vehicle, 0);
             API.setEntityDimension(player, 0);

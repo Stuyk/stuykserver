@@ -55,6 +55,7 @@ namespace stuykserver.Util
                 // IF CUSTOM CAMERA
                 if (shop.returnCameraCenterPoint() != new Vector3(0, 0, 0) && shop.returnCameraPoint() != new Vector3(0, 0, 0))
                 {
+                    API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                     API.setEntityPosition(player, shop.returnCameraCenterPoint());
                     API.triggerClientEvent(player, "createCamera", shop.returnCameraPoint(), player.position);
                     API.triggerClientEvent(player, "openSkinPanel", player.handle);
@@ -64,6 +65,7 @@ namespace stuykserver.Util
                 }
 
                 // ELSE DEFAULT CAMERA
+                API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.setEntityPosition(player, new Vector3(-1279.177, -1118.023, 6.990117));
                 API.triggerClientEvent(player, "createCamera", new Vector3(-1281.826, -1118.141, 7.5), player.position);
                 API.triggerClientEvent(player, "openSkinPanel", player.handle);
@@ -77,6 +79,7 @@ namespace stuykserver.Util
             Vector3 returnPosition = (Vector3)API.getEntityData(player, "ReturnPosition");
             db.setPlayerHUD(player, true);
             API.setEntityDimension(player, 0);
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             API.setEntityPosition(player, returnPosition);
             API.stopPlayerAnimation(player);
             API.stopPedAnimation(player);

@@ -343,6 +343,7 @@ namespace stuykserver.Util
             API.setEntityData(player, "IsInInterior", true); // Set IsInInterior
             API.setEntityData(player, "InteriorInstance", instance); // Set House Instance
             API.requestIpl(instance.returnType().ToString());
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             API.setEntityDimension(player, instance.returnID());
             API.setEntityPosition(player, instance.returnExitPosition());
         }
@@ -351,6 +352,7 @@ namespace stuykserver.Util
         public void actionHouseExit(Client player)
         {
             API.call("ChatHandler", "cmdChatMe", player, "grabs the door, opens it, and exits the building.");
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             API.setEntityPosition(player, (Vector3)API.getEntityData(player, "ReturnPosition"));
             API.setEntityDimension(player, 0);
             API.setEntityData(player, "ReturnPosition", null); // Set Return Position

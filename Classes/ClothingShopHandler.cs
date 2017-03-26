@@ -48,6 +48,7 @@ namespace stuykserver.Util
                 Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
                 if (shop.returnCameraCenterPoint() != new Vector3(0, 0, 0) && shop.returnCameraPoint() != new Vector3(0, 0, 0))
                 {
+                    API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                     API.setEntityPosition(player, shop.returnCameraCenterPoint());
                     API.triggerClientEvent(player, "createCamera", shop.returnCameraPoint(), player.position);
                     API.triggerClientEvent(player, "openClothingPanel");
@@ -55,6 +56,7 @@ namespace stuykserver.Util
                     API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
                     return;
                 }
+                API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
                 API.triggerClientEvent(player, "createCamera", new Vector3(-1190.004, -766.2875, 17.3196), player.position);
                 API.triggerClientEvent(player, "openClothingPanel");
@@ -68,6 +70,7 @@ namespace stuykserver.Util
         {
             Vector3 returnPosition = (Vector3)API.getEntityData(player, "ReturnPosition");
             db.setPlayerHUD(player, true);
+            API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             API.setEntityPosition(player, returnPosition);
             API.setEntityDimension(player, 0);
             API.stopPlayerAnimation(player);

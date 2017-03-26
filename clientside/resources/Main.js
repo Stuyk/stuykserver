@@ -23,13 +23,22 @@ activeShooter = false;
 // BLIP HANDLER
 // ################
 var activeBlips = [];
+var activeShooterBlips = [];
+var blip = null;
 class blipHandler {
 	constructor (position, color, sprite)
 	{
-		var blip = API.createBlip(position);
+		blip = API.createBlip(position);
 		API.setBlipSprite(blip, sprite);
 		API.setBlipColor(blip, color);
+	}
+
+	pushToActive() {
 		activeBlips.push(blip);
+	}
+	
+	pushToShooter() {
+		activeShooterBlips.push(blip);
 	}
 }
 
@@ -280,7 +289,13 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	}
 	
 	if (eventName == "pushBlip") {
-		var newHandler = new blipHandler(args[0], args[1], args[2]);
+		var blipHandle = new blipHandler(args[0], args[1], args[2]);
+		blipHandle.pushToActive(blipHandle);
+	}
+	
+	if (eventName == "pushShooterBlip") {
+		var blipHandle = new blipHandler(args[0], args[1], args[2]);
+		blipHandle.pushToShooter(blipHandle);
 	}
 	
 	if (eventName == "removeBlips") {
