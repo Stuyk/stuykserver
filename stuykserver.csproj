@@ -64,6 +64,7 @@
     <Compile Include="Classes\RepairShopHandler.cs" />
     <Compile Include="Classes\ShopHandler.cs" />
     <Compile Include="Classes\Shop.cs" />
+    <Compile Include="Classes\Time.cs" />
     <Compile Include="Classes\VehicleClass.cs" />
     <Compile Include="Jobs\BodyGuard.cs" />
     <Compile Include="Jobs\EMT.cs" />
