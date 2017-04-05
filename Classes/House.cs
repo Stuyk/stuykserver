@@ -116,6 +116,8 @@ namespace stuykserver.Classes
         {
             // House Entrance
             houseEntryCollision = API.createCylinderColShape(houseEntry, 1f, 1f);
+            houseEntryCollision.setData("Type", "House");
+            houseEntryCollision.setData("Instance", this);
 
             // Blip
             houseBlip = API.createBlip(houseEntry);
@@ -124,6 +126,8 @@ namespace stuykserver.Classes
             // House Exit
             houseExit = HouseLocations[houseType];
             houseExitCollision = API.createCylinderColShape(houseExit, 1f, 1f);
+            houseExitCollision.setData("Type", "House");
+            houseExitCollision.setData("Instance", this);
 
             // Change Blip Marker
             if (forSale)

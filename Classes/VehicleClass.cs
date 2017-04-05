@@ -82,6 +82,8 @@ namespace stuykserver.Classes
             };
 
             vehicleCollision = API.createCylinderColShape(vehiclePosition, 3f, 3f); // Vehicle Collision
+            vehicleCollision.setData("Instance", this);
+            vehicleCollision.setData("Type", "Vehicle");
             API.setVehicleCustomPrimaryColor(vehicle, rgb[0], rgb[1], rgb[2]);
             API.setVehicleCustomSecondaryColor(vehicle, srgb[0], srgb[1], srgb[2]);
             API.setVehicleEngineStatus(vehicle, false);
@@ -301,6 +303,8 @@ namespace stuykserver.Classes
         {
             vehicleCollision = collision;
             vehiclePosition = position;
+            vehicleCollision.setData("Instance", this);
+            vehicleCollision.setData("Type", "Vehicle");
         }
 
         public void vehicleKeysAdd(Client player)

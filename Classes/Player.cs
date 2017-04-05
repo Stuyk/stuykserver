@@ -114,7 +114,8 @@ namespace stuykserver.Classes
             API.setEntityData(playerClient, "AlreadyDied", false);
             API.setEntityData(playerClient, "ActiveShooter", false);
             API.setEntityData(playerClient, "CHEAT_ALLOW_TELEPORT", false);
-            
+
+            API.setEntityData(playerClient, "Instance", this); // Setup our instance with this.
         }
 
         public void savePlayerLogOut()

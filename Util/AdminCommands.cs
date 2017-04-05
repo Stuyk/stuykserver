@@ -48,6 +48,17 @@ namespace stuykserver.Util
             }
         }
 
+        [Command("setcamera")]
+        public void cmdSetCamera(Client player, double amount)
+        {
+            if (amount == 0)
+            {
+                return;
+            }
+
+            API.triggerClientEvent(player, "createCameraAtHeadHeight", new Vector3(player.position.X, player.position.Y, player.position.Z + amount), player.rotation);
+        }
+
         [Command("killcamera")]
         public void cmdKillCamera(Client player)
         {

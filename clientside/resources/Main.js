@@ -42,6 +42,21 @@ class blipHandler {
 	}
 }
 
+// Marker Handler
+var activeMarkers = [];
+var marker = null;
+class markerHandler {
+	constructor (type, position, scale, alpha, r, g, b, rotation)
+	{
+		marker = API.createMarker(type, position, new Vector3(), rotation, scale, r, g, b, alpha);
+	}
+	
+	pushToActive()
+	{
+		activeMarkers.push(marker);
+	}
+}
+
 // CEF Boilerplate
 class CefHelper {
   constructor (resourcePath)
@@ -298,6 +313,19 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		blipHandle.pushToShooter(blipHandle);
 	}
 	
+	if (eventName == "pushMarker") {
+		var markerHandle = new markerHandler(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
+		markerHandle.pushToActive(markerHandle);
+	}
+	
+	if (eventName == "removeMarkers") {
+		for (i = 0; i < activeMarkers.length; i++) {
+			API.deleteEntity(activeMarkers[i]);
+		}
+		
+		activeMarkers = [];
+	}
+	
 	if (eventName == "removeBlips") {
 		for (i = 0; i < activeBlips.length; i++) {
 			API.deleteEntity(activeBlips[i]);
@@ -403,6 +431,11 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		API.pointCameraAtEntity(camera, API.getLocalPlayer(), new Vector3());
 		API.setActiveCamera(camera);
 	}
+	
+	if (eventName == "createCameraAtHeadHeight") {
+		camera = API.createCamera(args[0], args[1]);
+		API.setActiveCamera(camera);
+	}
 
 	// Destroy a camera.
 	if (eventName == "endCamera") {
@@ -422,6 +455,11 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		API.setActiveCamera(null);
 	}
 });
+
+// ON UPDATE
+// ON UPDATE
+// ON UPDATE
+// ON UPDATE
 
 API.onUpdate.connect(function() {
 	var player = API.getLocalPlayer();
@@ -470,129 +508,131 @@ API.onUpdate.connect(function() {
 
 	// USE FUNCTION DISPLAYS
 	if (useFunction != null) {
+		var pointOfDraw = Point.Round(API.worldToScreen(API.getEntityPosition(player)));
+		var playerHeadPoint = new Point(pointOfDraw.X, pointOfDraw.Y - 300);
 		switch (currentCollisionType) {
 			case "Modification":
-				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "FuelPump":
-				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Repair":
-				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 
 			case "Atm":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 
 			case "Fishing":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 
 			case "FishingSale":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 
 			case "Barbershop":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 
 			case "Clothing":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 
 			case "VehicleEngine":
-				API.dxDrawTexture("clientside/resources/images/pressbalt.png", new Point(resX / 2 - 25, resY / 2 - 75), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressbalt.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 
 			case "Vehicle":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 
 			case "House":
-				API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressbalt3.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "ForSale":
-				API.dxDrawTexture("clientside/resources/images/pressbalt3.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressbalt3.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Boats":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Classic":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Commercial":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Compacts":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Coupes":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Bicycles":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Helicopters":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Industrial":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Motorcycles":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "OffRoad":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 			
 			case "Muscle":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 			
 			case "Planes":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Police":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "SUVS":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Sedans":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Sports":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Super":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Utility":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 				
 			case "Vans":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", new Point(resX / 2 - 200, resY / 2 - 125), new Size(200, 125), 1);
+				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
 				break;
 		}
 	}

@@ -20,68 +20,102 @@ namespace stuykserver.Classes
         {
             if (API.getEntityType(entity) == EntityType.Player)
             {
+                // Convert out entity into a player handle.
                 Client player = API.getPlayerFromHandle(entity);
 
-                // All Class Calls
-                Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
-                House house = (House)API.call("HouseHandler", "getHouse", colshape);
-                VehicleClass veh = (VehicleClass)API.call("VehicleHandler", "getVehicle", player, colshape);
-
-                // Shops
-                if (shop != null)
+                // If our collision doesn't have an instance return.
+                if (!colshape.hasData("Instance") && !colshape.hasData("Type"))
                 {
+                    return;
+                }
+
+                // SHOP COLLISION TYPES
+                // If our Collision is of the Shop Type
+                if (colshape.getData("Type") == "Shop")
+                {
+                    // Pull our shop instance.
+                    Shop shop = (Shop)colshape.getData("Instance");
+                    // Let the player know what type of shop this is.
+                    API.sendNotificationToPlayer(player, shop.returnShopMessage());
+
+                    // If the player is not in a vehicle and they're near one of the follow shops, don't let them use it.
                     if (!player.isInVehicle)
                     {
-                        switch (shop.returnShopType().ToString())
+                        switch (shop.returnShopType())
                         {
-                            case "Modification":
+                            case Shop.ShopType.Modification:
                                 API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
                                 return;
-                            case "Repair":
+                            case Shop.ShopType.Repair:
                                 API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
                                 return;
-                            case "FuelPump":
+                            case Shop.ShopType.FuelPump:
                                 API.sendNotificationToPlayer(player, "~r~You must be in a vehicle to access this.");
                                 return;
                         }
                     }
 
-                    API.setEntityData(player, "ShopInstance", shop);
-                    API.setEntityData(player, "Collision", shop.returnShopType().ToString());
+                    // Move on to the rest of the shop handling...
+                    API.setEntityData(player, "Collision", Convert.ToString(shop.returnShopType()));
                     API.setEntityData(player, "ColShape", colshape);
                     API.triggerClientEvent(player, "triggerUseFunction", shop.returnShopType().ToString());
-                    return;
+
+                    if (shop.returnShopOwner() == API.getEntityData(player, "PlayerID"))
+                    {
+                        API.sendNotificationToPlayer(player, "~g~This shop belongs to you.");
+                    }
                 }
 
-                // Outside House
-                if (house != null)
+                // HOUSE COLLISION TYPES
+                // If our collision is of the House Type
+                if (colshape.getData("Type") == "House")
                 {
+                    // If the player is in a vehicle, tell them to fuck off.
+                    if (player.isInVehicle)
+                    {
+                        return;
+                    }
+
+                    // Get our house instance.
+                    House house = (House)colshape.getData("Instance");
+
+                    // When a player is inside an interior and they enter a collision space.
+                    if (API.getEntityData(player, "IsInInterior") == true)
+                    {
+                        API.setEntityData(player, "Collision", house.returnHouseStatus());
+                        API.triggerClientEvent(player, "triggerUseFunction", "House");
+                        return;
+                    }
+
                     API.setEntityData(player, "Collision", house.returnHouseStatus());
                     API.setEntityData(player, "ColShape", house.returnEntryCollision());
                     API.triggerClientEvent(player, "triggerUseFunction", house.returnHouseStatus());
+
+                    if (house.returnHouseOwner() == API.getEntityData(player, "PlayerID"))
+                    {
+                        API.sendNotificationToPlayer(player, "~g~This house belongs to you.");
+                    }
+
                     return;
                 }
-
-                // Vehicle
-                if (veh != null)
+                
+                // VEHICLE COLLISION TYPES
+                // If our collision is of the Vehicle Type
+                if (colshape.getData("Type") == "Vehicle")
                 {
+                    VehicleClass veh = (VehicleClass)colshape.getData("Instance");
+
                     API.setEntityData(player, "Collision", veh.returnCollisionType());
                     API.setEntityData(player, "NearVehicle", veh.returnVehicleID());
                     API.setEntityData(player, "ColShape", veh.returnCollision());
                     API.triggerClientEvent(player, "triggerUseFunction", veh.returnCollisionType());
-                    return;
-                }
 
-                // Interior for Housing + Whatever Else
-                if (API.getEntityData(player, "IsInInterior") == true)
-                {
-                    House instance = (House)API.getEntityData(player, "InteriorInstance");
-                    if (instance != null)
+                    if (veh.returnOwner() == player)
                     {
-                        API.setEntityData(player, "Collision", instance.returnHouseStatus());
-                        API.triggerClientEvent(player, "triggerUseFunction", "House");
-                        return;
+                        API.sendNotificationToPlayer(player, "~g~This vehicle belongs to you.");
                     }
+
+                    return;
                 }
             }
         }
@@ -98,7 +132,6 @@ namespace stuykserver.Classes
                     API.setEntityData(player, "Collision", "None");
                     API.setEntityData(player, "ColShape", null);
                     API.setEntityData(player, "SelectedHouse", null);
-                    API.setEntityData(player, "ShopInstance", null);
                     API.triggerClientEvent(player, "removeUseFunction");
                     if (player.isInVehicle)
                     {

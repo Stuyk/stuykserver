@@ -68,6 +68,8 @@
     <Compile Include="Classes\VehicleClass.cs" />
     <Compile Include="Jobs\BodyGuard.cs" />
     <Compile Include="Jobs\EMT.cs" />
+    <Compile Include="Jobs\Race.cs" />
+    <Compile Include="Jobs\RaceHandler.cs" />
     <Compile Include="Jobs\TradeHandler.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Jobs\Fishing.cs" />

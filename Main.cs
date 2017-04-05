@@ -65,5 +65,11 @@ namespace stuykserver
             API.playSoundFrontEnd(player, "Menu_Accept", "Phone_SoundSet_Default");
             API.sendNotificationToPlayer(player, message);
         }
+
+        [Command("fakemarker")]
+        public void cmdFakeMarker(Client player, int type)
+        {
+            API.createMarker(type, new Vector3(player.position.X, player.position.Y, player.position.Z - 1.5), new Vector3(), new Vector3(), new Vector3(3, 3, 10), 50, 0, 255, 0);
+        }
     }
 }

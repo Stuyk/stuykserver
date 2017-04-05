@@ -42,8 +42,8 @@ namespace stuykserver.Classes
             shopKeys = new List<Client>();
             shopEmployeePayrates = new Dictionary<EmployeeRank, int>();
             shopObjects = new List<GTANetworkServer.Object>();
-            setupBlip();
             setupCollision();
+            setupBlip();
         }
 
         // SHOP OWNERSHIP PROPERTIES
@@ -117,6 +117,9 @@ namespace stuykserver.Classes
         int shopPrice; // Mostly used for HOUSING.
         int shopDimension; // Mostly used for HOUSING.
 
+        //Shop Messages
+        string shopMessage;
+
         public void saveShop()
         {
             string[] varNames = { "PlayerID", "Units", "Money", "ForSale", "Price" };
@@ -132,12 +135,20 @@ namespace stuykserver.Classes
         public void setupCollision()
         {
             collisionShape = API.createCylinderColShape(collisionPosition, range, height);
+            collisionShape.setData("Instance", this);
+            collisionShape.setData("Type", "Shop");
         }
 
         // SHOP ID
         public int returnShopID()
         {
             return shopID;
+        }
+
+        // SHOP MESSAGE
+        public string returnShopMessage()
+        {
+            return shopMessage;
         }
 
         // SHOP OWNER
@@ -336,91 +347,110 @@ namespace stuykserver.Classes
                         API.setBlipSprite(collisionBlip, 108);
                         API.setBlipColor(collisionBlip, 2);
                         textLabel = API.createTextLabel(shopType.ToString(), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "I can make a transaction with a bank here.";
                         break;
                     case ShopType.Barbershop:
                         API.setBlipSprite(collisionBlip, 71);
                         textLabel = API.createTextLabel(shopType.ToString(), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "I can get a haircut here.";
                         break;
                     case ShopType.Motorcycles:
                         API.setBlipSprite(collisionBlip, 226);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Motorcycles around.";
                         break;
                     case ShopType.Helicopters:
                         API.setBlipSprite(collisionBlip, 43);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Helicopters around.";
                         break;
                     case ShopType.Industrial:
                         API.setBlipSprite(collisionBlip, 318);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 20f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Industrial Vehicles around.";
                         break;
                     case ShopType.Commercial:
                         API.setBlipSprite(collisionBlip, 477);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Commercial Vehicles around.";
                         break;
                     case ShopType.Planes:
                         API.setBlipSprite(collisionBlip, 251);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Planes around.";
                         break;
                     case ShopType.Super:
                         API.setBlipSprite(collisionBlip, 147);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Super Vehicles around.";
                         break;
                     case ShopType.Boats:
                         API.setBlipSprite(collisionBlip, 455);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Boats around.";
                         break;
                     case ShopType.OffRoad:
                         API.setBlipSprite(collisionBlip, 512);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Offroad Vehicles around.";
                         break;
                     case ShopType.Vans:
                         API.setBlipSprite(collisionBlip, 67);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Vans around.";
                         break;
                     case ShopType.Bicycles:
                         API.setBlipSprite(collisionBlip, 348);
                         API.setBlipColor(collisionBlip, 73);
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "There appears to be a lot of Bicycles around.";
                         break;
                     case ShopType.Clothing:
                         API.setBlipSprite(collisionBlip, 73);
                         textLabel = API.createTextLabel(shopType.ToString(), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "I could get a new set of clothes here.";
                         break;
                     case ShopType.FishingSale:
                         API.setBlipSprite(collisionBlip, 431);
                         API.setBlipColor(collisionBlip, 42);
                         textLabel = API.createTextLabel("The cooks are looking for fresh fish.", collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "I could probably sell any fish I get here.";
                         break;
                     case ShopType.Fishing:
                         API.setBlipSprite(collisionBlip, 68);
                         API.setBlipColor(collisionBlip, 42);
+                        shopMessage = "I could catch some fish here.";
                         break;
                     case ShopType.Modification:
                         API.setBlipSprite(collisionBlip, 446);
+                        shopMessage = "I could get my vehicle modified here.";
                         break;
                     case ShopType.Repair:
                         API.setBlipSprite(collisionBlip, 402);
                         API.setBlipColor(collisionBlip, 11);
                         textLabel = API.createTextLabel(string.Format("Vehicle {0}s", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
+                        shopMessage = "This seems like a place where I could get my vehicle fixed.";
                         break;
                     case ShopType.FuelPump:
                         API.setBlipSprite(collisionBlip, 361);
                         API.setBlipColor(collisionBlip, 59);
                         textLabel = API.createTextLabel(string.Format("~b~Pump: ~b~{0}/5000 Units", shopUnits), collisionPosition, 10f, 0.8f, true);
+                        shopMessage = "This seems like a place where I could get my vehicle some gas.";
                         break;
                     default:
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);
                         API.setBlipSprite(collisionBlip, 225);
                         API.setBlipColor(collisionBlip, 73);
+                        shopMessage = string.Format("There appears to be a lot of {0} Vehicles around.", shopType.ToString());
                         break;
                 }
                 API.setBlipShortRange(collisionBlip, true);

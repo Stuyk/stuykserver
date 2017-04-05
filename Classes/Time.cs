@@ -57,10 +57,12 @@ namespace stuykserver.Classes
             // If the minutes are at exactly. :00 Let's toss in some weather.
             if (serverTime.Minutes == 0)
             {
+                // Create a random that selects a weather ID from 0 to 8.
                 Random random = new Random();
                 int weatherID = random.Next(0, 8);
                 API.setWeather(weatherID);
 
+                // Let the console know what weather is going on.
                 switch (weatherID)
                 {
                     case 0:
