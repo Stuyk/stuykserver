@@ -36,6 +36,8 @@ namespace stuykserver
         {
             API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             player.position = API.getPlayerFromName(target).position;
+
+            
         }
 
         [Command("getpos")] //Temporary
@@ -57,6 +59,9 @@ namespace stuykserver
         public void cmdClearBlips(Client player)
         {
             API.triggerClientEvent(player, "removeBlips");
+
+            float pos = player.position.DistanceTo(player.position);
+            Vector3 lerp = Vector3.Lerp(player.position, player.position, pos / 2);
         }
 
         // Modified send notificaiton with clientside noise.
@@ -64,12 +69,6 @@ namespace stuykserver
         {
             API.playSoundFrontEnd(player, "Menu_Accept", "Phone_SoundSet_Default");
             API.sendNotificationToPlayer(player, message);
-        }
-
-        [Command("fakemarker")]
-        public void cmdFakeMarker(Client player, int type)
-        {
-            API.createMarker(type, new Vector3(player.position.X, player.position.Y, player.position.Z - 1.5), new Vector3(), new Vector3(), new Vector3(3, 3, 10), 50, 0, 255, 0);
         }
     }
 }

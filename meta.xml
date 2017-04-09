@@ -5,6 +5,8 @@
 
 	<script src="clientside/resources/Main.js" type="client" lang="javascript" />
 	<script src="clientside/resources/Fishing.js" type="client" lang="javascript" />
+	<script src="clientside/resources/Camera.js" type="client" lang="javascript" />
+	<script src="clientside/resources/Arpg.js" type="client" lang="javascript" />
 
 	<file src="clientside/resources/invalidname.html"/>
 	<file src="clientside/resources/dealership.html"/>

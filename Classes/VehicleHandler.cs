@@ -134,6 +134,13 @@ namespace stuykserver.Util
 
             API.sendNativeToPlayer(player, (ulong)Hash.SET_VEHICLE_RADIO_ENABLED, vehicle, false);
 
+            int vehicleClass = API.getVehicleClass((VehicleHash)player.vehicle.model);
+            if (vehicleClass == 15 || vehicleClass == 16)
+            {
+                API.givePlayerWeapon(player, WeaponHash.Parachute, 1, true, true);
+            }
+
+
             // If it's locked, kick them the fuck out.
             if (API.getVehicleLocked(vehicle))
             {

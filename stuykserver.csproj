@@ -55,7 +55,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Anticheat.cs" />
+    <Compile Include="Classes\arpg.cs" />
     <Compile Include="Classes\CollisionHandler.cs" />
+    <Compile Include="Classes\Dice.cs" />
     <Compile Include="Classes\FuelPumpHandler.cs" />
     <Compile Include="Classes\House.cs" />
     <Compile Include="Classes\OrganizationHandler.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="Classes\Time.cs" />
     <Compile Include="Classes\VehicleClass.cs" />
     <Compile Include="Jobs\BodyGuard.cs" />
+    <Compile Include="Jobs\CashDelivery.cs" />
     <Compile Include="Jobs\EMT.cs" />
     <Compile Include="Jobs\Race.cs" />
     <Compile Include="Jobs\RaceHandler.cs" />

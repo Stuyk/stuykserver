@@ -313,6 +313,12 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		blipHandle.pushToShooter(blipHandle);
 	}
 	
+	if (eventName == "popShooterBlip") {
+		for (i = 0; i < activeShooterBlips.length; i++) {
+			API.deleteEntity(activeShooterBlips[i]);
+		}
+	}
+	
 	if (eventName == "pushMarker") {
 		var markerHandle = new markerHandler(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
 		markerHandle.pushToActive(markerHandle);
@@ -456,6 +462,11 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	}
 });
 
+function removeShooterBlip(blip) {
+	API.deleteEntity(blip);
+}
+
+
 // ON UPDATE
 // ON UPDATE
 // ON UPDATE
@@ -463,6 +474,7 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 
 API.onUpdate.connect(function() {
 	var player = API.getLocalPlayer();
+	
 	if (API.returnNative("IS_PED_SHOOTING", 8, player))
 	{
 		API.triggerServerEvent("PedIsShooting");

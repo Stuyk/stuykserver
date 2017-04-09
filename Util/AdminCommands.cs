@@ -141,7 +141,11 @@ namespace stuykserver.Util
         [Command("getweapon")] // Temporary
         public void WeaponCommandGet(Client player, WeaponHash hash)
         {
-            API.givePlayerWeapon(player, hash, 500, true, true);
+            Player instance = (Player)player.getData("Instance");
+            if (instance.isAdmin())
+            {
+                API.givePlayerWeapon(player, hash, 500, true, true);
+            }
         }
 
         [Command("giveadminmoney")] // Admin Command
@@ -179,7 +183,7 @@ namespace stuykserver.Util
         [Command("mx")]
         public void cmdMX(Client player)
         {
-            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            Player instance = (Player)player.getData("Instance");
             if (instance.isAdmin())
             {
                 API.setEntityPosition(player, new Vector3(player.position.X + 5, player.position.Y, player.position.Z));
@@ -189,7 +193,7 @@ namespace stuykserver.Util
         [Command("my")]
         public void cmdMY(Client player)
         {
-            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            Player instance = (Player)player.getData("Instance");
             if (instance.isAdmin())
             {
                 API.setEntityPosition(player, new Vector3(player.position.X, player.position.Y + 5, player.position.Z));
@@ -199,7 +203,7 @@ namespace stuykserver.Util
         [Command("addKarma")] // Only for Self
         public void cmdAdminAddKarma(Client player, int amount)
         {
-            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            Player instance = (Player)player.getData("Instance");
             if (instance.isAdmin())
             {
                 instance.addPlayerKarma(amount);
@@ -209,8 +213,7 @@ namespace stuykserver.Util
         [Command("removeKarma")] // Only for Self
         public void cmdAdminRemoveKarma(Client player, int amount)
         {
-            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
-
+            Player instance = (Player)player.getData("Instance");
             if (instance.isAdmin())
             {
                 instance.removePlayerKarma(amount);
@@ -220,7 +223,7 @@ namespace stuykserver.Util
         [Command("getKarma")] // Only for Self
         public void cmdAdminGetKarma(Client player)
         {
-            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            Player instance = (Player)player.getData("Instance");
             if (instance.isAdmin())
             {
                 API.sendNotificationToPlayer(player, string.Format("{0}'s Karma Is: {1}", player.name, instance.returnPlayerKarma()));
@@ -230,20 +233,18 @@ namespace stuykserver.Util
         [Command("spawncar")]
         public void cmdSpawnCar(Client player, VehicleHash model)
         {
-            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            Player instance = (Player)player.getData("Instance");
             if (instance.isAdmin())
             {
                 var rot = API.getEntityRotation(player.handle);
                 var vehicle = API.createVehicle(model, player.position, new Vector3(0, 0, rot.Z), 0, 0);
-                return;
             }
-            return;
         }
 
         [Command("coords")]
         public void cmdCoords(Client player, float x=0, float y=0, float z=0)
         {
-            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            Player instance = (Player)player.getData("Instance");
             if (instance.isAdmin())
             {
                 Vector3 pos = new Vector3(x, y, z);
@@ -256,7 +257,7 @@ namespace stuykserver.Util
         [Command("wandervehicle")]
         public void cmdCommandWander(Client player)
         {
-            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            Player instance = (Player)player.getData("Instance");
             if (instance.isAdmin())
             {
                 API.sendNativeToPlayer(player, (ulong)Hash.TASK_VEHICLE_DRIVE_WANDER, player, player.vehicle, 40f, 1074528293);

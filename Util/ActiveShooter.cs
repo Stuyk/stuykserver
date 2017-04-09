@@ -40,9 +40,19 @@ namespace stuykserver.Util
             List<Client> victims = API.getPlayersInRadiusOfPlayer(50f, player);
             foreach (Client victim in victims)
             {
-                API.triggerClientEvent(player, "pushShooterBlip", API.getEntityPosition(player), 23, 84); // Position, Color, Sprite.
+                API.triggerClientEvent(victim, "pushShooterBlip", API.getEntityPosition(player), 23, 84); // Position, Color, Sprite.
+                popActiveShooterBlip(victim);
             }
             
+        }
+
+        public void popActiveShooterBlip(Client player)
+        {
+            // 2 Minute Delay before Removing Blips
+            API.delay(120000, true, () =>
+            {
+                API.triggerClientEvent(player, "popShooterBlip");
+            });
         }
 
         public void addActiveShooter(Client player)
