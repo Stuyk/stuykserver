@@ -90,7 +90,6 @@
     <Compile Include="Util\LoginHandler.cs" />
     <Compile Include="Classes\Organization.cs" />
     <Compile Include="Classes\SkinHandler.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="Classes\VehicleHandler.cs" />
     <Compile Include="Classes\VehicleModificationHandler.cs" />
@@ -158,6 +157,9 @@
     <TypeScriptCompile Include="types-gtanetwork\System.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\System.Drawing.dll.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Xilium.CefGlue.dll.d.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

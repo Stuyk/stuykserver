@@ -102,6 +102,7 @@ namespace stuykserver.Util
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
             if (instance.isAdmin())
             {
+                API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.setEntityPosition(player, new Vector3(649.5031, -10.4181, 82.7862));
             }
         }

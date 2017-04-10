@@ -40,6 +40,16 @@ namespace stuykserver.Util
                 purchaseDealershipVehicle(player, arguments[0].ToString());
                 API.triggerClientEvent(player, "endCamera");
             }
+
+            if (eventName == "enterShop")
+            {
+                API.setEntityData(player, "CHEAT_IN_SHOP", true);
+            }
+
+            if (eventName == "leaveShop")
+            {
+                API.setEntityData(player, "CHEAT_IN_SHOP", false);
+            }
         }
 
         // When a player tries to enter a Dealership.

@@ -41,7 +41,7 @@ namespace stuykserver.Classes
             {
                 if (!API.getEntityData(player, "CHEAT_ALLOW_TELEPORT"))
                 {
-                    if (lastPos.DistanceTo(API.getEntityPosition(vehicle)) >= 3f)
+                    if (lastPos.DistanceTo(API.getEntityPosition(vehicle)) >= 50f)
                     {
                         API.kickPlayer(player, msgTeleportHacks);
                     }
@@ -128,13 +128,17 @@ namespace stuykserver.Classes
             {
                 if (API.hasEntityData(player, "PlayerID"))
                 {
-                    scanTeleportChanges(player);
-                    scanVelocity(player);
-                    scanModelChanges(player);
-
-                    if (player.isInVehicle)
+                    //Disable antihack while a player is in a store
+                    if (!API.getEntityData(player, "CHEAT_IN_SHOP"))
                     {
-                        scanHighVehicleHealth(player);
+                        scanTeleportChanges(player);
+                        scanVelocity(player);
+                        scanModelChanges(player);
+
+                        if (player.isInVehicle)
+                        {
+                            scanHighVehicleHealth(player);
+                        }
                     }
                 }
             }

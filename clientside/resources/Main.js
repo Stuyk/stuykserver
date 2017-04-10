@@ -835,6 +835,7 @@ var faceMoles = 0;
 function showModelMenu(player) {
 	pagePanel = new CefHelper("clientside/resources/skinchanger.html");
 	pagePanel.show();
+	API.triggerServerEvent("enterShop");
 	
 	faceGender = Number(API.getEntitySyncedData(player, "GTAO_GENDER"));
 	faceShapeOne = Number(API.getEntitySyncedData(player, "GTAO_SHAPE_FIRST_ID"));
@@ -903,7 +904,8 @@ function changeFaceSave() {
 }
 
 function changeFaceExit() {
-	API.triggerServerEvent("exitFace");
+    API.triggerServerEvent("exitFace");
+    API.triggerServerEvent("leaveShop");
 }
 
 function changeUpdateFace() {
@@ -1245,10 +1247,12 @@ var clothingAccessory = null;
 function showClothingPanel() {
 	pagePanel = new CefHelper("clientside/resources/clothingpanel.html");
 	pagePanel.show();
+	API.triggerServerEvent("enterShop");
 }
 
 function changeClothingExitShop() {
-	API.triggerServerEvent("exitClothingShop");
+    API.triggerServerEvent("exitClothingShop");
+    API.triggerServerEvent("leaveShop");
 }
 
 function clothingPassLocalVariableUpdate(player) {
@@ -2198,9 +2202,12 @@ function showDealership() {
 		pagePanel = new CefHelper("clientside/resources/dealership.html");
 		pagePanel.show();
 	}
+
+	API.triggerServerEvent("enterShop");
 }
 
 function dealershipLeave() {
+    API.triggerServerEvent("leaveShop");
 	API.triggerServerEvent("leaveDealership");
 	killPanel();
 }
@@ -2210,6 +2217,7 @@ function randomInteger(min, max) {
 }
 
 function startBrowsing(type, dimension, vehPos) {
+	    API.triggerServerEvent("enterShop");
 	vehicleSelectionDimension = dimension;
 	vehiclePosition = vehPos
 	switch (type) {
