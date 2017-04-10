@@ -70,5 +70,11 @@ namespace stuykserver
             API.playSoundFrontEnd(player, "Menu_Accept", "Phone_SoundSet_Default");
             API.sendNotificationToPlayer(player, message);
         }
+
+        [Command("clothingmenu")]
+        public void cmdShowClothingMenu(Client player)
+        {
+            API.triggerClientEvent(player, "displayClothingMenu");
+        }
     }
 }

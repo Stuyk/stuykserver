@@ -108,18 +108,6 @@
     <None Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="types-gtanetwork\Declarations.d.ts" />
-    <TypeScriptCompile Include="types-gtanetwork\Enums.ts" />
-    <TypeScriptCompile Include="types-gtanetwork\GTANetwork.dll.d.ts" />
-    <TypeScriptCompile Include="types-gtanetwork\GTANetworkShared.dll.d.ts" />
-    <TypeScriptCompile Include="types-gtanetwork\index.d.ts" />
-    <TypeScriptCompile Include="types-gtanetwork\NativeUI.dll.d.ts" />
-    <TypeScriptCompile Include="types-gtanetwork\ScriptHookVDotNet.dll.d.ts" />
-    <TypeScriptCompile Include="types-gtanetwork\System.d.ts" />
-    <TypeScriptCompile Include="types-gtanetwork\System.Drawing.dll.d.ts" />
-    <TypeScriptCompile Include="types-gtanetwork\Xilium.CefGlue.dll.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="clientside\ActiveShooter.js" />
     <Content Include="clientside\Main.js" />
     <Content Include="clientside\MoneyDisplay.js" />
@@ -158,7 +146,19 @@
     <Content Include="clientside\WaypointHelper.js" />
     <Content Include="meta.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <TypeScriptCompile Include="clientside\resources\interaction_mode.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\Declarations.d.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\Enums.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\GTANetwork.dll.d.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\GTANetworkShared.dll.d.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\index.d.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\NativeUI.dll.d.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\ScriptHookVDotNet.dll.d.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\System.d.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\System.Drawing.dll.d.ts" />
+    <TypeScriptCompile Include="types-gtanetwork\Xilium.CefGlue.dll.d.ts" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
