@@ -55,7 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Anticheat.cs" />
-    <Compile Include="Classes\arpg.cs" />
     <Compile Include="Classes\CollisionHandler.cs" />
     <Compile Include="Classes\Dice.cs" />
     <Compile Include="Classes\FuelPumpHandler.cs" />
@@ -147,6 +146,7 @@
     <Content Include="meta.xml" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\interaction_mode.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Declarations.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Enums.ts" />

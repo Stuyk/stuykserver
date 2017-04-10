@@ -35,10 +35,22 @@ namespace stuykserver.Classes
             }
 
             Vector3 lastPos = (Vector3)API.getEntityData(player, "CHEAT_LAST_POS");
-            if (lastPos.DistanceTo(API.getEntityPosition(vehicle)) >= 3f)
+
+
+            if (API.hasEntityData(player, "CHEAT_ALLOW_TELEPORT"))
             {
-                API.kickPlayer(player, msgTeleportHacks);
-                return;
+                if (!API.getEntityData(player, "CHEAT_ALLOW_TELEPORT"))
+                {
+                    if (lastPos.DistanceTo(API.getEntityPosition(vehicle)) >= 3f)
+                    {
+                        API.kickPlayer(player, msgTeleportHacks);
+                    }
+                    return;
+                }
+                else
+                {
+                    return;
+                }
             }
         }
 
@@ -104,7 +116,7 @@ namespace stuykserver.Classes
         private void API_onResourceStart()
         {
             Timer timer = new Timer();
-            timer.Interval = 2000;
+            timer.Interval = 5000;
             timer.Enabled = true;
             timer.Elapsed += Timer_ScanAllPlayers;
         }
