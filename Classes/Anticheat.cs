@@ -11,11 +11,11 @@ namespace stuykserver.Classes
 {
     public class Anticheat : Script
     {
-        static string msgAntiCheat = "~y~Anticheat:";
-        static string msgArmorHacks = string.Format("{0} ~o~Armor Hacks", msgAntiCheat);
-        static string msgHealthHacks = string.Format("{0} ~o~Health Hacks", msgAntiCheat);
-        static string msgSpeedHacks = string.Format("{0} ~o~Speed Hacks", msgAntiCheat);
-        static string msgTeleportHacks = string.Format("{0} ~o~Teleport Hacks", msgAntiCheat);
+        static string msgAntiCheat = "Anticheat:";
+        static string msgArmorHacks = string.Format("{0} Armor Hacks", msgAntiCheat);
+        static string msgHealthHacks = string.Format("{0} Health Hacks", msgAntiCheat);
+        static string msgSpeedHacks = string.Format("{0} Speed Hacks", msgAntiCheat);
+        static string msgTeleportHacks = string.Format("{0} Teleport Hacks", msgAntiCheat);
 
         public Anticheat()
         {

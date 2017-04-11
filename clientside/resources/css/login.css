@@ -35,24 +35,33 @@ body {
   text-align: center;
 }
 
-.nav-pills > li.active > a {
-	background-color: #5bc0de;
+.login-container {
+  background: url('../images/login_bg.png');
+    background-attachment: fixed;
+    background-position: 70% 20%;
+  margin-top: 15%;
+  box-shadow: 0 0 30px #000;
+  padding: 25px;
+  z-index: 200;
+  height: 380px;
 }
 
-.nav-pills > li.active > a:hover {
-	background-color: #5bc0de;
+.login-switch {
+  background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url('../images/login_bg.png');
+  background-attachment: fixed;
+  background-position: 70% 20%;
+  margin: 0px 20px;
+  padding: 10px 0 10px;
+  box-shadow: 0 0 10px #000;
 }
 
-.nav-pills > li.active > a:visited {
-	background-color: #5bc0de;
+.login-btn {
+  margin-top: 55px;
+  border-radius: 0;
 }
 
-.nav-pills > li.active > a:active {
-	background-color: #5bc0de;
-}
-
-.nav-pills > li.active > a:link {
-	background-color: #5bc0de;
+.register-btn {
+  border-radius: 0;
 }
 
 .custom-logo-spacer {
@@ -72,12 +81,9 @@ body {
 	width: 100%;
 }
 
-.custom-link {
-	color: #000;
-	background-color: rgba(255,255,255,0.25);
+.custom-link, .custom-link:hover, .custom-link:active {
+	color: #FFF;
 }
-
-
 
 .site-wrapper {
   display: table;
@@ -198,4 +204,13 @@ body {
   .cover-container {
     width: 700px;
   }
+}
+
+input[type=text], input[type=email], input[type=password] {
+  background: rgba(0,0,0,0);
+  color: #FFF;
+  border-radius: 0;
+  border: 0;
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.1);
 }
