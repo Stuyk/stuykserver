@@ -115,6 +115,7 @@ namespace stuykserver.Classes
             API.setEntityData(playerClient, "ActiveShooter", false);
             API.setEntityData(playerClient, "CHEAT_ALLOW_TELEPORT", false);
 
+            API.setEntitySyncedData(playerClient, "StopDraws", false); // Tells main level drawing to draw or not.
             API.setEntityData(playerClient, "Instance", this); // Setup our instance with this.
         }
 

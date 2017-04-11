@@ -487,7 +487,7 @@ API.onUpdate.connect(function() {
     }
 	
 	// SCREEN OVERLAYS
-    if (pagePanel == null) {
+    if (pagePanel === null && !API.getEntitySyncedData(API.getLocalPlayer(), "StopDraws")) {
 		if (currentMoney != null) {
 			API.drawText("$" + currentMoney, 310, resY - 50, 0.5, 50, 211, 82, 255, 4, 0, false, true, 0);
 		}

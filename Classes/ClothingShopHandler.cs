@@ -42,6 +42,7 @@ namespace stuykserver.Util
             {
                 db.setPlayerHUD(player, false);
                 API.setEntityData(player, "ReturnPosition", player.position);
+                API.setEntitySyncedData(player, "StopDraws", true);
                 API.setEntityDimension(player, Convert.ToInt32(API.getEntityData(player, "PlayerID")));
 
                 ColShape colshape = (ColShape)API.getEntityData(player, "ColShape");
@@ -50,20 +51,12 @@ namespace stuykserver.Util
                 {
                     API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                     API.setEntityPosition(player, shop.returnCameraCenterPoint());
-                    //API.triggerClientEvent(player, "createCamera", shop.returnCameraPoint(), player.position);
-                    //API.triggerClientEvent(player, "openClothingPanel");
                     API.triggerClientEvent(player, "setupClothingMode", shop.returnCameraPoint());
-                    //clothingHandler.updateLocalClothingVariables(player);
-                    //API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
                     return;
                 }
                 API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
-                //API.triggerClientEvent(player, "createCamera", new Vector3(-1190.004, -766.2875, 17.3196), player.position);
-                //API.triggerClientEvent(player, "openClothingPanel", );
                 API.triggerClientEvent(player, "setupClothingMode", new Vector3(-1190.004, -766.2875, 17.3196));
-                //clothingHandler.updateLocalClothingVariables(player);
-                //API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
                 return;
             }     
         }
@@ -78,6 +71,7 @@ namespace stuykserver.Util
             API.stopPlayerAnimation(player);
             API.stopPedAnimation(player);
             API.setEntityData(player, "ReturnPosition", null);
+            API.setEntitySyncedData(player, "StopDraws", false);
         }
     }
 }

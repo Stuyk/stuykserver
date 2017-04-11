@@ -96,12 +96,20 @@ API.onUpdate.connect(function () {
         API.setHudVisible(true);
         API.setChatVisible(true);
         API.callNative("CLEAR_PED_TASKS_IMMEDIATELY", API.getLocalPlayer());
+        API.triggerServerEvent("exitClothingShop");
+    }
+    if (API.isDisabledControlJustPressed(23 /* Enter */)) {
+        camera = null;
+        API.setActiveCamera(null);
+        API.setHudVisible(true);
+        API.setChatVisible(true);
+        API.callNative("CLEAR_PED_TASKS_IMMEDIATELY", API.getLocalPlayer());
         API.triggerServerEvent("clothingSave", n_Tops, t_Tops, n_Undershirt, t_Undershirt, n_Torso, n_Legs, t_Legs, n_Feet, t_Feet, n_Accessories, n_Glasses, t_Glasses, n_Bags, t_Bags, n_Mask, t_Mask, t_Torso, n_BodyArmor, t_BodyArmor, t_Accessories, n_Decals, t_Decals, n_Hat, t_Hat);
     }
 });
 function displayText() {
     API.drawRectangle(0, 0, x / 6, y, 0, 0, 0, 150);
-    API.drawText("~b~Keybinds:~w~~n~Change Index - W or S~n~Change Clothing - A or D~n~Change Texture - Q or E~n~Enter - Save~n~Backspace - Exit~n~~b~CurrentIndex:~w~ " + currentIndexName, 20, 20, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Keybinds:~w~~n~Change Index - W or S~n~Change Clothing - A or D~n~Change Texture - Q or E~n~F - Save~n~Backspace/Esc - Exit~n~~b~CurrentIndex:~w~ " + currentIndexName, 20, 20, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
     API.drawText("~b~Hat: ~w~" + n_Hat + "~b~/~w~" + n_Hat_Max + " ~b~||~w~ " + t_Hat + "~b~/~w~" + t_Hat_Max, 20, 250, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
     API.drawText("~b~Mask: ~w~" + n_Mask + "~b~/~w~" + n_Mask_Max + " ~b~||~w~ " + t_Mask + "~b~/~w~" + t_Mask_Max, 20, 285, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
     API.drawText("~b~Glasses: ~w~" + n_Glasses + "~b~/~w~" + n_Glasses_Max + " ~b~||~w~ " + t_Glasses + "~b~/~w~" + t_Glasses_Max, 20, 320, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
