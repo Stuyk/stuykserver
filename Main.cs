@@ -76,5 +76,12 @@ namespace stuykserver
         {
             API.triggerClientEvent(player, "displayClothingMenu");
         }
-    }
+
+        [Command("marker")]
+        public void cmdCreateFakeMarker(Client player)
+        {
+            GTANetworkServer.Object obj = API.createObject(645231946, player.position, player.rotation);
+            API.setEntityTransparency(obj, 0);
+        }
+    }   
 }

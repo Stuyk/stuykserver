@@ -79,6 +79,9 @@ API.onUpdate.connect(function () {
             case Enums.EntityType.Player:
                 API.drawText("~b~[~w~Selected~b~] ~w~" + API.getPlayerName(target), newPointer.X, newPointer.Y, 0.3, 0, 0, 255, 255, 4, 1, false, true, 100);
                 return;
+            case Enums.EntityType.Prop:
+                API.drawText("~b~[~w~Selected~b~] ~w~Marker", newPointer.X, newPointer.Y, 0.3, 0, 0, 255, 255, 4, 1, false, true, 100);
+                return;
         }
     }
 });
@@ -90,7 +93,7 @@ API.onPlayerEnterVehicle.connect(function(entity) {
 function drawRayCast() {
     // Get the player Aimed Position, and create a raycast.
     var aimPos = API.getPlayerAimCoords(API.getLocalPlayer());
-    var rayCast = API.createRaycast(API.getEntityPosition(API.getLocalPlayer()).Add(new Vector3(0, 0, 3)), aimPos, (Enums.IntersectOptions.Vehicles | Enums.IntersectOptions.Peds1), null);
+    var rayCast = API.createRaycast(API.getEntityPosition(API.getLocalPlayer()).Add(new Vector3(0, 0, 3)), aimPos, (Enums.IntersectOptions.Vehicles | Enums.IntersectOptions.Peds1 | Enums.IntersectOptions.Objects), null);
     // If our raycast hits anything.
     if (rayCast.didHitAnything === false) {
         return;
@@ -107,6 +110,9 @@ function drawRayCast() {
             target = rayCast.hitEntity;
             break;
         case Enums.EntityType.Player:
+            target = rayCast.hitEntity;
+            break;
+        case Enums.EntityType.Prop:
             target = rayCast.hitEntity;
             break;
         default:

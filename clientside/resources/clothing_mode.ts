@@ -1,6 +1,7 @@
 ﻿var x = API.getScreenResolutionMantainRatio().Width;
 var y = API.getScreenResolutionMantainRatio().Height;
 var camera = null;
+var cameraHeading = 0;
 var currentIndex = 1;
 var currentIndexName = "Mask";
 // Main Values
@@ -56,15 +57,6 @@ var t_BodyArmor_Max = 0;
 var t_Decals_Max = 0;
 var t_Tops_Max = 0;
 
-API.onChatMessage.connect(function (msg) {
-    if (msg !== "clothing") {
-        return;
-    }
-
-    API.sendChatMessage("CLOTHING TIME MOTHAFUCKA!");
-    setupClothingMode();
-});
-
 API.onUpdate.connect(function () {
     if (camera === null) {
         return;
@@ -89,11 +81,11 @@ API.onUpdate.connect(function () {
         switchClothing(1);
     }
 
-    if (API.isDisabledControlJustPressed(Enums.Controls.MoveUpOnly)) {
+    if (API.isDisabledControlJustPressed(Enums.Controls.MoveDownOnly)) {
         setCurrentIndex(1);
     }
 
-    if (API.isDisabledControlJustPressed(Enums.Controls.MoveDownOnly)) {
+    if (API.isDisabledControlJustPressed(Enums.Controls.MoveUpOnly)) {
         setCurrentIndex(-1);
     }
 
@@ -105,48 +97,46 @@ API.onUpdate.connect(function () {
         switchTexture(1);
     }
 
-    if (API.isDisabledControlPressed(Enums.Controls.LookLeftOnly)) {
-
-    }
-
     if (API.isDisabledControlJustPressed(Enums.Controls.PhoneCancel)) {
         camera = null;
         API.setActiveCamera(null);
         API.setHudVisible(true);
         API.setChatVisible(true);
-        // Save Push Here
+        API.callNative("CLEAR_PED_TASKS_IMMEDIATELY", API.getLocalPlayer());
+        API.triggerServerEvent("clothingSave", n_Tops, t_Tops, n_Undershirt, t_Undershirt, n_Torso, t_Torso, n_Legs, t_Legs, n_Feet, t_Feet, n_Accessories);
     }
 });
 
 function displayText() {
     API.drawRectangle(0, 0, x / 4, y, 0, 0, 0, 150);
     API.drawText("~b~Keybinds:~w~~n~Change Index - W or S~n~Change Clothing - A or D~n~Change Texture - Q or E~n~Enter - Save~n~Backspace - Exit~n~~b~CurrentIndex:~w~ " + currentIndexName, 20, 20, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Face: ~w~" + n_Face + "/" + n_Face_Max, 20, 250, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Mask: ~w~" + n_Mask + "/" + n_Mask_Max, 20, 285, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Hair: ~w~" + n_Hair + "/" + n_Hair_Max, 20, 320, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Torso: ~w~" + n_Torso + "/" + n_Torso_Max, 20, 355, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Legs: ~w~" + n_Legs + "/" + n_Legs_Max, 20, 390, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Bags: ~w~" + n_Bags + "/" + n_Bags_Max, 20, 425, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Feet: ~w~" + n_Feet + "/" + n_Feet_Max, 20, 460, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Accessories: ~w~" + n_Accessories + "/" + n_Accessories_Max, 20, 495, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Undershirt: ~w~" + n_Undershirt + "/" + n_Undershirt_Max, 20, 530, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Body Armor: ~w~" + n_BodyArmor + "/" + n_BodyArmor_Max, 20, 565, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Decals: ~w~" + n_Decals + "/" + n_Decals_Max, 20, 600, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Top: ~w~" + n_Tops + "/" + n_Tops_Max, 20, 635, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    //API.drawText("~b~Face: ~w~" + n_Face + "/" + n_Face_Max, 20, 250, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Mask: ~w~" + n_Mask + "/" + n_Mask_Max + " || " + t_Mask + "/" + t_Mask_Max, 20, 320, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    //API.drawText("~b~Hair: ~w~" + n_Hair + "/" + n_Hair_Max + " || " + t_Hair + "/" + t_Hair_Max, 20, 320, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Torso: ~w~" + n_Torso + "/" + n_Torso_Max + " || " + t_Torso + "/" + t_Torso_Max, 20, 355, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Legs: ~w~" + n_Legs + "/" + n_Legs_Max + " || " + t_Legs + "/" + t_Legs_Max, 20, 390, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Bags: ~w~" + n_Bags + "/" + n_Bags_Max + " || " + t_Bags + "/" + t_Bags_Max, 20, 425, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Feet: ~w~" + n_Feet + "/" + n_Feet_Max + " || " + t_Feet + "/" + t_Feet_Max, 20, 460, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Accessories: ~w~" + n_Accessories + "/" + n_Accessories_Max + " || " + t_Accessories + "/" + t_Accessories_Max, 20, 495, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Undershirt: ~w~" + n_Undershirt + "/" + n_Undershirt_Max + " || " + t_Undershirt + "/" + t_Undershirt_Max, 20, 530, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Body Armor: ~w~" + n_BodyArmor + "/" + n_BodyArmor_Max + " || " + t_BodyArmor + "/" + t_BodyArmor_Max, 20, 565, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Decals: ~w~" + n_Decals + "/" + n_Decals_Max + " || " + t_Decals + "/" + t_Decals_Max, 20, 600, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
+    API.drawText("~b~Top: ~w~" + n_Tops + "/" + n_Tops_Max + " || " + t_Tops + "/" + t_Tops_Max, 20, 635, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
 }
 
-function setupClothingMode() {
+function setupClothingMode(cameraPosition) {
     API.setHudVisible(false);
     API.setChatVisible(false);
-
-    camera = API.createCamera(API.getEntityPosition(API.getLocalPlayer()), new Vector3());
-    API.attachCameraToEntity(camera, API.getLocalPlayer(), new Vector3(0, 3, 0));
+    camera = API.createCamera(cameraPosition, new Vector3());
     API.pointCameraAtEntity(camera, API.getLocalPlayer(), new Vector3(0.5, 0, 0));
     API.setActiveCamera(camera);
+    getPlayerClothing();
 
-    n_Face_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0);
+    API.callNative("TASK_TURN_PED_TO_FACE_COORD", API.getLocalPlayer(), cameraPosition.X, cameraPosition.Y, cameraPosition.Z, -1);
+
+    //n_Face_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0);
     n_Mask_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 1);
-    n_Hair_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 2);
+    //n_Hair_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 2);
     n_Torso_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 3);
     n_Legs_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 4);
     n_Bags_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 5);
@@ -163,60 +153,59 @@ function adjustCameraFOV(amount) {
 }
 
 function setCurrentIndex(amount) {
-    if (currentIndex + amount === -1 || currentIndex + amount === 12) {
+    if (currentIndex + amount === 0 || currentIndex + amount === 12) {
         return;
     }
 
+    var lastIndex = currentIndex;
     currentIndex += amount;
 
     switch (currentIndex) {
         case 0:
             currentIndexName = "Face";
-            t_Face = 0;
             break;
         case 1:
             currentIndexName = "Mask";
-            t_Mask = 0;
             break;
         case 2:
-            currentIndexName = "Hair";
-            t_Hair = 0;
+            //currentIndexName = "Hair";
+            if (lastIndex === 1) {
+                currentIndex = 3;
+                currentIndexName = "Torso";
+                break;
+            }
+
+            if (lastIndex === 3) {
+                currentIndex = 1;
+                currentIndexName = "Mask";
+            }
             break;
         case 3:
             currentIndexName = "Torso";
-            t_Torso = 0;
             break;
         case 4:
             currentIndexName = "Legs";
-            t_Legs = 0;
             break;
         case 5:
             currentIndexName = "Bags & Backpacks";
-            t_Bags = 0;
             break;
         case 6:
             currentIndexName = "Feet";
-            t_Feet = 0;
             break;
         case 7:
             currentIndexName = "Accessories";
-            t_Accessories = 0;
             break;
         case 8:
             currentIndexName = "Undershirt";
-            t_Undershirt = 0;
             break;
         case 9:
             currentIndexName = "Body Armor";
-            t_BodyArmor = 0;
             break;
         case 10:
             currentIndexName = "Decals";
-            t_Decals = 0;
             break;
         case 11:
             currentIndexName = "Tops";
-            t_Tops = 0;
             break;
     }
 }
@@ -227,60 +216,73 @@ function switchClothing(amount) {
             n_Face += amount;
             n_Face = checkForZeroOrMax(n_Face, n_Face_Max);
             t_Face_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Face);
+            t_Face = 0;
             break;
         case 1:
             n_Mask += amount;
             n_Mask = checkForZeroOrMax(n_Mask, n_Mask_Max);
-            t_Mask_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Mask);
+            t_Mask_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 1, n_Mask);
+            t_Mask = 0;
             break;
         case 2:
-            n_Hair += amount;
-            n_Hair = checkForZeroOrMax(n_Hair, n_Hair_Max);
-            t_Hair_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Hair);
+            //n_Hair += amount;
+            //n_Hair = checkForZeroOrMax(n_Hair, n_Hair_Max);
+            //t_Hair_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 2, n_Hair);
+            //t_Hair = 0;
             break;
         case 3:
             n_Torso += amount;
             n_Torso = checkForZeroOrMax(n_Torso, n_Torso_Max);
-            t_Torso_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Torso);
+            t_Torso_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 3, n_Torso);
+            t_Torso = 0;
             break;
         case 4:
             n_Legs += amount;
             n_Legs = checkForZeroOrMax(n_Legs, n_Legs_Max);
-            t_Legs_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Legs);
+            t_Legs_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 4, n_Legs);
+            t_Legs = 0;
             break;
         case 5:
             n_Bags += amount;
             n_Bags = checkForZeroOrMax(n_Bags, n_Bags_Max);
-            t_Bags_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Bags);
+            t_Bags_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 5, n_Bags);
+            t_Bags = 0;
             break;
         case 6:
             n_Feet += amount;
             n_Feet = checkForZeroOrMax(n_Feet, n_Feet_Max);
-            t_Feet_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Feet);
+            t_Feet_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 6, n_Feet);
+            t_Feet = 0;
             break;
         case 7:
             n_Accessories += amount;
             n_Accessories = checkForZeroOrMax(n_Accessories, n_Accessories_Max);
-            t_Accessories_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Accessories);
+            t_Accessories_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 7, n_Accessories);
+            t_Accessories = 0;
             break;
         case 8:
             n_Undershirt += amount;
             n_Undershirt = checkForZeroOrMax(n_Undershirt, n_Undershirt_Max);
-            t_Undershirt_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Undershirt);
+            t_Undershirt_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 8, n_Undershirt);
+            t_Accessories = 0;
             break;
         case 9:
             n_BodyArmor += amount;
             n_BodyArmor = checkForZeroOrMax(n_BodyArmor, n_BodyArmor_Max);
-            t_BodyArmor_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_BodyArmor);
+            t_BodyArmor_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 9, n_BodyArmor);
+            t_BodyArmor = 0;
             break;
         case 10:
             n_Decals += amount;
             n_Decals = checkForZeroOrMax(n_Decals, n_Decals_Max);
-            t_Decals_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 0, n_Decals);
+            t_Decals_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 10, n_Decals);
+            t_Decals = 0;
             break;
         case 11:
             n_Tops += amount;
             t_Tops_Max = checkForZeroOrMax(n_Tops, n_Tops_Max);
+            t_Tops_Max = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 11, n_Tops);
+            t_Tops = 0;
             break;
     }
     updateClothing();
@@ -297,8 +299,6 @@ function switchTexture(amount) {
             t_Mask = checkForZeroOrMax(t_Mask, t_Mask_Max);
             break;
         case 2:
-            t_Hair += amount;
-            t_Hair = checkForZeroOrMax(t_Hair, t_Hair_Max);
             break;
         case 3:
             t_Torso += amount;
@@ -356,17 +356,42 @@ function checkForZeroOrMax(current, max) {
 }
 
 function updateClothing() {
-    var player = API.getLocalPlayer();
-    API.setPlayerClothes(player, 0, n_Face, t_Face);
-    API.setPlayerClothes(player, 1, n_Mask, t_Mask);
-    API.setPlayerClothes(player, 2, n_Hair, t_Hair);
-    API.setPlayerClothes(player, 3, n_Torso, t_Torso);
-    API.setPlayerClothes(player, 4, n_Legs, t_Legs);
-    API.setPlayerClothes(player, 5, n_Bags, t_Bags);
-    API.setPlayerClothes(player, 6, n_Feet, t_Feet);
-    API.setPlayerClothes(player, 7, n_Accessories, t_Accessories);
-    API.setPlayerClothes(player, 8, n_Undershirt, t_Undershirt);
-    API.setPlayerClothes(player, 9, n_BodyArmor, t_BodyArmor);
-    API.setPlayerClothes(player, 10, n_Decals, t_Decals);
-    API.setPlayerClothes(player, 11, n_Tops, t_Tops);
+    API.setPlayerClothes(API.getLocalPlayer(), 0, n_Face, t_Face);
+    API.setPlayerClothes(API.getLocalPlayer(), 1, n_Mask, t_Mask);
+    //API.setPlayerClothes(player, 2, n_Hair, t_Hair);
+    API.setPlayerClothes(API.getLocalPlayer(), 3, n_Torso, t_Torso);
+    API.setPlayerClothes(API.getLocalPlayer(), 4, n_Legs, t_Legs);
+    API.setPlayerClothes(API.getLocalPlayer(), 5, n_Bags, t_Bags);
+    API.setPlayerClothes(API.getLocalPlayer(), 6, n_Feet, t_Feet);
+    API.setPlayerClothes(API.getLocalPlayer(), 7, n_Accessories, t_Accessories);
+    API.setPlayerClothes(API.getLocalPlayer(), 8, n_Undershirt, t_Undershirt);
+    API.setPlayerClothes(API.getLocalPlayer(), 9, n_BodyArmor, t_BodyArmor);
+    API.setPlayerClothes(API.getLocalPlayer(), 10, n_Decals, t_Decals);
+    API.setPlayerClothes(API.getLocalPlayer(), 11, n_Tops, t_Tops);
+}
+
+function getPlayerClothing() {
+    n_Mask = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingMask"));
+    //n_Hair = Number(API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_HAIRSTYLE"));
+    n_Torso = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingTorso"));
+    n_Legs = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingLegs"));
+    n_Bags = 0;
+    n_Feet = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingShoes"));
+    n_Accessories = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingAccessory"));
+    n_Undershirt = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingUndershirt"));
+    n_BodyArmor = 0;
+    n_Decals = 0;
+    n_Tops = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingTop"));
+
+    t_Mask = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingMaskColor"));
+    //t_Hair = Number(API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_HAIRSTYLE"));
+    t_Torso = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingTorsoColor"));
+    t_Legs = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingLegsColor"));
+    t_Bags = 0;
+    t_Feet = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingShoesColor"));
+    t_Accessories = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingAccessory"));
+    t_Undershirt = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingUndershirtColor"));
+    t_BodyArmor = 0;
+    t_Decals = 0;
+    t_Tops = Number(API.getEntitySyncedData(API.getLocalPlayer(), "clothingTopColor"));
 }

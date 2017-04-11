@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
+    <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\interaction_mode.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Declarations.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Enums.ts" />

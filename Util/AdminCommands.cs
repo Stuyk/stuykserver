@@ -113,6 +113,7 @@ namespace stuykserver.Util
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
             if (instance.isAdmin())
             {
+                API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.setPlayerToSpectatePlayer(player, API.getPlayerFromName(target));
                 API.sendNotificationToPlayer(player, "You are now spectating " + target);
             }
@@ -124,6 +125,7 @@ namespace stuykserver.Util
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
             if (instance.isAdmin())
             {
+                API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.unspectatePlayer(player);
             }
 

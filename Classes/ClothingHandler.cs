@@ -75,7 +75,6 @@ namespace stuykserver.Util
             updateClothingForPlayer(player);
 
             API.call("ClothingShopHandler", "leaveClothingShop", player);
-            API.triggerClientEvent(player, "killPanel");
             API.triggerClientEvent(player, "endCamera");
             API.stopPedAnimation(player);
             API.stopPlayerAnimation(player);
