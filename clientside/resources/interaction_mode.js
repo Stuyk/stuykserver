@@ -118,6 +118,12 @@ function drawRayCast() {
     }
 }
 function taskEnterVehicle(seat) {
+    if (API.getVehicleLocked(target)) {
+        return;
+    }
+    if (API.returnNative("GET_VEHICLE_DOORS_LOCKED_FOR_PLAYER", 8 /* Bool */, target, API.getLocalPlayer())) {
+        return;
+    }
     if (seat === 0) {
         var maxSeats = API.returnNative("GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS", 0 /* Int */, target);
         API.sendChatMessage("" + maxSeats);

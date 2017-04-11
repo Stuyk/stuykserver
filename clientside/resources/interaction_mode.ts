@@ -122,6 +122,14 @@ function drawRayCast() {
 }
 
 function taskEnterVehicle(seat) {
+    if (API.getVehicleLocked(target)) {
+        return;
+    }
+
+    if (API.returnNative("GET_VEHICLE_DOORS_LOCKED_FOR_PLAYER", Enums.NativeReturnTypes.Bool, target, API.getLocalPlayer())) {
+        return;
+    }
+
     if (seat === 0) {
         var maxSeats = API.returnNative("GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS", Enums.NativeReturnTypes.Int, target);
         API.sendChatMessage("" + maxSeats);
@@ -169,4 +177,3 @@ function taskEnterVehicle(seat) {
     API.callNative("TASK_ENTER_VEHICLE", API.getLocalPlayer(), target, 3000, seat, 1.0, 1, 0);
     return;
 }
-

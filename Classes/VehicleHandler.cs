@@ -140,7 +140,6 @@ namespace stuykserver.Util
                 API.givePlayerWeapon(player, WeaponHash.Parachute, 1, true, true);
             }
 
-
             // If it's locked, kick them the fuck out.
             if (API.getVehicleLocked(vehicle))
             {
