@@ -60,7 +60,6 @@ namespace stuykserver.Util
             }
 
             // If the username is valid. Move on.
-            db.setPlayerHUD(player, false);
             API.triggerClientEvent(player, "createCamera", new Vector3(649.5031, -10.4181, 450), new Vector3(649.5031, -10.4181, 82.78617));
             API.triggerClientEvent(player, "showLogin");
             Random random = new Random();

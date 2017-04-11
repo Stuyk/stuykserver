@@ -109,12 +109,7 @@
     <Content Include="clientside\ActiveShooter.js" />
     <Content Include="clientside\Main.js" />
     <Content Include="clientside\MoneyDisplay.js" />
-    <Content Include="clientside\resources\atmpanel.css" />
     <Content Include="clientside\resources\atmpanel.html" />
-    <Content Include="clientside\resources\businessfemale.html" />
-    <Content Include="clientside\resources\businessmale.html" />
-    <Content Include="clientside\resources\casualfemale.html" />
-    <Content Include="clientside\resources\casualmale.html" />
     <Content Include="clientside\resources\cover.css" />
     <Content Include="clientside\resources\css\bootstrap.css" />
     <Content Include="clientside\resources\css\bootstrap.min.css" />
@@ -127,16 +122,11 @@
     <Content Include="clientside\resources\images\skins\placeholder.png" />
     <Content Include="clientside\resources\images\tweed.png" />
     <Content Include="clientside\resources\index.html" />
-    <Content Include="clientside\resources\industryone.html" />
-    <Content Include="clientside\resources\industrytwo.html" />
-    <Content Include="clientside\resources\inventory.css" />
     <Content Include="clientside\resources\inventory.html" />
     <Content Include="clientside\resources\js\bootstrap.js" />
     <Content Include="clientside\resources\js\bootstrap.min.js" />
     <Content Include="clientside\resources\js\npm.js" />
     <Content Include="clientside\resources\loading.html" />
-    <Content Include="clientside\resources\policefemale.html" />
-    <Content Include="clientside\resources\policemale.html" />
     <Content Include="clientside\resources\regsuccess.html" />
     <Content Include="clientside\resources\skinselector.css" />
     <Content Include="clientside\resources\skinselector.html" />
@@ -145,9 +135,15 @@
     <Content Include="meta.xml" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="clientside\resources\active_shooter_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\blip_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\browser_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\function_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\hud_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\interaction_mode.ts" />
+    <TypeScriptCompile Include="clientside\resources\marker_manager.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Declarations.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Enums.ts" />
     <TypeScriptCompile Include="types-gtanetwork\GTANetwork.dll.d.ts" />

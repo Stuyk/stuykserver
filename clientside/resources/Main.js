@@ -10,365 +10,13 @@ playerAccountBalance = null; // Player Account Balance
 email = ""; // Registration System
 password = ""; // Registration System
 page = ""; // CEF? Probably unused.
-useFunction = null; // KEYPRESS USE BUTTON System
-vehicleSpecialFunction = null; // KEYPRESS USE BUTTON System
-currentCollisionType = null; // KEYPRESS USE BUTTON System
 camera = null; // Server Camera
 repairCost = null;
 repairPosition = null;
 vehicleFuel = "Loading..."; // Used for VehicleFuel Display
 activeShooter = false;
 
-// ################
-// BLIP HANDLER
-// ################
-var activeBlips = [];
-var activeShooterBlips = [];
-var blip = null;
-class blipHandler {
-	constructor (position, color, sprite)
-	{
-		blip = API.createBlip(position);
-		API.setBlipSprite(blip, sprite);
-		API.setBlipColor(blip, color);
-	}
-
-	pushToActive() {
-		activeBlips.push(blip);
-	}
-	
-	pushToShooter() {
-		activeShooterBlips.push(blip);
-	}
-}
-
-// Marker Handler
-var activeMarkers = [];
-var marker = null;
-class markerHandler {
-	constructor (type, position, scale, alpha, r, g, b, rotation)
-	{
-		marker = API.createMarker(type, position, new Vector3(), rotation, scale, r, g, b, alpha);
-	}
-	
-	pushToActive()
-	{
-		activeMarkers.push(marker);
-	}
-}
-
-// CEF Boilerplate
-class CefHelper {
-  constructor (resourcePath)
-  {
-    this.path = resourcePath;
-    this.open = false;
-  }
-
-  show () {
-    if (this.open == false) {
-      this.open = true;
-      var resolution = API.getScreenResolution();
-      this.browser = API.createCefBrowser(resolution.Width, resolution.Height, true);
-      API.waitUntilCefBrowserInit(this.browser);
-      API.setCefBrowserPosition(this.browser, 0, 0);
-      API.loadPageCefBrowser(this.browser, this.path);
-      API.showCursor(true);
-      API.setCanOpenChat(false);
-    }
-  }
-
-  destroy () {
-    this.open = false;
-    API.destroyCefBrowser(this.browser);
-    API.showCursor(false);
-    API.setCanOpenChat(true);
-  }
-
-  eval (string) {
-    this.browser.eval(string);
-  }
-}
-
-// KILL CEF PANEL, WITH FIRE. FUCK YEAH!
-function killPanel() {
-	if (pagePanel != null) {
-		pagePanel.destroy();
-		pagePanel = null;
-		API.triggerServerEvent("stopAnimation");
-	}
-}
-
-// DISCONNECTED? BETTER STOP THE CEF SHIT.
-API.onResourceStop.connect(function() {
-    if (pagePanel != null) {
-		pagePanel.destroy();
-		pagePanel = null;
-	}
-});
-
-API.onKeyDown.connect(function(player, e) {
-	// SHIFT + B - KEYPRESS HELPER
-	if (!API.isChatOpen() && e.KeyCode == Keys.B && e.Shift && currentCollisionType != null) {
-		if (currentCollisionType == "Vehicle")
-		{
-			showRadialMenu();
-			vehicleSpecialFunction = null;
-			useFunction = null;
-			API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-			return;
-		}
-		
-		API.triggerServerEvent("useSpecial", currentCollisionType);
-		vehicleSpecialFunction = null;
-		useFunction = null;
-		API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-		return;
-	}
-
-	// B - KEYPRESS HELPER
-	if (!API.isChatOpen() && e.KeyCode == Keys.B && currentCollisionType != null) {
-		API.triggerServerEvent("useFunction", currentCollisionType);
-		vehicleSpecialFunction = null;
-		useFunction = null;
-		API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-		return;
-	}
-});
-
 API.onServerEventTrigger.connect(function(eventName, args) {
-	// KEYPRESS EVENTS
-	switch (eventName) {
-		case "triggerUseFunction":
-		{
-			useFunction = true;
-			currentCollisionType = args[0];
-			API.playSoundFrontEnd("Click_Special", "WEB_NAVIGATION_SOUNDS_PHONE");
-			break;
-		}
-		case "triggerSilentUseFunction":
-		{
-			useFunction = true;
-			currentCollisionType = args[0];
-			useFunction = null;
-			break;
-		}
-		case "removeUseFunction":
-		{
-			currentCollisionType = null;
-			vehicleSpecialFunction = null;
-			useFunction = null;
-			API.playSoundFrontEnd("CLICK_BACK", "WEB_NAVIGATION_SOUNDS_PHONE");
-			break;
-		}
-		case "displayRepairCost":
-		{
-			repairPosition = args[0];
-			repairCost = args[1];
-			break;
-		}
-		case "setActiveShooter":
-		{
-			activeShooter = args[0];
-		}
-	}
-
-	// CEF REQUEST PANEL EVENTS
-	if (pagePanel == null) {
-		switch(eventName) {
-			case "showLogin":
-			{
-				showLoginScreen();
-				break;
-			}
-			case "showInvalidName":
-			{
-				showInvalidUsernameScreen();
-				break;
-			}
-			case "openInventory":
-			{
-				showInventory();
-				break;
-			}
-			case "openSkinPanel":
-			{
-				showModelMenu(args[0]);
-				break;
-			}
-			case "openClothingPanel":
-			{
-				showClothingPanel();
-				break;
-			}
-			case "openCarPanel":
-			{
-				showVehiclePanel();
-				break;
-			}
-			case "loadATM":
-			{
-				showATM();
-				break;
-			}
-			case "loadFishing":
-			{
-				showFishing();
-				break;
-			}
-			case "showBuyHousing":
-			{
-				showBuyHouse();
-				break;
-			}
-			case "ShowHousePropertyPanel":
-			{
-				showHousePropertyPanel();
-				break;
-			}
-			case "showRadialMenu":
-			{
-				showRadialMenu();
-				break;
-			}
-		}
-	}
-
-	// CEF REQUEST CALL EVENTS
-	if (pagePanel != null) {
-		switch(eventName) {
-			case "refreshATM":
-			{
-				pagePanel.browser.call("displayAccountBalance", args[0], args[1]);
-				break;
-			}
-			case "depositAlertSuccess":
-			{
-				pagePanel.browser.call("displayDepositSuccess");
-				break;
-			}
-			case "displayWithdrawSuccess":
-			{
-				pagePanel.browser.call("displayWithdrawSuccess");
-				break;
-			}
-			case "displayNotThatMuch":
-			{
-				pagePanel.browser.call("displayNotThatMuch");
-				break;
-			}
-			case "registerSuccessful":
-			{
-				pagePanel.browser.call("showLogin");
-				break;
-			}
-			case "passwordDoesNotMatch":
-			{
-				pagePanel.browser.call("doesNotMatch");
-				break;
-			}
-			case "alreadyLoggedIn":
-			{
-				pagePanel.browser.call("alreadyLoggedIn");
-				break;
-			}
-			case "accountDoesNotExist":
-			{
-				pagePanel.browser.call("doesNotExist");
-				break;
-			}
-			case "doesNotMatchAccount":
-			{
-				pagePanel.browser.call("doesNotMatchAccount");
-				break;
-			}
-			case "fishingPushWord":
-			{
-				pagePanel.browser.call("displayWord", args[0]);
-				break;
-			}
-			case "passVehicleModifications":
-			{
-				pagePanel.browser.call("passVehicleModifications", args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18]);
-				updateVehicleVariables(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15], args[16], args[17], args[18]);
-				break;
-			}
-			case "passHousePrice":
-			{
-				pagePanel.browser.call("pushHousePricePoint", args[0]);
-				break;
-			}
-
-		}
-
-	}
-	
-	if (eventName == "pushBlip") {
-		var blipHandle = new blipHandler(args[0], args[1], args[2]);
-		blipHandle.pushToActive(blipHandle);
-	}
-	
-	if (eventName == "pushShooterBlip") {
-		var blipHandle = new blipHandler(args[0], args[1], args[2]);
-		blipHandle.pushToShooter(blipHandle);
-	}
-	
-	if (eventName == "popShooterBlip") {
-		for (i = 0; i < activeShooterBlips.length; i++) {
-			API.deleteEntity(activeShooterBlips[i]);
-		}
-	}
-	
-	if (eventName == "pushMarker") {
-		var markerHandle = new markerHandler(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
-		markerHandle.pushToActive(markerHandle);
-	}
-	
-	if (eventName == "removeMarkers") {
-		for (i = 0; i < activeMarkers.length; i++) {
-			API.deleteEntity(activeMarkers[i]);
-		}
-		
-		activeMarkers = [];
-	}
-	
-	if (eventName == "removeBlips") {
-		for (i = 0; i < activeBlips.length; i++) {
-			API.deleteEntity(activeBlips[i]);
-		}
-		
-		activeBlips = [];
-	}
-	
-	if (eventName == "updateFuel")
-	{
-		vehicleFuel = args[0];
-	}
-	
-	// EVENT NAMES THAT CAN'T GO ANYWHERE
-	if (eventName == "killPanel") {
-		if (pagePanel != null) {
-			pagePanel.destroy();
-			pagePanel = null;
-			API.triggerServerEvent("stopAnimation");
-		}
-	}
-
-	// LOADSAMONEY Proble
-	if (eventName === "update_money_display") {
-        currentMoney = args[0];
-    }
-
-	// VEHICLE FUNCTIONS - CLOSE THE DOOR
-	if (eventName=="closeCarDoor") {
-		API.setVehicleDoorState(args[0], args[1], false);
-	}
-
-	// CLOTHING CHANGER VARIABLES
-	if (eventName=="clothingLocalVariableUpdate") {
-		clothingPassLocalVariableUpdate(args[0]);
-	}
-
 	// MODEL CHANGER VARIABLES
 	if (eventName=="loadFaceData") {
 		facePanelOpen = true;
@@ -410,10 +58,6 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		faceMoles = args[34];
 	}
 
-	if (eventName=="updateKarma") { // Karma
-		karmaDisplay = args[0];
-	}
-
 	if (eventName == "startBrowsing") { // Dealership
 		startBrowsing(args[0], args[1], args[2]);
 	}
@@ -442,11 +86,6 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		camera = API.createCamera(args[0], args[1]);
 		API.setActiveCamera(camera);
 	}
-
-	// Destroy a camera.
-	if (eventName == "endCamera") {
-		API.setActiveCamera(null);
-	}
 	
 	// Move to Pass Position Camera
 	if (eventName == "intorpolateCamera") {
@@ -461,11 +100,6 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		API.setActiveCamera(null);
 	}
 });
-
-function removeShooterBlip(blip) {
-	API.deleteEntity(blip);
-}
-
 
 // ON UPDATE
 // ON UPDATE
@@ -485,169 +119,6 @@ API.onUpdate.connect(function() {
     {
         API.triggerServerEvent("ServeCheetos");
     }
-	
-	// SCREEN OVERLAYS
-    if (pagePanel === null && !API.getEntitySyncedData(API.getLocalPlayer(), "StopDraws")) {
-		if (currentMoney != null) {
-			API.drawText("$" + currentMoney, 310, resY - 50, 0.5, 50, 211, 82, 255, 4, 0, false, true, 0);
-		}
-
-		if (karmaDisplay != null) {
-			API.drawText("~w~Karma: " + karmaDisplay, 310, resY - 85, 0.5, 244, 244, 66, 255, 4, 0, false, true, 0);
-		}
-		
-		if (API.isPlayerInAnyVehicle(API.getLocalPlayer()))
-		{
-			API.drawText("~b~Fuel: ~w~" + Math.round(vehicleFuel * 100) / 100, 310, resY - 120, 0.5, 255, 255, 255, 255, 4, 0, false, true, 0);
-		}
-		
-		if (API.isPlayerInAnyVehicle(API.getLocalPlayer()))
-		{
-			var velocity = API.getEntityVelocity(API.getPlayerVehicle(API.getLocalPlayer()));
-			var speed = Math.sqrt(
-				velocity.X * velocity.X +
-				velocity.Y * velocity.Y +
-				velocity.Z * velocity.Z
-				) / 0.44704;
-				
-			API.drawText("~b~Speed: ~w~" + Math.round(speed * 100) / 100, 310, resY - 155, 0.5, 255, 255, 255, 255, 4, 0, false, true, 0);	
-		}
-		
-		if (activeShooter == true) {
-			API.drawText("~r~ACTIVE SHOOTER", 310, resY - 190, 0.5, 255, 255, 255, 255, 4, 0, false, true, 0);
-		}
-	}
-
-	// USE FUNCTION DISPLAYS
-	if (useFunction != null) {
-		var pointOfDraw = Point.Round(API.worldToScreen(API.getEntityPosition(player)));
-		var playerHeadPoint = new Point(pointOfDraw.X, pointOfDraw.Y - 300);
-		switch (currentCollisionType) {
-			case "Modification":
-				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "FuelPump":
-				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Repair":
-				API.dxDrawTexture("clientside/resources/images/pressbalt2.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-
-			case "Atm":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-
-			case "Fishing":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-
-			case "FishingSale":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-
-			case "Barbershop":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-
-			case "Clothing":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-
-			case "VehicleEngine":
-				API.dxDrawTexture("clientside/resources/images/pressbalt.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-
-			case "Vehicle":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-
-			case "House":
-				API.dxDrawTexture("clientside/resources/images/pressbalt3.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "ForSale":
-				API.dxDrawTexture("clientside/resources/images/pressbalt3.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Boats":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Classic":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Commercial":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Compacts":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Coupes":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Bicycles":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Helicopters":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Industrial":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Motorcycles":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "OffRoad":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-			
-			case "Muscle":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-			
-			case "Planes":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Police":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "SUVS":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Sedans":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Sports":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Super":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Utility":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-				
-			case "Vans":
-				API.dxDrawTexture("clientside/resources/images/pressb.png", playerHeadPoint, new Size(200, 125), 1);
-				break;
-		}
-	}
 });
 
 // ##########################
@@ -656,16 +127,6 @@ API.onUpdate.connect(function() {
 // ##########################
 function housePurchase() {
 	API.triggerServerEvent("housePurchase");
-}
-
-function showBuyHouse() {
-	pagePanel = new CefHelper("clientside/resources/buyhousing.html");
-	pagePanel.show();
-}
-
-function showHousePropertyPanel() {
-	pagePanel = new CefHelper("clientside/resources/housing.html");
-	pagePanel.show();
 }
 
 function housePriceGet() {
@@ -690,11 +151,6 @@ function setHouseLock(value) {
 // # FISHING   FUNCTIONS ####
 // #### WRITTEN BY STUYK ####
 // ##########################
-function showFishing() {
-	pagePanel = new CefHelper("clientside/resources/fishing.html");
-	pagePanel.show();
-}
-
 function fishingGetWord() {
 	API.triggerServerEvent("pushWordToPanel");
 }
@@ -704,40 +160,9 @@ function fishingPushWord(value) {
 }
 
 // ##########################
-// # REGISTRATION FUNCTIONS #
-// #### WRITTEN BY STUYK ####
-// ##########################
-function registerHandler(email, password) {
-    API.triggerServerEvent("clientRegistration", email, password);
-}
-
-function loginHandler(email, password) {
-    API.triggerServerEvent("clientLogin", email, password);
-}
-
-function showLoginScreen() {
-	if (pagePanel == null) {
-		pagePanel = new CefHelper("clientside/resources/index.html");
-		pagePanel.show();
-	}
-}
-
-function showInvalidUsernameScreen() {
-	if (pagePanel == null) {
-		pagePanel = new CefHelper("clientside/resources/invalidname.html");
-		pagePanel.show();
-	}
-}
-
-// ##########################
 // ### ATM       FUNCTIONS ##
 // #### WRITTEN BY STUYK ####
 // ##########################
-function showATM() {
-	pagePanel = new CefHelper("clientside/resources/atmpanel.html");
-	pagePanel.show();
-}
-
 function withdrawATM(amount) {
 	API.triggerServerEvent("withdrawATM_Server", amount);
 }
@@ -755,37 +180,15 @@ function requestAccountBalance() {
 }
 
 // ##########################
-// ### INVENTORY FUNCTIONS ##
-// #### WRITTEN BY STUYK ####
-// ##########################
-function showInventory() {
-	pagePanel = new CefHelper("clientside/resources/inventory.html");
-	pagePanel.show();
-}
-
-// ##########################
 // #### VEHICLE FUNCTIONS ###
 // #### WRITTEN BY STUYK ####
 // ##########################
-
-function showVehiclePanel() {
-	pagePanel = new CefHelper("clientside/resources/carpanel.html");
-	pagePanel.show();
-}
-
 function vehicleOpenHood() {
 	API.triggerServerEvent("vehicleHood");
 }
 
 function vehicleOpenTrunk() {
 	API.triggerServerEvent("vehicleTrunk");
-}
-
-function showRadialMenu() {
-	if (pagePanel == null) {
-			pagePanel = new CefHelper("clientside/resources/menu_vehiclecontrols.html");
-			pagePanel.show();
-	}
 }
 
 // ##########################
@@ -1228,243 +631,9 @@ function changeFaceHairstyleTexture(amount) {
 
 	changeUpdateFace();
 }
-// ##########################
-// #### CLOTHING CHANGER ####
-// #### WRITTEN BY STUYK ####
-// ##########################
-var clothingTopNum = null;
-var clothingTopColorNum = null;
-var clothingUndershirtNum = null;
-var clothingUndershirtColorNum = null;
-var clothingLegsNum = null;
-var clothingLegsColorNum = null;
-var clothingShoesNum = null;
-var clothingShoesColorNum = null;
-var clothingTorsoNum = null;
-var clothingPanelOpen = null;
-var clothingAccessory = null;
 
-function showClothingPanel() {
-	pagePanel = new CefHelper("clientside/resources/clothingpanel.html");
-	pagePanel.show();
-	API.triggerServerEvent("enterShop");
-}
 
-function changeClothingExitShop() {
-    API.triggerServerEvent("exitClothingShop");
-    API.triggerServerEvent("leaveShop");
-}
-
-function clothingPassLocalVariableUpdate(player) {
-	clothingPanelOpen = true;
-	clothingTorsoNum = Number(API.getEntitySyncedData(player, "clothingTorso"));
-	clothingTopNum = Number(API.getEntitySyncedData(player, "clothingTop"));
-	clothingTopColorNum = Number(API.getEntitySyncedData(player, "clothingTopColor"));
-	clothingUndershirtNum = Number(API.getEntitySyncedData(player, "clothingUndershirt"));
-	clothingUndershirtColorNum = Number(API.getEntitySyncedData(player, "clothingUndershirtColor"));
-	clothingLegsNum = Number(API.getEntitySyncedData(player, "clothingLegs"));;
-	clothingLegsColorNum = Number(API.getEntitySyncedData(player, "clothingLegsColor"));
-	clothingShoesNum = Number(API.getEntitySyncedData(player, "clothingShoes"));
-	clothingShoesColorNum = Number(API.getEntitySyncedData(player, "clothingShoesColor"));
-	clothingAccessory = Number(API.getEntitySyncedData(player, "clothingAccessory"));
-	updateClothingProperties();
-}
-
-function changeAccessory(amount) {
-	if (clothingAccessory != null) {
-		clothingAccessory = clothingAccessory + amount;
-
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 7);
-		
-		if (clothingAccessory < 0) {
-			clothingAccessory = maxComponent;
-		}
-		
-		if (clothingAccessory > maxComponent) {
-			clothingAccessory = 0;
-		}
-
-		API.setPlayerClothes(API.getLocalPlayer(), 7, clothingAccessory, 0);
-		updateClothingProperties();
-	}
-}
-
-function changeClothingTorso(amount) { // Torso Changer
-	if (clothingTorsoNum != null) {
-		clothingTorsoNum = clothingTorsoNum + amount;
-		
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 3);
-		
-		if (clothingTorsoNum < 0) {
-			clothingTorsoNum = maxComponent;
-		}
-
-		if (clothingTorsoNum > maxComponent) {
-			clothingTorsoNum = 0;
-		}
-
-		API.setPlayerClothes(API.getLocalPlayer(), 3, clothingTorsoNum, 0);
-		updateClothingProperties();
-	}
-}
-
-function changeClothingTop(amount) { // Top Changer
-	if (clothingTopNum != null) {
-		clothingTopNum = clothingTopNum + amount;
-
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 11);
-		clothingTopColorNum = 0; // SET TO ZERO to prevent invisibles.
-		
-		if (clothingTopNum < 0) {
-			clothingTopNum = maxComponent;
-		}
-
-		if (clothingTopNum > maxComponent) {
-			clothingTopNum = 0;
-		}
-
-		API.setPlayerClothes(API.getLocalPlayer(), 11, clothingTopNum, clothingTopColorNum);
-		updateClothingProperties();
-	}
-}
-
-function changeClothingTopColor(amount) { // Top Color Changer
-	if (clothingTopColorNum != null) {
-		clothingTopColorNum = clothingTopColorNum + amount;
-
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", 0, API.getLocalPlayer(), 11, clothingTopNum) - 1;
-		
-		if (clothingTopColorNum < 0) {
-			clothingTopColorNum = maxComponent;
-		}
-		
-		if (clothingTopColorNum > maxComponent) {
-			clothingTopColorNum = 0;
-		}
-
-		API.setPlayerClothes(API.getLocalPlayer(), 11, clothingTopNum, clothingTopColorNum);
-		updateClothingProperties();
-	}
-}
-
-function changeClothingUndershirt(amount) { // Undershirt Changer
-	if (clothingUndershirtNum != null) {
-		clothingUndershirtNum = clothingUndershirtNum + amount;
-
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 8);
-		clothingUndershirtColorNum = 0; // SET TO ZERO to prevent invisibles.
-		
-		if (clothingUndershirtNum < 0) {
-			clothingUndershirtNum = maxComponent;
-		}
-
-		if (clothingUndershirtNum > maxComponent) {
-			clothingUndershirtNum = 0;
-		}
-
-		API.setPlayerClothes(API.getLocalPlayer(), 8, clothingUndershirtNum, clothingUndershirtColorNum);
-		updateClothingProperties();
-	}
-}
-
-function changeClothingUndershirtColor(amount) { // Undershirt Color Changer
-	if (clothingUndershirtColorNum != null) {
-		clothingUndershirtColorNum = clothingUndershirtColorNum + amount;
-
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", 0, API.getLocalPlayer(), 8, clothingUndershirtNum) - 1;
-		
-		if (clothingUndershirtColorNum < 0) {
-			clothingUndershirtColorNum = maxComponent;
-		}
-
-		if (clothingUndershirtColorNum > maxComponent)
-		{
-			clothingUndershirtColorNum = 0;
-		}
-		
-		API.setPlayerClothes(API.getLocalPlayer(), 8, clothingUndershirtNum, clothingUndershirtColorNum);
-		updateClothingProperties();
-	}
-}
-
-function changeClothingLegs(amount) { // Legs Changer
-	if (clothingLegsNum != null) {
-		clothingLegsNum = clothingLegsNum + amount;
-		
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 4);
-		clothingLegsColorNum = 0; // SET TO ZERO to prevent invisibles.
-
-		if (clothingLegsNum < 0) {
-			clothingLegsNum = maxComponent;
-		}
-		
-		if (clothingLegsNum > maxComponent) {
-			clothingLegsNum = 0;
-		}
-
-		API.setPlayerClothes(API.getLocalPlayer(), 4, clothingLegsNum, clothingLegsColorNum);
-		updateClothingProperties();
-	}
-}
-
-function changeClothingLegsColor(amount) { // Legs Color Changer
-	if (clothingLegsColorNum != null) {
-		clothingLegsColorNum = clothingLegsColorNum + amount;
-
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", 0, API.getLocalPlayer(), 4, clothingLegsNum) - 1;
-		
-		if (clothingLegsColorNum < 0) {
-			clothingLegsColorNum = maxComponent;
-		}
-		
-		if (clothingLegsColorNum > maxComponent) {
-			clothingLegsColorNum = 0;
-		}
-
-		API.setPlayerClothes(API.getLocalPlayer(), 4, clothingLegsNum, clothingLegsColorNum);
-		updateClothingProperties();
-	}
-}
-
-function changeClothingShoes(amount) { // Shoes Changer
-	if (clothingShoesNum != null) {
-		clothingShoesNum = clothingShoesNum + amount;
-
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", 0, API.getLocalPlayer(), 6);
-		clothingShoesColorNum = 0; // SET TO ZERO to prevent invisibles.
-		
-		if (clothingShoesNum < 0) {
-			clothingShoesNum = maxComponent;
-		}
-		
-		if (clothingShoesNum > maxComponent) {
-			clothingShoesNum = 0;
-		}
-
-		API.setPlayerClothes(API.getLocalPlayer(), 6, clothingShoesNum, clothingShoesColorNum);
-		updateClothingProperties();
-	}
-}
-
-function changeClothingShoesColor(amount) { // Shoes Color Changer
-	if (clothingShoesColorNum != null) {
-		clothingShoesColorNum = clothingShoesColorNum + amount;
-		
-		var maxComponent = API.returnNative("GET_NUMBER_OF_PED_TEXTURE_VARIATIONS", 0, API.getLocalPlayer(), 4, clothingShoesNum) - 1;
-
-		if (clothingShoesColorNum < 0) {
-			clothingShoesColorNum = maxComponent;
-		}
-		
-		if (clothingShoesColorNum > maxComponent) {
-			clothingShoesColorNum = 0;
-		}
-
-		API.setPlayerClothes(API.getLocalPlayer(), 6, clothingShoesNum, clothingShoesColorNum);
-		updateClothingProperties();
-	}
-}
-
+// ROTATIONS
 function clothingRotatePlayer(amount) {
   var player = API.getLocalPlayer();
   var oldamount = API.getEntityRotation(player);
@@ -1477,28 +646,6 @@ function changeRotationHandle(amount) {
 	var oldamount = API.getEntityRotation(player);
 	API.setEntityRotation(player, new Vector3(oldamount.X, oldamount.Y, oldamount.Z + amount));
 	API.playPlayerAnimation("amb@world_human_hang_out_street@male_b@base", "base", 0, -1);
-}
-
-function updateClothingProperties() {
-	pagePanel.browser.call("updateClothingProperties", clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum, clothingAccessory);
-}
-
-function changePushClothingChanges() {
-	API.triggerServerEvent("clothingSave", clothingTopNum, clothingTopColorNum, clothingUndershirtNum, clothingUndershirtColorNum, clothingTorsoNum, clothingLegsNum, clothingLegsColorNum, clothingShoesNum, clothingShoesColorNum, clothingAccessory);
-	API.stopPlayerAnimation();
-	clothingPanelOpen = null;
-	clothingTorsoNum = null;
-	clothingTopNum = null;
-	clothingTopColorNum = null;
-	clothingUndershirtNum = null;
-	clothingUndershirtColorNum = null;
-	clothingLegsNum = null;
-	clothingLegsColorNum = null;
-	clothingHatNum = null;
-	clothingHatColorNum = null;
-	clothingShoesNum = null;
-	clothingShoesColorNum = null;
-	clothingAccessory = null;
 }
 
 // ##########################

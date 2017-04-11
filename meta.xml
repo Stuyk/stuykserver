@@ -6,10 +6,17 @@
 	<script src="clientside/resources/Main.js" type="client" lang="javascript" />
 	<script src="clientside/resources/Fishing.js" type="client" lang="javascript" />
 	<script src="clientside/resources/Camera.js" type="client" lang="javascript" />
-	<script src="clientside/resources/Arpg.js" type="client" lang="javascript" />
+	
+	<!-- New Javascript Files -->
 	<script src="clientside/resources/interaction_mode.js" type="client" lang="javascript" />
 	<script src="clientside/resources/clothing_mode.js" type="client" lang="javascript" />
 	<script src="clientside/resources/event_manager.js" type="client" lang="javascript" />
+	<script src="clientside/resources/active_shooter_manager.js" type="client" lang="javascript" />
+	<script src="clientside/resources/blip_manager.js" type="client" lang="javascript" />
+	<script src="clientside/resources/marker_manager.js" type="client" lang="javascript" />
+	<script src="clientside/resources/function_manager.js" type="client" lang="javascript" />
+	<script src="clientside/resources/hud_manager.js" type="client" lang="javascript" />
+	<script src="clientside/resources/browser_manager.js" type="client" lang="javascript" />
 
 	<file src="clientside/resources/invalidname.html"/>
 	<file src="clientside/resources/dealership.html"/>

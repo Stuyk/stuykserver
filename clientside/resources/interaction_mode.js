@@ -3,12 +3,6 @@ var x = API.getScreenResolutionMantainRatio().Width;
 var y = API.getScreenResolutionMantainRatio().Height;
 var target = null;
 API.onUpdate.connect(function () {
-    if (API.getEntitySyncedData(API.getLocalPlayer(), "StopDraws")) {
-        return;
-    }
-    // Draw a Cursor
-    API.drawRectangle(x / 2 - 3, y / 2 - 3, 6, 6, 0, 0, 0, 255);
-    API.drawRectangle(x / 2 - 2.5, y / 2 - 2.5, 5, 5, 255, 255, 255, 255);
     // If the chat is open, fuck it.
     if (API.isChatOpen()) {
         return;
