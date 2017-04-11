@@ -86,19 +86,6 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 		camera = API.createCamera(args[0], args[1]);
 		API.setActiveCamera(camera);
 	}
-	
-	// Move to Pass Position Camera
-	if (eventName == "intorpolateCamera") {
-		var tempcamera = API.createCamera(new Vector3(args[0].X, args[0].Y, 1500), args[1]);
-		API.pointCameraAtEntity(tempcamera, API.getLocalPlayer(), new Vector3());
-		API.interpolateCameras(API.getActiveCamera(), tempcamera, 3000, true, true);
-		API.sleep(3000);
-		var newtempcamera = API.createCamera(new Vector3(args[0].X, args[0].Y, args[0].Z + 5), new Vector3());
-		API.pointCameraAtEntity(newtempcamera, API.getLocalPlayer(), new Vector3());
-		API.interpolateCameras(API.getActiveCamera(), newtempcamera, 3000, true, true);
-		API.sleep(3000);
-		API.setActiveCamera(null);
-	}
 });
 
 // ON UPDATE
@@ -107,89 +94,12 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 // ON UPDATE
 
 API.onUpdate.connect(function() {
-	var player = API.getLocalPlayer();
-	
-	if (API.returnNative("IS_PED_SHOOTING", 8, player))
-	{
-		API.triggerServerEvent("PedIsShooting");
-	}
-
-    if (!API.getEntityInvincible(player) && 
+    if (!API.getEntityInvincible(API.getLocalPlayer()) && 
          API.getLocalPlayerInvincible())
     {
         API.triggerServerEvent("ServeCheetos");
     }
 });
-
-// ##########################
-// # HOUSE     FUNCTIONS ####
-// #### WRITTEN BY STUYK ####
-// ##########################
-function housePurchase() {
-	API.triggerServerEvent("housePurchase");
-}
-
-function housePriceGet() {
-	API.triggerServerEvent("housePricePoint");
-}
-
-function housePropertyChanges(forSale, price) {
-	if (forSale == true) {
-		API.triggerServerEvent("setHouseProperties", true, price);
-	}
-
-	if (forSale == false) {
-		API.triggerServerEvent("setHouseProperties", false, null);
-	}
-}
-
-function setHouseLock(value) {
-	API.triggerServerEvent("setHouseLock", value);
-}
-
-// ##########################
-// # FISHING   FUNCTIONS ####
-// #### WRITTEN BY STUYK ####
-// ##########################
-function fishingGetWord() {
-	API.triggerServerEvent("pushWordToPanel");
-}
-
-function fishingPushWord(value) {
-	API.triggerServerEvent("submitWord", value);
-}
-
-// ##########################
-// ### ATM       FUNCTIONS ##
-// #### WRITTEN BY STUYK ####
-// ##########################
-function withdrawATM(amount) {
-	API.triggerServerEvent("withdrawATM_Server", amount);
-}
-
-function depositATM(amount) {
-	API.triggerServerEvent("depositATM_Server", amount);
-}
-
-function hideATMCash() {
-	cashDisplay = null;
-}
-
-function requestAccountBalance() {
-	API.triggerServerEvent("balanceNotDisplayed");
-}
-
-// ##########################
-// #### VEHICLE FUNCTIONS ###
-// #### WRITTEN BY STUYK ####
-// ##########################
-function vehicleOpenHood() {
-	API.triggerServerEvent("vehicleHood");
-}
-
-function vehicleOpenTrunk() {
-	API.triggerServerEvent("vehicleTrunk");
-}
 
 // ##########################
 // #### MODEL CHANGER    ####

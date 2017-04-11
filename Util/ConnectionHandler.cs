@@ -98,9 +98,8 @@ namespace stuykserver.Util
             API.exported.gtaocharacter.updatePlayerFace(player.handle);
 
             // Player Client Events
+            API.triggerClientEvent(player, "serverLoginCamera", player.position, player.rotation);
             API.triggerClientEvent(player, "update_money_display", playerInstance.returnPlayerCash());
-            API.triggerClientEvent(player, "killPanel");
-            API.triggerClientEvent(player, "intorpolateCamera", player.position, player.rotation);
             API.setEntityData(player, "CHEAT_MODEL", player.model);
 
             // Player Specific Settings

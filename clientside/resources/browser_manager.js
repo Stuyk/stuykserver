@@ -67,6 +67,35 @@ function callCEF(func, args) {
 //=========================================
 // LOGIN / REGISTRATION EVENTS - LoginHandler.cs
 //=========================================
-function loginHandler(email, password) {
-    API.triggerServerEvent("clientLogin", email, password);
+function loginHandler(email, password) { API.triggerServerEvent("clientLogin", email, password); }
+function registerHandler(email, password) { API.triggerServerEvent("clientRegistration", email, password); }
+//=========================================
+// FISHING EVENTS - Jobs/Fishing.cs
+//=========================================
+function fishingGetWord() { API.triggerServerEvent("pushWordToPanel"); }
+function fishingPushWord(value) { API.triggerServerEvent("submitWord", value); }
+//=========================================
+// ATM EVENTS - BankHandler.cs
+//=========================================
+function withdrawATM(amount) { API.triggerServerEvent("withdrawATM_Server", amount); }
+function depositATM(amount) { API.triggerServerEvent("depositATM_Server", amount); }
+function requestAccountBalance() { API.triggerServerEvent("balanceNotDisplayed"); }
+//=========================================
+// VEHICLE EVENTS - VehicleHandler.cs
+//=========================================
+function vehicleOpenHood() { API.triggerServerEvent("vehicleHood"); }
+function vehicleOpenTrunk() { API.triggerServerEvent("vehicleTrunk"); }
+//=========================================
+// HOUSE EVENTS - HouseHandler.cs
+//=========================================
+function housePurchase() { API.triggerServerEvent("housePurchase"); }
+function housePriceGet() { API.triggerServerEvent("housePricePoint"); }
+function setHouseLock(value) { API.triggerServerEvent("setHouseLock", value); }
+function housePropertyChanges(forSale, price) {
+    if (forSale == true) {
+        API.triggerServerEvent("setHouseProperties", true, price);
+    }
+    if (forSale == false) {
+        API.triggerServerEvent("setHouseProperties", false, null);
+    }
 }

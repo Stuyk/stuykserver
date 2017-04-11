@@ -137,19 +137,30 @@ API.onServerEventTrigger.connect(function (event, args) {
         case "pushBlip":
             resource.blip_manager.pushBlip(args[0], args[1], args[2]);
             return;
-        case "pushShooterBlip":
-            resource.blip_manager.pushShooterBlip(args[0], args[1], args[2]);
-            return;
-        case "popShooterBlip":
-            resource.blip_manager.popShooterBlip();
-            return;
         case "removeBlips":
             resource.blip_manager.popActiveBlips();
+            return;
+        // Active Shooter
+        case "pushShooterBlip":
+            resource.active_shooter_manager.pushShooterBlip(args[0], args[1], args[2]);
+            return;
+        case "popShooterBlip":
+            resource.active_shooter_manager.popShooterBlip();
             return;
         //=========================================
         // CAMERA EVENTS
         //=========================================
         case "endCamera":
+            API.setActiveCamera(null);
+            API.setGameplayCameraActive();
+            return;
+        case "serverLoginCamera":
+            resource.camera_manager.cameraActiveCameraToArray();
+            resource.camera_manager.cameraSetupSilent(API.getEntityPosition(API.getLocalPlayer()).Add(new Vector3(0, 0, 1500)), API.getEntityRotation(API.getLocalPlayer()));
+            resource.camera_manager.cameraPointAtPlayer();
+            resource.camera_manager.cameraSetupSilent(API.getEntityPosition(API.getLocalPlayer()).Add(new Vector3(0, 0, 5)), new Vector3());
+            resource.camera_manager.cameraPointAtPlayer();
+            resource.camera_manager.cameraSilentAnimate(3000);
             API.setActiveCamera(null);
             API.setGameplayCameraActive();
             return;
