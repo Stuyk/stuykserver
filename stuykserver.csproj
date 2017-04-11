@@ -136,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="clientside\resources\active_shooter_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\anticheat.ts" />
     <TypeScriptCompile Include="clientside\resources\blip_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\browser_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\camera_manager.ts" />
@@ -144,6 +145,7 @@
     <TypeScriptCompile Include="clientside\resources\function_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\hud_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\interaction_mode.ts" />
+    <TypeScriptCompile Include="clientside\resources\login_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\marker_manager.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Declarations.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Enums.ts" />

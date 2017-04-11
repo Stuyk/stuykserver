@@ -61,44 +61,6 @@ API.onServerEventTrigger.connect(function(eventName, args) {
 	if (eventName == "startBrowsing") { // Dealership
 		startBrowsing(args[0], args[1], args[2]);
 	}
-
-	// SERVERSIDE CAMERA FUNCTIONS
-	// Create a camera.
-	if (eventName == "createCamera") {
-		var pos = args[0];
-		var target = args[1];
-
-		camera = API.createCamera(pos, new Vector3());
-		API.pointCameraAtPosition(camera, target);
-		API.setActiveCamera(camera);
-	}
-	
-	if (eventName == "createEntityCamera") {
-		var pos = args[0];
-		var target = args[1];
-		
-		camera = API.createCamera(pos, new Vector3());
-		API.pointCameraAtEntity(camera, API.getLocalPlayer(), new Vector3());
-		API.setActiveCamera(camera);
-	}
-	
-	if (eventName == "createCameraAtHeadHeight") {
-		camera = API.createCamera(args[0], args[1]);
-		API.setActiveCamera(camera);
-	}
-});
-
-// ON UPDATE
-// ON UPDATE
-// ON UPDATE
-// ON UPDATE
-
-API.onUpdate.connect(function() {
-    if (!API.getEntityInvincible(API.getLocalPlayer()) && 
-         API.getLocalPlayerInvincible())
-    {
-        API.triggerServerEvent("ServeCheetos");
-    }
 });
 
 // ##########################

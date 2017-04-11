@@ -56,7 +56,7 @@ namespace stuykserver.Classes
 
         private void API_onClientEventTrigger(Client sender, string eventName, params object[] arguments)
         {
-            if (eventName == "ServeCheetos")
+            if (eventName == "AnticheatInvincibilityCheck")
             {
                 API.kickPlayer(sender);
             }

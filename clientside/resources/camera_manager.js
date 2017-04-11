@@ -222,6 +222,12 @@ function cameraSetup(position, rotation) {
     currentCamera = activeCameras.length - 1;
     API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
 }
+function cameraPointAtPosition() {
+    API.pointCameraAtPosition(currentCamera, API.getEntityPosition(API.getLocalPlayer()));
+}
+function cameraActivate() {
+    API.setActiveCamera(currentCamera);
+}
 // Setup a camera on the server silently.
 function cameraSetupSilent(position, rotation) {
     var camera = API.createCamera(position, rotation);

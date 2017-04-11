@@ -1,5 +1,13 @@
 ﻿API.onServerEventTrigger.connect(function (event, args) {
     switch (event) {
+        //=========================================
+        // Misc Functions
+        //=========================================
+        // login_manager.js
+        case "setLoggedIn":
+            resource.login_manager.setLoggedIn(true);
+            return;
+        // ???
         case "closeCarDoor":
             //API.setVehicleDoorState(args[0], args[1], false);
             return;
@@ -40,8 +48,10 @@
         // CEF BROWSER EVENTS - browser_manager.js
         //=========================================
         case "showLogin":
-            API.setHudVisible(true);
+            API.setHudVisible(false);
             resource.browser_manager.showCEF("clientside/resources/index.html");
+            API.startAudio("clientside/resources/audio/trulyyours.mp3", true);
+            API.setGameVolume(0.5);
             return;
         case "showInvalidName":
             resource.browser_manager.showCEF("clientside/resources/invalidname.html");
@@ -153,16 +163,29 @@
         case "endCamera":
             API.setActiveCamera(null);
             API.setGameplayCameraActive();
+            resource.camera_manager.clearCameraBlips();
             return;
         case "serverLoginCamera":
-            resource.camera_manager.cameraActiveCameraToArray();
-            resource.camera_manager.cameraSetupSilent(API.getEntityPosition(API.getLocalPlayer()).Add(new Vector3(0, 0, 1500)), API.getEntityRotation(API.getLocalPlayer()));
-            resource.camera_manager.cameraPointAtPlayer();
-            resource.camera_manager.cameraSetupSilent(API.getEntityPosition(API.getLocalPlayer()).Add(new Vector3(0, 0, 5)), new Vector3());
-            resource.camera_manager.cameraPointAtPlayer();
-            resource.camera_manager.cameraSilentAnimate(3000);
+            resource.browser_manager.killPanel();
+            API.callNative("DO_SCREEN_FADE_OUT", 3000);
+            API.sleep(4000);
+            API.callNative("DO_SCREEN_FADE_IN", 3000);
             API.setActiveCamera(null);
             API.setGameplayCameraActive();
+            API.setHudVisible(true);
+            API.stopAudio();
+            API.displaySubtitle("~b~Welcome back ~o~" + API.getPlayerName(API.getLocalPlayer()), 4000);
+            API.sendChatMessage("~r~Current Not Working: ~n~Dealerships, ~n~Car Customization, ~n~Player Customization");
+            API.sendChatMessage("~b~Come back in a few days after it's fixed.");
+            return;
+        case "createCamera":
+            resource.camera_manager.cameraSetupSilent(args[0], new Vector3());
+            resource.camera_manager.cameraPointAtPosition();
+            resource.camera_manager.cameraActivate();
+            return;
+        case "createCameraNoPosition":
+            resource.camera_manager.cameraSetupSilent(args[0], new Vector3());
+            resource.camera_manager.cameraActivate();
             return;
     }
 });

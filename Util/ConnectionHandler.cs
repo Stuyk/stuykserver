@@ -54,13 +54,13 @@ namespace stuykserver.Util
                 API.setEntityPosition(player, new Vector3(649.5031, -10.4181, 75));
                 API.freezePlayer(player, true);
                 db.setPlayerHUD(player, false);
-                API.triggerClientEvent(player, "createCamera", new Vector3(649.5031, -10.4181, 450), new Vector3(649.5031, -10.4181, 82.78617));
+                API.triggerClientEvent(player, "createCameraNoPosition", new Vector3(649.5031, -10.4181, 450), new Vector3());
                 API.triggerClientEvent(player, "showInvalidName");
                 return;
             }
 
             // If the username is valid. Move on.
-            API.triggerClientEvent(player, "createCamera", new Vector3(649.5031, -10.4181, 450), new Vector3(649.5031, -10.4181, 82.78617));
+            API.triggerClientEvent(player, "createCameraNoPosition", new Vector3(649.5031, -10.4181, 450), new Vector3());
             API.triggerClientEvent(player, "showLogin");
             Random random = new Random();
             int r = random.Next(1, 1000);
@@ -84,6 +84,7 @@ namespace stuykserver.Util
 
         public void SpawnPlayer(Client player)
         {
+
             string[] varNames = { "ID" };
             string before = "SELECT ID, LASTX, LASTY, SocialClub, LASTZ, Dead, Money, Bank, Nametag, Health, Armor, Admin, Karma, Time, Organization, Business FROM Players WHERE";
             object[] data = { Convert.ToString(API.getEntityData(player, "PlayerID")) };
@@ -98,17 +99,13 @@ namespace stuykserver.Util
             API.exported.gtaocharacter.updatePlayerFace(player.handle);
 
             // Player Client Events
-            API.triggerClientEvent(player, "serverLoginCamera", player.position, player.rotation);
+            API.triggerClientEvent(player, "setLoggedIn");
+            API.triggerClientEvent(player, "serverLoginCamera");
             API.triggerClientEvent(player, "update_money_display", playerInstance.returnPlayerCash());
             API.setEntityData(player, "CHEAT_MODEL", player.model);
 
             // Player Specific Settings
             API.freezePlayer(player, false);
-            API.sendNativeToPlayer(player, Hash.DISPLAY_HUD, true);
-            API.sendNativeToPlayer(player, Hash.DISPLAY_RADAR, true);
-
-            API.sendNotificationToPlayer(player, "If a menu freezes. Press F1.");
-
             // Organization Login Message
             if (playerInstance.returnPlayerOrganization() != 0)
             {

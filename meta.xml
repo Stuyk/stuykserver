@@ -5,8 +5,7 @@
 
 	<script src="clientside/resources/Main.js" type="client" lang="javascript" />
 	<script src="clientside/resources/Fishing.js" type="client" lang="javascript" />
-
-	<!-- New Javascript Files -->
+	<script src="clientside/resources/anticheat.js" type="client" lang="javascript" />
 	<script src="clientside/resources/interaction_mode.js" type="client" lang="javascript" />
 	<script src="clientside/resources/clothing_mode.js" type="client" lang="javascript" />
 	<script src="clientside/resources/event_manager.js" type="client" lang="javascript" />
@@ -17,7 +16,8 @@
 	<script src="clientside/resources/hud_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/browser_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/camera_manager.js" type="client" lang="javascript" />
-
+	<script src="clientside/resources/login_manager.js" type="client" lang="javascript" />
+	
 	<file src="clientside/resources/invalidname.html"/>
 	<file src="clientside/resources/dealership.html"/>
 	<file src="clientside/resources/skinchanger.html"/>
@@ -86,6 +86,8 @@
 	<file src="clientside/resources/images/pressbalt2.png" />
 	<file src="clientside/resources/images/pressbalt3.png" />
 
+	<file src="clientside/resources/audio/trulyyours.mp3" />
+	
 	<include resource="database"/>
 	<include resource="gtaocharacter" />
 
