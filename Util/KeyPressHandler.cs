@@ -87,7 +87,6 @@ namespace stuykserver.Util
                     // ATM
                     if (currentFunction == "Atm")
                     {
-                        API.sendNotificationToPlayer(player, "Fired Key Handler for ATM");
                         API.call("BankHandler", "selectATM", player);
                         return;
                     }
