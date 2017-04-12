@@ -37,6 +37,7 @@ class CefHelper {
         this.browser.eval(string);
     }
 }
+
 // Destroy the CEF Panel if the user disconnects. That way we don't fucking destroy their game and aliens invade and shit.
 API.onResourceStop.connect(function () {
     if (cef !== null) {
