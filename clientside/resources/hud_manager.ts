@@ -14,7 +14,8 @@ function setFuel(arg: number) { fuel = arg; }
 function setActiveShooter(arg: boolean) { activeshooter = arg; }
 // Main OnUpdate Thread
 API.onUpdate.connect(function () {
-    if (!API.getEntitySyncedData(API.getLocalPlayer(), "StopDraws")) {
+    // If true, return.
+    if (API.getEntitySyncedData(API.getLocalPlayer(), "StopDraws")) {
         return;
     }
     // Display all of our shit.
@@ -37,7 +38,7 @@ function karmaDisplay() {
     if (karma === null) {
         return;
     }
-    API.drawText("~w~Karma: " + karmaDisplay, 310, resY - 85, 0.5, 244, 244, 66, 255, 4, 0, false, true, 0);
+    API.drawText("~w~Karma: " + karma, 310, resY - 85, 0.5, 244, 244, 66, 255, 4, 0, false, true, 0);
 }
 // Display that Fuel Dawg
 function fuelDisplay() {
@@ -71,6 +72,6 @@ function activeShooterDisplay() {
 }
 // Display that Crosshair Dawg
 function crosshairDisplay() {
-    API.drawRectangle(x / 2 - 3, y / 2 - 3, 6, 6, 0, 0, 0, 255);
-    API.drawRectangle(x / 2 - 2.5, y / 2 - 2.5, 5, 5, 255, 255, 255, 255);
+    API.drawRectangle(resX / 2 - 3, resY / 2 - 3, 6, 6, 0, 0, 0, 255);
+    API.drawRectangle(resX / 2 - 2.5, resY / 2 - 2.5, 5, 5, 255, 255, 255, 255);
 }

@@ -74,7 +74,7 @@ API.onKeyDown.connect(function (player, e) {
     }
     // Setup a new Camera = Tab
     if (e.KeyCode == Keys.Tab) {
-        cameraSetup(API.getEntityPosition(player), API.getEntityRotation(API.getLocalPlayer()));
+        cameraSetup(API.getEntityPosition(API.getLocalPlayer()), API.getEntityRotation(API.getLocalPlayer()));
         return;
     }
     // Kill Camera = Backspace
@@ -140,7 +140,7 @@ API.onKeyDown.connect(function (player, e) {
     // Active Camera Functions
     if (API.getActiveCamera() != null) {
         // Increase FOV = LShift + 
-        if (e.KeyCode == Keys.OemPlus && e.Shift) {
+        if (e.KeyCode == Keys.Oemplus && e.Shift) {
             var fov = API.getCameraFov(API.getActiveCamera());
             fov += 5;
             API.setCameraFov(API.getActiveCamera(), fov);
@@ -154,7 +154,7 @@ API.onKeyDown.connect(function (player, e) {
             return;
         }
         // Change Height by 1 = +
-        if (e.KeyCode == Keys.OemPlus) {
+        if (e.KeyCode == Keys.Oemplus) {
             var activePos = API.getCameraPosition(API.getActiveCamera());
             API.setCameraPosition(API.getActiveCamera(), new Vector3(activePos.X, activePos.Y, activePos.Z + 0.5));
             return;

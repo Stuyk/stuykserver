@@ -30,6 +30,28 @@ namespace stuykserver.Util
 
         public void API_onClientEventTrigger(Client player, string eventName, params object[] args)
         {
+            if (eventName == "barbershopSaveAndExit")
+            {
+                actionSaveBarbershop(player, args);
+                loadCurrentFace(player);
+                API.stopPlayerAnimation(player);
+                API.stopPedAnimation(player);
+                API.call("ClothingHandler", "updateClothingForPlayer", player);
+                API.call("BarberShopHandler", "leaveBarberShop", player);
+                API.triggerClientEvent(player, "killPanel");
+                API.triggerClientEvent(player, "endCamera");
+            }
+
+            if (eventName == "barbershopExit")
+            {
+                API.call("BarberShopHandler", "leaveBarberShop", player);
+                API.triggerClientEvent(player, "killPanel");
+                API.triggerClientEvent(player, "endCamera");
+                loadCurrentFace(player);
+                API.call("ClothingHandler", "updateClothingForPlayer", player);
+            }
+
+
             if (eventName == "saveFace")
             {
                 actionSaveFace(player, args);
@@ -51,6 +73,15 @@ namespace stuykserver.Util
                 API.call("ClothingHandler", "updateClothingForPlayer", player);
             }
         }
+
+        public void actionSaveBarbershop(Client player, params object[] args)
+        {
+            string[] varNames = { "skinHairstyle", "skinHairstyleColor", "skinHairstyleHighlight", "skinHairstyleTexture", "FacialHair", "FacialHairColor" };
+            string before = "UPDATE PlayerSkins SET";
+            string after = string.Format("WHERE PlayerID='{0}'", Convert.ToString(API.getEntityData(player, "PlayerID")));
+            db.compileQuery(before, after, varNames, args);
+        }
+
 
         public void actionSaveFace(Client player, params object[] args)
         {
@@ -97,10 +128,14 @@ namespace stuykserver.Util
             API.setEntitySyncedData(player.handle, "GTAO_HAIR_HIGHLIGHT_COLOR", Convert.ToInt32(result.Rows[0]["skinHairstyleHighlight"]));
             API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR", Convert.ToInt32(result.Rows[0]["FacialHair"]));
             API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR", Convert.ToInt32(result.Rows[0]["FacialHairColor"]));
-            API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR2", Convert.ToInt32(result.Rows[0]["FacialHairColor2"]));
+            API.setEntitySyncedData(player.handle, "GTAO_FACIAL_HAIR_COLOR2", Convert.ToInt32(result.Rows[0]["FacialHairColor"]));
             API.setEntitySyncedData(player.handle, "GTAO_AGEING", Convert.ToInt32(result.Rows[0]["Ageing"]));
             API.setEntitySyncedData(player.handle, "GTAO_COMPLEXION", Convert.ToInt32(result.Rows[0]["Complexion"]));
             API.setEntitySyncedData(player.handle, "GTAO_MOLES", Convert.ToInt32(result.Rows[0]["Moles"]));
+            API.setEntitySyncedData(player.handle, "GTAO_EYEBROWS", Convert.ToInt32(result.Rows[0]["skinEyebrows"]));
+            API.setEntitySyncedData(player.handle, "GTAO_EYEBROWS_COLOR", Convert.ToInt32(result.Rows[0]["FacialHairColor"]));
+            API.setEntitySyncedData(player.handle, "GTAO_EYEBROWS_COLOR2", Convert.ToInt32(result.Rows[0]["FacialHairColor"]));
+            API.setEntitySyncedData(player.handle, "GTAO_EYE_COLOR", Convert.ToInt32(result.Rows[0]["skinEyeColor"]));
 
             var list = new float[21];
             list[0] = Convert.ToSingle(result.Rows[0]["NoseWidth"]);

@@ -46,38 +46,21 @@ namespace stuykserver.Util
         {
             if (!player.isInVehicle)
             {
-                db.setPlayerHUD(player, false);
                 API.setEntityData(player, "ReturnPosition", player.position);
-                API.setEntityDimension(player, Convert.ToInt32(API.getEntityData(player, "PlayerID")));
-
-                ColShape colshape = (ColShape)API.getEntityData(player, "ColShape");
-                Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
-                // IF CUSTOM CAMERA
-                if (shop.returnCameraCenterPoint() != new Vector3(0, 0, 0) && shop.returnCameraPoint() != new Vector3(0, 0, 0))
-                {
-                    API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
-                    API.setEntityPosition(player, shop.returnCameraCenterPoint());
-                    API.triggerClientEvent(player, "createCamera", shop.returnCameraPoint(), player.position);
-                    API.triggerClientEvent(player, "openSkinPanel", player.handle);
-                    API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
-                    player.rotation = new Vector3(0, 0, 88.95126);
-                    return;
-                }
-
-                // ELSE DEFAULT CAMERA
                 API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
-                API.setEntityPosition(player, new Vector3(-1279.177, -1118.023, 6.990117));
-                API.triggerClientEvent(player, "createCamera", new Vector3(-1281.826, -1118.141, 7.5), player.position);
-                API.triggerClientEvent(player, "openSkinPanel", player.handle);
-                API.playPlayerAnimation(player, (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody), "amb@world_human_hang_out_street@male_b@base", "base");
-                player.rotation = new Vector3(0, 0, 88.95126);
+                API.setEntityPosition(player, new Vector3(-35.1, -153.3, 57));
+                API.setEntityRotation(player, new Vector3(0, 0, 70.6908));
+                API.freezePlayer(player, true);
+                API.triggerClientEvent(player, "setupBarberShop");
+                API.setEntitySyncedData(player, "StopDraws", true);
             }
         }
 
         public void leaveBarberShop(Client player)
         {
+            API.freezePlayer(player, false);
+            API.setEntitySyncedData(player, "StopDraws", false);
             Vector3 returnPosition = (Vector3)API.getEntityData(player, "ReturnPosition");
-            db.setPlayerHUD(player, true);
             API.setEntityDimension(player, 0);
             API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
             API.setEntityPosition(player, returnPosition);

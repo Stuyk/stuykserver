@@ -8,10 +8,11 @@ API.onUpdate.connect(function () {
         return;
     }
     // Disable the controls we want to use for our interaction mode.
-    API.disableControlThisFrame(242 /* CursorScrollDown */);
-    API.disableControlThisFrame(241 /* CursorScrollUp */);
-    API.disableControlThisFrame(23 /* Enter */);
-    API.disableControlThisFrame(58 /* ThrowGrenade */);
+    API.disableControlThisFrame(242 /* CursorScrollDown */); // SCROLL DOWN
+    API.disableControlThisFrame(241 /* CursorScrollUp */); // SCROLL UP
+    API.disableControlThisFrame(23 /* Enter */); // F
+    API.disableControlThisFrame(58 /* ThrowGrenade */); // G
+    API.disableControlThisFrame(178 /* PhoneOption */); // DEL Key
     API.callNative("HIDE_HUD_COMPONENT_THIS_FRAME", 19);
     // If the disabled control is pressed... SCROLL WHEEL DOWN
     if (API.isDisabledControlJustPressed(242 /* CursorScrollDown */)) {
@@ -43,7 +44,7 @@ API.onUpdate.connect(function () {
         }
     }
     // G
-    if (API.isControlJustPressed(58 /* ThrowGrenade */)) {
+    if (API.isDisabledControlJustPressed(58 /* ThrowGrenade */)) {
         if (target === null) {
             if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
                 return;
@@ -63,6 +64,11 @@ API.onUpdate.connect(function () {
     // Still show weapon wheel with tab.
     if (API.isControlPressed(37 /* SelectWeapon */)) {
         API.callNative("SHOW_HUD_COMPONENT_THIS_FRAME", 19);
+    }
+    // If DEL Key is Pressed. Print target coords.
+    if (API.isDisabledControlJustPressed(178 /* PhoneOption */)) {
+        var aimPos = API.getPlayerAimCoords(API.getLocalPlayer());
+        API.sendChatMessage("[COORDS] - ", aimPos.X.toFixed(4) + " " + aimPos.Y.toFixed(4) + " " + aimPos.Z.toFixed(4));
     }
     // If our target is null, delete the target marker.
     if (target !== null) {

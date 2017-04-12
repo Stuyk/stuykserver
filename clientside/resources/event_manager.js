@@ -42,7 +42,16 @@ API.onServerEventTrigger.connect(function (event, args) {
         // SHOP EVENTS - ???
         //=========================================
         case "setupClothingMode":
+            API.callNative("DO_SCREEN_FADE_OUT", 3000);
+            API.sleep(4000);
+            API.callNative("DO_SCREEN_FADE_IN", 3000);
             resource.clothing_mode.setupClothingMode(args[0]);
+            return;
+        case "setupBarberShop":
+            API.callNative("DO_SCREEN_FADE_OUT", 3000);
+            API.sleep(4000);
+            API.callNative("DO_SCREEN_FADE_IN", 3000);
+            resource.barber_mode.setupBarberShop();
             return;
         //=========================================
         // CEF BROWSER EVENTS - browser_manager.js
@@ -174,7 +183,7 @@ API.onServerEventTrigger.connect(function (event, args) {
             API.setGameplayCameraActive();
             API.setHudVisible(true);
             API.stopAudio();
-            API.displaySubtitle("~b~Welcome back ~o~" + API.getPlayerName(API.getLocalPlayer()), 4000);
+            API.showShard("~b~Welcome back ~o~" + API.getPlayerName(API.getLocalPlayer()), 6000);
             API.sendChatMessage("~r~Current Not Working: ~n~Dealerships, ~n~Car Customization, ~n~Player Customization");
             API.sendChatMessage("~b~Come back in a few days after it's fixed.");
             return;
