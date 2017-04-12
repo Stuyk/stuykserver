@@ -68,6 +68,7 @@ namespace stuykserver.Util
                 }
             }
 
+
             // B FUNCTIONS
             if (eventName == "useFunction")
             {
@@ -86,6 +87,7 @@ namespace stuykserver.Util
                     // ATM
                     if (currentFunction == "Atm")
                     {
+                        API.sendNotificationToPlayer(player, "Fired Key Handler for ATM");
                         API.call("BankHandler", "selectATM", player);
                         return;
                     }
@@ -142,7 +144,6 @@ namespace stuykserver.Util
                     switch (currentFunction)
                     {
                         case "Boats":
-                            pushDealership(player, currentFunction);
                             break;
                         case "Classic":
                             pushDealership(player, currentFunction);

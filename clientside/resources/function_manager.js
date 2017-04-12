@@ -8,31 +8,28 @@ var pressBAlt2 = "clientside/resources/images/pressbalt2.png";
 var pressBAlt3 = "clientside/resources/images/pressbalt3.png";
 // Main KeyDown Functions
 API.onKeyDown.connect(function (player, e) {
-    // If the chat is open, don't do any functions.
-    if (API.isChatOpen) {
+    if (API.isChatOpen()) {
         return;
     }
-    // If the Current Collision Type is not assigned, return.
     if (currentCollisionType === null) {
         return;
     }
-    // If Shift + B is pressed.
-    if (e.KeyCode == Keys.B && e.Shift) {
-        if (currentCollisionType == "Vehicle") {
-            resource.browser_manager.showCEF("clientside/resources/menu_vehiclecontrols.html");
+    if (e.KeyCode === Keys.B) {
+        if (e.Shift) {
+            if (currentCollisionType == "Vehicle") {
+                resource.browser_manager.showCEF("clientside/resources/menu_vehiclecontrols.html");
+                vehicleSpecialFunction = null;
+                useFunction = null;
+                API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
+                return;
+            }
+            API.triggerServerEvent("useSpecial", currentCollisionType);
             vehicleSpecialFunction = null;
             useFunction = null;
             API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
             return;
         }
-        API.triggerServerEvent("useSpecial", currentCollisionType);
-        vehicleSpecialFunction = null;
-        useFunction = null;
-        API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
-        return;
-    }
-    // If B is pressed.
-    if (e.KeyCode == Keys.B) {
+        API.sendChatMessage("B Pressed in collision: " + currentCollisionType);
         API.triggerServerEvent("useFunction", currentCollisionType);
         vehicleSpecialFunction = null;
         useFunction = null;
