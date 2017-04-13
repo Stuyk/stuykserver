@@ -102,6 +102,7 @@ function setupBarberShop() {
     n_beard = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_FACIAL_HAIR");
     n_eyes = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_EYE_COLOR");
     n_eyebrows = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_EYEBROWS");
+    API.callNative("DO_SCREEN_FADE_IN", 3000);
 }
 // Setup Camera
 function setupCamera() {
@@ -117,6 +118,7 @@ function drawBarberShopHud() {
     // Blue Header + Text
     API.drawRectangle(0, 0, (resX / 4), (resY / 16), 54, 117, 219, 255);
     API.drawText("Barbershop", (resX / 4) / 2, 0, 1, 255, 255, 255, 255, 1, 1, false, false, 500);
+    API.drawText("[F - Save] [Backspace - Exit]", resX / 2, 0, 0.5, 255, 255, 255, 255, 4, 1, false, false, 500);
     // Hair
     if (currentIndex === 0) {
         API.drawRectangle(0, (resY / 16) * 1, (resX / 4), (resY / 16), 255, 255, 255, 200);

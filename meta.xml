@@ -19,6 +19,7 @@
 	<script src="clientside/resources/login_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/barber_mode.js" type="client" lang="javascript" />
   <script src="clientside/resources/test.js" type="client" lang="javascript" />
+  <script src="clientside/resources/paperboy.js" type="client" lang="javascript" />
 	
 	<file src="clientside/resources/invalidname.html"/>
 	<file src="clientside/resources/dealership.html"/>

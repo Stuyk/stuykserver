@@ -44,13 +44,11 @@
         case "setupClothingMode":
             API.callNative("DO_SCREEN_FADE_OUT", 3000);
             API.sleep(4000);
-            API.callNative("DO_SCREEN_FADE_IN", 3000);
             resource.clothing_mode.setupClothingMode(args[0]);
             return;
         case "setupBarberShop":
             API.callNative("DO_SCREEN_FADE_OUT", 3000);
             API.sleep(4000);
-            API.callNative("DO_SCREEN_FADE_IN", 3000);
             resource.barber_mode.setupBarberShop();
             return;
         //=========================================

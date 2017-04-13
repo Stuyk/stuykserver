@@ -1,5 +1,5 @@
-﻿var x = API.getScreenResolutionMantainRatio().Width;
-var y = API.getScreenResolutionMantainRatio().Height;
+﻿var resX = API.getScreenResolutionMantainRatio().Width;
+var resY = API.getScreenResolutionMantainRatio().Height;
 var camera = null;
 var cameraHeading = 0;
 var currentIndex = 0;
@@ -67,7 +67,6 @@ API.onUpdate.connect(function () {
     }
 
     API.disableAllControlsThisFrame();
-    displayText();
 
     if (API.isDisabledControlJustPressed(Enums.Controls.CursorScrollUp)) {
         adjustCameraFOV(-1);
@@ -118,24 +117,122 @@ API.onUpdate.connect(function () {
         API.callNative("CLEAR_PED_TASKS_IMMEDIATELY", API.getLocalPlayer());
         API.triggerServerEvent("clothingSave", n_Tops, t_Tops, n_Undershirt, t_Undershirt, n_Torso, n_Legs, t_Legs, n_Feet, t_Feet, n_Accessories, n_Glasses, t_Glasses, n_Bags, t_Bags, n_Mask, t_Mask, t_Torso, n_BodyArmor, t_BodyArmor, t_Accessories, n_Decals, t_Decals, n_Hat, t_Hat);
     }
-});
 
-function displayText() {
-    API.drawRectangle(0, 0, x / 6, y, 0, 0, 0, 150);
-    API.drawText("~b~Keybinds:~w~~n~Change Index - W or S~n~Change Clothing - A or D~n~Change Texture - Q or E~n~F - Save~n~Backspace/Esc - Exit~n~~b~CurrentIndex:~w~ " + currentIndexName, 20, 20, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Hat: ~w~" + n_Hat + "~b~/~w~" + n_Hat_Max + " ~b~||~w~ " + t_Hat + "~b~/~w~" + t_Hat_Max, 20, 250, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Mask: ~w~" + n_Mask + "~b~/~w~" + n_Mask_Max + " ~b~||~w~ " + t_Mask + "~b~/~w~" + t_Mask_Max, 20, 285, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Glasses: ~w~" + n_Glasses + "~b~/~w~" + n_Glasses_Max + " ~b~||~w~ " + t_Glasses + "~b~/~w~" + t_Glasses_Max, 20, 320, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Torso: ~w~" + n_Torso + "~b~/~w~" + n_Torso_Max + " ~b~||~w~ " + t_Torso + "~b~/~w~" + t_Torso_Max, 20, 355, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Legs: ~w~" + n_Legs + "~b~/~w~" + n_Legs_Max + " ~b~||~w~ " + t_Legs + "~b~/~w~" + t_Legs_Max, 20, 390, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Bags: ~w~" + n_Bags + "~b~/~w~" + n_Bags_Max + " ~b~||~w~ " + t_Bags + "~b~/~w~" + t_Bags_Max, 20, 425, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Feet: ~w~" + n_Feet + "~b~/~w~" + n_Feet_Max + " ~b~||~w~ " + t_Feet + "~b~/~w~" + t_Feet_Max, 20, 460, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Accessories: ~w~" + n_Accessories + "~b~/~w~" + n_Accessories_Max + " ~b~||~w~ " + t_Accessories + "~b~/~w~" + t_Accessories_Max, 20, 495, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Undershirt: ~w~" + n_Undershirt + "~b~/~w~" + n_Undershirt_Max + " ~b~||~w~ " + t_Undershirt + "~b~/~w~" + t_Undershirt_Max, 20, 530, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Body Armor: ~w~" + n_BodyArmor + "~b~/~w~" + n_BodyArmor_Max + " ~b~||~w~ " + t_BodyArmor + "~b~/~w~" + t_BodyArmor_Max, 20, 565, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Decals: ~w~" + n_Decals + "~b~/~w~" + n_Decals_Max + " ~b~||~w~ " + t_Decals + "~b~/~w~" + t_Decals_Max, 20, 600, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-    API.drawText("~b~Top: ~w~" + n_Tops + "~b~/~w~" + n_Tops_Max + " ~b~||~w~ " + t_Tops + "~b~/~w~" + t_Tops_Max, 20, 635, 0.5, 0, 0, 0, 255, 4, 0, false, true, x / 4 - 40);
-}
+    // Black Background
+    API.drawRectangle(0, 0, (resX / 4), resY, 0, 0, 0, 150);
+    // Blue Header + Text
+    API.drawRectangle(0, 0, (resX / 4), (resY / 16), 54, 117, 219, 255);
+    API.drawText("Clothing", (resX / 4) / 2, 0, 1, 255, 255, 255, 255, 1, 1, false, false, 500);
+    API.drawText("[F - Save] [Backspace - Exit] ~n~[E & Q - Additional Textures]", resX / 2, 0, 0.5, 255, 255, 255, 255, 4, 1, false, false, 500);
+    // Hat
+    if (currentIndex === 0) {
+        API.drawRectangle(0, (resY / 16) * 1, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Hat", 20, ((resY / 16) * 2) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Hat + " )", (resX / 5) - 20, ((resY / 16) * 2) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Hat", 20, ((resY / 16) * 2) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Hat + " )", (resX / 5) - 20, ((resY / 16) * 2) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Mask
+    if (currentIndex === 1) {
+        API.drawRectangle(0, (resY / 16) * 2, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Mask", 20, ((resY / 16) * 3) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Mask + " )", (resX / 5) - 20, ((resY / 16) * 3) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Mask", 20, ((resY / 16) * 3) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Mask + " )", (resX / 5) - 20, ((resY / 16) * 3) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Glasses
+    if (currentIndex === 2) {
+        API.drawRectangle(0, (resY / 16) * 3, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Glasses", 20, ((resY / 16) * 4) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Glasses + " )", (resX / 5) - 20, ((resY / 16) * 4) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Glasses", 20, ((resY / 16) * 4) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Glasses + " )", (resX / 5) - 20, ((resY / 16) * 4) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Torso
+    if (currentIndex === 3) {
+        API.drawRectangle(0, (resY / 16) * 4, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Torso", 20, ((resY / 16) * 5) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Torso + " )", (resX / 5) - 20, ((resY / 16) * 5) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Torso", 20, ((resY / 16) * 5) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Torso + " )", (resX / 5) - 20, ((resY / 16) * 5) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Legs
+    if (currentIndex === 4) {
+        API.drawRectangle(0, (resY / 16) * 5, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Pants", 20, ((resY / 16) * 6) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Legs + " )", (resX / 5) - 20, ((resY / 16) * 6) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Pants", 20, ((resY / 16) * 6) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Legs + " )", (resX / 5) - 20, ((resY / 16) * 6) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Bags
+    if (currentIndex === 5) {
+        API.drawRectangle(0, (resY / 16) * 6, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Bags & Backpacks", 20, ((resY / 16) * 7) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Bags + " )", (resX / 5) - 20, ((resY / 16) * 7) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Bags & Backpacks", 20, ((resY / 16) * 7) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Bags + " )", (resX / 5) - 20, ((resY / 16) * 7) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Feet / Shoes
+    if (currentIndex === 6) {
+        API.drawRectangle(0, (resY / 16) * 7, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Shoes", 20, ((resY / 16) * 8) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Feet + " )", (resX / 5) - 20, ((resY / 16) * 8) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Shoes", 20, ((resY / 16) * 8) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Feet + " )", (resX / 5) - 20, ((resY / 16) * 8) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Accessories
+    if (currentIndex === 7) {
+        API.drawRectangle(0, (resY / 16) * 8, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Accessories", 20, ((resY / 16) * 9) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Accessories + " )", (resX / 5) - 20, ((resY / 16) * 9) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Accessories", 20, ((resY / 16) * 9) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Accessories + " )", (resX / 5) - 20, ((resY / 16) * 9) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Undershirt
+    if (currentIndex === 8) {
+        API.drawRectangle(0, (resY / 16) * 9, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Undershirt", 20, ((resY / 16) * 10) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Undershirt + " )", (resX / 5) - 20, ((resY / 16) * 10) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Undershirt", 20, ((resY / 16) * 10) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Undershirt + " )", (resX / 5) - 20, ((resY / 16) * 10) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Body Armor
+    if (currentIndex === 9) {
+        API.drawRectangle(0, (resY / 16) * 10, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("BodyArmor", 20, ((resY / 16) * 11) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_BodyArmor + " )", (resX / 5) - 20, ((resY / 16) * 11) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~BodyArmor", 20, ((resY / 16) * 11) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_BodyArmor + " )", (resX / 5) - 20, ((resY / 16) * 11) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Decals
+    if (currentIndex === 10) {
+        API.drawRectangle(0, (resY / 16) * 11, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("BodyArmor", 20, ((resY / 16) * 12) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Decals + " )", (resX / 5) - 20, ((resY / 16) * 12) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Decals", 20, ((resY / 16) * 12) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Decals + " )", (resX / 5) - 20, ((resY / 16) * 12) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    }
+    // Top
+    if (currentIndex === 11) {
+        API.drawRectangle(0, (resY / 16) * 12, (resX / 4), (resY / 16), 255, 255, 255, 200);
+        API.drawText("Top", 20, ((resY / 16) * 13) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("( " + n_Tops + " )", (resX / 5) - 20, ((resY / 16) * 13) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } else {
+        API.drawText("~w~Top", 20, ((resY / 16) * 13) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+        API.drawText("~w~( " + n_Tops + " )", (resX / 5) - 20, ((resY / 16) * 13) - (resY / 16), 1, 0, 0, 0, 255, 4, 0, false, false, 500);
+    } 
+});
 
 function setupClothingMode(cameraPosition) {
     API.setHudVisible(false);
@@ -159,6 +256,8 @@ function setupClothingMode(cameraPosition) {
     n_BodyArmor_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 9);
     n_Decals_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 10);
     n_Tops_Max = API.returnNative("GET_NUMBER_OF_PED_DRAWABLE_VARIATIONS", Enums.NativeReturnTypes.Int, API.getLocalPlayer(), 11);
+
+    API.callNative("DO_SCREEN_FADE_IN", 3000);
 }
 
 function adjustCameraFOV(amount) {
@@ -166,7 +265,7 @@ function adjustCameraFOV(amount) {
 }
 
 function setCurrentIndex(amount) {
-    if (currentIndex + amount === 0 || currentIndex + amount === 12) {
+    if (currentIndex + amount === -1 || currentIndex + amount === 12) {
         return;
     }
 

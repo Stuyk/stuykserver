@@ -23,6 +23,7 @@ namespace stuykserver.Util
 
         public void API_onChatMessage(Client player, string message, CancelEventArgs e)
         {
+            /*
             if (db.isPlayerLoggedIn(player))
             {
                 int dimension = API.getEntityDimension(player);
@@ -32,6 +33,7 @@ namespace stuykserver.Util
             }
             e.Cancel = true;
             return;
+            */
         }
 
         public void sendProximityMessage(Client player, string message, int dimension)

@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Anticheat.cs" />
+    <Compile Include="Classes\AnimationHandler.cs" />
     <Compile Include="Classes\CollisionHandler.cs" />
     <Compile Include="Classes\Dice.cs" />
     <Compile Include="Classes\FuelPumpHandler.cs" />
@@ -144,6 +145,8 @@
     <TypeScriptCompile Include="clientside\resources\camera_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\paperboy.ts" />
+    <TypeScriptCompile Include="clientside\resources\test.ts" />
     <TypeScriptCompile Include="clientside\resources\function_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\hud_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\interaction_mode.ts" />
