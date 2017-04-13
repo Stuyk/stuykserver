@@ -76,7 +76,7 @@ namespace stuykserver.Util
 
         public void actionSaveBarbershop(Client player, params object[] args)
         {
-            string[] varNames = { "skinHairstyle", "skinHairstyleColor", "skinHairstyleHighlight", "skinHairstyleTexture", "FacialHair", "FacialHairColor" };
+            string[] varNames = { "skinHairstyle", "skinHairstyleColor", "skinHairstyleHighlight", "skinHairstyleTexture", "FacialHair", "FacialHairColor", "skinEyeColor", "skinEyebrows" };
             string before = "UPDATE PlayerSkins SET";
             string after = string.Format("WHERE PlayerID='{0}'", Convert.ToString(API.getEntityData(player, "PlayerID")));
             db.compileQuery(before, after, varNames, args);

@@ -105,6 +105,14 @@ function setupBarberShop() {
     API.setChatVisible(false);
     API.callNative("TASK_LOOK_AT_COORD", API.getLocalPlayer(), -36.58, -152.68, 57.8, -1, 0, 0);
     API.playPlayerAnimation("misshair_shop@barbers", "player_base", 1, -1);
+    n_hair = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_HAIRSTYLE");
+    n_hair_color = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_HAIR_HIGHLIGHT_COLOR");
+    n_highlight = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_HAIRSTYLE");
+    n_beard = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_FACIAL_HAIR");
+    n_eyes = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_EYE_COLOR");
+    n_eyebrows = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_EYEBROWS");
+
+
 }
 // Setup Camera
 function setupCamera() {
@@ -304,7 +312,7 @@ function updatePlayer() {
 }
 // Save and Exit
 function saveAndExit() {
-    API.triggerServerEvent("barbershopSaveAndExit", n_hair, n_hair_color, n_highlight, 0, n_beard, n_hair_color);
+    API.triggerServerEvent("barbershopSaveAndExit", n_hair, n_hair_color, n_highlight, 0, n_beard, n_hair_color, n_eyes, n_eyebrows);
 }
 // Exit without Saving
 function justExit() {
