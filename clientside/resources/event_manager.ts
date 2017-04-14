@@ -58,7 +58,7 @@
             API.setHudVisible(false);
             resource.browser_manager.showCEF("clientside/resources/index.html");
             API.startAudio("clientside/resources/audio/trulyyours.mp3", true);
-            API.setGameVolume(0.5);
+            API.setGameVolume(0.1);
             return;
         case "showInvalidName":
             resource.browser_manager.showCEF("clientside/resources/invalidname.html");
@@ -193,6 +193,22 @@
         case "createCameraNoPosition":
             resource.camera_manager.cameraSetupSilent(args[0], new Vector3());
             resource.camera_manager.cameraActivate();
+            return;
+        //=========================================
+        // MISSION EVENTS
+        //=========================================
+        // Go to next mission objective, someone else completed it.
+        case "startMission":
+            resource.mission_handler.startMission();
+            return;
+        case "missionWinScreen":
+            resource.mission_handler.missionWinScreen();
+            return;
+        case "missionLoseScreen":
+            resource.mission_handler.missionLoseScreen();
+            return;
+        case "missionTieScreen":
+            resource.mission_handler.missionTieScreen();
             return;
     }
 });

@@ -60,6 +60,7 @@
     <Compile Include="Classes\Dice.cs" />
     <Compile Include="Classes\FuelPumpHandler.cs" />
     <Compile Include="Classes\House.cs" />
+    <Compile Include="Classes\MissionClass.cs" />
     <Compile Include="Classes\MissionHandler.cs" />
     <Compile Include="Classes\OrganizationHandler.cs" />
     <Compile Include="Classes\Player.cs" />
@@ -145,7 +146,7 @@
     <TypeScriptCompile Include="clientside\resources\camera_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
-    <TypeScriptCompile Include="clientside\resources\paperboy.ts" />
+    <TypeScriptCompile Include="clientside\resources\mission_handler.ts" />
     <TypeScriptCompile Include="clientside\resources\test.ts" />
     <TypeScriptCompile Include="clientside\resources\function_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\hud_manager.ts" />

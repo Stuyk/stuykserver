@@ -1,3 +1,5 @@
+var allyPoints = 0;
+var enemyPoints = 0;
 var resX = API.getScreenResolutionMantainRatio().Width;
 var resY = API.getScreenResolutionMantainRatio().Height;
 var debug = false;
@@ -30,6 +32,8 @@ API.onUpdate.connect(function () {
             positionsTypes.shift();
             shiftToNextTask();
             API.playSoundFrontEnd("Player_Collect", "DLC_PILOT_MP_HUD_SOUNDS");
+            API.triggerServerEvent("updateMissionBar", null);
+            API.triggerServerEvent("shiftMissionObjectives");
         }
         else {
             // Finish objective.
@@ -64,6 +68,8 @@ API.onUpdate.connect(function () {
                             positionsTypes.shift();
                             shiftToNextTask();
                             API.playSoundFrontEnd("Player_Collect", "DLC_PILOT_MP_HUD_SOUNDS");
+                            API.triggerServerEvent("updateMissionBar", null);
+                            API.triggerServerEvent("shiftMissionObjectives");
                             return;
                         }
                         else {
@@ -72,6 +78,7 @@ API.onUpdate.connect(function () {
                             return;
                         }
                     }
+                    API.triggerServerEvent("updateMissionBar", taskHealth);
                     return;
                 }
             }
@@ -93,6 +100,8 @@ API.onUpdate.connect(function () {
                     positionsTypes.shift();
                     shiftToNextTask();
                     API.playSoundFrontEnd("Player_Collect", "DLC_PILOT_MP_HUD_SOUNDS");
+                    API.triggerServerEvent("updateMissionBar", null);
+                    API.triggerServerEvent("shiftMissionObjectives");
                     return;
                 }
                 else {
@@ -107,6 +116,7 @@ API.onUpdate.connect(function () {
             else {
                 cooldown = (new Date().getTime() + 2000);
                 taskHealth += 5;
+                API.triggerServerEvent("updateMissionBar", taskHealth);
                 return;
             }
         }
@@ -134,6 +144,7 @@ API.onUpdate.connect(function () {
                     cooldown = (new Date().getTime() + 5000);
                     taskHealth += 10;
                     API.playSoundFrontEnd("Pin_Good", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
+                    API.triggerServerEvent("updateMissionBar", taskHealth);
                 }
             }
             else {
@@ -148,12 +159,12 @@ API.onUpdate.connect(function () {
                     shiftToNextTask();
                     API.playSoundFrontEnd("Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
                     API.triggerServerEvent("stopAnimation");
+                    API.triggerServerEvent("updateMissionBar", null);
+                    API.triggerServerEvent("shiftMissionObjectives");
                     return;
                 }
                 else {
                     finish();
-                    API.playSoundFrontEnd("WIN", "HUD_AWARDS");
-                    API.triggerServerEvent("stopAnimation");
                     return;
                 }
             }
@@ -173,51 +184,42 @@ function drawProgressBar() {
 // =========================================================
 // Chat Message Command, ONLY FOR DEBUG
 // =========================================================
-API.onChatMessage.connect(function (msg) {
-    //if (debug) {
-    if (msg !== "start") {
-        return;
-    }
-    if (started) {
-        started = false;
-        cleanup();
-        if (debug) {
-            API.sendChatMessage("[DEBUG] STOPPED");
-        }
-    }
-    else {
-        started = true;
-        if (debug) {
-            API.sendChatMessage("[DEBUG] STARTED");
-        }
-        cleanup();
-        // How to start a job.
-        //if (debug) {
-        positions.push(new Vector3(-41.5859, -98.7301, 57.3881));
-        positionsTypes.push("Hack");
-        positions.push(new Vector3(-34.8390, -104.8744, 56.3878));
-        positionsTypes.push("Waypoint");
-        positions.push(new Vector3(-29.2809, -93.2767, 56.2543));
-        positionsTypes.push("Capture");
-        positions.push(new Vector3(-27.0519, -80.7949, 56.2536));
-        positionsTypes.push("Waypoint");
-        positions.push(new Vector3(-27.1417, -77.5539, 56.8771));
-        positionsTypes.push("Destroy");
-        //}
-        shiftToNextTask();
-    }
-    //}
-});
 // Start your job
-function startJob() {
+function startMission() {
     if (positions.length < 1) {
         return;
     }
     shiftToNextTask();
 }
 // Add positions to our job array.
-function addJobPosition(position) {
+function addJobPosition(position, type) {
     positions.push(position);
+    positionsTypes.push(type);
+}
+// Shift next task
+function goToNextTask(allPoints, enmPoints) {
+    allyPoints = allPoints;
+    enemyPoints = enmPoints;
+    if (positions.length > 1) {
+        positions.shift();
+        positionsTypes.shift();
+        shiftToNextTask();
+        API.playSoundFrontEnd("Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
+        API.triggerServerEvent("stopAnimation");
+        return;
+    }
+    else {
+        finish();
+        API.playSoundFrontEnd("WIN", "HUD_AWARDS");
+        API.triggerServerEvent("stopAnimation");
+        return;
+    }
+}
+// Sync Mission Bars Up
+function syncMissionBar(amount, allPoints, enmPoints) {
+    allyPoints = allPoints;
+    enemyPoints = enmPoints;
+    taskHealth = amount;
 }
 // Cleanup any garbage.
 function cleanup() {
@@ -275,7 +277,27 @@ function shiftToNextTask() {
 // Finish a Job
 // =========================================================
 function finish() {
-    API.showColorShard("Mission Complete", "Great job, good luck on the next one.", 2, 10, 5000);
+    API.triggerServerEvent("stopAnimation");
+    var opposition = API.getEntitySyncedData(API.getLocalPlayer(), "Opposition");
+    switch (opposition) {
+        case "Ally":
+            if (allyPoints > enemyPoints) {
+                API.showColorShard("Mission Complete", "Your team won the mission.", 2, 10, 5000);
+            }
+            else {
+                API.showColorShard("Mission Failed", "Your team lost the mission.", 2, 10, 5000);
+            }
+            break;
+        case "Enemy":
+            if (enemyPoints > allyPoints) {
+                API.showColorShard("Mission Complete", "Your team won the mission.", 2, 10, 5000);
+            }
+            else {
+                API.showColorShard("Mission Failed", "Your team lost the mission.", 2, 10, 5000);
+            }
+            break;
+    }
+    API.triggerServerEvent("EndMission"); // Not implemented yet.
     cleanup();
     started = false;
 }

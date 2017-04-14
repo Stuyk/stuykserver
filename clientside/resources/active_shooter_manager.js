@@ -20,7 +20,7 @@ API.onUpdate.connect(function () {
 });
 // Push an active shooter blip to the Array and display it to the player.
 function pushShooterBlip(position, color, sprite) {
-    var blipHandle = new blipHandler(position, color, sprite);
+    var blipHandle = new activeShooterBlipHandler(position, color, sprite);
     blipHandle.pushToActive();
 }
 // Pop any active shooter blips.

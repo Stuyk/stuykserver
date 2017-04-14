@@ -8,74 +8,63 @@ using System.Threading.Tasks;
 
 namespace stuykserver.Classes
 {
-    public class MissionHandler : Script,IDisposable
+    public class MissionHandler : Script
     {
-        public enum MissionType
-        {
-            PaperRoute
-        }
-
-        public enum PointType
-        {
-            DestroyImmediately,
-            Capture,
-            Destroy
-        }
-
-        //=============================
-        // Mission Information
-        //=============================
-        Client missionOwner; // Mission Owner
-        List<Client> missionAllies; // Current Assigned Players
-        List<Client> missionOpposition; // Current Opposition
-        NetHandle missionTarget; // Current Target
-        List<NetHandle> missionTargets; // Other Targets
-        ColShape missionColShape; // Current Target
-        List<ColShape> missionColShapes; // Other Targets
-        MissionType missionType; // The Mission Type
-
         public MissionHandler()
         {
-            API.onEntityEnterColShape += API_onEntityEnterColShape;
+            API.onClientEventTrigger += API_onClientEventTrigger;
         }
 
-        private void API_onEntityEnterColShape(ColShape colshape, NetHandle entity)
+        private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
         {
-            if (API.getEntityType(entity) == EntityType.Player)
+            if (!player.hasData("Mission") && player.getData("Mission") != null)
             {
-                if (colshape.hasData("Owner"))
-                {
-                    Client player = API.getPlayerFromHandle(entity);
-                    if (colshape.getData("Owner") == player)
+                return;
+            }
+
+            MissionClass mission = player.getData("Mission");
+
+            switch (eventName)
+            {
+                case "updateMissionBar":
+                    if (arguments.Length > 0)
                     {
-                        switch ((MissionType)colshape.getData("PointType"))
-                        {
-                            case MissionType.PaperRoute:
-
-                                return;
-                        }
+                        mission.updateMissionBar(player, Convert.ToInt32(arguments[0]));
                     }
-                }
+                    return;
+                case "shiftMissionObjectives":
+                    mission.shiftMissionObjectives(player, (Vector3)arguments[0]);
+                    return;
             }
         }
 
-        public void setupColShape(Vector3 position, float range, PointType type)
+        [Command("startDebugMission")]
+        public void cmdStartDebugMission(Client player)
         {
-            ColShape colshape = API.createCylinderColShape(position, range, 5f);
-            colshape.setData("Owner", missionOwner);
-            colshape.setData("PointType", type);
-            // Setup Our First Collision Target
-            if (missionColShapes.Count - 1 == -1)
+            MissionClass mission = new MissionClass(player);
+            mission.addObjective(new Vector3(-34.8390, -104.8744, 56.3878), MissionClass.PointType.Waypoint);
+            mission.addObjective(new Vector3(-13.0416, -143.2909, 55.6454), MissionClass.PointType.DestroyVehicle);
+            mission.setTargetVehicleType(VehicleHash.Buffalo);
+            mission.addObjective(new Vector3(-41.5859, -98.7301, 57.3881), MissionClass.PointType.Hack);
+            mission.addObjective(new Vector3(-29.2809, -93.2767, 56.2543), MissionClass.PointType.Capture);
+            mission.addObjective(new Vector3(-27.0519, -80.7949, 56.2536), MissionClass.PointType.Waypoint);
+            mission.addObjective(new Vector3(-27.1417, -77.5539, 56.8771), MissionClass.PointType.Destroy);
+            
+            mission.startMission();
+        }
+
+        [Command("addplayer")]
+        public void cmdAddPlayer(Client player, string target)
+        {
+            Client tgt = API.getPlayerFromName(target);
+            if (tgt != null)
             {
-                missionColShape = colshape;
+                MissionClass mission = player.getData("Mission");
+                mission.addAlly(tgt);
             }
-            // Add it to our list.
-            missionColShapes.Add(colshape);
+            
         }
 
-        public void Dispose()
-        {
-            // CODE CLEANUP
-        }
+
     }
 }
