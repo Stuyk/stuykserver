@@ -1,8 +1,8 @@
 # StuykGTAVServer
 ---
-#### An optimized server for GTAV.
+### An optimized server for GTAV.
 ---
-#### Entity Information
+### Entity Information
 **Mission_Target** - Target for any mission.<br />
 **Mission_Opposition** - Target is of Ally or Enemy string.<br />
 **Mission_Position** - The current tasks position.<br />
