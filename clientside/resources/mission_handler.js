@@ -10,6 +10,7 @@ var positionType; // Current OBJECTIVE Type
 var currentTaskPosition = null; // Current Position Task
 var taskHealth = 25;
 var cooldown = Math.round(new Date().getTime());
+var timer = 180000;
 var inAnimation = false;
 var opposition;
 var target = null;
@@ -50,6 +51,9 @@ API.onEntityDataChange.connect(function (entity, string, oldValue) {
             enemyPoints = API.getEntitySyncedData(entity, "Mission_Points_Enemies");
             //API.sendChatMessage("New Sync Data" + string + " " + enemyPoints);
             break;
+        case "Mission_Timer":
+            timer = Number(API.getEntitySyncedData(entity, "Mission_Timer"));
+            break;
         case "Mission_Task_Bar_Allies":
             if (opposition == "Ally") {
                 taskHealth = API.getEntitySyncedData(entity, "Mission_Task_Bar_Allies");
@@ -83,16 +87,15 @@ API.onUpdate.connect(function () {
     if (!started && currentTaskPosition === null) {
         return;
     }
-    API.drawText("" + positionType, 50, 200, 0.5, 0, 0, 0, 255, 4, 0, false, false, 500);
     // Waypoint
     var playerPos = API.getEntityPosition(API.getLocalPlayer());
-    if (positionType == "Waypoint" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) < 2) {
+    if (positionType === "Waypoint" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) < 2) {
         positionType = null;
         goToNextTaskInherited();
         return;
     }
     // Destroy
-    if (positionType == "Destroy") {
+    if (positionType === "Destroy") {
         if (taskHealth !== null && playerPos.DistanceTo(currentTaskPosition) <= 10) {
             drawProgressBar();
         }
@@ -102,7 +105,7 @@ API.onUpdate.connect(function () {
             }
             if (playerPos.DistanceTo(currentTaskPosition) < 3) {
                 var aimPos = API.getPlayerAimCoords(API.getLocalPlayer());
-                if (aimPos.DistanceTo(currentTaskPosition) < 1) {
+                if (aimPos.DistanceTo(currentTaskPosition) < 1.5) {
                     cooldown = (new Date().getTime() + 1500);
                     taskHealth -= 10;
                     if (taskHealth <= 0) {
@@ -117,8 +120,8 @@ API.onUpdate.connect(function () {
         return;
     }
     // Destroy Vehicle
-    if (positionType == "DestroyVehicle") {
-        if (target != null && API.doesEntityExist(target)) {
+    if (positionType === "DestroyVehicle") {
+        if (target !== null && API.doesEntityExist(target)) {
             currentTaskPosition = API.getEntityPosition(target);
         }
         if (taskHealth !== null && playerPos.DistanceTo(currentTaskPosition) <= 10) {
@@ -130,7 +133,7 @@ API.onUpdate.connect(function () {
             }
             if (playerPos.DistanceTo(currentTaskPosition) < 3) {
                 var aimPos = API.getPlayerAimCoords(API.getLocalPlayer());
-                if (aimPos.DistanceTo(currentTaskPosition) < 1) {
+                if (aimPos.DistanceTo(currentTaskPosition) < 1.5) {
                     cooldown = (new Date().getTime() + 1200);
                     taskHealth -= 5;
                     if (taskHealth <= 0) {
@@ -145,7 +148,7 @@ API.onUpdate.connect(function () {
         return;
     }
     // Capture
-    if (positionType == "Capture") {
+    if (positionType === "Capture") {
         if (playerPos.DistanceTo(currentTaskPosition) <= 10) {
             drawProgressBar();
         }
@@ -169,7 +172,7 @@ API.onUpdate.connect(function () {
         }
     }
     // Hack
-    if (positionType == "Hack") {
+    if (positionType === "Hack") {
         if (playerPos.DistanceTo(currentTaskPosition) <= 10) {
             drawProgressBar();
         }
@@ -197,7 +200,7 @@ API.onUpdate.connect(function () {
             else {
                 var point = API.worldToScreenMantainRatio(currentTaskPosition);
                 var newPoint = Point.Round(point);
-                API.drawText("~w~Press [F] to ~b~hack.", newPoint.X, newPoint.Y, 0.5, 0, 0, 0, 255, 4, 1, false, true, 600);
+                API.drawText("~w~Hold [F] to ~b~hack.", newPoint.X, newPoint.Y, 0.5, 0, 0, 0, 255, 4, 1, false, true, 600);
             }
             if (taskHealth >= 100) {
                 positionType = null;
@@ -205,9 +208,19 @@ API.onUpdate.connect(function () {
             }
         }
     }
+    // Investigate
+    if (positionType === "Investigate" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) < 20) {
+        positionType = null;
+        goToNextTaskInherited();
+        return;
+    }
+    // DisableBomb
+    if (positionType == "DisableBomb" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) < 20) {
+        drawTimer();
+    }
 });
 // =========================================================
-// Used for Capture, Hack, Destroy
+// Draw Functions
 // =========================================================
 function drawProgressBar() {
     var point = API.worldToScreenMantainRatio(currentTaskPosition);
@@ -215,6 +228,17 @@ function drawProgressBar() {
     // taskHealth * 3 (100 = 300);
     API.drawRectangle(newPoint.X - 170, newPoint.Y - 10, 320, 40, 0, 0, 0, 100);
     API.drawRectangle(newPoint.X - 160, newPoint.Y, (taskHealth * 3), 20, 0, 255, 0, 100);
+}
+function drawTimer() {
+    if (new Date().getTime() > cooldown) {
+        cooldown = new Date().getTime() + 1000;
+        API.triggerServerEvent("updateMissionTimer", Math.round(timer));
+    }
+    if (timer <= 0) {
+    }
+    var point = API.worldToScreenMantainRatio(currentTaskPosition);
+    var newPoint = Point.Round(point);
+    API.drawText("" + timer, newPoint.X, newPoint.Y + 20, 0.5, 255, 0, 0, 255, 4, 1, false, true, 500);
 }
 // =========================================================
 // Chat Message Command, ONLY FOR DEBUG
@@ -264,6 +288,12 @@ function shiftToNextTask() {
             return;
         case "Hack":
             drawHack();
+            return;
+        case "Investigate":
+            drawInvestigate();
+            return;
+        case "DisableBomb":
+            drawDisableBomb();
             return;
     }
 }
@@ -348,4 +378,24 @@ function drawDestroyVehicle() {
     API.setBlipSprite(blip, 1);
     API.setBlipColor(blip, 67);
     API.displaySubtitle("Destroy the ~r~targets ~w~vehicle.", 5000);
+}
+// "Investigate"
+function drawInvestigate() {
+    API.displaySubtitle("Investigate the ~b~location.", 5000);
+    API.setWaypoint(currentTaskPosition.X, currentTaskPosition.Y);
+    blip = API.createBlip(currentTaskPosition);
+    API.setBlipSprite(blip, 1);
+    API.setBlipColor(blip, 67);
+}
+// "DisableBomb"
+function drawDisableBomb() {
+    cooldown = new Date().getTime() + 25000;
+    taskHealth = 100;
+    marker = API.createMarker(0 /* UpsideDownCone */, currentTaskPosition, new Vector3(), new Vector3(), new Vector3(0.2, 0.2, 0.2).Add(new Vector3(0, 0, 0.5)), 63, 137, 255, 150);
+    API.displaySubtitle("Defuse the ~b~bomb.", 5000);
+    API.setWaypoint(currentTaskPosition.X, currentTaskPosition.Y);
+    blip = API.createBlip(currentTaskPosition);
+    API.setBlipSprite(blip, 1);
+    API.setBlipColor(blip, 67);
+    timer = 180000;
 }

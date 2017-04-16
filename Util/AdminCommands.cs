@@ -38,6 +38,24 @@ namespace stuykserver.Util
             }
         }
 
+        [Command("everyone")]
+        public void cmdEveryone(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (!instance.isAdmin())
+            {
+                return;
+            }
+
+            List<Client> players = API.getAllPlayers();
+
+            foreach (Client p in players)
+            {
+                API.setEntityPosition(p, player.position);
+            }
+
+        }
+
         [Command("killcamera")]
         public void cmdKillCamera(Client player)
         {

@@ -35,6 +35,9 @@ namespace stuykserver.Classes
                 case "shiftMissionObjectives":
                     mission.shiftMissionObjectives(player, (Vector3)arguments[0]);
                     return;
+                case "updateMissionTimer":
+                    mission.updateTimer(Convert.ToInt32(arguments[0]));
+                    return;
             }
         }
 
@@ -42,6 +45,9 @@ namespace stuykserver.Classes
         public void cmdStartDebugMission(Client player)
         {
             MissionClass mission = new MissionClass(player);
+            
+            mission.addObjective(new Vector3(-34.8390, -104.8744, 56.3878), MissionClass.PointType.DisableBomb);
+            mission.addObjective(new Vector3(-13.0416, -143.2909, 55.6454), MissionClass.PointType.Investigate);
             mission.addObjective(new Vector3(-34.8390, -104.8744, 56.3878), MissionClass.PointType.Waypoint);
             mission.addObjective(new Vector3(-13.0416, -143.2909, 55.6454), MissionClass.PointType.DestroyVehicle);
             mission.setTargetVehicleType(VehicleHash.Buffalo);
@@ -49,7 +55,7 @@ namespace stuykserver.Classes
             mission.addObjective(new Vector3(-29.2809, -93.2767, 56.2543), MissionClass.PointType.Capture);
             mission.addObjective(new Vector3(-27.0519, -80.7949, 56.2536), MissionClass.PointType.Waypoint);
             mission.addObjective(new Vector3(-27.1417, -77.5539, 56.8771), MissionClass.PointType.Destroy);
-            
+
             mission.startMission();
         }
 

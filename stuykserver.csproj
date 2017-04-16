@@ -147,6 +147,7 @@
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\mission_handler.ts" />
+    <TypeScriptCompile Include="clientside\resources\snake.ts" />
     <TypeScriptCompile Include="clientside\resources\test.ts" />
     <TypeScriptCompile Include="clientside\resources\function_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\hud_manager.ts" />
