@@ -4,3 +4,7 @@ stuykserver.dll
 /Properties/*
 obj/Debug/stuykserver.dll
 obj/Debug/stuykserver.pdb
+*.zip
+*.exe
+*.config
+*.md
