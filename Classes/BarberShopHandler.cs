@@ -48,6 +48,7 @@ namespace stuykserver.Util
             {
                 API.setEntityData(player, "ReturnPosition", player.position);
                 API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
+                API.setEntityDimension(player, Convert.ToInt32(API.getEntityData(player, "PlayerID")));
                 API.setEntityPosition(player, new Vector3(-35.1, -153.3, 57));
                 API.setEntityRotation(player, new Vector3(0, 0, 70.6908));
                 API.freezePlayer(player, true);

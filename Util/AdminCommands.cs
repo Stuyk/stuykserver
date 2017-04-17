@@ -56,6 +56,42 @@ namespace stuykserver.Util
 
         }
 
+        [Command("giveeveryone")]
+        public void cmdEveryoneWeapon(Client player, WeaponHash hash)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (!instance.isAdmin())
+            {
+                return;
+            }
+
+            List<Client> players = API.getAllPlayers();
+
+            foreach (Client p in players)
+            {
+                API.givePlayerWeapon(p, hash, 500, true, true);
+            }
+
+        }
+
+        [Command("healeveryone")]
+        public void cmdEveryoneHeal(Client player)
+        {
+            Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
+            if (!instance.isAdmin())
+            {
+                return;
+            }
+
+            List<Client> players = API.getAllPlayers();
+
+            foreach (Client p in players)
+            {
+                API.setEntityData(p, "CHEAT_HEALTH", 100);
+                p.health = 100;
+            }
+        }
+
         [Command("killcamera")]
         public void cmdKillCamera(Client player)
         {

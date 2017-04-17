@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace stuykserver.Classes
 {
@@ -18,7 +19,9 @@ namespace stuykserver.Classes
             Hack,
             DestroyVehicle,
             Investigate,
-            DisableBomb
+            DisableBomb,
+            TakeVehicle,
+            DeliverVehicle
         }
         // Variables
         List<Vector3> missionObjectives;
@@ -32,7 +35,9 @@ namespace stuykserver.Classes
         int allyPoints;
         int enemyPoints;
         int timer;
+        Timer timerInstance;
         NetHandle target;
+        NetHandle targetDelivery;
         VehicleHash targetVehicleType;
         // Useless constructor.
         public MissionClass() { }
@@ -58,6 +63,18 @@ namespace stuykserver.Classes
             }
             currentObjective = null;
 
+            foreach (Client player in allies)
+            {
+                API.setEntitySyncedData(player, "Mission_Delay", true);
+            }
+
+            foreach (Client player in enemies)
+            {
+                API.setEntitySyncedData(player, "Mission_Delay", true);
+            }
+
+            PointType lastType = missionPoints[0];
+
             if (missionObjectives.Count > 0)
             {
                 missionObjectives.Remove(missionObjectives.First());
@@ -74,6 +91,28 @@ namespace stuykserver.Classes
                 enemyPoints += 1;
             }
 
+            if (API.doesEntityExist(target))
+            {
+                API.setEntityPositionFrozen(target, false);
+
+                if (lastType == PointType.DestroyVehicle)
+                {
+                    API.setVehicleHealth(target, -900);
+                    Vector3 vehiclePos = API.getEntityPosition(target);
+                    API.createExplosion(ExplosionType.Flame, new Vector3(vehiclePos.X, vehiclePos.Y, vehiclePos.Z - 2));
+                }
+
+                if (lastType == PointType.DisableBomb)
+                {
+                    API.deleteEntity(target);
+                }
+
+                if (lastType == PointType.DeliverVehicle)
+                {
+                    API.deleteEntity(target);
+                }
+            }
+
             if (missionObjectives.Count == 0)
             {
                 if (allyPoints > enemyPoints)
@@ -81,11 +120,13 @@ namespace stuykserver.Classes
                     foreach (Client player in allies)
                     {
                         API.triggerClientEvent(player, "missionWinScreen");
+                        API.setEntitySyncedData(player, "Mission_Delay", false);
                     }
 
                     foreach (Client player in enemies)
                     {
                         API.triggerClientEvent(player, "missionLoseScreen");
+                        API.setEntitySyncedData(player, "Mission_Delay", false);
                     }
                 }
 
@@ -94,11 +135,13 @@ namespace stuykserver.Classes
                     foreach (Client player in allies)
                     {
                         API.triggerClientEvent(player, "missionLoseScreen");
+                        API.setEntitySyncedData(player, "Mission_Delay", false);
                     }
 
                     foreach (Client player in enemies)
                     {
                         API.triggerClientEvent(player, "missionWinScreen");
+                        API.setEntitySyncedData(player, "Mission_Delay", false);
                     }
                 }
 
@@ -118,21 +161,6 @@ namespace stuykserver.Classes
             }
 
             currentObjective = missionObjectives[0];
-            if (API.doesEntityExist(target))
-            {
-                switch(API.getEntityType(target))
-                {
-                    case EntityType.Vehicle:
-                        API.deleteEntity(target);
-                        break; ;
-                    case EntityType.Prop:
-                        API.deleteEntity(target);
-                        break;
-                    default:
-                        API.deleteEntity(target);
-                        break;
-                }
-            }
 
             switch (missionPoints[0])
             {
@@ -141,6 +169,9 @@ namespace stuykserver.Classes
                     break;
                 case PointType.DisableBomb:
                     setupBombDevice();
+                    break;
+                case PointType.TakeVehicle:
+                    setupTargetVehicle();
                     break;
             }
 
@@ -155,8 +186,8 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(player, "Mission_Type", missionPoints[0].ToString());
                 API.setEntitySyncedData(player, "Mission_Points_Allies", allyPoints);
                 API.setEntitySyncedData(player, "Mission_Points_Enemies", enemyPoints);
-                API.setEntitySyncedData(player, "Mission_Target", target);
                 API.setEntitySyncedData(player, "Mission_Timer", timer);
+                API.setEntitySyncedData(player, "Mission_Delay", false);
             }
 
             foreach (Client player in enemies)
@@ -167,8 +198,8 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(player, "Mission_Type", missionPoints[0].ToString());
                 API.setEntitySyncedData(player, "Mission_Points_Allies", allyPoints);
                 API.setEntitySyncedData(player, "Mission_Points_Enemies", enemyPoints);
-                API.setEntitySyncedData(player, "Mission_Target", target);
                 API.setEntitySyncedData(player, "Mission_Timer", timer);
+                API.setEntitySyncedData(player, "Mission_Delay", false);
             }
         }
         // Sync Current Mission Bars
@@ -185,6 +216,11 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(player, "Mission_Task_Bar_Allies", allyBar);
                 API.setEntitySyncedData(player, "Mission_Task_Bar_Enemies", enemyBar);
             }
+        }
+        // Return Mission Owner
+        public Client returnMissionOwner()
+        {
+            return missionOwner;
         }
         // Update Mission Bars
         public void updateMissionBar(Client player, int amount)
@@ -272,16 +308,92 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(player, "Mission_Started", true);
             }
         }
-        // Update Mission Timer
-        public void updateTimer(int currentTime)
+        // Setup Target Vehicle
+        public void setupTargetVehicle()
         {
-            if (currentTime != timer)
+            target = API.createVehicle(targetVehicleType, missionObjectives[0].Add(new Vector3(0, 0, 1)), new Vector3(), 111, 111);
+            syncTarget();
+
+            if (missionPoints[0] == PointType.DestroyVehicle)
             {
+                API.setEntityPositionFrozen(target, true);
+                API.setVehicleLocked(target, true);
+                allyBar = 100;
+                enemyBar = 100;
+                syncMissionBars();
                 return;
             }
 
-            API.sendChatMessageToAll(timer.ToString());
+            if (missionPoints[0] == PointType.TakeVehicle)
+            {
+                API.setVehicleLocked(target, false);
+                timer = 180000;
+                timerInstance = new Timer();
+                timerInstance.Interval = 1000;
+                timerInstance.Elapsed += TimerInstance_Elapsed;
+                timerInstance.Start();
+                targetDelivery = target;
+                return;
+            }
+        }
+        // Setup Bomb Device
+        public void setupBombDevice()
+        {
+            allyBar = 0;
+            enemyBar = 0;
+            GTANetworkServer.Object device = API.createObject(1764669601, missionObjectives[0].Add(new Vector3(0, 0, 0.04)), new Vector3(-90, -90, 0), 0);
+            target = device;
+            syncTarget();
+            syncMissionBars();
+            timer = 180000;
+            timerInstance = new Timer();
+            timerInstance.Interval = 1000;
+            timerInstance.Elapsed += TimerInstance_Elapsed;
+            timerInstance.Start();
+        }
+
+        private void TimerInstance_Elapsed(object sender, ElapsedEventArgs e)
+        {
             timer = timer - 1000;
+
+            switch(missionPoints[0])
+            {
+                case PointType.DisableBomb:
+                    break;
+                case PointType.TakeVehicle:
+                    break;
+                default:
+                    timerInstance.Dispose();
+                    return;
+            }
+
+            if (timer <= 0)
+            {
+                if (missionPoints[0] == PointType.DisableBomb)
+                {
+                    API.createExplosion(ExplosionType.Rocket, missionObjectives[0], 10f, 0);
+                    API.deleteEntity(target);
+                }
+
+                if (missionPoints[0] == PointType.TakeVehicle)
+                {
+                    API.deleteEntity(target);
+                }
+
+                foreach (Client player in allies)
+                {
+                    API.triggerClientEvent(player, "missionLoseScreen");
+
+                }
+
+                foreach (Client player in enemies)
+                {
+                    API.triggerClientEvent(player, "missionLoseScreen");
+                }
+                timerInstance.Stop();
+                timerInstance.Enabled = false;
+                return;
+            }
 
             foreach (Client player in allies)
             {
@@ -293,28 +405,7 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(player, "Mission_Timer", timer);
             }
         }
-        // Setup Target Vehicle
-        public void setupTargetVehicle()
-        {
-            allyBar = 100;
-            enemyBar = 100;
-            target = API.createVehicle(targetVehicleType, missionObjectives[0].Add(new Vector3(0, 0, 1)), new Vector3(), 111, 111);
-            API.setVehicleLocked(target, true);
-            syncTarget();
-            syncMissionBars();
-        }
-        // Setup Bomb Device
-        public void setupBombDevice()
-        {
-            allyBar = 100;
-            enemyBar = 100;
-            GTANetworkServer.Object device = API.createObject(1764669601, missionObjectives[0].Add(new Vector3(0, 0, 2.0)), new Vector3(0, -90, 0), 0);
-            target = device;
-            syncTarget();
-            syncMissionBars();
-            timer = 180000;
-            updateTimer(180000);
-        }
+
         // Sync the Target for all players.
         public void syncTarget()
         {
@@ -333,9 +424,155 @@ namespace stuykserver.Classes
         {
             targetVehicleType = type;
         }
+        // Remove Ally
+        public void removeAlly(Client player)
+        {
+            if (allies.Count > 1)
+            {
+                if (allies.Contains(player))
+                {
+                    allies.Remove(player);
+                    API.setEntitySyncedData(player, "Mission_Started", false);
+                    API.resetEntitySyncedData(player, "Mission_Target");
+                    API.resetEntitySyncedData(player, "Mission_Opposition");
+                    API.resetEntitySyncedData(player, "Mission_Position");
+                    API.resetEntitySyncedData(player, "Mission_Type");
+                    API.resetEntitySyncedData(player, "Mission_Points_Allies");
+                    API.resetEntitySyncedData(player, "Mission_Points_Enemies");
+                    API.resetEntitySyncedData(player, "Mission_Task_Bar_Allies");
+                    API.resetEntitySyncedData(player, "Mission_Task_Bar_Enemies");
+                    API.resetEntitySyncedData(player, "Mission_Timer");
+                    API.sendChatMessageToPlayer(player, "~r~You have left the mission.");
+                    return;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                Dispose();
+            }
+        }
+        // Remove Enemy
+        public void removeEnemy(Client player)
+        {
+            if (enemies.Count > 1)
+            {
+                if (enemies.Contains(player))
+                {
+                    enemies.Remove(player);
+                    API.setEntitySyncedData(player, "Mission_Started", false);
+                    API.resetEntitySyncedData(player, "Mission_Target");
+                    API.resetEntitySyncedData(player, "Mission_Opposition");
+                    API.resetEntitySyncedData(player, "Mission_Position");
+                    API.resetEntitySyncedData(player, "Mission_Type");
+                    API.resetEntitySyncedData(player, "Mission_Points_Allies");
+                    API.resetEntitySyncedData(player, "Mission_Points_Enemies");
+                    API.resetEntitySyncedData(player, "Mission_Task_Bar_Allies");
+                    API.resetEntitySyncedData(player, "Mission_Task_Bar_Enemies");
+                    API.resetEntitySyncedData(player, "Mission_Timer");
+                    API.sendChatMessageToPlayer(player, "~r~You have left the mission.");
+                    return;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                Dispose();
+            }
+        }
         public void Dispose()
         {
-            // CODE CLEANUP
+            if (allies.Count > 1)
+            {
+                if (allies.Contains(missionOwner))
+                {
+                    allies.Remove(missionOwner);
+                    Client player = missionOwner;
+                    API.setEntitySyncedData(player, "Mission_Started", false);
+                    API.resetEntitySyncedData(player, "Mission_Target");
+                    API.resetEntitySyncedData(player, "Mission_Opposition");
+                    API.resetEntitySyncedData(player, "Mission_Position");
+                    API.resetEntitySyncedData(player, "Mission_Type");
+                    API.resetEntitySyncedData(player, "Mission_Points_Allies");
+                    API.resetEntitySyncedData(player, "Mission_Points_Enemies");
+                    API.resetEntitySyncedData(player, "Mission_Task_Bar_Allies");
+                    API.resetEntitySyncedData(player, "Mission_Task_Bar_Enemies");
+                    API.resetEntitySyncedData(player, "Mission_Timer");
+                    API.sendChatMessageToPlayer(player, "~r~You have left the mission.");
+                    return;
+                }
+            }
+
+            if (enemies.Count > 1)
+            {
+                if (enemies.Contains(missionOwner))
+                {
+                    allies.Remove(missionOwner);
+                    Client player = missionOwner;
+                    API.setEntitySyncedData(player, "Mission_Started", false);
+                    API.resetEntitySyncedData(player, "Mission_Target");
+                    API.resetEntitySyncedData(player, "Mission_Opposition");
+                    API.resetEntitySyncedData(player, "Mission_Position");
+                    API.resetEntitySyncedData(player, "Mission_Type");
+                    API.resetEntitySyncedData(player, "Mission_Points_Allies");
+                    API.resetEntitySyncedData(player, "Mission_Points_Enemies");
+                    API.resetEntitySyncedData(player, "Mission_Task_Bar_Allies");
+                    API.resetEntitySyncedData(player, "Mission_Task_Bar_Enemies");
+                    API.resetEntitySyncedData(player, "Mission_Timer");
+                    API.sendChatMessageToPlayer(player, "~r~You have left the mission.");
+                    return;
+                }
+            }
+
+            foreach (Client player in allies)
+            {
+                player.resetData("Mission");
+                API.setEntitySyncedData(player, "Mission_Started", false);
+                API.resetEntitySyncedData(player, "Mission_Target");
+                API.resetEntitySyncedData(player, "Mission_Opposition");
+                API.resetEntitySyncedData(player, "Mission_Position");
+                API.resetEntitySyncedData(player, "Mission_Type");
+                API.resetEntitySyncedData(player, "Mission_Points_Allies");
+                API.resetEntitySyncedData(player, "Mission_Points_Enemies");
+                API.resetEntitySyncedData(player, "Mission_Task_Bar_Allies");
+                API.resetEntitySyncedData(player, "Mission_Task_Bar_Enemies");
+                API.resetEntitySyncedData(player, "Mission_Timer");
+                if (timerInstance != null)
+                {
+                    timerInstance.Dispose();
+                }
+            }
+
+            foreach (Client player in enemies)
+            {
+                player.resetData("Mission");
+                API.setEntitySyncedData(player, "Mission_Started", false);
+                API.resetEntitySyncedData(player, "Mission_Target");
+                API.resetEntitySyncedData(player, "Mission_Opposition");
+                API.resetEntitySyncedData(player, "Mission_Position");
+                API.resetEntitySyncedData(player, "Mission_Type");
+                API.resetEntitySyncedData(player, "Mission_Points_Allies");
+                API.resetEntitySyncedData(player, "Mission_Points_Enemies");
+                API.resetEntitySyncedData(player, "Mission_Task_Bar_Allies");
+                API.resetEntitySyncedData(player, "Mission_Task_Bar_Enemies");
+                API.resetEntitySyncedData(player, "Mission_Timer");
+                if (timerInstance != null)
+                {
+                    timerInstance.Dispose();
+                }
+            }
+
+            if (API.doesEntityExist(target))
+            {
+                API.deleteEntity(target);
+            }
+            GC.SuppressFinalize(this);
         }
     }
 }

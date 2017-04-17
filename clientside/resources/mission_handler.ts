@@ -10,11 +10,14 @@ var positionType; // Current OBJECTIVE Type
 var currentTaskPosition = null; // Current Position Task
 var taskHealth = 25;
 var cooldown = Math.round(new Date().getTime());
+var timercooldown = Math.round(new Date().getTime());
 var timer = 180000;
 var inAnimation = false;
 var opposition;
 var target = null;
 var targets = [];
+var missionDelay = false;
+var deliveryVehicle = null;
 // =========================================================
 // Entity Data Function
 // =========================================================
@@ -68,17 +71,38 @@ API.onEntityDataChange.connect(function (entity, string, oldValue) {
             }
             break;
         case "Mission_Started":
-            var check = API.getEntitySyncedData(entity, "Mission_Started");
-            //API.sendChatMessage("New Sync Data" + string + " " + check);
-            if (check) {
-                started = true;
-                break;
-            } else {
-                started = false;
-                break;
+            started = API.getEntitySyncedData(entity, "Mission_Started");
+            if (!started) {
+                fullCleanup();
             }
+            break;
+        case "Mission_Delay":
+            missionDelay = API.getEntitySyncedData(entity, "Mission_Delay");
+            break;
         default:
             break;
+    }
+});
+// =========================================================
+// ONVEHICLE Function
+// =========================================================
+API.onPlayerEnterVehicle.connect(function (entity) {
+    if (!started && currentTaskPosition === null) {
+        return;
+    }
+
+    if (positionType === "TakeVehicle") {
+        if (!API.doesEntityExist(target)) {
+            return;
+        }
+
+        if (entity.Value !== target.Value) {
+            return;
+        }
+
+        deliveryVehicle = target;
+        positionType = null;
+        goToNextTaskInherited();
     }
 });
 // =========================================================
@@ -89,9 +113,18 @@ API.onUpdate.connect(function () {
     if (!started && currentTaskPosition === null) {
         return;
     }
+
+    if (missionDelay) {
+        return;
+    }
+
+    if (API.isChatOpen()) {
+        return;
+    }
+
     // Waypoint
     var playerPos = API.getEntityPosition(API.getLocalPlayer());
-    if (positionType === "Waypoint" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) < 2) {
+    if (positionType === "Waypoint" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) <= 2) {
         positionType = null;
         goToNextTaskInherited();
         return;
@@ -202,7 +235,7 @@ API.onUpdate.connect(function () {
                     return;
                 } else {
                     cooldown = (new Date().getTime() + 5000);
-                    taskHealth += 50;
+                    taskHealth += 5;
                     API.playSoundFrontEnd("Pin_Good", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
                     API.triggerServerEvent("updateMissionBar", taskHealth);
                 }
@@ -226,7 +259,61 @@ API.onUpdate.connect(function () {
     }
     // DisableBomb
     if (positionType == "DisableBomb" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) < 20) {
+        if (currentTaskPosition.DistanceTo(playerPos) <= 3) {
+            drawTimer();
+            drawProgressBar();
+
+            if (API.isControlJustPressed(Enums.Controls.Enter)) {
+                API.triggerServerEvent("playAnimation", "move_crouch_proto", "idle");
+            }
+
+            if (API.isControlJustReleased(Enums.Controls.Enter)) {
+                API.triggerServerEvent("stopAnimation");
+            }
+
+            if (API.isControlPressed(Enums.Controls.Enter)) {
+                var point = API.worldToScreenMantainRatio(currentTaskPosition);
+                var newPoint = Point.Round(point);
+                API.drawText("~w~Disarming...", newPoint.X, newPoint.Y, 0.5, 0, 0, 0, 255, 4, 1, false, true, 600);
+
+                if (Math.round(new Date().getTime()) < cooldown) {
+                    // Do fuggin nothing
+                } else {
+                    cooldown = (new Date().getTime() + 2000);
+                    taskHealth += 2;
+                    API.playSoundFrontEnd("Pin_Bad", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
+                    API.triggerServerEvent("updateMissionBar", taskHealth);
+                }
+            } else {
+                var point = API.worldToScreenMantainRatio(currentTaskPosition);
+                var newPoint = Point.Round(point);
+                API.drawText("~w~Hold [F] to ~b~disarm.", newPoint.X, newPoint.Y, 0.5, 0, 0, 0, 255, 4, 1, false, true, 600);
+            }
+
+            if (taskHealth >= 100) {
+                positionType = null;
+                goToNextTaskInherited();
+            }
+        }
+    }
+    // TakeVehicle
+    if (positionType == "TakeVehicle" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) <= 5) {
         drawTimer();
+
+        if (API.doesEntityExist(target)) {
+            if (API.getVehicleLocked(target)) {
+                API.setVehicleLocked(target, false);
+            }
+        }
+    }
+    // DeliverVehicle
+    if (positionType === "DeliverVehicle" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) <= 2) {
+        if (API.getPlayerVehicle(API.getLocalPlayer()).Value !== deliveryVehicle.Value) {
+            return;
+        }
+        positionType = null;
+        goToNextTaskInherited();
+        return;
     }
 });
 // =========================================================
@@ -240,18 +327,9 @@ function drawProgressBar() {
     API.drawRectangle(newPoint.X - 160, newPoint.Y, (taskHealth * 3), 20, 0, 255, 0, 100);
 }
 function drawTimer() {
-    if (new Date().getTime() > cooldown) {
-        cooldown = new Date().getTime() + 1000;
-        API.triggerServerEvent("updateMissionTimer", Math.round(timer));
-    }
-
-    if (timer <= 0) {
-        // Fail Mission Code
-    }
-
     var point = API.worldToScreenMantainRatio(currentTaskPosition);
     var newPoint = Point.Round(point);
-    API.drawText("" + timer, newPoint.X, newPoint.Y + 20, 0.5, 255, 0, 0, 255, 4, 1, false, true, 500);
+    API.drawText("" + (timer / 1000), newPoint.X, newPoint.Y - 20, 0.5, 255, 0, 0, 255, 4, 1, false, true, 500);
 }
 // =========================================================
 // Chat Message Command, ONLY FOR DEBUG
@@ -265,8 +343,8 @@ function startMission() {
 }
 // Function go to next task, local side.
 function goToNextTaskInherited() {
-    API.playSoundFrontEnd("Player_Collect", "DLC_PILOT_MP_HUD_SOUNDS");
     API.triggerServerEvent("shiftMissionObjectives", currentTaskPosition);
+    API.playSoundFrontEnd("Player_Collect", "DLC_PILOT_MP_HUD_SOUNDS");
     API.triggerServerEvent("stopAnimation");
 }
 // Cleanup any garbage.
@@ -287,7 +365,9 @@ function cleanup() {
 // Shift to the next Objective / Task.
 // =========================================================
 function shiftToNextTask() {
+    API.triggerServerEvent("stopAnimation");
     cooldown = Math.round(new Date().getTime());
+    cleanup();
     switch (positionType) {
         case "Waypoint":
             drawWaypoint();
@@ -309,6 +389,12 @@ function shiftToNextTask() {
             return;
         case "DisableBomb":
             drawDisableBomb();
+            return;
+        case "TakeVehicle":
+            drawTakeVehicle();
+            return;
+        case "DeliverVehicle":
+            drawDeliverVehicle();
             return;
     }
 }
@@ -404,14 +490,34 @@ function drawInvestigate() {
 }
 // "DisableBomb"
 function drawDisableBomb() {
-    cooldown = new Date().getTime() + 25000;
-    taskHealth = 100;
-    marker = API.createMarker(Enums.MarkerType.UpsideDownCone, currentTaskPosition, new Vector3(), new Vector3(), new Vector3(0.2, 0.2, 0.2).Add(new Vector3(0, 0, 0.5)), 63, 137, 255, 150);
+    cooldown = new Date().getTime();
+    timercooldown = new Date().getTime() + 1000;
+    taskHealth = 0;
+    marker = API.createMarker(Enums.MarkerType.UpsideDownCone, currentTaskPosition.Add(new Vector3(0, 0, 1.5)), new Vector3(), new Vector3(), new Vector3(0.2, 0.2, 0.7), 63, 137, 255, 150);
     API.displaySubtitle("Defuse the ~b~bomb.", 5000);
     API.setWaypoint(currentTaskPosition.X, currentTaskPosition.Y);
     blip = API.createBlip(currentTaskPosition);
     API.setBlipSprite(blip, 1);
     API.setBlipColor(blip, 67);
     timer = 180000;
+}
+// "TakeVehicle"
+function drawTakeVehicle() {
+    marker = API.createMarker(Enums.MarkerType.UpsideDownCone, currentTaskPosition.Add(new Vector3(0, 0, 5)), new Vector3(), new Vector3(), new Vector3(0.2, 0.2, 0.7), 63, 137, 255, 150);
+    API.displaySubtitle("Take the ~g~vehicle.", 5000);
+    API.setWaypoint(currentTaskPosition.X, currentTaskPosition.Y);
+    blip = API.createBlip(currentTaskPosition);
+    API.setBlipSprite(blip, 1);
+    API.setBlipColor(blip, 69);
+    timer = 180000;
+}
+// "DeliverVehicle"
+function drawDeliverVehicle() {
+    marker = API.createMarker(Enums.MarkerType.VerticalCylinder, currentTaskPosition, new Vector3(), new Vector3(), new Vector3(2, 2, 2), 63, 137, 255, 150);
+    API.setWaypoint(currentTaskPosition.X, currentTaskPosition.Y);
+    blip = API.createBlip(currentTaskPosition);
+    API.setBlipSprite(blip, 1);
+    API.setBlipColor(blip, 67);
+    API.displaySubtitle("Deliver the vehicle to the ~b~area~w~.", 5000);
 }
 
