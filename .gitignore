@@ -6,4 +6,9 @@ obj/Debug/stuykserver.dll
 obj/Debug/stuykserver.pdb
 *.zip
 *.exe
+<<<<<<< HEAD
 *.config
+=======
+*.config
+*.log
+>>>>>>> 069da46d8754424261f444a6a930d57bcaf5c2a1
