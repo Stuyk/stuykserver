@@ -18,6 +18,10 @@ var target = null;
 var targets = [];
 var missionDelay = false;
 var deliveryVehicle = null;
+var allies = null;
+var enemies = null;
+var fires = [];
+var fireSpread = 1;
 // =========================================================
 // Entity Data Function
 // =========================================================
@@ -79,6 +83,12 @@ API.onEntityDataChange.connect(function (entity, string, oldValue) {
         case "Mission_Delay":
             missionDelay = API.getEntitySyncedData(entity, "Mission_Delay");
             break;
+        case "Mission_Allies":
+            allies = API.getEntitySyncedData(entity, "Mission_Allies");
+            break;
+        case "Mission_Enemies":
+            enemies = API.getEntitySyncedData(entity, "Mission_Enemies");
+            break;
         default:
             break;
     }
@@ -120,6 +130,10 @@ API.onUpdate.connect(function () {
 
     if (API.isChatOpen()) {
         return;
+    }
+
+    if (opposition === "Ally") {
+        drawGroup(allies);
     }
 
     // Waypoint
@@ -315,6 +329,36 @@ API.onUpdate.connect(function () {
         goToNextTaskInherited();
         return;
     }
+    //
+    if (positionType == "Extinguish" && currentTaskPosition !== null && currentTaskPosition.DistanceTo(playerPos) <= 20) {
+        if (taskHealth !== null && playerPos.DistanceTo(currentTaskPosition) <= 10) {
+            drawProgressBar();
+        }
+
+        if (Math.round(new Date().getTime()) < cooldown) {
+            // Do fuggin nothing
+        } else {
+            var fireNum = API.returnNative("START_SCRIPT_FIRE", Enums.NativeReturnTypes.Int, currentTaskPosition.X + fireSpread, currentTaskPosition.Y, currentTaskPosition.Z, 22, false);
+            fires.push(fireNum);
+            if (API.getPlayerCurrentWeapon() !== 101631238) {
+                return;
+            }
+
+            if (!API.isPlayerShooting(API.getLocalPlayer())) {
+                return;
+            }
+            fireSpread += 1;
+            cooldown = (new Date().getTime() + 2000);
+            taskHealth -= 1;
+            API.triggerServerEvent("updateMissionBar", taskHealth);
+        }
+
+        if (taskHealth <= 0) {
+            positionType = null;
+            goToNextTaskInherited();
+            return;
+        }
+   }
 });
 // =========================================================
 // Draw Functions
@@ -330,6 +374,40 @@ function drawTimer() {
     var point = API.worldToScreenMantainRatio(currentTaskPosition);
     var newPoint = Point.Round(point);
     API.drawText("" + (timer / 1000), newPoint.X, newPoint.Y - 20, 0.5, 255, 0, 0, 255, 4, 1, false, true, 500);
+}
+function drawGroup(opp) {
+    API.drawRectangle(resX - 300, 20, 280, 40, 0, 0, 0, 100);
+    API.drawText("Mission", resX - 160, 20, 0.5, 255, 255, 255, 255, 4, 1, false, false, 255);
+
+    if (allies.Count > 0) {
+        API.drawRectangle(resX - 300, 80, 280, 40, 0, 0, 0, 100);
+        API.drawText("" + API.getPlayerName(opp[0]).replace(/_/g, ' '), resX - 160, 80, 0.5, 255, 255, 255, 255, 4, 1, false, false, 255);
+    }
+
+    if (allies.Count > 1) {
+        API.drawRectangle(resX - 300, 140, 280, 40, 0, 0, 0, 100);
+        API.drawText("" + API.getPlayerName(opp[1]).replace(/_/g, ' '), resX - 160, 140, 0.5, 255, 255, 255, 255, 4, 1, false, false, 255);
+    }
+
+    if (allies.Count > 2) {
+        API.drawRectangle(resX - 300, 200, 280, 40, 0, 0, 0, 100);
+        API.drawText("" + API.getPlayerName(opp[2]).replace(/_/g, ' '), resX - 160, 200, 0.5, 255, 255, 255, 255, 4, 1, false, false, 255);
+    }
+
+    if (allies.Count > 3) {
+        API.drawRectangle(resX - 300, 260, 280, 40, 0, 0, 0, 100);
+        API.drawText("" + API.getPlayerName(opp[3]).replace(/_/g, ' '), resX - 160, 260, 0.5, 255, 255, 255, 255, 4, 1, false, false, 255);
+    }
+
+    if (allies.Count > 4) {
+        API.drawRectangle(resX - 300, 320, 280, 40, 0, 0, 0, 100);
+        API.drawText("" + API.getPlayerName(opp[4]).replace(/_/g, ' '), resX - 160, 320, 0.5, 255, 255, 255, 255, 4, 1, false, false, 255);
+    }
+
+    if (allies.Count > 5) {
+        API.drawRectangle(resX - 300, 380, 280, 40, 0, 0, 0, 100);
+        API.drawText("" + API.getPlayerName(opp[5]).replace(/_/g, ' '), resX - 160, 380, 0.5, 255, 255, 255, 255, 4, 1, false, false, 255);
+    }
 }
 // =========================================================
 // Chat Message Command, ONLY FOR DEBUG
@@ -359,6 +437,12 @@ function cleanup() {
     if (blip !== null) {
         API.deleteEntity(blip);
         blip = null;
+    }
+
+    if (fires.length > 0) {
+        for (var i = 0; i < fires.length; i++) {
+            API.callNative("STOP_ENTITY_FIRE", fires[i]);
+        }
     }
 }
 // =========================================================
@@ -395,6 +479,9 @@ function shiftToNextTask() {
             return;
         case "DeliverVehicle":
             drawDeliverVehicle();
+            return;
+        case "Extinguish":
+            drawExtinguish();
             return;
     }
 }
@@ -519,5 +606,16 @@ function drawDeliverVehicle() {
     API.setBlipSprite(blip, 1);
     API.setBlipColor(blip, 67);
     API.displaySubtitle("Deliver the vehicle to the ~b~area~w~.", 5000);
+}
+// "Extinguish"
+function drawExtinguish() {
+    taskHealth = 100;
+    marker = API.createMarker(Enums.MarkerType.UpsideDownCone, currentTaskPosition.Add(new Vector3(0, 0, 5)), new Vector3(), new Vector3(), new Vector3(2, 2, 2), 63, 137, 255, 150);
+    API.setWaypoint(currentTaskPosition.X, currentTaskPosition.Y);
+    blip = API.createBlip(currentTaskPosition);
+    API.setBlipSprite(blip, 436);
+    API.setBlipColor(blip, 49);
+    API.displaySubtitle("Extinguish the ~r~fire.", 5000);
+    API.callNative("START_PARTICLE_FX_LOOPED_AT_COORD", "scr_fbi4_trucks_crash", currentTaskPosition.X, currentTaskPosition.Y, currentTaskPosition.Z, 0, 0, 0, 8, 0, 0, 0, 0);
 }
 

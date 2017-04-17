@@ -138,7 +138,7 @@ namespace stuykserver.Util
         // Just Set Player Position by Vector3
         public void setPlayerPositionByVector(Client player, Vector3 position)
         {
-            string[] varNames = { "LASTX", "LASTY", "LASTZ" };
+            string[] varNames = { "X", "Y", "Z" };
             string before = "UPDATE Players SET";
             object[] data = { position.X.ToString(), position.Y.ToString(), position.Z.ToString() };
             string after = string.Format("WHERE ID='{0}'", Convert.ToString(API.getEntityData(player, "PlayerID")));

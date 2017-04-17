@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
+using BCr = BCrypt.Net;
+
 namespace stuykserver.Util
 {
     public class LoginHandler : Script
@@ -49,43 +51,23 @@ namespace stuykserver.Util
             db.compileQuery(before, after, varNames, data);
         }
 
-        static string GetMd5Hash(MD5 md5Hash, string input)
-        {
-            byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
-
-            StringBuilder sBuilder = new StringBuilder();
-
-            for (int i = 0; i < data.Length; i++)
-            {
-                sBuilder.Append(data[i].ToString("x2"));
-            } 
-
-            return sBuilder.ToString();
-        }
-
         public void cmdLogin(Client player, string email, string password)
         {
-            string hash;
-
-            using (MD5 md5Hash = MD5.Create())
-            {
-                hash = GetMd5Hash(md5Hash, password);
-            }
-
-            string[] varNames = { "Email", "Password" };
-            string before = "SELECT ID, LoggedIn FROM Players WHERE";
-            object[] data = { email, hash };
+            string[] varNames = { "Email" };
+            string before = "SELECT ID, Password FROM Players WHERE";
+            object[] data = { email };
             DataTable result = db.compileSelectQuery(before, varNames, data);
 
-            if (result.Rows.Count != 1)
+            if (result.Rows.Count < 1)
             {
                 API.triggerClientEvent(player, "passwordDoesNotMatch");
                 return;
             }
 
-            if (Convert.ToBoolean(result.Rows[0]["LoggedIn"]))
+            bool verify = BCr.BCrypt.Verify(password, Convert.ToString(result.Rows[0]["Password"]));
+            if (!verify)
             {
-                API.triggerClientEvent(player, "alreadyLoggedIn");
+                API.triggerClientEvent(player, "passwordDoesNotMatch");
                 return;
             }
 
@@ -95,12 +77,7 @@ namespace stuykserver.Util
 
         public void cmdRegister(Client player, string email, string password)
         {
-            string hash;
-
-            using (MD5 md5Hash = MD5.Create())
-            {
-                hash = GetMd5Hash(md5Hash, password);
-            }
+            var hash = BCr.BCrypt.HashPassword(password, BCr.BCrypt.GenerateSalt(12));
 
             string[] varNamesZero = { "Email" };
             string beforeZero = "SELECT Email FROM Players WHERE";

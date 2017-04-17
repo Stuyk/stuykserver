@@ -12,7 +12,6 @@
 	<script src="clientside/resources/active_shooter_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/blip_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/marker_manager.js" type="client" lang="javascript" />
-	<script src="clientside/resources/function_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/hud_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/browser_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/camera_manager.js" type="client" lang="javascript" />
@@ -20,6 +19,7 @@
 	<script src="clientside/resources/barber_mode.js" type="client" lang="javascript" />
   <script src="clientside/resources/snake.js" type="client" lang="javascript" />
   <script src="clientside/resources/mission_handler.js" type="client" lang="javascript" />
+  <script src="clientside/resources/object_placer.js" type="client" lang="javascript" />
 	
 	<file src="clientside/resources/invalidname.html"/>
 	<file src="clientside/resources/dealership.html"/>
@@ -94,6 +94,7 @@
 	<include resource="database"/>
 	<include resource="gtaocharacter" />
 
+  <assembly ref="BCrypt.Net.dll"/>
 	<assembly ref="System.Data.dll"/>
 	<assembly ref="System.Xml.dll"/>
 </meta>

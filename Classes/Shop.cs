@@ -29,6 +29,7 @@ namespace stuykserver.Classes
             shopBalance = Convert.ToInt32(row["Money"]);
             shopType = (ShopType)row["Type"];
             collisionPosition = new Vector3(Convert.ToSingle(row["PosX"]), Convert.ToSingle(row["PosY"]), Convert.ToSingle(row["PosZ"]));
+            collisionRotation = new Vector3(Convert.ToSingle(row["RotX"]), Convert.ToSingle(row["RotY"]), Convert.ToSingle(row["RotZ"]));
             shopExit = new Vector3(Convert.ToSingle(row["ExitX"]), Convert.ToSingle(row["ExitY"]), Convert.ToSingle(row["ExitZ"]));
             shopCenterPoint = new Vector3(Convert.ToSingle(row["FocusX"]), Convert.ToSingle(row["FocusY"]), Convert.ToSingle(row["FocusZ"]));
             shopCameraPoint = new Vector3(Convert.ToSingle(row["CamX"]), Convert.ToSingle(row["CamY"]), Convert.ToSingle(row["CamZ"]));
@@ -42,7 +43,11 @@ namespace stuykserver.Classes
             shopKeys = new List<Client>();
             shopEmployeePayrates = new Dictionary<EmployeeRank, int>();
             shopObjects = new List<GTANetworkServer.Object>();
-            setupCollision();
+            // Setup our Door
+            selectableObject = API.createObject(-1652821467, collisionPosition, collisionRotation, 0);
+            API.setEntityTransparency(selectableObject, 0);
+            selectableObject.setData("Instance", this);
+            selectableObject.setSyncedData("Type", shopType.ToString());
             setupBlip();
         }
 
@@ -64,6 +69,7 @@ namespace stuykserver.Classes
         List<Client> shopKeys; // Exactly what it is.
         int shopBalance; // Amount of cash the shop has.
         int shopUnits; // Units the shop has.
+        GTANetworkServer.Object selectableObject;
 
         // SHOP PROPERTIES
         public enum ShopType
@@ -103,6 +109,7 @@ namespace stuykserver.Classes
         float range; // Collision Range
         float height; // Collision Height
         Vector3 collisionPosition; // Position for the collision, point of Exit / Entrance.
+        Vector3 collisionRotation;
         Blip collisionBlip; // Blip attached to the Collision.
         List<Client> outsidePlayers; // Players inside of the collision.
         Dictionary<Client, NetHandle> insidePlayers; // Players inside of an interior or shop.
@@ -134,9 +141,9 @@ namespace stuykserver.Classes
         // Setup Collision
         public void setupCollision()
         {
-            collisionShape = API.createCylinderColShape(collisionPosition, range, height);
-            collisionShape.setData("Instance", this);
-            collisionShape.setData("Type", "Shop");
+            //collisionShape = API.createCylinderColShape(collisionPosition, range, height);
+            //collisionShape.setData("Instance", this);
+            //collisionShape.setData("Type", "Shop");
         }
 
         // SHOP ID
@@ -649,6 +656,11 @@ namespace stuykserver.Classes
             if (collisionShape != null)
             {
                 API.deleteColShape(collisionShape);
+            }
+
+            if (API.doesEntityExist(selectableObject))
+            {
+                API.deleteEntity(selectableObject);
             }
 
             foreach(GTANetworkServer.Object obj in shopObjects)

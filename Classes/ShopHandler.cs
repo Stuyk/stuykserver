@@ -57,18 +57,7 @@ namespace stuykserver.Classes
             foreach (DataRow row in result.Rows)
             {
                 Shop shop = new Shop(row);
-                ColShape shape = shop.returnCollisionShape();
-                shopInfo.Add(shape, shop);
             }
-        }
-
-        public Shop getShop(ColShape collision)
-        {
-            if (shopInfo.ContainsKey(collision))
-            {
-                return shopInfo[collision];
-            }
-            return null;
         }
 
         [Command("reloadshops")]
@@ -85,16 +74,32 @@ namespace stuykserver.Classes
         public void cmdCreateShop(Client player, int type)
         {
             Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
-            if (instance.isAdmin())
+            if (!instance.isAdmin())
             {
-                Vector3 pos = player.position;
-                string[] vars = { "PosX", "PosY", "PosZ", "Type" };
-                string tableName = "Shops";
-                string[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), type.ToString() };
-                db.compileInsertQuery(tableName, vars, data);
-
-                initializeShops();
+                return;
             }
+
+            GTANetworkServer.Object obj = API.createObject(-1652821467, player.position, player.rotation, player.dimension);
+            API.triggerClientEvent(player, "attachObject", obj);
+            player.setData("Placing_Shop_Object", true);
+            player.setData("Placing_Shop_Object_Reference", obj);
+            player.setData("Placing_Shop_Object_Type", type);
+        }
+
+        public void actionPlaceDownShopObject(Client player, Vector3 position, Vector3 rotation)
+        {
+            var obj = player.getData("Placing_Shop_Object_Reference");
+            if (API.doesEntityExist(obj))
+            {
+                API.deleteEntity(obj);
+            }
+
+            string[] vars = { "PosX", "PosY", "PosZ", "Type", "RotX", "RotY", "RotZ" };
+            string tableName = "Shops";
+            string[] data = { position.X.ToString(), position.Y.ToString(), position.Z.ToString(), Convert.ToString(player.getData("Placing_Shop_Object_Type")), rotation.X.ToString(), rotation.Y.ToString(), rotation.Z.ToString() };
+            db.compileInsertQuery(tableName, vars, data);
+
+            initializeShops();
         }
 
         [Command("selectshop")]

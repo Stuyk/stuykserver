@@ -21,7 +21,8 @@ namespace stuykserver.Classes
             Investigate,
             DisableBomb,
             TakeVehicle,
-            DeliverVehicle
+            DeliverVehicle,
+            Extinguish
         }
         // Variables
         List<Vector3> missionObjectives;
@@ -173,10 +174,13 @@ namespace stuykserver.Classes
                 case PointType.TakeVehicle:
                     setupTargetVehicle();
                     break;
+                case PointType.Extinguish:
+                    setupAllies(WeaponHash.FireExtinguisher);
+                    break;
             }
 
-            allyBar = 50; // Set to 50
-            enemyBar = 50; // Set to 50
+            allyBar = 99; // Set to 50
+            enemyBar = 99; // Set to 50
 
             foreach (Client player in allies)
             {
@@ -188,6 +192,8 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(player, "Mission_Points_Enemies", enemyPoints);
                 API.setEntitySyncedData(player, "Mission_Timer", timer);
                 API.setEntitySyncedData(player, "Mission_Delay", false);
+                API.setEntitySyncedData(player, "Mission_Allies", allies);
+                API.setEntitySyncedData(player, "Mission_Enemies", enemies);
             }
 
             foreach (Client player in enemies)
@@ -200,6 +206,8 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(player, "Mission_Points_Enemies", enemyPoints);
                 API.setEntitySyncedData(player, "Mission_Timer", timer);
                 API.setEntitySyncedData(player, "Mission_Delay", false);
+                API.setEntitySyncedData(player, "Mission_Allies", allies);
+                API.setEntitySyncedData(player, "Mission_Enemies", enemies);
             }
         }
         // Sync Current Mission Bars
@@ -255,6 +263,8 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(missionOwner, "Mission_Task_Bar_Allies", allyBar);
                 API.setEntitySyncedData(missionOwner, "Mission_Task_Bar_Enemies", enemyBar);
                 API.setEntitySyncedData(missionOwner, "Mission_Timer", timer);
+                API.setEntitySyncedData(missionOwner, "Mission_Allies", allies);
+                API.setEntitySyncedData(missionOwner, "Mission_Enemies", enemies);
             }
         }
         // Push objectives to joiner, if ally.
@@ -273,7 +283,10 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(player, "Mission_Task_Bar_Allies", allyBar);
                 API.setEntitySyncedData(player, "Mission_Task_Bar_Enemies", enemyBar);
                 API.setEntitySyncedData(player, "Mission_Timer", timer);
+                API.setEntitySyncedData(player, "Mission_Allies", allies);
+                API.setEntitySyncedData(player, "Mission_Enemies", enemies);
                 API.triggerClientEvent(player, "startMission");
+
             }
         }
         // Push objectives to joiner, if enemy.
@@ -292,6 +305,8 @@ namespace stuykserver.Classes
                 API.setEntitySyncedData(player, "Mission_Task_Bar_Allies", allyBar);
                 API.setEntitySyncedData(player, "Mission_Task_Bar_Enemies", enemyBar);
                 API.setEntitySyncedData(player, "Mission_Timer", timer);
+                API.setEntitySyncedData(player, "Mission_Allies", allies);
+                API.setEntitySyncedData(player, "Mission_Enemies", enemies);
                 API.triggerClientEvent(player, "startMission");
             }
         }
@@ -423,6 +438,13 @@ namespace stuykserver.Classes
         public void setTargetVehicleType(VehicleHash type)
         {
             targetVehicleType = type;
+        }
+        public void setupAllies(WeaponHash hash)
+        {
+            foreach (Client player in allies)
+            {
+                API.givePlayerWeapon(player, hash, 9999, true, true);
+            }
         }
         // Remove Ally
         public void removeAlly(Client player)

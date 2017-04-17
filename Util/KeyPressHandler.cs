@@ -73,7 +73,7 @@ namespace stuykserver.Util
             if (eventName == "useFunction")
             {
                 // Pull Current Function off Player - Assigned by Collision Handler - These are ENUM Types converted to STRINGS.
-                string currentFunction = Convert.ToString(API.getEntityData(player, "Collision"));
+                string currentFunction = Convert.ToString(args[0]);
 
                 // If NONE, do nothing.
                 if (currentFunction == "None")
@@ -217,6 +217,12 @@ namespace stuykserver.Util
                             return;
                         case "FuelPump":
                             API.call("FuelPumpHandler", "actionUseFuel", player);
+                            return;
+                        case "Vehicle":
+                            API.call("VehicleHandler", "actionVehicleLock", player);
+                            return;
+                        case "VehicleDoors":
+                            API.call("VehicleHandler", "actionVehicleHood", player);
                             return;
                     }
                 }

@@ -44,16 +44,6 @@ namespace stuykserver.Util
                 API.setEntityData(player, "ReturnPosition", player.position);
                 API.setEntitySyncedData(player, "StopDraws", true);
                 API.setEntityDimension(player, Convert.ToInt32(API.getEntityData(player, "PlayerID")));
-
-                ColShape colshape = (ColShape)API.getEntityData(player, "ColShape");
-                Shop shop = (Shop)API.call("ShopHandler", "getShop", colshape);
-                if (shop.returnCameraCenterPoint() != new Vector3(0, 0, 0) && shop.returnCameraPoint() != new Vector3(0, 0, 0))
-                {
-                    API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
-                    API.setEntityPosition(player, shop.returnCameraCenterPoint());
-                    API.triggerClientEvent(player, "setupClothingMode", shop.returnCameraPoint());
-                    return;
-                }
                 API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
                 API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
                 API.triggerClientEvent(player, "setupClothingMode", new Vector3(-1190.004, -766.2875, 17.3196));

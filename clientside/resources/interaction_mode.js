@@ -7,6 +7,13 @@ API.onUpdate.connect(function () {
     if (API.isChatOpen()) {
         return;
     }
+    var playerPOS = API.getEntityPosition(API.getLocalPlayer());
+    if (target !== null) {
+        if (playerPOS.DistanceTo(API.getEntityPosition(target)) >= 10) {
+            target = null;
+            API.triggerServerEvent("Interaction_Update");
+        }
+    }
     // Disable the controls we want to use for our interaction mode.
     API.disableControlThisFrame(242 /* CursorScrollDown */); // SCROLL DOWN
     API.disableControlThisFrame(241 /* CursorScrollUp */); // SCROLL UP
@@ -16,14 +23,49 @@ API.onUpdate.connect(function () {
     API.callNative("HIDE_HUD_COMPONENT_THIS_FRAME", 19);
     // If the disabled control is pressed... SCROLL WHEEL DOWN
     if (API.isDisabledControlJustPressed(242 /* CursorScrollDown */)) {
+        // Lock Vehicle from Inside
+        if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
+            API.triggerServerEvent("useFunction", "Vehicle");
+            return;
+        }
         drawRayCast();
     }
     // If the disabled control is pressed... SCROLL WHEEL UP
     if (API.isDisabledControlJustPressed(241 /* CursorScrollUp */)) {
+        // Vehicle Engine
+        if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
+            API.triggerServerEvent("useFunction", "VehicleEngine");
+            return;
+        }
+        if (target !== null) {
+            switch (API.getEntityType(target)) {
+                case 1 /* Vehicle */:
+                    if (API.hasEntitySyncedData(target, "Type")) {
+                        // Vehicle Lock
+                        if (playerPOS.DistanceTo(API.getEntityPosition(target)) <= 5) {
+                            var type = API.getEntitySyncedData(target, "Type");
+                            API.triggerServerEvent("useFunction", type);
+                            return;
+                        }
+                    }
+                    break;
+                case 6 /* Player */:
+                    //
+                    break;
+                case 2 /* Prop */:
+                    //
+                    break;
+            }
+        }
     }
     // MIDDLE MOUSE BUTTON
     if (API.isControlJustPressed(27 /* Phone */)) {
+        if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
+            API.triggerServerEvent("useFunction", "VehicleDoors");
+            return;
+        }
         target = null;
+        API.triggerServerEvent("Interaction_Update");
     }
     // ENTER
     if (API.isControlJustPressed(23 /* Enter */)) {
@@ -39,7 +81,23 @@ API.onUpdate.connect(function () {
                 taskEnterVehicle(-1);
                 return;
             case 6 /* Player */:
-                // PLAYER INTERACTION CRAP
+                if (API.hasEntitySyncedData(API.getLocalPlayer(), "Mission_Started")) {
+                    if (API.getEntitySyncedData(API.getLocalPlayer(), "Mission_Started")) {
+                        API.triggerServerEvent("Mission_Invite", target);
+                        return;
+                    }
+                }
+                return;
+            case 2 /* Prop */:
+                if (playerPOS.DistanceTo(API.getEntityPosition(target)) > 2) {
+                    return;
+                }
+                if (API.hasEntitySyncedData(target, "Type")) {
+                    API.triggerServerEvent("useFunction", API.getEntitySyncedData(target, "Type"));
+                    target = null;
+                    API.triggerServerEvent("Interaction_Update");
+                    return;
+                }
                 return;
         }
     }
@@ -77,18 +135,25 @@ API.onUpdate.connect(function () {
         switch (API.getEntityType(target)) {
             case 1 /* Vehicle */:
                 API.drawText("~b~[~w~Selected~b~] ~w~" + API.getVehicleModelName(API.getEntityModel(target)), newPointer.X, newPointer.Y, 0.3, 0, 0, 255, 255, 4, 1, false, true, 100);
-                return;
+                break;
             case 6 /* Player */:
                 API.drawText("~b~[~w~Selected~b~] ~w~" + API.getPlayerName(target), newPointer.X, newPointer.Y, 0.3, 0, 0, 255, 255, 4, 1, false, true, 100);
-                return;
+                break;
             case 2 /* Prop */:
-                API.drawText("~b~[~w~Selected~b~] ~w~Marker", newPointer.X, newPointer.Y, 0.3, 0, 0, 255, 255, 4, 1, false, true, 100);
-                return;
+                if (API.hasEntitySyncedData(target, "Type")) {
+                    var type = API.getEntitySyncedData(target, "Type");
+                    API.drawText("~b~[~w~Selected~b~] ~w~" + type, newPointer.X, newPointer.Y, 0.3, 0, 0, 255, 255, 4, 1, false, true, 100);
+                }
+                else {
+                    API.drawText("~b~[~w~Selected~b~] ~w~Door", newPointer.X, newPointer.Y, 0.3, 0, 0, 255, 255, 4, 1, false, true, 100);
+                }
+                break;
         }
     }
 });
 API.onPlayerEnterVehicle.connect(function (entity) {
     target = null;
+    API.triggerServerEvent("Interaction_Update", entity);
 });
 function drawRayCast() {
     // Get the player Aimed Position, and create a raycast.
@@ -119,6 +184,7 @@ function drawRayCast() {
             target = null;
             return;
     }
+    API.triggerServerEvent("Interaction_Update", target);
 }
 function taskEnterVehicle(seat) {
     if (API.getVehicleLocked(target)) {

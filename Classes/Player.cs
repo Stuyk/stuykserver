@@ -41,7 +41,7 @@ namespace stuykserver.Classes
             dead = Convert.ToBoolean(row["Dead"]);
             admin = Convert.ToBoolean(row["Admin"]);
             playerSession = DateTime.Now;
-            Vector3 position = new Vector3(Convert.ToSingle(row["LASTX"]), Convert.ToSingle(row["LASTY"]), Convert.ToSingle(row["LASTZ"]));
+            Vector3 position = new Vector3(Convert.ToSingle(row["X"]), Convert.ToSingle(row["Y"]), Convert.ToSingle(row["Z"]));
             playerWeapons = new Dictionary<WeaponHash, int>();
             loadPlayer(position);
             updateKarma();
@@ -84,7 +84,7 @@ namespace stuykserver.Classes
                 pos = (Vector3)API.getEntityData(playerClient, "ReturnPosition");
             }
 
-            string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "Dead" };
+            string[] varNames = { "X", "Y", "Z", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "Dead" };
             string before = "UPDATE Players SET";
             object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), Convert.ToInt32(dead) };
             string after = string.Format("WHERE ID='{0}'", playerID);
@@ -132,7 +132,7 @@ namespace stuykserver.Classes
                 pos = (Vector3)API.getEntityData(playerClient, "ReturnPosition");
             }
 
-            string[] varNames = { "LASTX", "LASTY", "LASTZ", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "LoggedIn", "Dead" };
+            string[] varNames = { "X", "Y", "Z", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "LoggedIn", "Dead" };
             string before = "UPDATE Players SET";
             object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), "0", Convert.ToInt32(dead) };
             string after = string.Format("WHERE ID='{0}'", playerID);

@@ -81,13 +81,12 @@ namespace stuykserver.Classes
                 Convert.ToInt32(row["sBlue"])
             };
 
-            vehicleCollision = API.createCylinderColShape(vehiclePosition, 3f, 3f); // Vehicle Collision
-            vehicleCollision.setData("Instance", this);
-            vehicleCollision.setData("Type", "Vehicle");
+            //vehicleCollision = API.createCylinderColShape(vehiclePosition, 3f, 3f); // Vehicle Collision
+            
             API.setVehicleCustomPrimaryColor(vehicle, rgb[0], rgb[1], rgb[2]);
             API.setVehicleCustomSecondaryColor(vehicle, srgb[0], srgb[1], srgb[2]);
             API.setVehicleEngineStatus(vehicle, false);
-            API.setVehicleLocked(vehicle, true);
+            API.setVehicleLocked(vehicle, false);
             API.setVehicleMod(vehicle, 0, Spoilers);
             API.setVehicleMod(vehicle, 1, FrontBumper);
             API.setVehicleMod(vehicle, 2, RearBumper);
@@ -125,13 +124,18 @@ namespace stuykserver.Classes
             vehicleKeys = new List<Client>();
             playersInVehicle = new List<Client>();
 
-            vehicleHealth = API.createTextLabel(string.Format("~b~Health: ~w~{0}/1000", vehicle.health), new Vector3(), 30f, 0.5f, true);
-            vehicleHealth.transparency = 100;
-            vehicleHealth.attachTo(vehicle, "Main", new Vector3(0, 0, 1), new Vector3());
+            //vehicleHealth = API.createTextLabel(string.Format("~b~Health: ~w~{0}/1000", vehicle.health), new Vector3(), 30f, 0.5f, true);
+            //vehicleHealth.transparency = 100;
+            //vehicleHealth.attachTo(vehicle, "Main", new Vector3(0, 0, 1), new Vector3());
 
             API.setEntityRotation(vehicle, vehicleRotation);
             API.setEntityPosition(vehicle, vehiclePosition);
-            API.setEntityData(vehicle, "VehicleID", vehicleIDNumber);
+
+            // Sync Data
+            vehicle.setData("VehicleID", vehicleIDNumber);
+            vehicle.setData("Instance", this);
+            vehicle.setSyncedData("Owner", vehicleOwner);
+            vehicle.setSyncedData("Type", "Vehicle");
 
             fuelTimer = new Timer();
             fuelTimer.Interval = 10000;
@@ -225,8 +229,6 @@ namespace stuykserver.Classes
         int Livery; // 48
         int Plate; // 62
         int WindowTint; //69
-
-
 
         // Custom Colors
         List<int> rgb; // First
@@ -376,7 +378,6 @@ namespace stuykserver.Classes
 
         public void Dispose()
         {
-            API.deleteEntity(vehicleHealth);
             fuelTimer.Dispose();
             API.deleteEntity(vehicleID);
             vehicleKeys.Clear();

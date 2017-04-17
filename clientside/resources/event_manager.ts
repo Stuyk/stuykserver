@@ -181,7 +181,8 @@
             API.setGameplayCameraActive();
             API.setHudVisible(true);
             API.stopAudio();
-            API.showShard("~b~Welcome back ~o~" + API.getPlayerName(API.getLocalPlayer()), 6000);
+            var playerName = API.getPlayerName(API.getLocalPlayer());
+            API.showShard("~b~Welcome back ~y~" + playerName.replace(/_/g, ' '), 6000);
             API.sendChatMessage("~r~Current Not Working: ~n~Dealerships, ~n~Car Customization, ~n~Player Customization");
             API.sendChatMessage("~b~Come back in a few days after it's fixed.");
             return;
@@ -209,6 +210,12 @@
             return;
         case "missionTieScreen":
             resource.mission_handler.missionTieScreen();
+            return;
+        //=========================================
+        // Object Spooner
+        //=========================================
+        case "attachObject":
+            resource.object_placer.attachObject(args[0]);
             return;
     }
 });

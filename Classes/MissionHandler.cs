@@ -17,6 +17,11 @@ namespace stuykserver.Classes
 
         private void API_onClientEventTrigger(Client player, string eventName, params object[] arguments)
         {
+            if (eventName == "Mission_Invite")
+            {
+                cmdAddPlayer(player, API.getPlayerFromHandle((NetHandle)arguments[0]));
+            }
+
             if (!player.hasData("Mission") && player.getData("Mission") != null)
             {
                 return;
@@ -55,7 +60,7 @@ namespace stuykserver.Classes
             checkIfInMission(player);
             MissionClass mission = new MissionClass(player);
             mission.addObjective(new Vector3(-34.8390, -104.8744, 56.3878), MissionClass.PointType.Waypoint);
-            mission.addObjective(new Vector3(-34.8390, -104.8744, 56.3878), MissionClass.PointType.DisableBomb);
+            mission.addObjective(new Vector3(-34.8390, -104.8744, 56.3878), MissionClass.PointType.Extinguish);
             mission.addObjective(new Vector3(-13.0416, -143.2909, 55.6454), MissionClass.PointType.Investigate);
             mission.addObjective(new Vector3(-34.8390, -104.8744, 56.3878), MissionClass.PointType.Waypoint);
             mission.addObjective(new Vector3(-13.0416, -143.2909, 55.6454), MissionClass.PointType.DestroyVehicle);
@@ -100,20 +105,15 @@ namespace stuykserver.Classes
             mission.addObjective(new Vector3(-758.4518, -420.8088, 34.6613), MissionClass.PointType.DeliverVehicle);
         }
 
-        [Command("addplayer")]
-        public void cmdAddPlayer(Client player, string target)
+        public void cmdAddPlayer(Client player, Client target)
         {
-            Client tgt = API.getPlayerFromName(target);
-            if (tgt != null)
+            if (Convert.ToBoolean(target.getSyncedData("Mission_Started")))
             {
-                if (Convert.ToBoolean(tgt.getSyncedData("Mission_Started")))
-                {
-                    API.sendChatMessageToPlayer(player, "~r~Player is already in a mission.");
-                    return;
-                }
-                tgt.setSyncedData("Mission_Invite", player);
-                API.sendChatMessageToPlayer(tgt, string.Format("~g~You were invited to a mission by {0}, type ~y~/maccept ~g~to join or ~r~/mreject", API.getPlayerName(player)));
+                API.sendChatMessageToPlayer(player, "~r~Player is already in a mission.");
+                return;
             }
+            target.setSyncedData("Mission_Invite", player);
+            API.sendChatMessageToPlayer(target, string.Format("~g~You were invited to a mission by {0}, type ~y~/maccept ~g~to join or ~r~/mreject", API.getPlayerName(player)));
         }
 
         [Command("maccept")]

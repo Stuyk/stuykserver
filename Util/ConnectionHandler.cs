@@ -86,7 +86,7 @@ namespace stuykserver.Util
         {
 
             string[] varNames = { "ID" };
-            string before = "SELECT ID, LASTX, LASTY, SocialClub, LASTZ, Dead, Money, Bank, Nametag, Health, Armor, Admin, Karma, Time, Organization, Business FROM Players WHERE";
+            string before = "SELECT ID, X, Y, SocialClub, Z, Dead, Money, Bank, Nametag, Health, Armor, Admin, Karma, Time, Organization, Business FROM Players WHERE";
             object[] data = { Convert.ToString(API.getEntityData(player, "PlayerID")) };
             DataTable result = db.compileSelectQuery(before, varNames, data);
 
