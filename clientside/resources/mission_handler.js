@@ -230,7 +230,7 @@ API.onUpdate.connect(function () {
                     return;
                 }
                 else {
-                    cooldown = (new Date().getTime() + 5000);
+                    cooldown = (new Date().getTime() + 2000);
                     taskHealth += 5;
                     API.playSoundFrontEnd("Pin_Good", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS");
                     API.triggerServerEvent("updateMissionBar", taskHealth);

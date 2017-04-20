@@ -19,7 +19,7 @@ namespace stuykserver.Classes
         {
             if (eventName == "Mission_Invite")
             {
-                cmdAddPlayer(player, API.getPlayerFromHandle((NetHandle)arguments[0]));
+                cmdAddPlayer(player, API.getPlayerFromName(arguments[0].ToString()));
             }
 
             if (!player.hasData("Mission") && player.getData("Mission") != null)
@@ -78,8 +78,6 @@ namespace stuykserver.Classes
             checkIfInMission(player);
             MissionClass mission = new MissionClass(player);
             mission.addObjective(new Vector3(-56.7974, -66.2038, 58.2891), MissionClass.PointType.Investigate);
-            mission.addObjective(new Vector3(-81.4844, -49.0375, 62), MissionClass.PointType.DestroyVehicle);
-            mission.setTargetVehicleType(VehicleHash.BfInjection);
             mission.addObjective(new Vector3(-44.2143, -72.4286, 61.0867), MissionClass.PointType.Waypoint);
             mission.addObjective(new Vector3(-46.3358, -93.9127, 62.0233), MissionClass.PointType.Waypoint);
             mission.addObjective(new Vector3(-42.1593, -93.1439, 62.3606), MissionClass.PointType.Hack);
@@ -91,6 +89,11 @@ namespace stuykserver.Classes
             mission.addObjective(new Vector3(-19.9214, -22.1637, 67.9974), MissionClass.PointType.DisableBomb);
             mission.addObjective(new Vector3(-48.6407, -109.3436, 43.1382), MissionClass.PointType.Destroy);
             mission.addObjective(new Vector3(-44.1565, -15.0770, 68.5187), MissionClass.PointType.Waypoint);
+            mission.addObjective(new Vector3(-81.4844, -49.0375, 64), MissionClass.PointType.DestroyVehicle);
+            mission.setTargetVehicleType(VehicleHash.BfInjection);
+            mission.addObjective(new Vector3(-101.8112, -70.6753, 58.8354), MissionClass.PointType.Destroy);
+            mission.addObjective(new Vector3(-84.1131, -86.4961, 56.7753), MissionClass.PointType.Waypoint);
+            mission.startMission();
         }
 
         [Command("gta")]
@@ -103,15 +106,21 @@ namespace stuykserver.Classes
             mission.setTargetVehicleType(VehicleHash.Washington);
             mission.addObjective(new Vector3(-734.9340, -361.9490, 34.0274), MissionClass.PointType.Waypoint);
             mission.addObjective(new Vector3(-758.4518, -420.8088, 34.6613), MissionClass.PointType.DeliverVehicle);
+            mission.startMission();
         }
 
         public void cmdAddPlayer(Client player, Client target)
         {
-            if (Convert.ToBoolean(target.getSyncedData("Mission_Started")))
+
+            if (target.hasSyncedData("Mission_Started"))
             {
-                API.sendChatMessageToPlayer(player, "~r~Player is already in a mission.");
-                return;
+                if (Convert.ToBoolean(target.getSyncedData("Mission_Started")))
+                {
+                    API.sendChatMessageToPlayer(player, "~r~Player is already in a mission.");
+                    return;
+                }
             }
+
             target.setSyncedData("Mission_Invite", player);
             API.sendChatMessageToPlayer(target, string.Format("~g~You were invited to a mission by {0}, type ~y~/maccept ~g~to join or ~r~/mreject", API.getPlayerName(player)));
         }

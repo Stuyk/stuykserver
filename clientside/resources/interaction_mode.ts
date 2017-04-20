@@ -72,7 +72,9 @@ API.onUpdate.connect(function () {
         API.triggerServerEvent("Interaction_Update");
     }
     // ENTER
-    if (API.isControlJustPressed(Enums.Controls.Enter)) {
+    if (API.isDisabledControlJustPressed(Enums.Controls.Enter)) {
+        API.sendChatMessage("Pressed");
+
         if (target === null) {
             if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
                 return;
@@ -80,6 +82,7 @@ API.onUpdate.connect(function () {
             API.callNative("CLEAR_PED_TASKS_IMMEDIATELY", API.getLocalPlayer());
             return;
         }
+
         switch (API.getEntityType(target)) {
             case Enums.EntityType.Vehicle:
                 taskEnterVehicle(-1);
@@ -87,7 +90,7 @@ API.onUpdate.connect(function () {
             case Enums.EntityType.Player:
                 if (API.hasEntitySyncedData(API.getLocalPlayer(), "Mission_Started")) {
                     if (API.getEntitySyncedData(API.getLocalPlayer(), "Mission_Started")) {
-                        API.triggerServerEvent("Mission_Invite", target);
+                        API.triggerServerEvent("Mission_Invite", API.getPlayerName(target));
                         return;
                     }
                 }

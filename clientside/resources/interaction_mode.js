@@ -68,7 +68,8 @@ API.onUpdate.connect(function () {
         API.triggerServerEvent("Interaction_Update");
     }
     // ENTER
-    if (API.isControlJustPressed(23 /* Enter */)) {
+    if (API.isDisabledControlJustPressed(23 /* Enter */)) {
+        API.sendChatMessage("Pressed");
         if (target === null) {
             if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
                 return;
@@ -83,7 +84,7 @@ API.onUpdate.connect(function () {
             case 6 /* Player */:
                 if (API.hasEntitySyncedData(API.getLocalPlayer(), "Mission_Started")) {
                     if (API.getEntitySyncedData(API.getLocalPlayer(), "Mission_Started")) {
-                        API.triggerServerEvent("Mission_Invite", target);
+                        API.triggerServerEvent("Mission_Invite", API.getPlayerName(target));
                         return;
                     }
                 }

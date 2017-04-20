@@ -74,6 +74,7 @@
     <Compile Include="Classes\RepairShopHandler.cs" />
     <Compile Include="Classes\ShopHandler.cs" />
     <Compile Include="Classes\Shop.cs" />
+    <Compile Include="Classes\SurgeryHandler.cs" />
     <Compile Include="Classes\Time.cs" />
     <Compile Include="Classes\VehicleClass.cs" />
     <Compile Include="Jobs\BodyGuard.cs" />
@@ -153,6 +154,7 @@
     <TypeScriptCompile Include="clientside\resources\camera_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\surgery_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\mission_handler.ts" />
     <TypeScriptCompile Include="clientside\resources\object_placer.ts" />
     <TypeScriptCompile Include="clientside\resources\snake.ts" />

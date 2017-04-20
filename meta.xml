@@ -20,6 +20,7 @@
   <script src="clientside/resources/snake.js" type="client" lang="javascript" />
   <script src="clientside/resources/mission_handler.js" type="client" lang="javascript" />
   <script src="clientside/resources/object_placer.js" type="client" lang="javascript" />
+  <script src="clientside/resources/surgery_mode.js" type="client" lang="javascript" />
 	
 	<file src="clientside/resources/invalidname.html"/>
 	<file src="clientside/resources/dealership.html"/>

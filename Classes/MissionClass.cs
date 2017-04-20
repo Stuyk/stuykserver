@@ -326,12 +326,12 @@ namespace stuykserver.Classes
         // Setup Target Vehicle
         public void setupTargetVehicle()
         {
-            target = API.createVehicle(targetVehicleType, missionObjectives[0].Add(new Vector3(0, 0, 1)), new Vector3(), 111, 111);
+            target = API.createVehicle(targetVehicleType, missionObjectives[0], new Vector3(), 111, 111);
             syncTarget();
 
             if (missionPoints[0] == PointType.DestroyVehicle)
             {
-                API.setEntityPositionFrozen(target, true);
+                API.setEntityPosition(target, missionObjectives[0]);
                 API.setVehicleLocked(target, true);
                 allyBar = 100;
                 enemyBar = 100;

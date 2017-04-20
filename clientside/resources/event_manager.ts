@@ -181,6 +181,7 @@
             API.setGameplayCameraActive();
             API.setHudVisible(true);
             API.stopAudio();
+            API.setGameVolume(1.0);
             var playerName = API.getPlayerName(API.getLocalPlayer());
             API.showShard("~b~Welcome back ~y~" + playerName.replace(/_/g, ' '), 6000);
             API.sendChatMessage("~r~Current Not Working: ~n~Dealerships, ~n~Car Customization, ~n~Player Customization");
