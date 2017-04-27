@@ -8,14 +8,12 @@ var debugTest = true;
 var button = null;
 var panel = null;
 var image = null;
-var buttons = [];
-var pages = []; // Pages you can loop through.
-var panes = []; // Static Panels
+var menuElements = [];
 var currentPage = 0;
-var images = [];
 var padding = 10;
 // Set to True when your menu is ready.
 var menuIsReady = false;
+var selectedInput = null;
 class PanelImage {
     constructor(path, x, y, width, height) {
         this._path = path;
@@ -87,6 +85,108 @@ class Panel {
     }
     returnType() {
         return "Panel";
+    }
+}
+class InputPanel {
+    constructor(x, y, width, height, isPasswordProtected, isSelected) {
+        this._xPos = x * panelMinX;
+        this._yPos = y * panelMinY;
+        this._width = width * panelMinX;
+        this._height = height * panelMinY;
+        this._protected = isPasswordProtected;
+        this._input = "";
+        this._hovered = false;
+        this._selected = isSelected;
+        this._numeric = false;
+    }
+    draw() {
+        if (this._selected) {
+            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 175); // Darker Black
+            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 200);
+            if (this._protected) {
+                if (this._input.length < 1) {
+                    return;
+                }
+                API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            }
+            else {
+                API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            }
+            return;
+        }
+        if (this._hovered) {
+            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 175); // Darker Black
+            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 150);
+            if (this._protected) {
+                if (this._input.length < 1) {
+                    return;
+                }
+                API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            }
+            else {
+                API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            }
+        }
+        else {
+            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 175); // Black
+            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 100);
+            if (this._protected) {
+                if (this._input.length < 1) {
+                    return;
+                }
+                API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            }
+            else {
+                API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            }
+        }
+    }
+    isHovered() {
+        if (API.isCursorShown()) {
+            let cursorPos = API.getCursorPositionMantainRatio();
+            if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
+                this._hovered = true;
+            }
+            else {
+                this._hovered = false;
+            }
+        }
+    }
+    isClicked() {
+        let cursorPos = API.getCursorPositionMantainRatio();
+        if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
+            this._selected = true;
+            selectedInput = this;
+            return;
+        }
+        else {
+            this._selected = false;
+            return;
+        }
+    }
+    addToInput(text) {
+        if (this._input.length > 2147483647) {
+            return;
+        }
+        if (!this._numeric) {
+            this._input += text;
+            return this._input;
+        }
+        else {
+            if (Number.isInteger(+text)) {
+                this._input += text;
+                return this._input;
+            }
+        }
+    }
+    removeFromInput() {
+        this._input = this._input.substring(0, this._input.length - 1);
+    }
+    setNumericOnly() {
+        this._numeric = true;
+    }
+    returnType() {
+        return "InputPanel";
     }
 }
 class Button {
@@ -164,112 +264,188 @@ class Button {
     }
 }
 // On-Update Event -- Draws all of our stuff.
-var inputText = "!";
 API.onUpdate.connect(function () {
-    API.drawText(inputText, 50, 50, 1.0, 255, 255, 255, 255, 4, 0, false, false, 1920);
     if (!menuIsReady) {
         return;
     }
-    drawAllImages();
-    drawAllButtons();
-    if (API.isCursorShown()) {
-        updateAllButtons();
-        if (API.isControlJustPressed(237 /* CursorAccept */)) {
-            isButtonClicked();
-        }
-    }
-    drawAllPages();
-    drawAllStaticPanes();
+    drawAllMenuElements();
 });
 // On-Keydown Event
 API.onKeyDown.connect(function (sender, e) {
+    if (!menuIsReady) {
+        return;
+    }
+    if (selectedInput === null) {
+        return;
+    }
     if (e.KeyCode === Keys.Back) {
-        inputText = inputText.substring(0, inputText.length - 1);
+        selectedInput.removeFromInput();
         return;
     }
     let shiftOn = false;
     if (e.Shift) {
         shiftOn = true;
     }
-    let keypress;
+    let keypress = "";
     switch (e.KeyCode) {
+        case Keys.Space:
+            keypress = " ";
+            break;
         case Keys.A:
-            keypress = "A";
+            keypress = "a";
+            if (shiftOn) {
+                keypress = "A";
+            }
             break;
         case Keys.B:
-            keypress = "B";
+            keypress = "b";
+            if (shiftOn) {
+                keypress = "B";
+            }
             break;
         case Keys.C:
-            keypress = "C";
+            keypress = "c";
+            if (shiftOn) {
+                keypress = "C";
+            }
             break;
         case Keys.D:
-            keypress = "D";
+            keypress = "d";
+            if (shiftOn) {
+                keypress = "D";
+            }
             break;
         case Keys.E:
-            keypress = "E";
+            keypress = "e";
+            if (shiftOn) {
+                keypress = "E";
+            }
             break;
         case Keys.F:
-            keypress = "F";
+            keypress = "f";
+            if (shiftOn) {
+                keypress = "F";
+            }
             break;
         case Keys.G:
-            keypress = "G";
+            keypress = "g";
+            if (shiftOn) {
+                keypress = "G";
+            }
             break;
         case Keys.H:
-            keypress = "H";
+            keypress = "h";
+            if (shiftOn) {
+                keypress = "H";
+            }
             break;
         case Keys.I:
-            keypress = "I";
+            keypress = "i";
+            if (shiftOn) {
+                keypress = "I";
+            }
             break;
         case Keys.J:
-            keypress = "J";
+            keypress = "j";
+            if (shiftOn) {
+                keypress = "J";
+            }
             break;
         case Keys.K:
-            keypress = "K";
+            keypress = "k";
+            if (shiftOn) {
+                keypress = "K";
+            }
             break;
         case Keys.L:
-            keypress = "L";
+            keypress = "l";
+            if (shiftOn) {
+                keypress = "L";
+            }
             break;
         case Keys.M:
-            keypress = "M";
+            keypress = "m";
+            if (shiftOn) {
+                keypress = "M";
+            }
             break;
         case Keys.N:
-            keypress = "N";
+            keypress = "n";
+            if (shiftOn) {
+                keypress = "N";
+            }
             break;
         case Keys.O:
-            keypress = "O";
+            keypress = "o";
+            if (shiftOn) {
+                keypress = "O";
+            }
             break;
         case Keys.P:
-            keypress = "P";
+            keypress = "p";
+            if (shiftOn) {
+                keypress = "P";
+            }
             break;
         case Keys.Q:
-            keypress = "Q";
+            keypress = "q";
+            if (shiftOn) {
+                keypress = "Q";
+            }
             break;
         case Keys.R:
-            keypress = "R";
+            keypress = "r";
+            if (shiftOn) {
+                keypress = "R";
+            }
             break;
         case Keys.S:
-            keypress = "S";
+            keypress = "s";
+            if (shiftOn) {
+                keypress = "S";
+            }
             break;
         case Keys.T:
-            keypress = "T";
+            keypress = "t";
+            if (shiftOn) {
+                keypress = "T";
+            }
             break;
         case Keys.U:
-            keypress = "U";
+            keypress = "u";
+            if (shiftOn) {
+                keypress = "U";
+            }
             break;
         case Keys.V:
-            keypress = "V";
+            keypress = "v";
+            if (shiftOn) {
+                keypress = "V";
+            }
             break;
         case Keys.W:
-            keypress = "W";
+            keypress = "w";
+            if (shiftOn) {
+                keypress = "W";
+            }
             break;
         case Keys.X:
-            keypress = "X";
+            keypress = "x";
+            if (shiftOn) {
+                keypress = "X";
+            }
             break;
         case Keys.Y:
-            keypress = "Y";
+            keypress = "y";
+            if (shiftOn) {
+                keypress = "Y";
+            }
             break;
         case Keys.Z:
-            keypress = "Z";
+            keypress = "z";
+            if (shiftOn) {
+                keypress = "Z";
+            }
             break;
         case Keys.D0:
             keypress = "0";
@@ -331,17 +507,68 @@ API.onKeyDown.connect(function (sender, e) {
                 keypress = "(";
             }
             break;
+        case Keys.OemMinus:
+            keypress = "-";
+            if (shiftOn) {
+                keypress = "_";
+            }
+            break;
+        case Keys.Oemplus:
+            keypress = "=";
+            if (shiftOn) {
+                keypress = "+";
+            }
+            break;
+        case Keys.OemQuestion:
+            keypress = "/";
+            if (shiftOn) {
+                keypress = "?";
+            }
+            break;
+        case Keys.Oemcomma:
+            keypress = ",";
+            if (shiftOn) {
+                keypress = "<";
+            }
+            break;
+        case Keys.OemPeriod:
+            keypress = ".";
+            if (shiftOn) {
+                keypress = ">";
+            }
+            break;
+        case Keys.OemSemicolon:
+            keypress = ";";
+            if (shiftOn) {
+                keypress = ":";
+            }
+            break;
+        case Keys.OemOpenBrackets:
+            keypress = "[";
+            if (shiftOn) {
+                keypress = "{";
+            }
+            break;
+        case Keys.OemCloseBrackets:
+            keypress = "]";
+            if (shiftOn) {
+                keypress = "}";
+            }
+            break;
     }
-    if (shiftOn) {
-        inputText += keypress.toUpperCase();
+    if (keypress === "") {
+        return;
+    }
+    if (keypress.length > 0) {
+        selectedInput.addToInput(keypress);
     }
     else {
-        inputText += keypress.toLowerCase();
+        return;
     }
 });
 // Goes to Next Page
 function nextPage() {
-    if (currentPage + 1 > pages.length - 1) {
+    if (currentPage + 1 > menuElements.length - 1) {
         currentPage = 0;
     }
     else {
@@ -351,86 +578,43 @@ function nextPage() {
 // Goes to Previous Page
 function prevPage() {
     if (currentPage - 1 < 0) {
-        currentPage = pages.length - 1;
+        currentPage = menuElements.length - 1;
     }
     else {
         currentPage -= 1;
     }
 }
-// Draws all panels.
-function drawAllPages() {
-    if (pages.length > 0) {
-        if (Array.isArray(pages[currentPage])) {
-            for (var i = 0; i < pages[currentPage].length; i++) {
-                pages[currentPage][i].draw();
-                let type = pages[currentPage][i].returnType();
-                if (type === "Button") {
-                    pages[currentPage][i].isHovered();
+// Draws all elements.
+function drawAllMenuElements() {
+    // Check if Elements are present.
+    if (menuElements.length < 1) {
+        return;
+    }
+    // Determine if our current page has elements or not.
+    if (!Array.isArray(menuElements[currentPage])) {
+        return;
+    }
+    for (var i = 0; i < menuElements[currentPage].length; i++) {
+        // This will draw each element.
+        menuElements[currentPage][i].draw();
+        // Return the type of element.
+        let type = menuElements[currentPage][i].returnType();
+        // Check for Hover Events
+        switch (type) {
+            case "Button":
+                menuElements[currentPage][i].isHovered();
+                // Check for Click Events
+                if (API.isControlJustPressed(237 /* CursorAccept */)) {
+                    menuElements[currentPage][i].isClicked();
                 }
-            }
-        }
-        else {
-            pages[currentPage].draw();
-            let type = pages[currentPage].returnType();
-            if (type === "Button") {
-                pages[currentPage].isHovered();
-            }
-        }
-    }
-}
-// Draws all static panes.
-function drawAllStaticPanes() {
-    if (panes.length > 0) {
-        for (var i = 0; i < panes.length; i++) {
-            panes[i].draw();
-        }
-    }
-}
-// Draws all buttons.
-function drawAllButtons() {
-    if (buttons.length > 0) {
-        for (var i = 0; i < buttons.length; i++) {
-            buttons[i].draw();
-        }
-    }
-}
-// Draws all images.
-function drawAllImages() {
-    if (images.length > 0) {
-        for (var i = 0; i < images.length; i++) {
-            images[i].draw();
-        }
-    }
-}
-// Determine if our mouse is hovered.
-function updateAllButtons() {
-    if (buttons.length > 0) {
-        for (var i = 0; i < buttons.length; i++) {
-            buttons[i].isHovered();
-        }
-    }
-}
-// Determines if the mouse is clicked.
-function isButtonClicked() {
-    if (buttons.length > 0) {
-        for (var i = 0; i < buttons.length; i++) {
-            buttons[i].isClicked();
-        }
-    }
-    if (pages.length > 0) {
-        if (Array.isArray(pages[currentPage])) {
-            for (var i = 0; i < pages[currentPage].length; i++) {
-                let type = pages[currentPage][i].returnType();
-                if (type === "Button") {
-                    pages[currentPage][i].isClicked();
+                break;
+            case "InputPanel":
+                menuElements[currentPage][i].isHovered();
+                // Check for Click Events
+                if (API.isControlJustPressed(237 /* CursorAccept */)) {
+                    menuElements[currentPage][i].isClicked();
                 }
-            }
-        }
-        else {
-            let type = pages[currentPage].returnType();
-            if (type === "Button") {
-                pages[currentPage].isClicked();
-            }
+                break;
         }
     }
 }
@@ -438,43 +622,37 @@ function isButtonClicked() {
 function setMenuReady(isReady) {
     menuIsReady = isReady;
 }
+// Setup our pages with arrays. This is the first thing we should call.
+function setupMenu(numberOfPages) {
+    for (var i = 0; i < numberOfPages; i++) {
+        let emptyArray = [];
+        menuElements.push(emptyArray);
+    }
+    API.sendChatMessage("" + menuElements.length);
+}
 // Add a page to our pages array.
-function addPage(xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text) {
+function createPanel(page, xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text) {
     panel = new Panel(xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text);
-    pages.push(panel);
-}
-// Add a page array to our pages array.
-function pushPageElements(pageElements) {
-    pages.push(pageElements);
-}
-// Created a page that can be used to push to the 'column' page type.
-function createPage(xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text) {
-    panel = new Panel(xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text);
+    menuElements[page].push(panel);
     return panel;
 }
-// Create a static button.
-function createButton(xStart, yStart, xGridWidth, yGridHeight, type, text) {
+// Add a button to our pages array.
+function createButton(page, xStart, yStart, xGridWidth, yGridHeight, type, text) {
     button = new Button(xStart, yStart, xGridWidth, yGridHeight, type, text);
-    buttons.push(button);
+    menuElements[page].push(button);
     return button;
 }
-// Create and Return a button.
-function createPageButton(xStart, yStart, xGridWidth, yGridHeight, type, text) {
-    button = new Button(xStart, yStart, xGridWidth, yGridHeight, type, text);
-    return button;
-}
-// Add a static pane to our grid. Use this for fillers / spacers / column spacers / etc.
-function addPane(xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text) {
-    panel = new Panel(xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text);
-    panes.push(panel);
+// Add a static input to our pages array.
+function createInput(page, xStart, yStart, xGridWidth, yGridHeight, isPasswordProtected, isSelected) {
+    panel = new InputPanel(xStart, yStart, xGridWidth, yGridHeight, isPasswordProtected, isSelected);
+    menuElements[page].push(panel);
     return panel;
 }
 // Clears the menu entirely.
-function exitMenu(cursor, hud, chat, blur) {
+function exitMenu(cursor, hud, chat, blur, canOpenChat) {
     menuIsReady = false;
-    buttons = [];
-    panes = [];
-    pages = [];
+    menuElements = [];
+    selectedInput = null;
     if (cursor) {
         API.showCursor(true);
     }
@@ -496,8 +674,14 @@ function exitMenu(cursor, hud, chat, blur) {
     if (blur) {
         API.callNative("_TRANSITION_FROM_BLURRED", 3000);
     }
+    if (canOpenChat) {
+        API.setCanOpenChat(true);
+    }
+    else {
+        API.setCanOpenChat(false);
+    }
 }
-function openMenu(cursor, hud, chat, blur) {
+function openMenu(cursor, hud, chat, blur, canOpenChat) {
     if (blur === true) {
         API.callNative("_TRANSITION_TO_BLURRED", 3000);
     }
@@ -519,5 +703,11 @@ function openMenu(cursor, hud, chat, blur) {
     }
     else {
         API.setChatVisible(false);
+    }
+    if (canOpenChat) {
+        API.setCanOpenChat(true);
+    }
+    else {
+        API.setCanOpenChat(false);
     }
 }
