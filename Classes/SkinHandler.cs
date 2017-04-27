@@ -136,6 +136,8 @@ namespace stuykserver.Util
             API.setEntitySyncedData(player.handle, "GTAO_EYEBROWS_COLOR", Convert.ToInt32(result.Rows[0]["FacialHairColor"]));
             API.setEntitySyncedData(player.handle, "GTAO_EYEBROWS_COLOR2", Convert.ToInt32(result.Rows[0]["FacialHairColor"]));
             API.setEntitySyncedData(player.handle, "GTAO_EYE_COLOR", Convert.ToInt32(result.Rows[0]["skinEyeColor"]));
+            API.setEntitySyncedData(player.handle, "GTAO_BLEMISHES", Convert.ToInt32(result.Rows[0]["Blemishes"]));
+            API.setEntitySyncedData(player.handle, "GTAO_SUNDAMAGE", Convert.ToInt32(result.Rows[0]["SunDamage"]));
 
             var list = new float[21];
             list[0] = Convert.ToSingle(result.Rows[0]["NoseWidth"]);

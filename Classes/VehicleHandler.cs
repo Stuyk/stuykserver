@@ -193,7 +193,12 @@ namespace stuykserver.Util
                 vehicle = player.vehicle;
             }
 
-            if (!API.hasEntityData(vehicle, "Instance") && player.position.DistanceTo(API.getEntityPosition(vehicle)) > 8)
+            if (player.position.DistanceTo(API.getEntityPosition(vehicle)) > 8)
+            {
+                return;
+            }
+
+            if (!API.hasEntityData(vehicle, "Instance"))
             {
                 return;
             }

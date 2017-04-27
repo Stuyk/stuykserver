@@ -434,7 +434,7 @@ function switchTexture(amount) {
 }
 function checkForZeroOrMax(current, max) {
     if (current > max) {
-        current = 0;
+        current = -1;
         return current;
     }
     if (current < 0) {

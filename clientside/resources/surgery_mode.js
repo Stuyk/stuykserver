@@ -40,20 +40,9 @@ var faceBlemishes = 0;
 var faceSunDamage = 0;
 // Menu Reference Math
 var startPointY = resY / 16;
-var menuWidth = resX / 4;
+var menuWidth = resX / 4 + 50;
 var menuHeight = resY / 16;
 var menuTextHeight = resY / 16;
-API.onChatMessage.connect(function (msg) {
-    if (msg == "su") {
-        if (camera === null) {
-            setupSurgery();
-        }
-        else {
-            API.setActiveCamera(null);
-            camera = null;
-        }
-    }
-});
 // On Update
 API.onUpdate.connect(function () {
     if (camera === null) {
@@ -61,6 +50,20 @@ API.onUpdate.connect(function () {
     }
     API.disableAllControlsThisFrame();
     showSurgeryMenu();
+    if (API.isDisabledControlJustPressed(23 /* Enter */)) {
+        saveSurgeryChanges();
+        camera = null;
+        API.setActiveCamera(null);
+        API.setChatVisible(true);
+        API.setHudVisible(true);
+    }
+    if (API.isDisabledControlJustPressed(177 /* PhoneCancel */)) {
+        API.triggerServerEvent("leaveSurgery");
+        camera = null;
+        API.setActiveCamera(null);
+        API.setChatVisible(true);
+        API.setHudVisible(true);
+    }
     if (API.isDisabledControlJustPressed(242 /* CursorScrollDown */)) {
         rotateSurgeryCamera(-0.1);
     }
@@ -77,6 +80,7 @@ API.onUpdate.connect(function () {
             currentPage -= 1;
             return;
         }
+        updateCurrentIndexMinus(currentPage);
     }
     if (API.isDisabledControlJustPressed(35 /* MoveRightOnly */)) {
         API.playSoundFrontEnd("SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
@@ -145,17 +149,20 @@ API.onUpdate.connect(function () {
         }
     }
 });
+// Update player.
+function saveSurgeryChanges() {
+    API.triggerServerEvent("saveSurgeryFace", faceShapeOne, faceShapeTwo, faceSkinOne, faceSkinTwo, faceShapeMix, faceSkinMix, faceNoseWidth, faceNoseHeight, faceNoseLength, faceNoseBridge, faceNoseTip, faceNoseBridgeDepth, faceEyebrowHeight, faceEyebrowDepth, faceCheekboneHeight, faceCheekboneDepth, faceCheekboneWidth, faceEyelids, faceLips, faceJawWidth, faceJawDepth, faceJawLength, faceChinFullness, faceChinWidth, faceNeckWidth, faceAgeing, faceComplexion, faceMoles, faceGender, faceBlemishes, faceSunDamage);
+}
+// +1 to Values
 function updateCurrentIndex(currentPage) {
     if (currentPage === 0) {
         switch (currentIndex) {
             case 1:
-                if (faceGender >= 1) {
-                    faceGender = 1;
-                    return;
-                }
-                faceGender += 1;
+                faceGender = 1;
+                API.setPlayerSkin(-1667301416);
                 API.callNative("SET_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, API.f(faceShapeMix), API.f(faceSkinMix), 0, false);
                 API.callNative("UPDATE_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), API.f(faceShapeMix), API.f(faceSkinMix), 0);
+                setupSurgeryCamera();
                 return;
             case 2:
                 faceShapeOne += 1;
@@ -313,13 +320,188 @@ function updateCurrentIndex(currentPage) {
         }
     }
 }
+// -1 To Values
+function updateCurrentIndexMinus(currentPage) {
+    if (currentPage === 0) {
+        switch (currentIndex) {
+            case 1:
+                faceGender = 0;
+                API.setPlayerSkin(1885233650);
+                API.callNative("SET_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, API.f(faceShapeMix), API.f(faceSkinMix), 0, false);
+                API.callNative("UPDATE_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), API.f(faceShapeMix), API.f(faceSkinMix), 0);
+                setupSurgeryCamera();
+                return;
+            case 2:
+                faceShapeOne -= 1;
+                if (faceShapeOne < 0) {
+                    faceShapeOne = 45;
+                }
+                API.callNative("SET_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, API.f(faceShapeMix), API.f(faceSkinMix), 0, false);
+                API.callNative("UPDATE_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), API.f(faceShapeMix), API.f(faceSkinMix), 0);
+                return;
+            case 3:
+                faceShapeTwo -= 1;
+                if (faceShapeOne < 0) {
+                    faceShapeOne = 45;
+                }
+                API.callNative("SET_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, API.f(faceShapeMix), API.f(faceSkinMix), 0, false);
+                API.callNative("UPDATE_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), API.f(faceShapeMix), API.f(faceSkinMix), 0);
+                return;
+            case 4:
+                faceSkinOne -= 1;
+                if (faceShapeOne < 0) {
+                    faceShapeOne = 45;
+                }
+                API.callNative("SET_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, API.f(faceShapeMix), API.f(faceSkinMix), 0, false);
+                API.callNative("UPDATE_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), API.f(faceShapeMix), API.f(faceSkinMix), 0);
+                return;
+            case 5:
+                faceSkinTwo -= 1;
+                if (faceShapeOne < 0) {
+                    faceShapeOne = 45;
+                }
+                API.callNative("SET_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), faceShapeOne, faceShapeTwo, 0, faceSkinOne, faceSkinTwo, 0, API.f(faceShapeMix), API.f(faceSkinMix), 0, false);
+                API.callNative("UPDATE_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), API.f(faceShapeMix), API.f(faceSkinMix), 0);
+                return;
+            case 6:
+                faceShapeMix -= 0.1;
+                if (faceShapeMix < -1) {
+                    faceShapeMix = -1;
+                }
+                faceShapeMix = (Math.round(faceShapeMix * 100) / 100);
+                API.callNative("UPDATE_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), API.f(faceShapeMix), API.f(faceSkinMix), 0);
+                return;
+            case 7:
+                faceSkinMix -= 0.1;
+                if (faceSkinMix < -1) {
+                    faceSkinMix = -1;
+                }
+                faceSkinMix = (Math.round(faceSkinMix * 100) / 100);
+                API.callNative("UPDATE_PED_HEAD_BLEND_DATA", API.getLocalPlayer(), API.f(faceShapeMix), API.f(faceSkinMix), 0);
+                return;
+            case 8:
+                if (faceAgeing < 0) {
+                    faceAgeing = 14;
+                    return;
+                }
+                faceAgeing -= 1;
+                API.callNative("SET_PED_HEAD_OVERLAY", API.getLocalPlayer(), 3, faceAgeing, API.f(1));
+                return;
+            case 9:
+                if (faceComplexion < 0) {
+                    faceComplexion = 11;
+                    return;
+                }
+                faceComplexion -= 1;
+                API.callNative("SET_PED_HEAD_OVERLAY", API.getLocalPlayer(), 6, faceComplexion, API.f(1));
+                return;
+            case 10:
+                if (faceMoles < 0) {
+                    faceMoles = 17;
+                    return;
+                }
+                faceMoles -= 1;
+                API.callNative("SET_PED_HEAD_OVERLAY", API.getLocalPlayer(), 9, faceMoles, API.f(1));
+                return;
+            case 11:
+                if (faceBlemishes < 0) {
+                    faceBlemishes = 23;
+                    return;
+                }
+                faceBlemishes -= 1;
+                API.callNative("SET_PED_HEAD_OVERLAY", API.getLocalPlayer(), 0, faceBlemishes, API.f(1));
+                return;
+            case 12:
+                if (faceSunDamage < 0) {
+                    faceSunDamage = 10;
+                    return;
+                }
+                faceSunDamage -= 1;
+                API.callNative("SET_PED_HEAD_OVERLAY", API.getLocalPlayer(), 7, faceSunDamage, API.f(1));
+                return;
+        }
+    }
+    if (currentPage === 1) {
+        switch (currentIndex) {
+            case 1:
+                faceNoseWidth = adjustSelection(faceNoseWidth, -0.1, 0);
+                return;
+            case 2:
+                faceNoseHeight = adjustSelection(faceNoseHeight, -0.1, 1);
+                return;
+            case 3:
+                faceNoseLength = adjustSelection(faceNoseLength, -0.1, 2);
+                return;
+            case 4:
+                faceNoseBridge = adjustSelection(faceNoseBridge, -0.1, 3);
+                return;
+            case 5:
+                faceNoseTip = adjustSelection(faceNoseTip, -0.1, 4);
+                return;
+            case 6:
+                faceNoseBridgeDepth = adjustSelection(faceNoseBridgeDepth, -0.1, 5);
+                return;
+            case 7:
+                faceEyebrowHeight = adjustSelection(faceEyebrowHeight, -0.1, 6);
+                return;
+            case 8:
+                faceEyebrowDepth = adjustSelection(faceEyebrowDepth, -0.1, 7);
+                return;
+        }
+    }
+    if (currentPage === 2) {
+        switch (currentIndex) {
+            case 1:
+                faceCheekboneHeight = adjustSelection(faceCheekboneHeight, -0.1, 8);
+                return;
+            case 2:
+                faceCheekboneDepth = adjustSelection(faceCheekboneDepth, -0.1, 9);
+                return;
+            case 3:
+                faceCheekboneWidth = adjustSelection(faceCheekboneWidth, -0.1, 10);
+                return;
+            case 4:
+                faceEyelids = adjustSelection(faceEyelids, -0.1, 11);
+                return;
+            case 5:
+                faceLips = adjustSelection(faceLips, -0.1, 12);
+                return;
+            case 6:
+                faceJawWidth = adjustSelection(faceJawWidth, -0.1, 13);
+                return;
+            case 7:
+                faceJawDepth = adjustSelection(faceJawDepth, -0.1, 14);
+                return;
+            case 8:
+                faceJawLength = adjustSelection(faceJawLength, -0.1, 15);
+                return;
+            case 9:
+                faceChinFullness = adjustSelection(faceChinFullness, -0.1, 16);
+                return;
+            case 10:
+                faceChinWidth = adjustSelection(faceChinWidth, -0.1, 17);
+                return;
+            case 11:
+                faceNeckWidth = adjustSelection(faceNeckWidth, -0.1, 19);
+                return;
+        }
+    }
+}
+// Round to Fixed
 function roundToFixed(_float, _digits) {
     var rounder = Math.pow(10, _digits);
     return (Math.round(_float * rounder) / rounder).toFixed(_digits);
 }
+// Adjust Selection Function
 function adjustSelection(type, amount, feature) {
     if (type > 1) {
         type = 1;
+        API.callNative("_SET_PED_FACE_FEATURE", API.getLocalPlayer(), feature, API.f(type));
+        return type;
+    }
+    if (type < -1) {
+        type = -1;
+        API.callNative("_SET_PED_FACE_FEATURE", API.getLocalPlayer(), feature, API.f(type));
         return type;
     }
     type += amount;
@@ -330,10 +512,10 @@ function adjustSelection(type, amount, feature) {
 // Surgery Menu
 function showSurgeryMenu() {
     // Black Background
-    API.drawRectangle(0, 0, (resX / 4), resY, 0, 0, 0, 150);
+    API.drawRectangle(0, 0, menuWidth, resY, 0, 0, 0, 150);
     // Blue Header + Text
-    API.drawRectangle(0, 0, (resX / 4), (resY / 16), 112, 33, 33, 255);
-    API.drawText("Surgery", (resX / 4) / 2, 0, 1, 255, 255, 255, 255, 1, 1, false, false, 500);
+    API.drawRectangle(0, 0, menuWidth, (resY / 16), 112, 33, 33, 255);
+    API.drawText("Surgery", menuWidth / 2, 0, 1, 255, 255, 255, 255, 1, 1, false, false, 500);
     API.drawText("[F - Save] [Backspace - Exit]", resX / 2, 0, 0.5, 255, 255, 255, 255, 4, 1, false, false, 500);
     // Gender
     if (currentPage === 0) {
@@ -377,6 +559,7 @@ function showSurgeryMenu() {
         drawTextMenuText(11, "Neck Width", faceNeckWidth);
     }
 }
+// Draw Menu Text
 function drawTextMenuText(index, text, parameter) {
     if (currentIndex === index) {
         API.drawRectangle(0, startPointY * (index + 1), menuWidth, menuHeight, 255, 255, 255, 200);
@@ -395,10 +578,11 @@ function setupSurgery() {
     API.setChatVisible(false);
     API.callNative("TASK_LOOK_AT_COORD", API.getLocalPlayer(), -36.58, -152.68, 57.8, -1, 0, 0);
     API.callNative("DO_SCREEN_FADE_IN", 3000);
+    setupVariables();
 }
 // Setup Camera
 function setupSurgeryCamera() {
-    camera = API.createCamera(API.getEntityPosition(API.getLocalPlayer()).Add(new Vector3(2, 0, 0.85)), new Vector3());
+    camera = API.createCamera(API.getEntityPosition(API.getLocalPlayer()).Add(new Vector3(-2, 0, 1.0)), new Vector3());
     API.pointCameraAtEntity(camera, API.getLocalPlayer(), new Vector3(0, 0, 0.6));
     API.setActiveCamera(camera);
     API.setCameraFov(camera, 15);
@@ -413,4 +597,66 @@ function rotateSurgeryCamera(value) {
     var x = (cosTheta * (camera.X - center.X) - sinTheta * (camera.Y - center.Y) + center.X);
     var y = (sinTheta * (camera.X - center.X) + cosTheta * (camera.Y - center.Y) + center.Y);
     API.setCameraPosition(API.getActiveCamera(), new Vector3(x, y, camera.Z));
+}
+// Setup Variables
+function setupVariables() {
+    faceShapeOne = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_SHAPE_FIRST_ID");
+    faceShapeTwo = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_SHAPE_SECOND_ID");
+    faceSkinOne = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_SKIN_FIRST_ID");
+    faceSkinTwo = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_SKIN_SECOND_ID");
+    faceShapeMix = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_SHAPE_MIX");
+    faceShapeMix = Number(roundToFixed(faceShapeMix, 1));
+    faceSkinMix = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_SKIN_MIX");
+    faceSkinMix = Number(roundToFixed(faceSkinMix, 1));
+    faceAgeing = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_AGEING");
+    faceComplexion = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_COMPLEXION");
+    faceMoles = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_MOLES");
+    faceBlemishes = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_BLEMISHES");
+    faceSunDamage = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_SUNDAMAGE");
+    var faceFeatureList = API.getEntitySyncedData(API.getLocalPlayer(), "GTAO_FACE_FEATURES_LIST");
+    faceNoseWidth = faceFeatureList[0];
+    faceNoseWidth = Number(roundToFixed(faceNoseWidth, 1));
+    faceNoseHeight = faceFeatureList[1];
+    faceNoseHeight = Number(roundToFixed(faceNoseHeight, 1));
+    faceNoseLength = faceFeatureList[2];
+    faceNoseLength = Number(roundToFixed(faceNoseLength, 1));
+    faceNoseBridge = faceFeatureList[3];
+    faceNoseBridge = Number(roundToFixed(faceNoseBridge, 1));
+    faceNoseTip = faceFeatureList[4];
+    faceNoseTip = Number(roundToFixed(faceNoseTip, 1));
+    faceNoseBridgeDepth = faceFeatureList[5];
+    faceNoseBridgeDepth = Number(roundToFixed(faceNoseBridgeDepth, 1));
+    faceEyebrowHeight = faceFeatureList[6];
+    faceEyebrowHeight = Number(roundToFixed(faceEyebrowHeight, 1));
+    faceEyebrowDepth = faceFeatureList[7];
+    faceEyebrowDepth = Number(roundToFixed(faceEyebrowDepth, 1));
+    faceCheekboneHeight = faceFeatureList[8];
+    faceCheekboneHeight = Number(roundToFixed(faceCheekboneHeight, 1));
+    faceCheekboneDepth = faceFeatureList[9];
+    faceCheekboneDepth = Number(roundToFixed(faceCheekboneDepth, 1));
+    faceCheekboneWidth = faceFeatureList[10];
+    faceCheekboneWidth = Number(roundToFixed(faceCheekboneWidth, 1));
+    faceEyelids = faceFeatureList[11];
+    faceEyelids = Number(roundToFixed(faceEyelids, 1));
+    faceLips = faceFeatureList[12];
+    faceLips = Number(roundToFixed(faceLips, 1));
+    faceJawWidth = faceFeatureList[13];
+    faceJawWidth = Number(roundToFixed(faceJawWidth, 1));
+    faceJawDepth = faceFeatureList[14];
+    faceJawDepth = Number(roundToFixed(faceJawDepth, 1));
+    faceJawLength = faceFeatureList[15];
+    faceJawLength = Number(roundToFixed(faceJawLength, 1));
+    faceChinFullness = faceFeatureList[16];
+    faceChinFullness = Number(roundToFixed(faceChinFullness, 1));
+    faceChinWidth = faceFeatureList[17];
+    faceChinWidth = Number(roundToFixed(faceChinWidth, 1));
+    faceNeckWidth = faceFeatureList[19];
+    faceNeckWidth = Number(roundToFixed(faceNeckWidth, 1));
+    var model = API.getEntityModel(API.getLocalPlayer());
+    if (model === 1885233650) {
+        faceGender = 0;
+    }
+    else {
+        faceGender = 1;
+    }
 }

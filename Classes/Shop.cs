@@ -101,7 +101,8 @@ namespace stuykserver.Classes
             Fishing,
             FishingSale,
             Repair,
-            FuelPump
+            FuelPump,
+            Surgery
         }
 
         ColShape collisionShape; // Used for the main point.
@@ -452,6 +453,12 @@ namespace stuykserver.Classes
                         API.setBlipColor(collisionBlip, 59);
                         textLabel = API.createTextLabel(string.Format("~b~Pump: ~b~{0}/5000 Units", shopUnits), collisionPosition, 10f, 0.8f, true);
                         shopMessage = "This seems like a place where I could get my vehicle some gas.";
+                        break;
+                    case ShopType.Surgery:
+                        API.setBlipSprite(collisionBlip, 403);
+                        API.setBlipColor(collisionBlip, 49);
+                        API.setBlipName(collisionBlip, "Facial Reconstruction");
+                        shopMessage = "I could get my face modified here.";
                         break;
                     default:
                         textLabel = API.createTextLabel(string.Format("Dealership: {0}", shopType.ToString()), collisionPosition, 10f, 0.8f, false);

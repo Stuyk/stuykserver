@@ -18,13 +18,47 @@ namespace stuykserver.Classes
         // Create a Timer so we can call it for other functions.
         Timer serverTimer;
 
+        DateTime _currentime;
+
         public Time()
         {
             API.onResourceStart += API_onResourceStart;
+            API.onUpdate += API_onUpdate;
+        }
+
+        int tick;
+
+        private void API_onUpdate()
+        {
+            if (tick > 7200)
+            { // 120 Tickrate
+                if (DateTime.Now > _currentime.AddMilliseconds(5000))
+                {
+                    _currentime = DateTime.Now;
+                    API.consoleOutput("Tick");
+                }
+            }
+           
+            tick += 1;
         }
 
         private void API_onResourceStart()
         {
+            // Get our current time.
+            _currentime = DateTime.Now;
+
+
+
+
+
+
+
+
+
+
+
+
+
             // Set the time to our start time.
             API.setTime(serverStartTime.Hours, serverStartTime.Minutes);
 

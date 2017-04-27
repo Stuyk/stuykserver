@@ -290,6 +290,18 @@ namespace stuykserver.Util
             }
         }
 
+        [Command("ipl")]
+        public void cmdIPL(Client player, string iplName)
+        {
+            API.requestIpl(iplName);
+        }
+
+        [Command("ripl")]
+        public void cmdrIPL(Client player, string iplName)
+        {
+            API.removeIpl(iplName);
+        }
+
         [Command("wandervehicle")]
         public void cmdCommandWander(Client player)
         {

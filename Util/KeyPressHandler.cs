@@ -74,6 +74,7 @@ namespace stuykserver.Util
             {
                 // Pull Current Function off Player - Assigned by Collision Handler - These are ENUM Types converted to STRINGS.
                 string currentFunction = Convert.ToString(args[0]);
+                
 
                 // If NONE, do nothing.
                 if (currentFunction == "None")
@@ -84,6 +85,12 @@ namespace stuykserver.Util
                 // ON FOOT FUNCTIONS
                 if (!player.isInVehicle)
                 {
+                    if (currentFunction == "Surgery")
+                    {
+                        API.call("SurgeryHandler", "actionSurgery", player);
+                        return;
+                    }
+
                     // ATM
                     if (currentFunction == "Atm")
                     {

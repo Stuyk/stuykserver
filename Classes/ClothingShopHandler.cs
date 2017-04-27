@@ -42,11 +42,14 @@ namespace stuykserver.Util
             {
                 db.setPlayerHUD(player, false);
                 API.setEntityData(player, "ReturnPosition", player.position);
-                API.setEntitySyncedData(player, "StopDraws", true);
-                API.setEntityDimension(player, Convert.ToInt32(API.getEntityData(player, "PlayerID")));
-                API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
-                API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
                 API.triggerClientEvent(player, "setupClothingMode", new Vector3(-1190.004, -766.2875, 17.3196));
+                API.delay(5000, true, () =>
+                {
+                    API.setEntitySyncedData(player, "StopDraws", true);
+                    API.setEntityDimension(player, Convert.ToInt32(API.getEntityData(player, "PlayerID")));
+                    API.setEntityData(player, "CHEAT_ALLOW_TELEPORT", true);
+                    API.setEntityPosition(player, new Vector3(-1187.994, -764.7119, 17.31953));
+                });
                 return;
             }     
         }

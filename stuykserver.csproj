@@ -154,6 +154,8 @@
     <TypeScriptCompile Include="clientside\resources\camera_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\menu_builder.ts" />
+    <TypeScriptCompile Include="clientside\resources\menu_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\surgery_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\mission_handler.ts" />
     <TypeScriptCompile Include="clientside\resources\object_placer.ts" />
@@ -163,6 +165,7 @@
     <TypeScriptCompile Include="clientside\resources\interaction_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\login_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\marker_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\worldToSpriteAnimation.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Declarations.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Enums.ts" />
     <TypeScriptCompile Include="types-gtanetwork\GTANetwork.dll.d.ts" />
