@@ -41,12 +41,7 @@ namespace stuykserver.Util
                     {
                         instance.addPlayerCash(input);
                         instance.removePlayerBank(input);
-                        updateATMDisplay(player);
-                        API.triggerClientEvent(player, "displayWithdrawSuccess");
-                    }
-                    else
-                    {
-                        API.triggerClientEvent(player, "displayNotThatMuch");
+                        API.triggerClientEvent(player, "atmSuccess");
                     }
                 }
             }
@@ -67,12 +62,7 @@ namespace stuykserver.Util
                     {
                         instance.removePlayerCash(input);
                         instance.addPlayerBank(input);
-                        updateATMDisplay(player);
-                        API.triggerClientEvent(player, "depositAlertSuccess");
-                    }
-                    else
-                    {
-                        API.triggerClientEvent(player, "displayNotThatMuch");
+                        API.triggerClientEvent(player, "atmSuccess");
                     }
                 }
             }

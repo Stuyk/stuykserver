@@ -17,92 +17,15 @@
 	<script src="clientside/resources/camera_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/login_manager.js" type="client" lang="javascript" />
 	<script src="clientside/resources/barber_mode.js" type="client" lang="javascript" />
-  <script src="clientside/resources/snake.js" type="client" lang="javascript" />
   <script src="clientside/resources/mission_handler.js" type="client" lang="javascript" />
   <script src="clientside/resources/object_placer.js" type="client" lang="javascript" />
   <script src="clientside/resources/surgery_mode.js" type="client" lang="javascript" />
-  <script src="clientside/resources/worldToSpriteAnimation.js" type="client" lang="javascript" />
+  
   <script src="clientside/resources/menu_builder.js" type="client" lang="javascript" />
-  <script src="clientside/resources/menu_manager.js" type="client" lang="javascript" />
-	
-	<file src="clientside/resources/invalidname.html"/>
-	<file src="clientside/resources/dealership.html"/>
-	<file src="clientside/resources/skinchanger.html"/>
-	<file src="clientside/resources/index.html"/>
-	<file src="clientside/resources/regsuccess.html"/>
-	<file src="clientside/resources/inventory.html"/>
-	<file src="clientside/resources/loading.html"/>
-	<file src="clientside/resources/atmpanel.html"/>
-	<file src="clientside/resources/clothingpanel.html"/>
-	<file src="clientside/resources/carpanel.html"/>
-	<file src="clientside/resources/menu_vehiclecontrols.html"/>
-	<file src="clientside/resources/fishing.html"/>
-	<file src="clientside/resources/buyhousing.html"/>
-	<file src="clientside/resources/housing.html"/>
-
-	<file src="clientside/resources/js/bootstrap.js"/>
-	<file src="clientside/resources/js/bootstrap.min.js"/>
-	<file src="clientside/resources/js/npm.js"/>
-	<file src="clientside/resources/js/jquery.min.js"/>
-	<file src="clientside/resources/js/spectrum.js"/>
-	<file src="clientside/resources/js/bootstrap-slider.js" />
-	<file src="clientside/resources/js/raphael.min.js" />
-	<file src="clientside/resources/js/raphael.icons.min.js" />
-	<file src="clientside/resources/js/wheelnav.min.js" />
-	<file src="clientside/resources/js/bootstrap-toggle.js"/>
-	<file src="clientside/resources/js/bootstrap-select.js"/>
-
-	<file src="clientside/resources/fonts/glyphicons-halflings-regular.eot" />
-	<file src="clientside/resources/fonts/glyphicons-halflings-regular.svg" />
-	<file src="clientside/resources/fonts/glyphicons-halflings-regular.ttf" />
-	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff" />
-	<file src="clientside/resources/fonts/glyphicons-halflings-regular.woff2" />
-	<file src="clientside/resources/fonts/Lobster-Regular.ttf" />
-
-	<file src="clientside/resources/css/dealership.css" />
-	<file src="clientside/resources/css/housing.css" />
-	<file src="clientside/resources/css/atmpanelnew.css" />
-	<file src="clientside/resources/css/radialmenu.css" />
-	<file src="clientside/resources/css/login.css" />
-	<file src="clientside/resources/css/skinchanger.css" />
-	<file src="clientside/resources/css/cover.css" />
-	<file src="clientside/resources/css/inventory.css" />
-	<file src="clientside/resources/css/skinselector.css"/>
-	<file src="clientside/resources/css/atmpanel.css"/>
-	<file src="clientside/resources/css/carpanel.css"/>
-	<file src="clientside/resources/css/spectrum.css"/>
-	<file src="clientside/resources/css/bootstrap.css" />
-	<file src="clientside/resources/css/bootstrap.min.css" />
-	<file src="clientside/resources/css/bootstrap.min.css.map"/>
-	<file src="clientside/resources/css/slider.css" />
-	<file src="clientside/resources/css/menu.css" />
-	<file src="clientside/resources/css/fishing.css" />
-	<file src="clientside/resources/css/bootstrap-toggle.css" />
-	<file src="clientside/resources/css/bootstrap-select.css"/>
-
-	<file src="clientside/resources/images/logo.png" />
-	<file src="clientside/resources/images/login_bg.png" />
-	<file src="clientside/resources/images/bg.png" />
-	<file src="clientside/resources/images/geo.png" />
-	<file src="clientside/resources/images/dashed.png" />
-	<file src="clientside/resources/images/tweed.png" />
-
-	<file src="clientside/resources/images/fishing.png" />
-	<file src="clientside/resources/images/pressb.png" />
-	<file src="clientside/resources/images/pressbalt.png" />
-	<file src="clientside/resources/images/pressbalt2.png" />
-	<file src="clientside/resources/images/pressbalt3.png" />
-
-  <file src="clientside/resources/images/coin/0.png" />
-  <file src="clientside/resources/images/coin/1.png" />
-  <file src="clientside/resources/images/coin/2.png" />
-  <file src="clientside/resources/images/coin/3.png" />
-  <file src="clientside/resources/images/coin/4.png" />
-  <file src="clientside/resources/images/coin/5.png" />
-
-
-  <file src="clientside/resources/audio/trulyyours.mp3" />
-	
+  <script src="clientside/resources/menu_eula.js" type="client" lang="javascript" />
+  <script src="clientside/resources/menu_login.js" type="client" lang="javascript" />
+  <script src="clientside/resources/menu_atm.js" type="client" lang="javascript" />
+  
 	<include resource="database"/>
 	<include resource="gtaocharacter" />
 

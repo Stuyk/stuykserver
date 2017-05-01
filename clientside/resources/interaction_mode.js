@@ -69,7 +69,6 @@ API.onUpdate.connect(function () {
     }
     // ENTER
     if (API.isDisabledControlJustPressed(23 /* Enter */)) {
-        API.sendChatMessage("Pressed");
         if (target === null) {
             if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
                 return;

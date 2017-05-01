@@ -46,6 +46,8 @@ class Panel {
         this._textScale = (panelMinY / (panelMinY * 10)) * height;
         this._fontScale = (panelMinY / (panelMinY * 10)) * height + 0.2;
         this._centered = false;
+        this._centeredVertically = false;
+        this._offset = 0;
         if (this._textScale > 0.6) {
             this._textScale = 0.6;
         }
@@ -55,24 +57,53 @@ class Panel {
     }
     draw() {
         if (this._header) {
-            if (this._centered) {
-                API.drawText(this._text, this._xPos + (this._width / 2), this._yPos + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 1, false, false, this._width - padding);
+            // If it's centered.
+            if (this._centered || this._centeredVertically) {
+                if (this._centered && this._centeredVertically) {
+                    API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 2) + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 1, false, false, this._width - padding);
+                }
+                else if (this._centered) {
+                    API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 1, false, false, this._width - padding);
+                }
+                else if (this._centeredVertically) {
+                    API.drawText(this._text, this._offset + this._xPos + padding, this._yPos + (this._height / 2) + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 0, false, false, this._width - padding);
+                }
             }
             else {
-                API.drawText(this._text, this._xPos + padding, this._yPos + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 0, false, false, this._width - padding);
+                API.drawText(this._text, this._offset + this._xPos + padding, this._yPos + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 0, false, false, this._width - padding);
             }
             API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225);
             API.drawRectangle(this._xPos, this._yPos + this._height - 5, this._width, 5, 255, 255, 255, 50);
         }
         else {
-            if (this._centered) {
-                API.drawText(this._text, this._xPos + (this._width / 2), this._yPos + padding, this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 1, false, false, this._width - padding);
+            if (this._centered || this._centeredVertically) {
+                if (this._centered && this._centeredVertically) {
+                    API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 20, this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 1, false, false, this._width - padding);
+                }
+                else if (this._centered) {
+                    API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 4), this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 1, false, false, this._width - padding);
+                }
+                else if (this._centeredVertically) {
+                    API.drawText(this._text, this._offset + this._xPos + padding, this._yPos + (this._height / 2) + (this._height / 4), this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 0, false, false, this._width - padding);
+                }
             }
             else {
-                API.drawText(this._text, this._xPos + padding, this._yPos + padding, this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 0, false, false, this._width - padding);
+                API.drawText(this._text, this._offset + this._xPos + padding, this._yPos + (this._height / 4), this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 0, false, false, this._width - padding);
             }
-            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 200);
+            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225);
         }
+    }
+    setText(value) {
+        this._text = value;
+    }
+    setTextScale(value) {
+        this._textScale = value;
+    }
+    setFontScale(value) {
+        this._fontScale = value;
+    }
+    setVerticalCentered() {
+        this._centeredVertically = true;
     }
     setCentered() {
         this._centered = true;
@@ -82,6 +113,9 @@ class Panel {
     }
     isClicked() {
         return;
+    }
+    setOffset(value) {
+        this._offset = value;
     }
     returnType() {
         return "Panel";
@@ -98,6 +132,7 @@ class InputPanel {
         this._hovered = false;
         this._selected = isSelected;
         this._numeric = false;
+        this._isError = false;
     }
     draw() {
         if (this._selected) {
@@ -116,7 +151,12 @@ class InputPanel {
         }
         if (this._hovered) {
             API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 175); // Darker Black
-            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 150);
+            if (this._isError) {
+                API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 0, 0, 100);
+            }
+            else {
+                API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 150);
+            }
             if (this._protected) {
                 if (this._input.length < 1) {
                     return;
@@ -129,7 +169,12 @@ class InputPanel {
         }
         else {
             API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 175); // Black
-            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 100);
+            if (this._isError) {
+                API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 0, 0, 100);
+            }
+            else {
+                API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 100);
+            }
             if (this._protected) {
                 if (this._input.length < 1) {
                     return;
@@ -151,6 +196,16 @@ class InputPanel {
                 this._hovered = false;
             }
         }
+    }
+    isError(value) {
+        this._isError = value;
+    }
+    setSelected() {
+        selectedInput = this;
+        this._selected = true;
+    }
+    setUnselected() {
+        this._selected = false;
     }
     isClicked() {
         let cursorPos = API.getCursorPositionMantainRatio();
@@ -182,6 +237,9 @@ class InputPanel {
     removeFromInput() {
         this._input = this._input.substring(0, this._input.length - 1);
     }
+    returnInput() {
+        return this._input;
+    }
     setNumericOnly() {
         this._numeric = true;
     }
@@ -198,6 +256,7 @@ class Button {
         this.text = t;
         this.hovered = false;
         this.type = type;
+        this._args = null;
         switch (type) {
             case 0:
                 this.r = 255;
@@ -224,16 +283,19 @@ class Button {
     function(obj) {
         this.thisFunction = obj;
     }
+    addArgs(args) {
+        this._args = args;
+    }
     draw() {
         if (this.hovered) {
-            API.drawRectangle(this.xPos, this.yPos, this.Width, this.Height, 0, 0, 0, 175); // Darker Black
+            API.drawRectangle(this.xPos, this.yPos, this.Width, this.Height, 0, 0, 0, 200); // Lighter
             API.drawRectangle(this.xPos, this.yPos + this.Height - 5, this.Width, 5, this.r, this.g, this.b, 200);
             API.drawText(this.text, this.xPos + (this.Width / 2), this.yPos + (this.Height / 2) - 14, 0.5, this.r, this.g, this.b, 255, 4, 1, false, false, (panelMinX * this.Width));
         }
         else {
             API.drawRectangle(this.xPos, this.yPos, this.Width, this.Height, 0, 0, 0, 225); // Black
             API.drawRectangle(this.xPos, this.yPos + this.Height - 5, this.Width, 5, this.r, this.g, this.b, 50);
-            API.drawText(this.text, this.xPos + (this.Width / 2), this.yPos + (this.Height / 2) - 14, 0.5, this.r, this.g, this.b, 50, 4, 1, false, false, (panelMinX * this.Width));
+            API.drawText(this.text, this.xPos + (this.Width / 2), this.yPos + (this.Height / 2) - 14, 0.5, this.r, this.g, this.b, 255, 4, 1, false, false, (panelMinX * this.Width));
         }
     }
     isHovered() {
@@ -255,7 +317,7 @@ class Button {
         if (cursorPos.X > this.xPos && cursorPos.X < (this.xPos + this.Width) && cursorPos.Y > this.yPos && cursorPos.Y < this.yPos + this.Height) {
             API.playSoundFrontEnd("Click", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
             if (this.thisFunction !== null) {
-                this.thisFunction();
+                this.thisFunction(this._args);
             }
         }
     }
@@ -266,6 +328,12 @@ class Button {
 // On-Update Event -- Draws all of our stuff.
 API.onUpdate.connect(function () {
     if (!menuIsReady) {
+        return;
+    }
+    if (menuElements.length === 0) {
+        return;
+    }
+    if (menuElements[currentPage].length === 0) {
         return;
     }
     drawAllMenuElements();
@@ -555,6 +623,36 @@ API.onKeyDown.connect(function (sender, e) {
                 keypress = "}";
             }
             break;
+        case Keys.NumPad0:
+            keypress = "0";
+            break;
+        case Keys.NumPad1:
+            keypress = "1";
+            break;
+        case Keys.NumPad2:
+            keypress = "2";
+            break;
+        case Keys.NumPad3:
+            keypress = "3";
+            break;
+        case Keys.NumPad4:
+            keypress = "4";
+            break;
+        case Keys.NumPad5:
+            keypress = "5";
+            break;
+        case Keys.NumPad6:
+            keypress = "6";
+            break;
+        case Keys.NumPad7:
+            keypress = "7";
+            break;
+        case Keys.NumPad8:
+            keypress = "8";
+            break;
+        case Keys.NumPad9:
+            keypress = "9";
+            break;
     }
     if (keypress === "") {
         return;
@@ -584,37 +682,38 @@ function prevPage() {
         currentPage -= 1;
     }
 }
+// Set Page
+function setPage(value) {
+    currentPage = value;
+}
 // Draws all elements.
 function drawAllMenuElements() {
-    // Check if Elements are present.
-    if (menuElements.length < 1) {
+    if (!menuIsReady) {
         return;
     }
-    // Determine if our current page has elements or not.
-    if (!Array.isArray(menuElements[currentPage])) {
-        return;
-    }
-    for (var i = 0; i < menuElements[currentPage].length; i++) {
-        // This will draw each element.
-        menuElements[currentPage][i].draw();
-        // Return the type of element.
-        let type = menuElements[currentPage][i].returnType();
-        // Check for Hover Events
-        switch (type) {
-            case "Button":
-                menuElements[currentPage][i].isHovered();
-                // Check for Click Events
-                if (API.isControlJustPressed(237 /* CursorAccept */)) {
-                    menuElements[currentPage][i].isClicked();
-                }
-                break;
-            case "InputPanel":
-                menuElements[currentPage][i].isHovered();
-                // Check for Click Events
-                if (API.isControlJustPressed(237 /* CursorAccept */)) {
-                    menuElements[currentPage][i].isClicked();
-                }
-                break;
+    if (Array.isArray(menuElements[currentPage])) {
+        for (var i = 0; i < menuElements[currentPage].length; i++) {
+            // This will draw each element.
+            menuElements[currentPage][i].draw();
+            // Return the type of element.
+            let type = menuElements[currentPage][i].returnType();
+            // Check for Hover Events
+            switch (type) {
+                case "Button":
+                    menuElements[currentPage][i].isHovered();
+                    // Check for Click Events
+                    if (API.isControlJustPressed(237 /* CursorAccept */)) {
+                        menuElements[currentPage][i].isClicked();
+                    }
+                    break;
+                case "InputPanel":
+                    menuElements[currentPage][i].isHovered();
+                    // Check for Click Events
+                    if (API.isControlJustPressed(237 /* CursorAccept */)) {
+                        menuElements[currentPage][i].isClicked();
+                    }
+                    break;
+            }
         }
     }
 }
@@ -628,7 +727,6 @@ function setupMenu(numberOfPages) {
         let emptyArray = [];
         menuElements.push(emptyArray);
     }
-    API.sendChatMessage("" + menuElements.length);
 }
 // Add a page to our pages array.
 function createPanel(page, xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text) {
@@ -648,11 +746,17 @@ function createInput(page, xStart, yStart, xGridWidth, yGridHeight, isPasswordPr
     menuElements[page].push(panel);
     return panel;
 }
+function createImage(page, path, x, y, width, height) {
+    panel = new PanelImage(path, x, y, width, height);
+    menuElements[page].push(panel);
+    return panel;
+}
+function getCurrentPage() {
+    return currentPage;
+}
 // Clears the menu entirely.
 function exitMenu(cursor, hud, chat, blur, canOpenChat) {
     menuIsReady = false;
-    menuElements = [];
-    selectedInput = null;
     if (cursor) {
         API.showCursor(true);
     }
@@ -680,11 +784,26 @@ function exitMenu(cursor, hud, chat, blur, canOpenChat) {
     else {
         API.setCanOpenChat(false);
     }
+    menuElements = [[]];
+    selectedInput = null;
+    currentPage = 0;
+}
+function killMenu() {
+    menuIsReady = false;
+    selectedInput = null;
+    API.showCursor(false);
+    API.setHudVisible(true);
+    API.setChatVisible(true);
+    API.setCanOpenChat(true);
+    API.callNative("_TRANSITION_FROM_BLURRED", 3000);
+    menuElements = [[]];
+    currentPage = 0;
 }
 function openMenu(cursor, hud, chat, blur, canOpenChat) {
     if (blur === true) {
         API.callNative("_TRANSITION_TO_BLURRED", 3000);
     }
+    currentPage = 0;
     menuIsReady = true;
     if (cursor) {
         API.showCursor(true);

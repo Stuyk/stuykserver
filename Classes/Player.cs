@@ -10,11 +10,37 @@ using System.Threading.Tasks;
 
 namespace stuykserver.Classes
 {
-    public class Player : Script, IDisposable
+    public class Player : Script
     {
-        DatabaseHandler db = new DatabaseHandler();
+        // Player Core Information
+        public int playerID { get; set; }
+        public Client playerClient { get; set; }
+        public NetHandle playerNetHandle { get; set; }
+        // Player Date Information
+        public int playerOldTime { get; set; }
+        DateTime playerSession { get; set; }
+        // Player Special Information
+        public int playerKarma { get; set; }
+        public int playerCash { get; set; }
+        public int playerBank { get; set; }
+        public int playerHealth { get; set; }
+        public int playerArmor { get; set; }
+        public int playerOrganization { get; set; }
+        public int playerBusiness { get; set; }
+        public int playerModel { get; set; }
+        // Player Booleans
+        public bool nametagVisible { get; set; }
+        public bool dead { get; set; }
+        public bool admin { get; set; }
 
-        bool admin;
+
+
+
+
+
+
+
+        DatabaseHandler db = new DatabaseHandler();
 
         public Player()
         {
@@ -42,7 +68,6 @@ namespace stuykserver.Classes
             admin = Convert.ToBoolean(row["Admin"]);
             playerSession = DateTime.Now;
             Vector3 position = new Vector3(Convert.ToSingle(row["X"]), Convert.ToSingle(row["Y"]), Convert.ToSingle(row["Z"]));
-            playerWeapons = new Dictionary<WeaponHash, int>();
             loadPlayer(position);
             updateKarma();
             setPlayerHealth(playerHealth);
@@ -50,25 +75,9 @@ namespace stuykserver.Classes
             // WEAPONS
         }
 
-        DateTime playerSession; // When the account logged in.
         string playerName; // Player Name
         string playerNameTag; // Player Nametag = player.nametag
-        int playerID; // Row ID
-        int playerOldTime; // Time Logged from Database.
-        Client playerClient; // Current Client Session
-        NetHandle playerNetHandle; // Current NetHandle Session.
         string playerSocialClub; // Player SocialClub.
-        bool nametagVisible; // is the nametag visible.
-        bool dead; // Are you dead?
-        int playerKarma; // Player Karma
-        int playerCash; // Player Cash
-        int playerBank; // Player Bank
-        int playerHealth; // Player Health
-        int playerArmor; // Player Armor
-        int playerOrganization; // Player Organization by INT ID
-        int playerBusiness; // Player Business by INT ID
-        int playerModel; // INT ID of Player Model
-        Dictionary<WeaponHash, int> playerWeapons; // Weapon + Ammo
         Vector3 lastKnownPosition;
 
         public void savePlayer()
@@ -116,6 +125,8 @@ namespace stuykserver.Classes
             API.setEntityData(playerClient, "CHEAT_ALLOW_TELEPORT", false);
 
             API.setEntitySyncedData(playerClient, "StopDraws", false); // Tells main level drawing to draw or not.
+            API.setEntitySyncedData(playerClient, "P_Money", playerCash);
+            API.setEntitySyncedData(playerClient, "P_Bank", playerBank);
             API.setEntityData(playerClient, "Instance", this); // Setup our instance with this.
         }
 
@@ -290,11 +301,13 @@ namespace stuykserver.Classes
         public void addPlayerBank(int amount)
         {
             playerBank += amount;
+            API.setEntitySyncedData(playerClient, "P_Bank", playerBank);
         }
 
         public void removePlayerBank(int amount)
         {
             playerBank -= amount;
+            API.setEntitySyncedData(playerClient, "P_Bank", playerBank);
         }
 
         public void addPlayerCash(int amount)
@@ -302,6 +315,7 @@ namespace stuykserver.Classes
             playerCash += amount;
             API.triggerClientEvent(playerClient, "update_money_display", playerCash);
             API.sendNotificationToPlayer(playerClient, string.Format("~g~$ +{0}", amount));
+            API.setEntitySyncedData(playerClient, "P_Money", playerCash);
         }
 
         public void removePlayerCash(int amount)
@@ -309,6 +323,7 @@ namespace stuykserver.Classes
             playerCash -= amount;
             API.triggerClientEvent(playerClient, "update_money_display", playerCash);
             API.sendNotificationToPlayer(playerClient, string.Format("~g~$ ~r~-{0}", amount));
+            API.setEntitySyncedData(playerClient, "P_Money", playerCash);
         }
 
         public void removePlayerKarma(int amount)
@@ -356,31 +371,6 @@ namespace stuykserver.Classes
             playerOrganization = number;
         }
 
-        public void setPlayerWeaponAndAmmo(WeaponHash weapon, int ammunition)
-        {
-            if (!playerWeapons.ContainsKey(weapon))
-            {
-                playerWeapons.Add(weapon, ammunition);
-            }
-            else
-            {
-                playerWeapons[weapon] = ammunition;
-            }
-        }
-
-        public void removePlayerWeaponAndAmmo(WeaponHash weapon)
-        {
-            if (playerWeapons.ContainsKey(weapon))
-            {
-                playerWeapons.Remove(weapon);
-            }
-        }
-
-        public Dictionary<WeaponHash, int> returnPlayerWeaponAndAmmo()
-        {
-            return playerWeapons;
-        }
-
         public void setLastPosition(Client player)
         {
             lastKnownPosition = player.position;
@@ -409,7 +399,6 @@ namespace stuykserver.Classes
             playerArmor = -1;
             playerOrganization = -1;
             playerBusiness = -1;
-            playerWeapons.Clear();
             admin = false;
             playerOldTime = -1;
             

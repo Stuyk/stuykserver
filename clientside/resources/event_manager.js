@@ -62,9 +62,9 @@ API.onServerEventTrigger.connect(function (event, args) {
         case "showLogin":
             API.setHudVisible(true);
             API.setChatVisible(true);
-            API.startAudio("clientside/resources/audio/trulyyours.mp3", true);
-            API.setGameVolume(0.1);
-            resource.menu_manager.menuEULA();
+            //API.startAudio("clientside/resources/audio/trulyyours.mp3", true);
+            //API.setGameVolume(0.1);
+            resource.menu_eula.menuEULA();
             return;
         case "showInvalidName":
             resource.browser_manager.showCEF("clientside/resources/invalidname.html");
@@ -83,7 +83,7 @@ API.onServerEventTrigger.connect(function (event, args) {
             resource.browser_manager.showCEF("clientside/resources/carpanel.html");
             return;
         case "loadATM":
-            resource.browser_manager.showCEF("clientside/resources/atmpanel.html");
+            resource.menu_atm.menuATMPanel();
             return;
         case "showBuyHousing":
             resource.browser_manager.showCEF("clientside/resources/buyhousing.html");
@@ -120,17 +120,8 @@ API.onServerEventTrigger.connect(function (event, args) {
             resource.browser_manager.callCEF("doesNotMatchAccount", null);
             return;
         // ATM
-        case "refreshATM":
-            resource.browser_manager.callCEF("displayAccountBalance", args);
-            return;
-        case "depositAlertSuccess":
-            resource.browser_manager.callCEF("displayDepositSuccess", null);
-            return;
-        case "displayWithdrawSuccess":
-            resource.browser_manager.callCEF("displayWithdrawSuccess", null);
-            return;
-        case "displayNotThatMuch":
-            resource.browser_manager.callCEF("displayNotThatMuch");
+        case "atmSuccess":
+            resource.menu_atm.atmSuccess();
             return;
         // FISHING
         case "fishingPushWord":
@@ -185,6 +176,7 @@ API.onServerEventTrigger.connect(function (event, args) {
             API.sleep(4000);
             API.callNative("DO_SCREEN_FADE_IN", 3000);
             API.callNative("_TRANSITION_FROM_BLURRED", 3000);
+            resource.menu_builder.killMenu();
             API.setActiveCamera(null);
             API.setGameplayCameraActive();
             API.setHudVisible(true);

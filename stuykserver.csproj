@@ -47,6 +47,9 @@
       <HintPath>..\packages\gtanetwork.api.0.1.385.714\lib\GTANetworkShared.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Lidgren.Network">
+      <HintPath>..\..\Lidgren.Network.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -154,8 +157,10 @@
     <TypeScriptCompile Include="clientside\resources\camera_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\menu_atm.ts" />
     <TypeScriptCompile Include="clientside\resources\menu_builder.ts" />
-    <TypeScriptCompile Include="clientside\resources\menu_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\menu_eula.ts" />
+    <TypeScriptCompile Include="clientside\resources\menu_login.ts" />
     <TypeScriptCompile Include="clientside\resources\surgery_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\mission_handler.ts" />
     <TypeScriptCompile Include="clientside\resources\object_placer.ts" />

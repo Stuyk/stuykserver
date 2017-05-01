@@ -42,7 +42,7 @@ namespace stuykserver.Util
             API.consoleOutput("Started: BarberShop Handler");
         }
 
-        public void selectBarberShop(Client player)
+        public void selectBarberShop(Client player, bool free = false)
         {
             if (!player.isInVehicle)
             {

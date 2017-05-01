@@ -69,6 +69,11 @@ namespace stuykserver.Util
             API.setPlayerAccessory(player, 1, glasses, glassescolor);
             API.setPlayerAccessory(player, 0, hat, hatcolor);
 
+            if (hat == -1)
+            {
+                API.clearPlayerAccessory(player, 0);
+            }
+
             // Set Sync Data
             API.setEntitySyncedData(player.handle, "clothingTorso", torso);
             API.setEntitySyncedData(player.handle, "clothingTorsoColor", torsocolor);

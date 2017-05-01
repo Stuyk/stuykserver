@@ -50,7 +50,7 @@ namespace stuykserver.Classes
             Cancellable = 1 << 7
         }
 
-        public void actionSurgery(Client player)
+        public void actionSurgery(Client player, bool free = false)
         {
             if (!player.isInVehicle)
             {

@@ -84,7 +84,6 @@ namespace stuykserver.Util
 
         public void SpawnPlayer(Client player)
         {
-
             string[] varNames = { "ID" };
             string before = "SELECT ID, X, Y, SocialClub, Z, Dead, Money, Bank, Nametag, Health, Armor, Admin, Karma, Time, Organization, Business FROM Players WHERE";
             object[] data = { Convert.ToString(API.getEntityData(player, "PlayerID")) };
@@ -120,6 +119,11 @@ namespace stuykserver.Util
             }
 
             playerInstance.setPlayerModel(player.model);
+
+            if (API.hasEntityData(player, "FirstTimeLogin"))
+            {
+                API.call("SurgeryHandler", "actionSurgery", player, true);
+            }
         }
 
         [Flags]

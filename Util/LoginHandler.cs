@@ -87,7 +87,7 @@ namespace stuykserver.Util
             if (result.Rows.Count >= 1)
             {
                 // Email Exists
-                API.sendNotificationToPlayer(player, "That email already exists.");
+                API.sendNotificationToPlayer(player, "That username already exists.");
                 return;
             }
 
@@ -125,7 +125,8 @@ namespace stuykserver.Util
             db.compileInsertQuery(tableName, varNamesThree, dataThree);
 
             API.consoleOutput("Registered {0} at {1}.", player.name, playerID);
-            API.triggerClientEvent(player, "registerSuccessful");
+            API.setEntityData(player, "FirstTimeLogin", true);
+            cmdLogin(player, email, password);
         }
     }
 }

@@ -73,8 +73,6 @@ API.onUpdate.connect(function () {
     }
     // ENTER
     if (API.isDisabledControlJustPressed(Enums.Controls.Enter)) {
-        API.sendChatMessage("Pressed");
-
         if (target === null) {
             if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
                 return;
