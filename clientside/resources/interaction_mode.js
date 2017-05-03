@@ -2,7 +2,11 @@
 var x = API.getScreenResolutionMantainRatio().Width;
 var y = API.getScreenResolutionMantainRatio().Height;
 var target = null;
+var isInteractionActive = false;
 API.onUpdate.connect(function () {
+    if (!isInteractionActive) {
+        return;
+    }
     // If the chat is open, fuck it.
     if (API.isChatOpen()) {
         return;
@@ -231,4 +235,7 @@ function taskEnterVehicle(seat) {
     }
     API.callNative("TASK_ENTER_VEHICLE", API.getLocalPlayer(), target, 3000, seat, 1.0, 1, 0);
     return;
+}
+function setInteractionActive(value) {
+    isInteractionActive = value;
 }

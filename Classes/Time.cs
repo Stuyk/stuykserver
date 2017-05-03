@@ -1,24 +1,13 @@
 ﻿using GTANetworkServer;
-using GTANetworkShared;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
 
 namespace stuykserver.Classes
 {
     public class Time : Script
     {
-        // How much time do we want to add every time the timer does a heartbeat. HH / MM / SS
         static TimeSpan addOnTime = new TimeSpan(0, 5, 0);
-        // At what time of day do we want our server to start at when we launch the script. EX: 12:00:00
-        static TimeSpan serverStartTime = new TimeSpan(12, 0, 0);
-        // Create a Timer so we can call it for other functions.
-        Timer serverTimer;
-
-        DateTime _currentime;
+        private TimeSpan serverTime = new TimeSpan(11, 55, 0);
+        private int tick;
 
         public Time()
         {
@@ -26,68 +15,33 @@ namespace stuykserver.Classes
             API.onUpdate += API_onUpdate;
         }
 
-        int tick;
-
         private void API_onUpdate()
         {
             if (tick > 7200)
             { // 120 Tickrate
-                if (DateTime.Now > _currentime.AddMilliseconds(5000))
-                {
-                    _currentime = DateTime.Now;
-                    API.consoleOutput("Tick");
-                }
+                updateServerTime();
+                updateServerWeather();
+                tick = 0;
             }
-           
             tick += 1;
+        }
+
+        private void updateServerTime()
+        {
+            serverTime = API.getTime();
+            serverTime = serverTime.Add(addOnTime);
+            API.setTime(serverTime.Hours, serverTime.Minutes);
+            API.consoleOutput("In-Game Time is now: {0}", serverTime);
         }
 
         private void API_onResourceStart()
         {
-            // Get our current time.
-            _currentime = DateTime.Now;
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // Set the time to our start time.
-            API.setTime(serverStartTime.Hours, serverStartTime.Minutes);
-
-            // Create a timer that will run every minute.
-            serverTimer = new Timer();
-            serverTimer.Interval = 60000;
-
-            // This is what function will start everytime the timer ticks to the interval time.
-            serverTimer.Elapsed += Elapsed_Daylight_Timer;
-
-            // Enable it right when the resource starts.
-            serverTimer.Enabled = true;
-
-            // Initially start the weather off as Sunny.
             API.setWeather(0);
+            API.setTime(serverTime.Hours, serverTime.Minutes);
         }
 
-        private void Elapsed_Daylight_Timer(object sender, ElapsedEventArgs e)
+        private void updateServerWeather()
         {
-            // Pull the current server time.
-            TimeSpan serverTime = API.getTime();
-            // Add on our Timespan static.
-            serverTime += addOnTime;
-            // Set the server time to our new time.
-            API.setTime(serverTime.Hours, serverTime.Minutes);
-
-            // Current Time
-            API.consoleOutput("In-Game Time is now: {0}", serverTime);
-
             // If the minutes are at exactly. :00 Let's toss in some weather.
             if (serverTime.Minutes == 0)
             {
@@ -128,20 +82,6 @@ namespace stuykserver.Classes
                         break;
                 }
             }
-        }
-
-        [Command("stoptime")]
-        public void cmdStopTime(Client player)
-        {
-            serverTimer.Stop();
-            API.sendChatMessageToPlayer(player, "The server time has been stopped.");
-        }
-
-        [Command("resumetime")]
-        public void cmdStartTime(Client player)
-        {
-            serverTimer.Start();
-            API.sendChatMessageToPlayer(player, "The server time has been resumed.");
         }
     }
 }

@@ -118,33 +118,38 @@ function closeATM() {
 }
 
 function atmSuccess() {
-    API.playSoundFrontEnd("Checkpoint_Cash_Hit", "GTAO_FM_Events_Soundset");
+    panel = resource.menu_builder.createNotification(0, "~g~You have made a successful transaction.", 3000);
+    panel.setColor(0, 255, 0);
 }
 
 function depositCash() {
     let currentInput = atm_input_deposit.returnInput();
     if (p_Money < 1) {
         atm_input_deposit.isError(true);
-        API.playSoundFrontEnd("CHECKPOINT_MISSED", "HUD_MINI_GAME_SOUNDSET");
+        panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~You don't have that much money to deposit.", 3000);
+        panel.setColor(255, 0, 0);
         return;
     }
 
     // Check if anything is input at all.
     if (currentInput.length < 1) {
         atm_input_deposit.isError(true);
-        API.playSoundFrontEnd("CHECKPOINT_MISSED", "HUD_MINI_GAME_SOUNDSET");
+        panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~You must insert a value to deposit.", 3000);
+        panel.setColor(255, 0, 0);
         return;
     }
     // Less than Zero
     if (currentInput <= 0) {
         atm_input_deposit.isError(true);
-        API.playSoundFrontEnd("CHECKPOINT_MISSED", "HUD_MINI_GAME_SOUNDSET");
+        panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~You must insert a value greater than 0.", 3000);
+        panel.setColor(255, 0, 0);
         return;
     }
     // Greater than Max 32 Bit
     if (currentInput > 2147483647) {
         atm_input_deposit.isError(true);
-        API.playSoundFrontEnd("CHECKPOINT_MISSED", "HUD_MINI_GAME_SOUNDSET");
+        panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~Input exceeds max limit.", 3000);
+        panel.setColor(255, 0, 0);
         return;
     }
 
@@ -156,25 +161,29 @@ function withdrawCash() {
     let currentInput = atm_input_withdraw.returnInput();
     if (p_Bank < 1) {
         atm_input_withdraw.isError(true);
-        API.playSoundFrontEnd("CHECKPOINT_MISSED", "HUD_MINI_GAME_SOUNDSET");
+        panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~You don't have any money in the bank.", 3000);
+        panel.setColor(255, 0, 0);
         return;
     }
     // Check if anything is input at all.
     if (currentInput.length < 1) {
         atm_input_withdraw.isError(true);
-        API.playSoundFrontEnd("CHECKPOINT_MISSED", "HUD_MINI_GAME_SOUNDSET");
+        panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~You must insert a value to withdraw.", 3000);
+        panel.setColor(255, 0, 0);
         return;
     }
     // Less than Zero
     if (currentInput <= 0) {
         atm_input_withdraw.isError(true);
-        API.playSoundFrontEnd("CHECKPOINT_MISSED", "HUD_MINI_GAME_SOUNDSET");
+        panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~You must insert a positive value.", 3000);
+        panel.setColor(255, 0, 0);
         return;
     }
     // Greater than Max 32 Bit
     if (currentInput > 2147483647) {
         atm_input_withdraw.isError(true);
-        API.playSoundFrontEnd("CHECKPOINT_MISSED", "HUD_MINI_GAME_SOUNDSET");
+        panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~Input exceeds max limit.", 3000);
+        panel.setColor(255, 0, 0);
         return;
     }
 

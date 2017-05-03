@@ -60,7 +60,7 @@ namespace stuykserver.Util
 
             if (result.Rows.Count < 1)
             {
-                API.triggerClientEvent(player, "passwordDoesNotMatch");
+                API.triggerClientEvent(player, "usernameDoesNotExist");
                 return;
             }
 
@@ -87,7 +87,7 @@ namespace stuykserver.Util
             if (result.Rows.Count >= 1)
             {
                 // Email Exists
-                API.sendNotificationToPlayer(player, "That username already exists.");
+                API.triggerClientEvent(player, "usernameExists");
                 return;
             }
 
@@ -99,7 +99,7 @@ namespace stuykserver.Util
             if (result.Rows.Count >= 1)
             {
                 // Nametag Exists
-                API.sendNotificationToPlayer(player, "That nametag already exists.");
+                API.triggerClientEvent(player, "nametagExists");
                 return;
             }
 

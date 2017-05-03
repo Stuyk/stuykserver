@@ -9,11 +9,215 @@ var button = null;
 var panel = null;
 var image = null;
 var menuElements = [];
+var notification = null;
+var notifications = [];
 var currentPage = 0;
 var padding = 10;
 // Set to True when your menu is ready.
 var menuIsReady = false;
 var selectedInput = null;
+// Animation Stuff
+var animationFrames = 0;
+
+class ProgressBar {
+    _xPos: number;
+    _yPos: number;
+    _width: number;
+    _height: number;
+    _r: number;
+    _g: number;
+    _b: number;
+    _currentProgress: number;
+
+    constructor(x, y, width, height, currentProgress) {
+        this._xPos = x * panelMinX;
+        this._yPos = y * panelMinY;
+        this._width = width * panelMinX - 10;
+        this._height = height * panelMinY - 10;
+        this._currentProgress = currentProgress;
+        this._r = 0;
+        this._g = 0;
+        this._b = 0;
+    }
+
+    draw() {
+        
+        API.drawRectangle(this._xPos + 5, this._yPos + 5, ((this._width / 100) * this._currentProgress), this._height, this._r, this._g, this._b, 225);
+        API.drawText("" + Math.round(this._currentProgress), this._xPos + (((this._width / 100) * this._currentProgress) / 2), this._yPos, 0.5, 255, 255, 255, 255, 4, 1, false, true, 100);
+    }
+
+    setColor(r, g, b) {
+        this._r = r;
+        this._g = g;
+        this._b = b;
+    }
+
+    addProgress(value) {
+        if (this._currentProgress + value > 100) {
+            this._currentProgress = 100;
+            return;
+        }
+        this._currentProgress += value; 
+    }
+
+    subtractProgress(value) {
+        if (this._currentProgress - value < 0) {
+            this._currentProgress = 0;
+            return;
+        }
+        this._currentProgress -= value;
+    }
+
+    setProgressAmount(value) {
+        if (value >= 100) {
+            this._currentProgress = 100;
+            return;
+        }
+
+        if (value <= 0) {
+            this._currentProgress = 0;
+            return;
+        }
+
+        this._currentProgress = value;
+        return;
+    }
+
+    returnProgressAmount() {
+        return this._currentProgress;
+    }
+
+    returnType() {
+        return "ProgressBar";
+    }
+}
+
+
+class Notification {
+    _currentPosX: number;
+    _currentPosY: number;
+    _targetX: number;
+    _targetY: number;
+    _width: number;
+    _height: number;
+    _text: string;
+    _r: number;
+    _g: number;
+    _b: number;
+    _alpha: number;
+    _textScale: number;
+    _offset: number;
+    _lastUpdateTime: number;
+    _currentPhase: number;
+    _displayTime: number;
+    _running: boolean;
+    _sound: boolean;
+    _incrementer: number;
+
+    constructor(text, displayTime) {
+        this._currentPosX = 26 * panelMinX; // Starting Position
+        this._currentPosY = screenY; // Starting Position Y
+        this._targetX = 26 * panelMinX; // Ending Position
+        this._targetY = 15 * panelMinY; // Ending Position Y
+        this._width = panelMinX * 5;
+        this._height = panelMinY * 3;
+        // Text Settings
+        this._text = text;
+        this._r = 255;
+        this._g = 165;
+        this._b = 0;
+        this._offset = 0;
+        this._textScale = 0.5;
+        // Animation Settings
+        this._lastUpdateTime = new Date().getTime(); //ms
+        this._alpha = 255;
+        this._displayTime = displayTime;
+        this._incrementer = 0;
+        // Sound Settings
+        this._sound = true;
+    }
+
+    draw() {
+        if (notification !== this) {
+            return;
+        }
+
+        if (this._sound) {
+            this._sound = false;
+            API.playSoundFrontEnd("GOLF_NEW_RECORD", "HUD_AWARDS");
+        }
+
+        // Starts below max screen.
+        API.drawRectangle(this._currentPosX, this._currentPosY - 5, this._width, 5, this._r, this._g, this._b, this._alpha - 30);
+        API.drawRectangle(this._currentPosX, this._currentPosY, this._width, this._height, 0, 0, 0, this._alpha - 30);
+        API.drawText(this._text, this._offset + this._currentPosX + (this._width / 2), this._currentPosY + (this._height / 4), this._textScale, 255, 255, 255, this._alpha, 4, 1, false, false, this._width - padding);
+        this.animate();
+    }
+
+    animate() {
+        // Did we reach our goal?
+        if (this._currentPosY <= this._targetY) {
+            this._currentPosY = this._targetY;
+            // Ready to fade?
+            if (new Date().getTime() > this._lastUpdateTime + this._displayTime) {
+                this.fade();
+                return;
+            }
+            return;
+        }
+
+        this._lastUpdateTime = new Date().getTime();
+        // If not let's reach our goal.
+        if (this._currentPosY <= this._targetY + (this._height / 6)) {
+            this._currentPosY -= 3;
+            return;
+        } else {
+            this._currentPosY -= 5;
+            return;
+        }
+    }
+
+    fade() {
+        if (this._alpha <= 0) {
+            this.cleanUpNotification();
+            return;
+        }
+
+        this._alpha -= 5;
+        return;
+    }
+
+    cleanUpNotification() {
+        animationFrames = 0;
+        notification = null;
+    }
+
+    setText(value) {
+        this._text = value;
+    }
+
+    setColor(r, g, b) {
+        this._r = r;
+        this._g = g;
+        this._b = b;
+    }
+
+    setTextScale(value) {
+        this._textScale = value;
+    }
+
+    isHovered() {
+        return;
+    }
+
+    isClicked() {
+        return;
+    }
+
+    returnType() {
+        return "Notification";
+    }
+}
 
 class PanelImage {
     _xPos: number;
@@ -164,6 +368,7 @@ class InputPanel {
     _selected: boolean;
     _numeric: boolean;
     _isError: boolean;
+    _isTransparent: boolean;
 
     constructor(x, y, width, height, isPasswordProtected, isSelected) {
         this._xPos = x * panelMinX;
@@ -176,11 +381,14 @@ class InputPanel {
         this._selected = isSelected;
         this._numeric = false;
         this._isError = false;
+        this._isTransparent = false;
     }
 
     draw() {
         if (this._selected) {
-            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 175); // Darker Black
+            if (!this._isTransparent) {
+                API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225); // Darker Black
+            }
             API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 200);
             if (this._protected) {
                 if (this._input.length < 1) {
@@ -195,7 +403,9 @@ class InputPanel {
         }
 
         if (this._hovered) { // Hovered
-            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 175); // Darker Black
+            if (!this._isTransparent) {
+                API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225); // Darker Black
+            }
             if (this._isError) {
                 API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 0, 0, 100);
             } else {
@@ -212,7 +422,9 @@ class InputPanel {
             }
             //API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.5, this.r, this.g, this.b, 255, 4, 1, false, false, (panelMinX * this.Width));
         } else { // Not Hovered
-            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 175); // Black
+            if (!this._isTransparent) {
+                API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225); // Darker Black
+            }
             if (this._isError) {
                 API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 0, 0, 100);
             } else {
@@ -254,6 +466,10 @@ class InputPanel {
         this._selected = false;
     }
 
+    setTransparent() {
+        this._isTransparent = true;
+    }
+
     isClicked() {
         let cursorPos = API.getCursorPositionMantainRatio();
         if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
@@ -280,6 +496,10 @@ class InputPanel {
                 return this._input;
             }
         }
+    }
+
+    setInput(value) {
+        this._input = value;
     }
 
     removeFromInput() {
@@ -312,6 +532,8 @@ class Button {
     g: number;
     b: number;
     _args: any;
+    _tooltip: string;
+    _hoverTime: number;
 
     constructor(x, y, width, height, type, t) {
         this.xPos = x * panelMinX;
@@ -322,6 +544,8 @@ class Button {
         this.hovered = false;
         this.type = type;
         this._args = null;
+        this._hoverTime = 0;
+        this._tooltip = "";
 
         switch (type) {
             case 0: // Regular
@@ -355,6 +579,10 @@ class Button {
         this._args = args;
     }
 
+    setTooltip(value) {
+        this._tooltip = value;
+    }
+
     draw() {
         if (this.hovered) { // Hovered
             API.drawRectangle(this.xPos, this.yPos, this.Width, this.Height, 0, 0, 0, 200); // Lighter
@@ -372,8 +600,14 @@ class Button {
             let cursorPos = API.getCursorPositionMantainRatio();
             if (cursorPos.X > this.xPos && cursorPos.X < (this.xPos + this.Width) && cursorPos.Y > this.yPos && cursorPos.Y < this.yPos + this.Height) {
                 this.hovered = true;
+                this._hoverTime += 1;
+
+                if (this._hoverTime > 50) {
+                    API.drawText(this._tooltip, cursorPos.X + 25, cursorPos.Y, 0.4, 255, 255, 255, 255, 4, 0, true, true, 200);
+                }
             } else {
                 this.hovered = false;
+                this._hoverTime = 0;
             }
         }
     }
@@ -399,6 +633,9 @@ class Button {
 
 // On-Update Event -- Draws all of our stuff.
 API.onUpdate.connect(function () {
+    // Notifications can be global.
+    drawNotification();
+
     if (!menuIsReady) {
         return;
     }
@@ -765,6 +1002,19 @@ function prevPage() {
 function setPage(value) {
     currentPage = value;
 }
+function drawNotification() {
+    if (notification !== null) {
+        notification.draw();
+        return;
+    }
+
+    if (notifications.length <= 0) {
+        return;
+    }
+
+    notification = notifications.shift();
+    return;
+}
 // Draws all elements.
 function drawAllMenuElements() {
     if (!menuIsReady) {
@@ -832,6 +1082,17 @@ function createImage(page: number, path: string, x: number, y: number, width: nu
     menuElements[page].push(panel);
     return panel;
 }
+function createNotification(page: number, text: string, displayTime: number) {
+    // Add to queue.
+    let notify = new Notification(text, displayTime);
+    notifications.push(notify);
+    return notify;
+}
+function createProgressBar(page: number, x: number, y: number, width: number, height: number, currentProgress: number) {
+    let bar = new ProgressBar(x, y, width, height, currentProgress);
+    menuElements[page].push(bar);
+    return bar;
+}   
 function getCurrentPage() {
     return currentPage;
 }

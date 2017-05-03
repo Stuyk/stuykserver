@@ -1,4 +1,5 @@
-﻿API.onServerEventTrigger.connect(function (event, args) {
+﻿var panel;
+API.onServerEventTrigger.connect(function (event, args) {
     switch (event) {
         //=========================================
         // Misc Functions
@@ -98,23 +99,32 @@
             resource.browser_manager.showCEF("clientside/resources/dealership.html");
             return;
         //=========================================
-        // CEF BROWSER CALL EVENTS - browser_manager.js
+        // MENU CALL EVENTS
         //=========================================
         case "killPanel":
             resource.browser_manager.killPanel();
             return;
         // Strictly Login / Registration
-        case "registerSuccessful":
-            resource.browser_manager.callCEF("showLogin", null);
+        case "usernameDoesNotExist":
+            panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~Username or password does not match.", 3000);
+            panel.setColor(255, 0, 0);
+            resource.menu_builder.setPage(1);
             return;
         case "passwordDoesNotMatch":
-            resource.browser_manager.callCEF("doesNotMatch", null);
+            panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~Username or password does not match.", 3000);
+            panel.setColor(255, 0, 0);
+            resource.menu_builder.setPage(1);
             return;
-        case "alreadyLoggedIn":
-            resource.browser_manager.callCEF("alreadyLoggedIn", null);
+        case "usernameExists":
+            panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~Username already exists.", 3000);
+            panel.setColor(255, 0, 0);
+            resource.menu_builder.setPage(2);
             return;
-        case "accountDoesNotExist":
-            resource.browser_manager.callCEF("doesNotExist", null);
+        case "nametagExists":
+            panel = resource.menu_builder.createNotification(0, "~r~Error: ~w~Your nametag already exists. Change it in ~b~settings.", 3000);
+            panel.setTextScale(0.4);
+            panel.setColor(255, 0, 0);
+            resource.menu_builder.setPage(2);
             return;
         case "doesNotMatchAccount":
             resource.browser_manager.callCEF("doesNotMatchAccount", null);
@@ -170,22 +180,26 @@
             resource.camera_manager.clearCameraBlips();
             return;
         case "serverLoginCamera":
-            resource.browser_manager.killPanel();
             API.pauseAudio();
             API.callNative("DO_SCREEN_FADE_OUT", 3000);
             API.sleep(4000);
+            resource.menu_builder.killMenu();
+            // Panel Message
+            resource.menu_login.loginStopActivity();
+            panel = resource.menu_builder.createNotification(0, "~g~Successfully Logged In", 3000);
+            panel.setColor(0, 255, 0);
+            // Transition In
             API.callNative("DO_SCREEN_FADE_IN", 3000);
             API.callNative("_TRANSITION_FROM_BLURRED", 3000);
-            resource.menu_builder.killMenu();
             API.setActiveCamera(null);
             API.setGameplayCameraActive();
+            API.setChatVisible(true);
+            API.setCanOpenChat(true);
             API.setHudVisible(true);
             API.setGameVolume(1.0);
-            var playerName = API.getPlayerName(API.getLocalPlayer());
-            API.showShard("~b~Welcome back ~y~" + playerName.replace(/_/g, ' '), 6000);
-            API.sendChatMessage("~r~Current Not Working: ~n~Dealerships, ~n~Car Customization, ~n~Player Customization");
-            API.sendChatMessage("~b~Come back in a few days after it's fixed.");
             API.stopAudio();
+            // Turn on Interaction Mode
+            resource.interaction_mode.setInteractionActive(true);
             return;
         case "createCamera":
             resource.camera_manager.cameraSetupSilent(args[0], new Vector3());
@@ -195,6 +209,28 @@
         case "createCameraNoPosition":
             resource.camera_manager.cameraSetupSilent(args[0], new Vector3());
             resource.camera_manager.cameraActivate();
+            return;
+        //=========================================
+        // MISSION EVENTS
+        //=========================================
+        case "FishingStart":
+            resource.job_fishing.wordIsReady(args[0]);
+            return;
+        case "FishingUpdate":
+            resource.job_fishing.wordMode();
+            return;
+        case "FishingFinish":
+            resource.job_fishing.winEvent();
+            return;
+        case "FishingNotify":
+            let notification = resource.menu_builder.createNotification(0, "~b~You've added the fish to your inventory.", 1500);
+            notification.setColor(0, 153, 255);
+            return;
+        case "FishingFail":
+            resource.job_fishing.failEvent();
+            return;
+        case "FishingBuoy":
+            resource.job_fishing.createBuoy();
             return;
         //=========================================
         // MISSION EVENTS

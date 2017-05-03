@@ -33,6 +33,16 @@ namespace stuykserver.Util
             {
                 
                 int input = Convert.ToInt32(arguments[0]);
+                if (input.ToString().Contains("+"))
+                {
+                    return;
+                }
+
+                if (input.ToString().Contains("-"))
+                {
+                    return;
+                }
+
                 if (input > 0)
                 {
                     Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);
@@ -54,6 +64,15 @@ namespace stuykserver.Util
             if (eventName == "depositATM_Server")
             {
                 int input = Convert.ToInt32(arguments[0]);
+                if (input.ToString().Contains("+"))
+                {
+                    return;
+                }
+
+                if (input.ToString().Contains("-"))
+                {
+                    return;
+                }
                 if (input > 0)
                 {
                     Player instance = (Player)API.call("PlayerHandler", "getPlayer", player);

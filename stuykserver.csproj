@@ -110,43 +110,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="clientside\resources\css\bootstrap.min.css.map" />
-    <None Include="clientside\resources\fonts\glyphicons-halflings-regular.eot" />
-    <None Include="clientside\resources\fonts\glyphicons-halflings-regular.ttf" />
-    <None Include="clientside\resources\fonts\glyphicons-halflings-regular.woff" />
-    <None Include="clientside\resources\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="packages.config" />
     <None Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="clientside\ActiveShooter.js" />
-    <Content Include="clientside\Main.js" />
-    <Content Include="clientside\MoneyDisplay.js" />
-    <Content Include="clientside\resources\atmpanel.html" />
-    <Content Include="clientside\resources\cover.css" />
-    <Content Include="clientside\resources\css\bootstrap.css" />
-    <Content Include="clientside\resources\css\bootstrap.min.css" />
-    <Content Include="clientside\resources\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="clientside\resources\images\ajax-loader.gif" />
-    <Content Include="clientside\resources\images\bg.png" />
-    <Content Include="clientside\resources\images\dashed.png" />
-    <Content Include="clientside\resources\images\geo.png" />
-    <Content Include="clientside\resources\images\logo.png" />
-    <Content Include="clientside\resources\images\skins\placeholder.png" />
-    <Content Include="clientside\resources\images\tweed.png" />
-    <Content Include="clientside\resources\index.html" />
-    <Content Include="clientside\resources\inventory.html" />
-    <Content Include="clientside\resources\js\bootstrap.js" />
-    <Content Include="clientside\resources\js\bootstrap.min.js" />
-    <Content Include="clientside\resources\js\npm.js" />
-    <Content Include="clientside\resources\loading.html" />
-    <Content Include="clientside\resources\regsuccess.html" />
-    <Content Include="clientside\resources\skinselector.css" />
-    <Content Include="clientside\resources\skinselector.html" />
-    <Content Include="clientside\serversideCamera.js" />
-    <Content Include="clientside\WaypointHelper.js" />
     <Content Include="LICENSE.txt" />
-    <Content Include="meta.xml" />
+    <Content Include="meta.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="clientside\resources\active_shooter_manager.ts" />
@@ -157,20 +128,20 @@
     <TypeScriptCompile Include="clientside\resources\camera_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\job_fishing.ts" />
     <TypeScriptCompile Include="clientside\resources\menu_atm.ts" />
     <TypeScriptCompile Include="clientside\resources\menu_builder.ts" />
     <TypeScriptCompile Include="clientside\resources\menu_eula.ts" />
     <TypeScriptCompile Include="clientside\resources\menu_login.ts" />
+    <TypeScriptCompile Include="clientside\resources\sandbox.ts" />
     <TypeScriptCompile Include="clientside\resources\surgery_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\mission_handler.ts" />
     <TypeScriptCompile Include="clientside\resources\object_placer.ts" />
     <TypeScriptCompile Include="clientside\resources\snake.ts" />
-    <TypeScriptCompile Include="clientside\resources\test.ts" />
     <TypeScriptCompile Include="clientside\resources\hud_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\interaction_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\login_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\marker_manager.ts" />
-    <TypeScriptCompile Include="clientside\resources\worldToSpriteAnimation.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Declarations.d.ts" />
     <TypeScriptCompile Include="types-gtanetwork\Enums.ts" />
     <TypeScriptCompile Include="types-gtanetwork\GTANetwork.dll.d.ts" />

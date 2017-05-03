@@ -33,12 +33,18 @@ namespace stuykserver.Classes
         public bool dead { get; set; }
         public bool admin { get; set; }
 
-
-
-
-
-
-
+        private int inventoryFish;
+        public int playerFish
+        {
+            get
+            {
+                return inventoryFish;
+            }
+            set
+            {
+                inventoryFish += value;
+            }
+        }
 
         DatabaseHandler db = new DatabaseHandler();
 
@@ -72,7 +78,7 @@ namespace stuykserver.Classes
             updateKarma();
             setPlayerHealth(playerHealth);
             setPlayerArmor(playerArmor);
-            // WEAPONS
+            getInventory(playerID);
         }
 
         string playerName; // Player Name
@@ -150,6 +156,16 @@ namespace stuykserver.Classes
 
             // Send all our data to generate the query and run it
             db.compileQuery(before, after, varNames, data);
+        }
+
+        private void getInventory(int id)
+        {
+            string[] varNames = { "ID" };
+            string before = "SELECT Fish FROM PlayerInventory WHERE";
+            object[] data = { id };
+            DataTable result = db.compileSelectQuery(before, varNames, data);
+
+            playerFish = Convert.ToInt32(result.Rows[0]["Fish"]);
         }
 
         public void updateKarma()

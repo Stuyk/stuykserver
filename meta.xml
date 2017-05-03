@@ -20,6 +20,9 @@
   <script src="clientside/resources/mission_handler.js" type="client" lang="javascript" />
   <script src="clientside/resources/object_placer.js" type="client" lang="javascript" />
   <script src="clientside/resources/surgery_mode.js" type="client" lang="javascript" />
+  <script src="clientside/resources/job_fishing.js" type="client" lang="javascript" />
+
+  <script src="clientside/resources/sandbox.js" type="client" lang="javascript" />
   
   <script src="clientside/resources/menu_builder.js" type="client" lang="javascript" />
   <script src="clientside/resources/menu_eula.js" type="client" lang="javascript" />
