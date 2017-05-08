@@ -133,7 +133,9 @@
     <TypeScriptCompile Include="clientside\resources\menu_builder.ts" />
     <TypeScriptCompile Include="clientside\resources\menu_eula.ts" />
     <TypeScriptCompile Include="clientside\resources\menu_login.ts" />
+    <TypeScriptCompile Include="clientside\resources\missionhandler.ts" />
     <TypeScriptCompile Include="clientside\resources\sandbox.ts" />
+    <TypeScriptCompile Include="clientside\resources\sprite_loader.ts" />
     <TypeScriptCompile Include="clientside\resources\surgery_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\mission_handler.ts" />
     <TypeScriptCompile Include="clientside\resources\object_placer.ts" />

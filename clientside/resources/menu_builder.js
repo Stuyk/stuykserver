@@ -1,8 +1,8 @@
 var screenX = API.getScreenResolutionMantainRatio().Width;
 var screenY = API.getScreenResolutionMantainRatio().Height;
 // Built for 16:9
-var panelMinX = (screenX / 32); // 1920 = 128
-var panelMinY = (screenY / 18); // 1080 = 120
+var panelMinX = (screenX / 32);
+var panelMinY = (screenY / 18);
 // Menu Elements
 var debugTest = true;
 var button = null;
@@ -11,6 +11,8 @@ var image = null;
 var menuElements = [];
 var notification = null;
 var notifications = [];
+var textnotification = null;
+var textnotifications = [];
 var currentPage = 0;
 var padding = 10;
 // Set to True when your menu is ready.
@@ -18,6 +20,51 @@ var menuIsReady = false;
 var selectedInput = null;
 // Animation Stuff
 var animationFrames = 0;
+class PlayerTextNotification {
+    constructor(text) {
+        let playerPos = API.getEntityPosition(API.getLocalPlayer()).Add(new Vector3(0, 0, 1));
+        let point = API.worldToScreenMantainRatio(playerPos);
+        this._xPos = Point.Round(point).X;
+        this._yPos = Point.Round(point).Y;
+        this._drawing = true;
+        this._alpha = 255;
+        this._text = text;
+        this._increment = -1;
+        this._lastUpdateAlpha = new Date().getTime();
+        this._lastUpdateTextPosition = new Date().getTime();
+        this._r = 0;
+        this._g = 0;
+        this._b = 0;
+    }
+    draw() {
+        if (!this._drawing) {
+            return;
+        }
+        if (new Date().getTime() > this._lastUpdateAlpha + 35) {
+            this._lastUpdateAlpha = new Date().getTime();
+            this._alpha -= 5;
+        }
+        if (new Date().getTime() > this._lastUpdateTextPosition + 100) {
+            this._yPos -= 0.3;
+        }
+        API.drawText(this._text, this._xPos, this._yPos, 0.4, this._r, this._g, this._b, this._alpha, 4, 1, true, true, 500);
+        if (this._alpha <= 0) {
+            this.cleanUpNotification();
+        }
+    }
+    setColor(r, g, b) {
+        this._r = r;
+        this._g = g;
+        this._b = b;
+    }
+    cleanUpNotification() {
+        this._drawing = false;
+        textnotification = null;
+    }
+    returnType() {
+        return "PlayerTextNotification";
+    }
+}
 class ProgressBar {
     constructor(x, y, width, height, currentProgress) {
         this._xPos = x * panelMinX;
@@ -184,88 +231,563 @@ class PanelImage {
         return "PanelImage";
     }
 }
+API.onResourceStart.connect(function () {
+    resource.menu_builder.setupMenu(1);
+    let panel = createPanel(0, 12, 1, 8, 2);
+    panel.Header = true;
+    panel.Tooltip = "A header tooltip.";
+    panel.MainColorR = 187;
+    panel.MainColorG = 77;
+    panel.MainColorB = 62;
+    panel.MainAlpha = 255;
+    let textElement = panel.addText("Menu Builder");
+    textElement.R = 255;
+    textElement.G = 255;
+    textElement.B = 255;
+    textElement.Centered = true;
+    textElement.VerticalCentered = true;
+    textElement.FontScale = 0.6;
+    textElement.Font = 1;
+    textElement.HoverAlpha = 100;
+    panel.HoverR = 113;
+    panel.HoverG = 47;
+    panel.HoverB = 38;
+    panel.HoverAlpha = 255;
+    panel.Hoverable = true;
+    panel.Function = doNothing;
+    // Panel 2
+    panel = createPanel(0, 12, 3, 8, 10);
+    panel.MainColorR = 48;
+    panel.MainColorG = 47;
+    panel.MainColorB = 47;
+    panel.MainAlpha = 255;
+    textElement = panel.addText("Beautiful UI made very easy but how easy you may say");
+    textElement.Font = 2;
+    textElement.FontScale = 0.4;
+    textElement.Centered = true;
+    textElement = panel.addText("- Create text lines for your panels.");
+    textElement.Font = 4;
+    textElement.FontScale = 0.4;
+    textElement = panel.addText("- Modify each piece of your design with a few lines of code.");
+    textElement.Font = 1;
+    textElement.FontScale = 0.4;
+    textElement.Alpha = 100;
+    textElement = panel.addText("- Fast and it doesn't even use CEF.");
+    textElement.Font = 0;
+    textElement.FontScale = 0.3;
+    textElement = panel.addText("- Supports inline ~r~c ~o~o ~y~l ~g~o ~b~r ~p~s ~w~supported by GTANetwork.");
+    textElement.Font = 7;
+    textElement.FontScale = 0.3;
+    textElement = panel.addText("- Can even center per line.");
+    textElement.Font = 7;
+    textElement.FontScale = 0.3;
+    textElement.Centered = true;
+    // Panel 3
+    panel = createPanel(0, 20, 3, 8, 5);
+    panel.MainBackgroundImage = "clientside/resources/images/backgrounds/background_0.jpg";
+    panel.MainBackgroundImagePadding = 10;
+    panel.MainColorR = 65;
+    panel.MainColorG = 64;
+    panel.MainColorB = 64;
+    panel.MainAlpha = 255;
+    panel.Function = doNothing;
+    panel.FunctionAudioLib = "Enter_Capture_Zone";
+    panel.FunctionAudioName = "DLC_Apartments_Drop_Zone_Sounds";
+    resource.menu_builder.openMenu(true, false, false, true, false);
+});
+function doNothing() {
+    API.sendChatMessage("We're doing nothing.");
+}
+class TextElement {
+    // Constructor
+    constructor(text, x, y, width, height, line) {
+        this._xPos = x;
+        this._yPos = y + (panelMinY * line);
+        this._width = width;
+        this._height = height;
+        this._text = text;
+        this._fontScale = 0.6;
+        this._centered = false;
+        this._centeredVertically = false;
+        this._font = 4;
+        this._fontR = 255;
+        this._fontG = 255;
+        this._fontB = 255;
+        this._fontAlpha = 255;
+        this._hoverTextAlpha = 255;
+        this._hoverTextR = 255;
+        this._hoverTextG = 255;
+        this._hoverTextB = 255;
+        this._offset = 0;
+        this._padding = 10;
+        this._hovered = false;
+        this._shadow = false;
+        this._outline = false;
+    }
+    draw() {
+        if (this._centered && this._centeredVertically) {
+            this.drawAsCenteredAll();
+            return;
+        }
+        if (this._centered) {
+            this.drawAsCentered();
+            return;
+        }
+        if (this._centeredVertically) {
+            this.drawAsCenteredVertically();
+            return;
+        }
+        this.drawAsNormal();
+    }
+    //** Is this text element in a hover state? */
+    set Hovered(value) {
+        this._hovered = value;
+    }
+    get Hovered() {
+        return this._hovered;
+    }
+    /** Sets the color for RGB of R type. Max of 255 */
+    set R(value) {
+        this._fontR = value;
+    }
+    /** Gets the color for RGB of R type. */
+    get R() {
+        return this._fontR;
+    }
+    /** Sets the color for RGB of G type. Max of 255 */
+    set G(value) {
+        this._fontG = value;
+    }
+    /** Gets the color for RGB of G type. */
+    get G() {
+        return this._fontG;
+    }
+    /** Sets the color for RGB of B type. Max of 255 */
+    set B(value) {
+        this._fontB = value;
+    }
+    /** Gets the color for RGB of B type. */
+    get B() {
+        return this._fontB;
+    }
+    /** Sets the font Alpha property */
+    set Alpha(value) {
+        this._fontAlpha = value;
+    }
+    get Alpha() {
+        return this._fontAlpha;
+    }
+    /** Sets the font Alpha property */
+    set HoverAlpha(value) {
+        this._hoverTextAlpha = value;
+    }
+    get HoverAlpha() {
+        return this._hoverTextAlpha;
+    }
+    /** Sets the hover color for the text RGB of R type. */
+    set HoverR(value) {
+        this._hoverTextR = value;
+    }
+    get HoverR() {
+        return this._hoverTextR;
+    }
+    /** Sets the hover color for the text RGB of G type. */
+    set HoverG(value) {
+        this._hoverTextG = value;
+    }
+    get HoverG() {
+        return this._hoverTextG;
+    }
+    /** Sets the hover color for the text RGB of B type. */
+    set HoverB(value) {
+        this._hoverTextB = value;
+    }
+    get HoverB() {
+        return this._hoverTextB;
+    }
+    /** Set your font type. 0 - 7
+    * 0 Normal
+    * 1 Cursive
+    * 2 All Caps
+    * 3 Squares / Arrows / Etc.
+    * 4 Condensed Normal
+    * 5 Garbage
+    * 6 Condensed Normal
+    * 7 Bold GTA Style
+    */
+    set Font(value) {
+        this._font = value;
+    }
+    get Font() {
+        return this._font;
+    }
+    /** Sets the size of the text. 0.6 is pretty normal. 1 is quite large. */
+    set FontScale(value) {
+        this._fontScale = value;
+    }
+    get FontScale() {
+        return this._fontScale;
+    }
+    /** Centers the content vertically. Do not use if your box is not very high to begin with */
+    set VerticalCentered(value) {
+        this._centeredVertically = value;
+    }
+    get VerticalCentered() {
+        return this._centeredVertically;
+    }
+    /** Use this if you want centered content. */
+    set Centered(value) {
+        this._centered = value;
+    }
+    get Centered() {
+        return this._centered;
+    }
+    drawAsCenteredAll() {
+        if (this._hovered) {
+            API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 20, this._fontScale, this._hoverTextR, this._hoverTextG, this._hoverTextB, this._hoverTextAlpha, this._font, 1, this._shadow, this._outline, this._width);
+            return;
+        }
+        API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 20, this._fontScale, this._fontR, this._fontG, this._fontB, this._fontAlpha, this._font, 1, this._shadow, this._outline, this._width);
+    }
+    drawAsCenteredVertically() {
+        if (this._hovered) {
+            API.drawText(this._text, this._offset + this._xPos, this._yPos + (this._height / 2) - 20, this._fontScale, this._hoverTextR, this._hoverTextG, this._hoverTextB, this._hoverTextAlpha, this._font, 0, this._shadow, this._outline, this._width);
+            return;
+        }
+        API.drawText(this._text, this._offset + this._xPos, this._yPos + (this._height / 2) - 20, this._fontScale, this._fontR, this._fontG, this._fontB, this._fontAlpha, this._font, 0, this._shadow, this._outline, this._width);
+    }
+    drawAsCentered() {
+        if (this._hovered) {
+            API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._padding + this._yPos, this._fontScale, this._hoverTextR, this._hoverTextG, this._hoverTextB, this._hoverTextAlpha, this._font, 1, this._shadow, this._outline, this._width);
+            return;
+        }
+        API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._padding + this._yPos, this._fontScale, this._fontR, this._fontG, this._fontB, this._fontAlpha, this._font, 1, this._shadow, this._outline, this._width);
+    }
+    drawAsNormal() {
+        if (this._hovered) {
+            API.drawText(this._text, this._offset + this._xPos + this._padding, this._yPos + this._padding, this._fontScale, this._hoverTextR, this._hoverTextG, this._hoverTextB, this._hoverTextAlpha, this._font, 0, this._shadow, this._outline, this._width - this._padding);
+            return;
+        }
+        API.drawText(this._text, this._offset + this._xPos + this._padding, this._yPos + this._padding, this._fontScale, this._fontR, this._fontG, this._fontB, this._fontAlpha, this._font, 0, this._shadow, this._outline, this._width - this._padding);
+    }
+}
 class Panel {
-    constructor(x, y, width, height, isHeader, text) {
+    /**
+     *
+     * @param x - Max of 31. Starts on left side.
+     * @param y - Max of 17. Starts at the top.
+     * @param width - Max of 31. Each number fills a square.
+     * @param height - Max of 17. Each number fills a square.
+     */
+    constructor(x, y, width, height) {
+        this._padding = 10;
         this._xPos = x * panelMinX;
         this._yPos = y * panelMinY;
         this._width = width * panelMinX;
         this._height = height * panelMinY;
-        this._text = text;
-        this._header = isHeader;
-        this._textScale = (panelMinY / (panelMinY * 10)) * height;
-        this._fontScale = (panelMinY / (panelMinY * 10)) * height + 0.2;
-        this._centered = false;
-        this._centeredVertically = false;
+        this._alpha = 225;
+        this._header = false;
         this._offset = 0;
-        if (this._textScale > 0.6) {
-            this._textScale = 0.6;
-        }
-        if (this._fontScale > 0.6) {
-            this._fontScale = 0.6;
-        }
+        this._r = 0;
+        this._g = 0;
+        this._b = 0;
+        this._textLines = [];
+        this._currentLine = 0;
+        this._shadow = false;
+        this._outline = false;
+        this._tooltip = null;
+        this._hovered = false;
+        this._hoverTime = 0;
+        this._hoverR = 0;
+        this._hoverG = 0;
+        this._hoverB = 0;
+        this._hoverAlpha = 200;
+        this._backgroundImage = null;
+        this._backgroundImagePadding = 0;
+        this._function = null;
+        this._functionArgs = [];
+        this._functionAudioLib = "Click";
+        this._functionAudioName = "DLC_HEIST_HACKING_SNAKE_SOUNDS";
+        this._hoverAudioLib = "Cycle_Item";
+        this._hoverAudioName = "DLC_Dmod_Prop_Editor_Sounds";
+        this._hoverAudio = true;
+        this._functionClickAudio = true;
+        this._hoverable = false;
+        this._line = 0;
     }
+    /**
+     * Do not call this. It's specifically used for the menu builder file.
+     */
     draw() {
+        // Only used if using text lines.
+        if (this._textLines.length > 0) {
+            for (var i = 0; i < this._textLines.length; i++) {
+                this._textLines[i].draw();
+            }
+        }
+        this.drawRectangles();
+        this.isClicked();
+        this.isHovered();
+    }
+    // Normal Versions
+    drawRectangles() {
+        if (this._backgroundImage !== null) {
+            this.drawBackgroundImage();
+            return;
+        }
+        if (this._hovered) {
+            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, this._hoverR, this._hoverG, this._hoverB, this._hoverAlpha);
+            if (this._header) {
+                API.drawRectangle(this._xPos, this._yPos + this._height - 5, this._width, 5, 255, 255, 255, 50);
+            }
+            return;
+        }
+        API.drawRectangle(this._xPos, this._yPos, this._width, this._height, this._r, this._g, this._b, this._alpha);
         if (this._header) {
-            // If it's centered.
-            if (this._centered || this._centeredVertically) {
-                if (this._centered && this._centeredVertically) {
-                    API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 2) + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 1, false, false, this._width - padding);
-                }
-                else if (this._centered) {
-                    API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 1, false, false, this._width - padding);
-                }
-                else if (this._centeredVertically) {
-                    API.drawText(this._text, this._offset + this._xPos + padding, this._yPos + (this._height / 2) + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 0, false, false, this._width - padding);
-                }
-            }
-            else {
-                API.drawText(this._text, this._offset + this._xPos + padding, this._yPos + (this._height / 4), this._textScale * 5, 255, 255, 255, 255, 1, 0, false, false, this._width - padding);
-            }
-            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225);
             API.drawRectangle(this._xPos, this._yPos + this._height - 5, this._width, 5, 255, 255, 255, 50);
         }
+    }
+    drawBackgroundImage() {
+        if (this._backgroundImagePadding > 1) {
+            API.dxDrawTexture(this._backgroundImage, new Point(this._xPos + this._backgroundImagePadding, this._yPos + this._backgroundImagePadding), new Size(this._width - (this._backgroundImagePadding * 2), this._height - (this._backgroundImagePadding * 2)), 0);
+            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, this._r, this._g, this._b, this._alpha);
+            return;
+        }
+        API.dxDrawTexture(this._backgroundImage, new Point(this._xPos, this._yPos), new Size(this._width, this._height), 0);
+    }
+    // Function Settings
+    set Function(value) {
+        this._function = value;
+    }
+    /** Add an array or a single value as a function. IMPORTANT! Any function you write must be able to take an array of arguments. */
+    addFunctionArgs(value) {
+        if (Array.isArray(value)) {
+            this._functionArgs = value;
+        }
         else {
-            if (this._centered || this._centeredVertically) {
-                if (this._centered && this._centeredVertically) {
-                    API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 20, this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 1, false, false, this._width - padding);
-                }
-                else if (this._centered) {
-                    API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 4), this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 1, false, false, this._width - padding);
-                }
-                else if (this._centeredVertically) {
-                    API.drawText(this._text, this._offset + this._xPos + padding, this._yPos + (this._height / 2) + (this._height / 4), this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 0, false, false, this._width - padding);
-                }
-            }
-            else {
-                API.drawText(this._text, this._offset + this._xPos + padding, this._yPos + (this._height / 4), this._fontScale - (this._fontScale / 4), 255, 255, 255, 255, 4, 0, false, false, this._width - padding);
-            }
-            API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225);
+            this._functionArgs.push(value);
         }
     }
-    setText(value) {
-        this._text = value;
+    // HOVER AUDIO
+    /** Sets the hover audio library. Ex: "Cycle_Item" */
+    set HoverAudioLib(value) {
+        this._hoverAudioLib = value;
     }
-    setTextScale(value) {
-        this._textScale = value;
+    get HoverAudioLib() {
+        return this._hoverAudioLib;
     }
-    setFontScale(value) {
-        this._fontScale = value;
+    /** Sets the hover audio name. Ex: "DLC_Dmod_Prop_Editor_Sounds" */
+    set HoverAudioName(value) {
+        this._hoverAudioName = value;
     }
-    setVerticalCentered() {
-        this._centeredVertically = true;
+    get HoverAudioName() {
+        return this._hoverAudioName;
     }
-    setCentered() {
-        this._centered = true;
+    // FUNCTION AUDIO
+    /** Sets the function audio library. Ex: "Cycle_Item" */
+    set FunctionAudioLib(value) {
+        this._functionAudioLib = value;
     }
-    isHovered() {
-        return;
+    get FunctionAudioLib() {
+        return this._functionAudioLib;
     }
-    isClicked() {
-        return;
+    /** Sets the function audio name. Ex: "DLC_Dmod_Prop_Editor_Sounds" */
+    set FunctionAudioName(value) {
+        this._functionAudioName = value;
     }
-    setOffset(value) {
+    get FunctionAudioName() {
+        return this._functionAudioName;
+    }
+    /** Sets if the function audio plays. */
+    set FunctionAudio(value) {
+        this._functionClickAudio = value;
+    }
+    get FunctionAudio() {
+        return this._functionClickAudio;
+    }
+    // Background Alpha
+    /** Sets the background alpha property */
+    set MainAlpha(value) {
+        this._alpha = value;
+    }
+    get MainAlpha() {
+        return this._alpha;
+    }
+    /** Sets the background image padding property */
+    set MainBackgroundImagePadding(value) {
+        this._backgroundImagePadding = value;
+    }
+    get MainBackgroundImagePadding() {
+        return this._backgroundImagePadding;
+    }
+    /** Uses a custom image for your panel background. Must include extension. EX. 'clientside/image.jpg' */
+    set MainBackgroundImage(value) {
+        this._backgroundImage = value;
+    }
+    get MainBackgroundImage() {
+        return this._backgroundImage;
+    }
+    /** Sets the color for RGB of R type. Max of 255 */
+    set MainColorR(value) {
+        this._r = value;
+    }
+    /** Gets the color for RGB of R type. */
+    get MainColorR() {
+        return this._r;
+    }
+    /** Sets the color for RGB of G type. Max of 255 */
+    set MainColorG(value) {
+        this._g = value;
+    }
+    /** Gets the color for RGB of G type. */
+    get MainColorG() {
+        return this._g;
+    }
+    /** Sets the color for RGB of B type. Max of 255 */
+    set MainColorB(value) {
+        this._b = value;
+    }
+    /** Gets the color for RGB of B type. */
+    get MainColorB() {
+        return this._b;
+    }
+    /** Is there a hover state? */
+    set Hoverable(value) {
+        this._hoverable = value;
+    }
+    get Hoverable() {
+        return this._hoverable;
+    }
+    /** Sets the hover alpha */
+    set HoverAlpha(value) {
+        this._hoverAlpha = value;
+    }
+    get HoverAlpha() {
+        return this._hoverAlpha;
+    }
+    /** Sets the hover color for RGB of R type. */
+    set HoverR(value) {
+        this._hoverR = value;
+    }
+    get HoverR() {
+        return this._hoverR;
+    }
+    /** Sets the hover color for RGB of G type. */
+    set HoverG(value) {
+        this._hoverG = value;
+    }
+    get HoverG() {
+        return this._hoverG;
+    }
+    /** Sets the hover color for RGB of B type. */
+    set HoverB(value) {
+        this._hoverB = value;
+    }
+    get HoverB() {
+        return this._hoverB;
+    }
+    /** Sets the font Outline property */
+    set FontOutline(value) {
+        this._outline = value;
+    }
+    get FontOutline() {
+        return this._outline;
+    }
+    /** Sets the font Shadow property */
+    set FontShadow(value) {
+        this._shadow = value;
+    }
+    get FontShadow() {
+        return this._shadow;
+    }
+    /** Sets the Tooltip text for your element. */
+    set Tooltip(value) {
+        this._tooltip = value;
+    }
+    get Tooltip() {
+        return this._tooltip;
+    }
+    /** Adds a stylized line under your your box. */
+    set Header(value) {
+        this._header = value;
+    }
+    get Header() {
+        return this._header;
+    }
+    /** If your text needs to be pushed in a certain direction either add or remove pixels here. */
+    set Offset(value) {
         this._offset = value;
     }
+    get Offset() {
+        return this._offset;
+    }
+    addText(value) {
+        let textElement = new TextElement(value, this._xPos, this._yPos, this._width, this._height, this._line);
+        this._textLines.push(textElement);
+        this._line += 1;
+        return textElement;
+    }
+    // Hover Action
+    isHovered() {
+        if (!API.isCursorShown()) {
+            return;
+        }
+        if (!this._hoverable) {
+            return;
+        }
+        let cursorPos = API.getCursorPositionMantainRatio();
+        if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < this._yPos + this._height) {
+            if (!this._hovered) {
+                this._hovered = true;
+                this.setTextHoverState(true);
+                if (this._hoverAudio) {
+                    API.playSoundFrontEnd(this._hoverAudioLib, this._hoverAudioName);
+                }
+            }
+            this._hoverTime += 1;
+            if (this._hoverTime > 50) {
+                if (this._tooltip.length > 1) {
+                    API.drawText(this._tooltip, cursorPos.X + 25, cursorPos.Y, 0.4, 255, 255, 255, 255, 4, 0, true, true, 200);
+                }
+            }
+            return;
+        }
+        this._hovered = false;
+        this._hoverTime = 0;
+        this.setTextHoverState(false);
+    }
+    // Click Action
+    isClicked() {
+        // Is there even a cursor?
+        if (!API.isCursorShown()) {
+            return;
+        }
+        // Is there a function if they click it?
+        if (this._function === null) {
+            return;
+        }
+        // Are they even left clicking?
+        if (!API.isControlJustPressed(237 /* CursorAccept */)) {
+            return;
+        }
+        let cursorPos = API.getCursorPositionMantainRatio();
+        if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < this._yPos + this._height) {
+            if (this._functionClickAudio) {
+                API.playSoundFrontEnd(this._functionAudioLib, this._functionAudioName);
+            }
+            if (this._functionArgs.length > 0) {
+                this._function(this._functionArgs);
+                return;
+            }
+            this._function();
+        }
+    }
+    setTextHoverState(value) {
+        for (var i = 0; i < this._textLines.length; i++) {
+            this._textLines[i].Hovered = value;
+        }
+    }
+    // Type
     returnType() {
         return "Panel";
     }
@@ -501,6 +1023,7 @@ class Button {
 API.onUpdate.connect(function () {
     // Notifications can be global.
     drawNotification();
+    drawTextNotification();
     if (!menuIsReady) {
         return;
     }
@@ -860,6 +1383,17 @@ function prevPage() {
 function setPage(value) {
     currentPage = value;
 }
+function drawTextNotification() {
+    if (textnotification !== null) {
+        textnotification.draw();
+        return;
+    }
+    if (textnotifications.length <= 0) {
+        return;
+    }
+    textnotification = textnotifications.shift();
+    return;
+}
 function drawNotification() {
     if (notification !== null) {
         notification.draw();
@@ -880,25 +1414,6 @@ function drawAllMenuElements() {
         for (var i = 0; i < menuElements[currentPage].length; i++) {
             // This will draw each element.
             menuElements[currentPage][i].draw();
-            // Return the type of element.
-            let type = menuElements[currentPage][i].returnType();
-            // Check for Hover Events
-            switch (type) {
-                case "Button":
-                    menuElements[currentPage][i].isHovered();
-                    // Check for Click Events
-                    if (API.isControlJustPressed(237 /* CursorAccept */)) {
-                        menuElements[currentPage][i].isClicked();
-                    }
-                    break;
-                case "InputPanel":
-                    menuElements[currentPage][i].isHovered();
-                    // Check for Click Events
-                    if (API.isControlJustPressed(237 /* CursorAccept */)) {
-                        menuElements[currentPage][i].isClicked();
-                    }
-                    break;
-            }
         }
     }
 }
@@ -914,8 +1429,8 @@ function setupMenu(numberOfPages) {
     }
 }
 // Add a page to our pages array.
-function createPanel(page, xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text) {
-    panel = new Panel(xStart, yStart, xGridWidth, yGridHeight, isHeaderType, text);
+function createPanel(page, xStart, yStart, xGridWidth, yGridHeight) {
+    panel = new Panel(xStart, yStart, xGridWidth, yGridHeight);
     menuElements[page].push(panel);
     return panel;
 }
@@ -940,6 +1455,11 @@ function createNotification(page, text, displayTime) {
     // Add to queue.
     let notify = new Notification(text, displayTime);
     notifications.push(notify);
+    return notify;
+}
+function createPlayerTextNotification(text) {
+    let notify = new PlayerTextNotification(text);
+    textnotifications.push(notify);
     return notify;
 }
 function createProgressBar(page, x, y, width, height, currentProgress) {

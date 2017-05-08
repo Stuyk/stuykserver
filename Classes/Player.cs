@@ -99,13 +99,19 @@ namespace stuykserver.Classes
                 pos = (Vector3)API.getEntityData(playerClient, "ReturnPosition");
             }
 
+            // Update Player Information
             string[] varNames = { "X", "Y", "Z", "Money", "Bank", "Nametag", "Karma", "Health", "Armor", "Organization", "Business", "Time", "Dead" };
             string before = "UPDATE Players SET";
             object[] data = { pos.X.ToString(), pos.Y.ToString(), pos.Z.ToString(), playerCash, playerBank, playerName, playerKarma, playerClient.health.ToString(), playerClient.armor.ToString(), playerOrganization.ToString(), playerBusiness.ToString(), getSessionTime().ToString(), Convert.ToInt32(dead) };
             string after = string.Format("WHERE ID='{0}'", playerID);
-
-            // Send all our data to generate the query and run it
             db.compileQuery(before, after, varNames, data);
+
+            // Update Player Inventory
+            string[] varNames2 = { "Fish" };
+            string before2 = "UPDATE PlayerInventory SET";
+            object[] data2 = { inventoryFish };
+            string after2 = string.Format("WHERE PlayerID='{0}'", playerID);
+            db.compileQuery(before2, after2, varNames2, data2);
         }
 
         public void loadPlayer(Vector3 position)

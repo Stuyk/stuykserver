@@ -65,7 +65,7 @@ API.onServerEventTrigger.connect(function (event, args) {
             API.setChatVisible(true);
             //API.startAudio("clientside/resources/audio/trulyyours.mp3", true);
             //API.setGameVolume(0.1);
-            resource.menu_eula.menuEULA();
+            //resource.menu_eula.menuEULA();
             return;
         case "showInvalidName":
             resource.browser_manager.showCEF("clientside/resources/invalidname.html");

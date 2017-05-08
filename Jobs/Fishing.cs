@@ -85,6 +85,10 @@ namespace stuykserver.Jobs
 
                 if (input.ToLower() == word.ToLower())
                 {
+                    Player instance = (Player)player.getData("Instance");
+                    int fish = instance.playerFish;
+                    fish += 1;
+                    instance.playerFish = fish;
                     API.triggerClientEvent(player, "FishingFinish");
                     API.triggerClientEvent(player, "FishingNotify");
                 } else {
@@ -144,21 +148,6 @@ namespace stuykserver.Jobs
             var timer = new Timer(fishTime);
             timer.Elapsed += (sender, e) => fishingTimer(sender, e, player, fishTime, word);
             timer.Start();
-
-            /*
-            API.delay(fishTime, true, () =>
-            {   
-                if (!isPlayerAlreadyFishing(player))
-                {
-                    return;
-                }
-
-                if (API.getEntityData(player, "FishingSession") == fishTime)
-                {
-                    API.triggerClientEvent(player, "FishingStart", word);
-                }
-            });
-            */
         }
 
         private void fishingTimer(object sender, ElapsedEventArgs e, Client player, int fishTime, string word)
@@ -175,6 +164,8 @@ namespace stuykserver.Jobs
             {
                 API.triggerClientEvent(player, "FishingStart", word);
             }
+
+            timer.Dispose();
         }
 
         // Completely end Fishing

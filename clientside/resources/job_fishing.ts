@@ -12,102 +12,116 @@ var word = null;
 var isWordReady = false;
 var isFishing = false;
 var inWater = false;
+var inBoat = false;
 var lastTimeCheck = new Date().getTime(); // ms
 var fishTimeout = new Date().getTime();
-var notificationSent = false; // Has our notification been sent yet?
+var notificationSentWater = false; // Has our notification been sent yet?
+var notificationSentBoat = false;
 var posX = API.getScreenResolutionMantainRatio().Width;
 var posY = API.getScreenResolutionMantainRatio().Height;
+var fishingBugOutTimer = new Date().getTime(); // Used to cancel the event if something isn't happening.
 API.onUpdate.connect(function () {
-    if (new Date().getTime() > lastTimeCheck + 5000) {
-        lastTimeCheck = new Date().getTime();
-        isPlayerNearWater();
-    }
-
-    if (!inWater) {
+    if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
         return;
     }
 
-    if (isWordReady && word !== null) {
-        if (API.isControlJustPressed(Enums.Controls.Enter) || API.isControlJustPressed(Enums.Controls.CursorAccept) && !API.isChatOpen()) {
+    if (new Date().getTime() > lastTimeCheck + 5000) {
+        lastTimeCheck = new Date().getTime();
+        isPlayerNearWater();
+        isPlayerNearBoat();
+    }
+
+    if (inWater || inBoat) {
+        if (isWordReady && word !== null) {
+            if (API.isControlJustPressed(Enums.Controls.Enter) || API.isControlJustPressed(Enums.Controls.CursorAccept) && !API.isChatOpen()) {
+                switch (phase) {
+                    case 0:
+                        drawFishingMenus();
+                        return;
+                    case 1:
+                        phase = 2;
+                        API.triggerServerEvent("requestWord", progressBar.returnProgressAmount());
+                        return;
+                }
+                return;
+            }
+
             switch (phase) {
                 case 0:
-                    drawFishingMenus();
+                    if (buoy !== null && new Date().getTime() > buoyUpdate + 60) {
+                        API.deleteEntity(buoy);
+                        buoyUpdate = new Date().getTime();
+                        castPosition = new Vector3(castPosition.X, castPosition.Y, castPosition.Z - 0.01);
+                        buoy = API.createMarker(Enums.MarkerType.DebugSphere, castPosition, new Vector3(), new Vector3(), new Vector3(0.1, 0.1, 0.1), 255, 0, 0, 255);
+                    }
+                    if (new Date().getTime() > fishTimeout + 8000) {
+                        stopFishing();
+                        failEvent();
+                    }
                     return;
                 case 1:
-                    phase = 2;
-                    API.triggerServerEvent("requestWord", progressBar.returnProgressAmount());
+                    let currentValue = progressBar.returnProgressAmount()
+                    if (progressBarPhase === 0) {
+                        if (currentValue >= 100) {
+                            progressBarPhase = 1;
+                        }
+
+                        if (currentValue < 100) {
+                            if (currentValue <= 0.5) {
+                                progressBar.addProgress(1);
+                            }
+                            progressBar.addProgress(0.05 * currentValue);
+                        }
+                    }
+
+                    if (progressBarPhase === 1) {
+                        if (currentValue <= 1) {
+                            progressBarPhase = 0;
+                        }
+
+                        if (currentValue > -5) {
+                            progressBar.subtractProgress(0.05 * currentValue);
+                        }
+                    }
+                    return;
+                case 2:
+                    let currentInput: string = inputBox.returnInput();
+
+                    if (currentInput.length < 1) {
+                        return;
+                    }
+
+                    if (currentInput === word.substring(0, currentInput.length)) {
+                        wordPanel.setText(`Type: ~g~${word.substring(0, currentInput.length)}~w~${word.substring(currentInput.length, word.length)}`);
+                    } else {
+                        API.triggerServerEvent("FishingFail");
+                    }
+
+                    if (currentInput.length === word.length) {
+                        phase = 4;
+                        API.triggerServerEvent("FishingVerify", inputBox.returnInput());
+                    }
                     return;
             }
             return;
         }
 
-        switch (phase) {
-            case 0:
-                if (buoy !== null && new Date().getTime() > buoyUpdate + 60) {
-                    API.deleteEntity(buoy);
-                    buoyUpdate = new Date().getTime();
-                    castPosition = new Vector3(castPosition.X, castPosition.Y, castPosition.Z - 0.01);
-                    buoy = API.createMarker(Enums.MarkerType.DebugSphere, castPosition, new Vector3(), new Vector3(), new Vector3(0.1, 0.1, 0.1), 255, 0, 0, 255);
-                }
-                if (new Date().getTime() > fishTimeout + 8000) {
-                    stopFishing();
-                    failEvent();
-                }
-                return;
-            case 1:
-                let currentValue = progressBar.returnProgressAmount()
-                if (progressBarPhase === 0) {
-                    if (currentValue >= 100) {
-                        progressBarPhase = 1;
-                    }
-
-                    if (currentValue < 100) {
-                        if (currentValue <= 0.5) {
-                            progressBar.addProgress(1);
-                        }
-                        progressBar.addProgress(0.05 * currentValue);
-                    }
-                }
-
-                if (progressBarPhase === 1) {
-                    if (currentValue <= 1) {
-                        progressBarPhase = 0;
-                    }
-
-                    if (currentValue > -5) {
-                        progressBar.subtractProgress(0.05 * currentValue);
-                    }
-                }
-                return;
-            case 2:
-                let currentInput: string = inputBox.returnInput();
-
-                if (currentInput.length < 1) {
-                    return;
-                }
-
-                if (currentInput === word.substring(0, currentInput.length)) {
-                    wordPanel.setText(`Type: ~g~${word.substring(0, currentInput.length)}~w~${word.substring(currentInput.length, word.length)}`);
-                } else {
-                    API.triggerServerEvent("FishingFail");
-                }
-
-                if (currentInput.length === word.length) {
-                    phase = 4;
-                    API.triggerServerEvent("FishingVerify", inputBox.returnInput());
-                }
-                return;
+        if (isFishing) {
+            if (new Date().getTime() > fishingBugOutTimer + 60000) {
+                fishingBugOutTimer = new Date().getTime();
+                stopFishing();
+                noFishHere();
+            }
         }
-        return;
-    }
 
-    if (phase > 0) {
-        return;
-    }
+        if (phase > 0) {
+            return;
+        }
 
-    if (API.isControlJustPressed(Enums.Controls.Enter) && !API.isChatOpen()) {
-        tryToFish();
-        return;
+        if (API.isControlJustPressed(Enums.Controls.Enter) && !API.isChatOpen()) {
+            tryToFish();
+            return;
+        }
     }
 });
 function isPlayerNearWater() {
@@ -126,15 +140,32 @@ function isPlayerNearWater() {
     }
 
     if (!inWater) {
-        notificationSent = false;
+        notificationSentWater = false;
         return;
     }
 
-    if (!notificationSent) {
-        notificationSent = true;
+    if (!notificationSentWater) {
+        notificationSentWater = true;
         let notification = resource.menu_builder.createNotification(0, "You've entered some water. ~n~Press your action key to begin fishing.", 2000);
         notification.setColor(255, 255, 255);
     }
+}
+function isPlayerNearBoat() {
+    var boats = API.getAllVehicles();
+    var playerPos = API.getEntityPosition(API.getLocalPlayer());
+    for (var i = 0; i < boats.Length; i++) {
+        if (API.getEntityPosition(boats[i]).DistanceTo(playerPos) <= 10) {
+            inBoat = true;
+            if (!notificationSentBoat) {
+                notificationSentBoat = true;
+                let notification = resource.menu_builder.createNotification(0, "You're near a boat. ~n~Press your action key to begin fishing.", 2000);
+                notification.setColor(255, 255, 255);
+            }
+            return;
+        }
+    }
+    inBoat = false;
+    notificationSentBoat = false;
 }
 function tryToFish() {
     let aimCoords = API.getPlayerAimCoords(API.getLocalPlayer());
@@ -163,12 +194,21 @@ function tryToFish() {
     if (buoy !== null) {
         API.deleteEntity(buoy);
     }
-    let playerPoint = API.getEntityPosition(API.getLocalPlayer());
-    castPosition = new Vector3(aimCoords.X, aimCoords.Y, playerPoint.Z - 0.2);
+
+    if (inWater) {
+        let playerPoint = API.getEntityPosition(API.getLocalPlayer());
+        castPosition = new Vector3(aimCoords.X, aimCoords.Y, playerPoint.Z - 0.2);
+    }
+
+    if (inBoat) {
+        let playerPoint = API.getEntityPosition(API.getLocalPlayer());
+        castPosition = new Vector3(aimCoords.X, aimCoords.Y, playerPoint.Z - 1.2);
+    }
 
     API.sleep(2000);
     API.triggerServerEvent("tryFishing");
     isFishing = true;
+    fishingBugOutTimer = new Date().getTime();
 }
 function wordIsReady(value) {
     isWordReady = true;
@@ -181,16 +221,20 @@ function drawFishingMenus() {
     phase = 1;
     resource.menu_builder.setupMenu(2);
     // Page 1
-    let panel = resource.menu_builder.createPanel(0, 12, 4, 7, 1, true, "Fishing")
-    panel.setCentered();
+    let panel: Panel = resource.menu_builder.createPanel(0, 12, 4, 7, 1, true, "Fishing")
+    panel.Centered = true;
+    panel.TextScale = 0.8;
+    panel.Font = 7;
     panel = resource.menu_builder.createPanel(0, 12, 5, 7, 2, false, "Press ~b~F ~w~when your progress bar is maxed out.")
-    panel.setCentered();
-    panel.setFontScale(0.4);
+    panel.Centered = true;
+    panel.TextScale = 0.6;
     progressBar = resource.menu_builder.createProgressBar(0, 12, 6, 7, 1, 0);
     progressBar.setColor(0, 153, 255);
     // Page 2
     panel = resource.menu_builder.createPanel(1, 12, 4, 7, 1, true, "Fishing")
-    panel.setCentered();
+    panel.Centered = true;
+    panel.Header = true;
+    panel.Font = 7;
     wordPanel = resource.menu_builder.createPanel(1, 12, 5, 7, 1, false, "Type: " + word);
     wordPanel.setCentered();
     wordPanel.setFontScale(0.6);
@@ -222,7 +266,8 @@ function winEvent() {
     word = null;
     phase = 0;
     resource.menu_builder.killMenu();
-    API.showColorShard("~y~Perfect Catch!", "~y~Well Done!", 2, 12, 3000);
+    //API.showColorShard("~y~Perfect Catch!", "~y~Well Done!", 2, 12, 3000);
+    resource.menu_builder.createPlayerTextNotification("~b~+1 Fish");
     API.playSoundFrontEnd("WIN", "HUD_AWARDS");
     if (buoy !== null) {
         API.deleteEntity(buoy);
@@ -235,4 +280,8 @@ function failEvent() {
 }
 function createBuoy() {
     buoy = API.createMarker(Enums.MarkerType.DebugSphere, castPosition, new Vector3(), new Vector3(), new Vector3(0.1, 0.1, 0.1), 255, 0, 0, 255);
+}
+function noFishHere() {
+    let notification = resource.menu_builder.createNotification(0, "Woops, doesn't seem to be any fish around here.", 2000);
+    notification.setColor(255, 255, 255);
 }
