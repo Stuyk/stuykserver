@@ -1041,12 +1041,14 @@ class Panel {
                 API.playSoundFrontEnd(this._functionAudioLib, this._functionAudioName);
             }
 
-            if (this._functionArgs.length > 0) {
-                this._function(this._functionArgs);
-                return;
-            }
+            if (this._function !== null) {
+                if (this._functionArgs.length > 0) {
+                    this._function(this._functionArgs);
+                    return;
+                }
 
-            this._function();
+                this._function();
+            }
         }
     }
 
