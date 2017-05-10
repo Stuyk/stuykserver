@@ -1,10 +1,7 @@
 ﻿var screenX = API.getScreenResolutionMantainRatio().Width;
 var screenY = API.getScreenResolutionMantainRatio().Height;
-// Built for 16:9
 var panelMinX = (screenX / 32);
 var panelMinY = (screenY / 18);
-// Menu Elements
-var debugTest = true;
 var button = null;
 var panel = null;
 var image = null;
@@ -24,6 +21,118 @@ var animationFrames = 0;
 // Tab Indexing for Inputs
 var tabIndex: any = [[]];
 var currentTabIndex: number = 0;
+
+var menus: Array<Menu> = [];
+
+function createMenu(pages: number) {
+    let menu = new Menu(pages);
+    return menu;
+}
+
+class Menu {
+    private _isReady: boolean;
+    private _currentPage: number;
+    private _pages: any;
+
+    constructor(pages: number) {
+        this._isReady = false;
+        this._currentPage = 0;
+        this._pages = [[]];
+        this.initializePages(pages);
+        menus.push(this);
+        return this;
+    }
+
+    /** Start drawing our menu. Set to true to start. Set to false to stop. */
+    set Ready(value: boolean) {
+        this._isReady = value;
+        if (value) {
+            menus.push(this);
+        } else {
+            let index;
+            for (var i = 0; i < menus.length; i++) {
+                if (menus[i] === this) {
+                    index = i;
+                    break;
+                }
+            }
+            menus.splice(i, 1);
+        }
+    }
+
+    get Ready(): boolean {
+        return this._isReady;
+    }
+
+    /** Set the page that is currently being viewed. (0 - Max) */
+    set CurrentPage(value: number) {
+        this._currentPage = value;
+    }
+
+    get CurrentPage(): number {
+        return this._currentPage;
+    }
+
+    /** Move to next inline page. */
+    public nextPage() {
+        if (this._currentPage + 1 > this._pages.length) {
+            this._currentPage = 0;
+            return;
+        }
+
+        this._currentPage += 1;
+    }
+
+    /** Move to previous inline page. */
+    public prevPage() {
+        if (this._currentPage - 1 < this._pages.length) {
+            this._currentPage = this._pages.length;
+            return;
+        }
+
+        this._currentPage -= 1;
+    }
+
+    /**
+     * 
+     * @param page - What page do you want this to show up on?
+     * @param xStart - Start position on the grid for X position.
+     * @param yStart - Start position on the grid for Y position.
+     * @param xGridWidth - Width of the Panel.
+     * @param yGridHeight - Height of the Panel.
+     */
+    public createPanel(page: number, xStart: number, yStart: number, xGridWidth: number, yGridHeight: number) {
+        let newPanel = new Panel(page, xStart, yStart, xGridWidth, yGridHeight);
+        this._pages[this._currentPage].push(newPanel);
+        return newPanel;
+    }
+
+    /**
+     *  Used to draw the menu.
+     */
+    public update() {
+        if (!this._isReady) {
+            return;
+        }
+
+        if (Array.isArray(this._pages[this._currentPage])) {
+            if (this._pages[this._currentPage].length < 1) {
+                return;
+            }
+
+            for (var i = 0; i < this._pages[this._currentPage].length; i++) {
+                this._pages[this._currentPage][i].draw();
+            }
+        }
+    }
+
+    private initializePages(count: number) {
+        for (var i = 0; i < count; i++) {
+            let emptyArray = [];
+            this._pages.push(emptyArray);
+        }
+    }
+}
 
 class PlayerTextNotification {
     _xPos: number;
@@ -291,104 +400,9 @@ class Notification {
     }
 }
 
-API.onResourceStart.connect(function () {
-    resource.menu_builder.setupMenu(1);
-    let panel: Panel = createPanel(0, 12, 1, 8, 2);
-    panel.Header = true;
-    panel.Tooltip = "A header tooltip.";
-    panel.MainColorR = 187;
-    panel.MainColorG = 77;
-    panel.MainColorB = 62;
-    panel.MainAlpha = 255;
-
-    let textElement: TextElement = panel.addText("Menu Builder");
-    textElement.R = 255;
-    textElement.G = 255;
-    textElement.B = 255;
-    textElement.Centered = true;
-    textElement.VerticalCentered = true;
-    textElement.FontScale = 0.6;
-    textElement.Font = 1;
-    textElement.HoverAlpha = 100;
-    panel.HoverR = 113;
-    panel.HoverG = 47;
-    panel.HoverB = 38;
-    panel.HoverAlpha = 255;
-    panel.Hoverable = true;
-    panel.Function = doNothing;
-    // Panel 2
-    panel = createPanel(0, 12, 3, 8, 10);
-    panel.MainColorR = 48;
-    panel.MainColorG = 47;
-    panel.MainColorB = 47;
-    panel.MainAlpha = 255;
-    textElement = panel.addText("Beautiful UI made very easy but how easy you may say");
-    textElement.Font = 2;
-    textElement.FontScale = 0.4;
-    textElement.Centered = true;
-    textElement = panel.addText("- Create text lines for your panels.");
-    textElement.Font = 4;
-    textElement.FontScale = 0.4;
-    textElement = panel.addText("- Modify each piece of your design with a few lines of code.");
-    textElement.Font = 1;
-    textElement.FontScale = 0.4;
-    textElement.Alpha = 100;
-    textElement = panel.addText("- Fast and it doesn't even use CEF.");
-    textElement.Font = 0;
-    textElement.FontScale = 0.3;
-    textElement = panel.addText("- Supports inline ~r~c ~o~o ~y~l ~g~o ~b~r ~p~s ~w~supported by GTANetwork.");
-    textElement.Font = 7;
-    textElement.FontScale = 0.3;
-    textElement = panel.addText("- Can even center per line.");
-    textElement.Font = 7;
-    textElement.FontScale = 0.3;
-    textElement.Centered = true;
-
-    let inputPanel = panel.addInput(0, 12, 8, 1);
-    inputPanel.Input = "test";
-    inputPanel = panel.addInput(0, 13, 8, 1);
-    inputPanel.Input = "test2";
-    // Panel 3
-    panel = createPanel(0, 20, 3, 8, 5);
-    panel.MainBackgroundImage = "clientside/resources/images/backgrounds/background_0.jpg";
-    panel.MainBackgroundImagePadding = 10;
-    panel.MainColorR = 65;
-    panel.MainColorG = 64;
-    panel.MainColorB = 64;
-    panel.MainAlpha = 255;
-    panel.Function = doNothing;
-    panel.FunctionAudioLib = "Enter_Capture_Zone";
-    panel.FunctionAudioName = "DLC_Apartments_Drop_Zone_Sounds";
-    resource.menu_builder.openMenu(true, false, false, true, false);
-
-    API.sendChatMessage(`Current Length: ${tabIndex.length}`);
-    API.sendChatMessage(`Current Length: ${tabIndex[currentPage].length}`);
-});
-
-
 function doNothing() {
     API.sendChatMessage("We're doing nothing.");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 class TextElement {
     // Positioning
@@ -873,6 +887,14 @@ class Panel {
     /** Gets the color for RGB of B type. */
     get MainColorB(): number {
         return this._b;
+    }
+
+    /** Sets RGB Color of Main */
+    public MainBackgroundColor(r: number, g: number, b: number, alpha: number) {
+        this._r = r;
+        this._g = g;
+        this._b = b;
+        this._alpha = alpha;
     }
 
     /** Is there a hover state? */
@@ -1388,6 +1410,7 @@ API.onUpdate.connect(function () {
     drawNotification();
     drawTextNotification();
 
+    /*
     if (!menuIsReady) {
         return;
     }
@@ -1399,8 +1422,18 @@ API.onUpdate.connect(function () {
     if (menuElements[currentPage].length === 0) {
         return;
     }
+    */
 
-    drawAllMenuElements();
+    if (menus.length < 1) {
+        return;
+    }
+
+    for (var i = 0; i < menus.length; i++) {
+        menus[i].update();
+    }
+
+
+    //drawAllMenuElements();
 });
 
 // On-Keydown Event
@@ -1748,26 +1781,7 @@ API.onKeyDown.connect(function (sender, e) {
         return;
     }
 });
-// Goes to Next Page
-function nextPage() {
-    if (currentPage + 1 > menuElements.length - 1) {
-        currentPage = 0;
-    } else {
-        currentPage += 1;
-    }
-}
-// Goes to Previous Page
-function prevPage() {
-    if (currentPage - 1 < 0) {
-        currentPage = menuElements.length - 1;
-    } else {
-        currentPage -= 1;
-    }
-}
-// Set Page
-function setPage(value) {
-    currentPage = value;
-}
+
 function drawTextNotification() {
     if (textnotification !== null) {
         textnotification.draw();
@@ -1796,20 +1810,7 @@ function drawNotification() {
 }
 // Draws all elements.
 function drawAllMenuElements() {
-    if (!menuIsReady) {
-        return;
-    }
-
-    if (Array.isArray(menuElements[currentPage])) {
-        for (var i = 0; i < menuElements[currentPage].length; i++) {
-            // This will draw each element.
-            menuElements[currentPage][i].draw();
-            //menuElements[currentPage][i].isHovered();
-            //if (API.isControlJustPressed(Enums.Controls.CursorAccept)) {
-            //    menuElements[currentPage][i].isClicked();
-            //}
-        }
-    }
+    
 }
 
 // Ready to draw the menu?
@@ -1825,11 +1826,7 @@ function setupMenu(numberOfPages: number) {
     }
 }
 // Add a page to our pages array.
-function createPanel(page: number, xStart: number, yStart: number, xGridWidth: number, yGridHeight: number) {
-    panel = new Panel(page, xStart, yStart, xGridWidth, yGridHeight);
-    menuElements[page].push(panel);
-    return panel;
-}
+
 function createNotification(page: number, text: string, displayTime: number) {
     // Add to queue.
     let notify = new Notification(text, displayTime);
@@ -1846,9 +1843,6 @@ function createProgressBar(page: number, x: number, y: number, width: number, he
     menuElements[page].push(bar);
     return bar;
 }   
-function getCurrentPage() {
-    return currentPage;
-}
 // Clears the menu entirely.
 function exitMenu(cursor: boolean, hud: boolean, chat: boolean, blur: boolean, canOpenChat: boolean) {
     menuIsReady = false;
