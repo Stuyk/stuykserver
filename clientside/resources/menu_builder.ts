@@ -5,132 +5,126 @@ var panelMinY = (screenY / 18);
 var button = null;
 var panel = null;
 var image = null;
-var menuElements = [];
 var notification = null;
 var notifications = [];
 var textnotification = null;
 var textnotifications = [];
-var currentPage = 0;
+var currentMenu = 0;
 var padding = 10;
 // Set to True when your menu is ready.
-var menuIsReady = false;
+
 var selectedInput: InputPanel = null;
 // Animation Stuff
 var animationFrames = 0;
 
 // Tab Indexing for Inputs
-var tabIndex: any = [[]];
-var currentTabIndex: number = 0;
+//var tabIndex = [];
+//var currentTabIndex: number = 0;
 
-var menus: Array<Menu> = [];
+// Menu Properties
+var menuElements = [];
+var isReady = false;
+var currentPage = 0;
 
+var clickDelay = new Date().getTime();
+
+// On-Update Event -- Draws all of our stuff.
+API.onUpdate.connect(function () {
+    // Notifications can be global.
+    drawNotification();
+    drawTextNotification();
+
+    if (!isReady) {
+        return;
+    }
+
+    if (menuElements.length < 1) {
+        return;
+    }
+
+    if (currentPage === null) {
+        return;
+    }
+
+    if (!Array.isArray(menuElements[currentPage])) {
+        return;
+    }
+
+    if (menuElements[currentPage].length < 1) {
+        return;
+    }
+
+    for (var i = 0; i < menuElements[currentPage].length; i++) {
+        menuElements[currentPage][i].draw();
+        menuElements[currentPage][i].isHovered();
+        menuElements[currentPage][i].isClicked();
+    }
+
+    // 0 - 1
+    // Page - Page
+    // Panel - Panel
+    // Panel - Panel
+    // Panel - Panel
+});
+
+/**
+ * Initialize how many pages our menu is going to have.
+ * @param pages - Number of pages.
+ */
 function createMenu(pages: number) {
     let menu = new Menu(pages);
     return menu;
 }
 
 class Menu {
-    private _isReady: boolean;
-    private _currentPage: number;
-    private _pages: any;
-
     constructor(pages: number) {
-        this._isReady = false;
-        this._currentPage = 0;
-        this._pages = [[]];
-        this.initializePages(pages);
-        menus.push(this);
-        return this;
+        if (Array.isArray(menuElements[0])) {
+            return;
+        }
+        for (var i = 0; i < pages; i++) {
+            let emptyArray = [];
+            menuElements.push(emptyArray);
+            //tabIndex.push(i);
+        }
     }
 
-    /** Start drawing our menu. Set to true to start. Set to false to stop. */
+    /** Start drawing our menu. */
     set Ready(value: boolean) {
-        this._isReady = value;
-        if (value) {
-            menus.push(this);
-        } else {
-            let index;
-            for (var i = 0; i < menus.length; i++) {
-                if (menus[i] === this) {
-                    index = i;
-                    break;
-                }
-            }
-            menus.splice(i, 1);
-        }
+        isReady = value;
     }
 
     get Ready(): boolean {
-        return this._isReady;
+        return isReady;
     }
 
-    /** Set the page that is currently being viewed. (0 - Max) */
-    set CurrentPage(value: number) {
-        this._currentPage = value;
-    }
-
-    get CurrentPage(): number {
-        return this._currentPage;
-    }
-
-    /** Move to next inline page. */
     public nextPage() {
-        if (this._currentPage + 1 > this._pages.length) {
-            this._currentPage = 0;
+        if (currentPage + 1 > menuElements.length - 1) {
+            currentPage = 0;
             return;
         }
-
-        this._currentPage += 1;
+        currentPage++;
     }
 
-    /** Move to previous inline page. */
     public prevPage() {
-        if (this._currentPage - 1 < this._pages.length) {
-            this._currentPage = this._pages.length;
+        if (currentPage - 1 < 0) {
+            currentPage = menuElements.length - 1;
             return;
         }
-
-        this._currentPage -= 1;
+        currentPage--;
     }
 
     /**
-     * 
-     * @param page - What page do you want this to show up on?
-     * @param xStart - Start position on the grid for X position.
-     * @param yStart - Start position on the grid for Y position.
-     * @param xGridWidth - Width of the Panel.
-     * @param yGridHeight - Height of the Panel.
+     * Create a new panel.
+     * @param page - The page you would like to add panels to.
+     * @param xStart
+     * @param yStart
+     * @param xGridWidth
+     * @param yGridHeight
      */
     public createPanel(page: number, xStart: number, yStart: number, xGridWidth: number, yGridHeight: number) {
-        let newPanel = new Panel(page, xStart, yStart, xGridWidth, yGridHeight);
-        this._pages[this._currentPage].push(newPanel);
+        let newPanel: Panel = new Panel(page, xStart, yStart, xGridWidth, yGridHeight);
+        menuElements[page].push(newPanel);
         return newPanel;
-    }
-
-    /**
-     *  Used to draw the menu.
-     */
-    public update() {
-        if (!this._isReady) {
-            return;
-        }
-
-        if (Array.isArray(this._pages[this._currentPage])) {
-            if (this._pages[this._currentPage].length < 1) {
-                return;
-            }
-
-            for (var i = 0; i < this._pages[this._currentPage].length; i++) {
-                this._pages[this._currentPage][i].draw();
-            }
-        }
-    }
-
-    private initializePages(count: number) {
-        for (var i = 0; i < count; i++) {
-            let emptyArray = [];
-            this._pages.push(emptyArray);
-        }
     }
 }
 
@@ -400,10 +394,6 @@ class Notification {
     }
 }
 
-function doNothing() {
-    API.sendChatMessage("We're doing nothing.");
-}
-
 class TextElement {
     // Positioning
     private _xPos: number;
@@ -484,6 +474,14 @@ class TextElement {
 
     get Hovered(): boolean {
         return this._hovered;
+    }
+
+    //** Sets the color of the main text. A = Alpha */
+    public Color(r: number, g: number, b: number, a: number) {
+        this._fontR = r;
+        this._fontG = g;
+        this._fontB = b;
+        this._fontAlpha = a;
     }
 
     /** Sets the color for RGB of R type. Max of 255 */
@@ -724,6 +722,9 @@ class Panel {
      * Do not call this. It's specifically used for the menu builder file.
      */
     draw() {
+        if (this._page !== currentPage) {
+            return;
+        }
         this.drawRectangles();
         // Only used if using text lines.
         if (this._textLines.length > 0) {
@@ -737,10 +738,6 @@ class Panel {
                 this._inputPanels[i].draw();
             }
         }
-        // Normal Panel Draws
-        
-        this.isClicked();
-        this.isHovered();
     }
     // Normal Versions
     private drawRectangles() {
@@ -897,6 +894,14 @@ class Panel {
         this._alpha = alpha;
     }
 
+    /** Sets the RGB Color of Hover */
+    public HoverBackgroundColor(r: number, g: number, b: number, alpha: number) {
+        this._hoverR = r;
+        this._hoverG = g;
+        this._hoverB = b;
+        this._hoverAlpha = alpha;
+    }
+
     /** Is there a hover state? */
     set Hoverable(value: boolean) {
         this._hoverable = value;
@@ -1030,6 +1035,10 @@ class Panel {
             this._hoverTime += 1;
 
             if (this._hoverTime > 50) {
+                if (this._tooltip === null) {
+                    return;
+                }
+
                 if (this._tooltip.length > 1) {
                     API.drawText(this._tooltip, cursorPos.X + 25, cursorPos.Y, 0.4, 255, 255, 255, 255, 4, 0, true, true, 200);
                 }
@@ -1055,23 +1064,21 @@ class Panel {
         }
 
         // Are they even left clicking?
-        if (!API.isControlJustPressed(Enums.Controls.CursorAccept)) {
-            return;
-        }
-
-        let cursorPos = API.getCursorPositionMantainRatio();
-        if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < this._yPos + this._height) {
-            if (this._functionClickAudio) {
-                API.playSoundFrontEnd(this._functionAudioLib, this._functionAudioName);
-            }
-
-            if (this._function !== null) {
-                if (this._functionArgs.length > 0) {
-                    this._function(this._functionArgs);
+        if (API.isControlJustPressed(Enums.Controls.CursorAccept)) {
+            let cursorPos = API.getCursorPositionMantainRatio();
+            if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < this._yPos + this._height) {
+                if (new Date().getTime() < clickDelay + 200) {
                     return;
                 }
 
+                clickDelay = new Date().getTime();
+
+                if (this._functionClickAudio) {
+                    API.playSoundFrontEnd(this._functionAudioLib, this._functionAudioName);
+                }
+
                 this._function();
+                return;
             }
         }
     }
@@ -1141,12 +1148,7 @@ class InputPanel {
         this._selectAlpha = 125;
         this._inputAudioLib = "Click";
         this._inputAudioName = "DLC_HEIST_HACKING_SNAKE_SOUNDS";
-        if (tabIndex[page].length < 1) {
-            tabIndex[page].push(this);
-        } else {
-            tabIndex[page].unshift(this);
-        }
-        
+        // Tab Indezx
     }
     /** Sets whether or not there is an error. */
     set isError(value: boolean) {
@@ -1200,6 +1202,27 @@ class InputPanel {
         return this._hoverAlpha;
     }
     // Main BACKGROUND PARAMETERS
+    public MainBackgroundColor(r: number, g: number, b: number, alpha: number) {
+        this._r = r;
+        this._g = g;
+        this._b = b;
+        this._alpha = alpha;
+    }
+
+    public HoverBackgroundColor(r: number, g: number, b: number, alpha: number) {
+        this._hoverR = r;
+        this._hoverG = g;
+        this._hoverB = b;
+        this._hoverAlpha = alpha;
+    }
+
+    public SelectBackgroundColor(r: number, g: number, b: number, alpha: number) {
+        this._selectR = r;
+        this._selectG = g;
+        this._selectB = b;
+        this._selectAlpha = alpha;
+    }
+
     /** Set R of RGB on main background. */
     set R(value: number) {
         this._r = value;
@@ -1369,6 +1392,9 @@ class InputPanel {
 
     private isClicked() {
         if (API.isControlJustPressed(Enums.Controls.CursorAccept)) {
+            if (new Date().getTime() < clickDelay + 200) {
+                return;
+            }
             let cursorPos = API.getCursorPositionMantainRatio();
             if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
                 if (!this._selected) {
@@ -1378,7 +1404,6 @@ class InputPanel {
                 selectedInput = this;
             } else {
                 this._selected = false;
-                selectedInput = null;
             }
         }
     }
@@ -1404,57 +1429,31 @@ class InputPanel {
     }
 }
 
-// On-Update Event -- Draws all of our stuff.
-API.onUpdate.connect(function () {
-    // Notifications can be global.
-    drawNotification();
-    drawTextNotification();
-
-    /*
-    if (!menuIsReady) {
-        return;
-    }
-
-    if (menuElements.length === 0) {
-        return;
-    }
-
-    if (menuElements[currentPage].length === 0) {
-        return;
-    }
-    */
-
-    if (menus.length < 1) {
-        return;
-    }
-
-    for (var i = 0; i < menus.length; i++) {
-        menus[i].update();
-    }
-
-
-    //drawAllMenuElements();
-});
-
 // On-Keydown Event
 API.onKeyDown.connect(function (sender, e) {
-    if (!menuIsReady) {
+    if (!isReady) {
         return;
     }
 
     // Shift between Input Boxes.
+    /*
     if (e.KeyCode == Keys.Tab) {
-        currentTabIndex += 1;
         if (selectedInput !== null) {
             selectedInput.Selected = false;
         }
-        if (currentTabIndex > tabIndex[currentPage].length - 1) {
+        if (currentTabIndex + 1 >= tabIndex[currentPage].length - 1) {
+            
             currentTabIndex = 0;
+            selectedInput = tabIndex[currentPage][currentTabIndex];
+            selectedInput.Selected = true;
+            return;
         }
+        currentTabIndex++
         selectedInput = tabIndex[currentPage][currentTabIndex];
         selectedInput.Selected = true;
+        //API.sendChatMessage(`Less Than 1: ${currentTabIndex}`);
         return;
-    }
+    }*/
 
     if (selectedInput === null) {
         return;
@@ -1776,6 +1775,9 @@ API.onKeyDown.connect(function (sender, e) {
     }
 
     if (keypress.length > 0) {
+        if (selectedInput === null) {
+            return;
+        }
         selectedInput.addToInput(keypress);
     } else {
         return;
@@ -1808,24 +1810,6 @@ function drawNotification() {
     notification = notifications.shift();
     return;
 }
-// Draws all elements.
-function drawAllMenuElements() {
-    
-}
-
-// Ready to draw the menu?
-function setMenuReady(isReady: boolean) {
-    menuIsReady = isReady;
-}
-// Setup our pages with arrays. This is the first thing we should call.
-function setupMenu(numberOfPages: number) {
-    for (var i = 0; i < numberOfPages; i++) {
-        let emptyArray = [];
-        menuElements.push(emptyArray);
-        tabIndex.push(i);
-    }
-}
-// Add a page to our pages array.
 
 function createNotification(page: number, text: string, displayTime: number) {
     // Add to queue.
@@ -1845,7 +1829,7 @@ function createProgressBar(page: number, x: number, y: number, width: number, he
 }   
 // Clears the menu entirely.
 function exitMenu(cursor: boolean, hud: boolean, chat: boolean, blur: boolean, canOpenChat: boolean) {
-    menuIsReady = false;
+    isReady = false;
     
     if (cursor) {
         API.showCursor(true);
@@ -1881,7 +1865,7 @@ function exitMenu(cursor: boolean, hud: boolean, chat: boolean, blur: boolean, c
 }
 
 function killMenu() {
-    menuIsReady = false;
+    isReady = false;
     selectedInput = null;
     API.showCursor(false);
     API.setHudVisible(true);
@@ -1898,7 +1882,7 @@ function openMenu(cursor: boolean, hud: boolean, chat: boolean, blur: boolean, c
     }
 
     currentPage = 0;
-    menuIsReady = true;
+    isReady = true;
 
     if (cursor) {
         API.showCursor(true);
