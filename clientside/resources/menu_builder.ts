@@ -21,6 +21,9 @@ var selectedInput = null;
 // Animation Stuff
 var animationFrames = 0;
 
+// Tab Indexing for Inputs
+var tabIndex: any = [[]];
+
 class PlayerTextNotification {
     _xPos: number;
     _yPos: number;
@@ -620,10 +623,12 @@ class Panel {
     private _line: number;
     private _header: boolean;
     private _offset: number;
+    private _page: number;
     private _r: number;
     private _g: number;
     private _b: number;
     private _textLines: TextElement[];
+    private _inputPanels: InputPanel[];
     private _currentLine: number;
     private _alpha: number;
     private _shadow: boolean;
@@ -655,7 +660,8 @@ class Panel {
      * @param width - Max of 31. Each number fills a square.
      * @param height - Max of 17. Each number fills a square.
      */
-    constructor(x, y, width, height) {
+    constructor(page, x, y, width, height) {
+        this._page = page;
         this._padding = 10;
         this._xPos = x * panelMinX;
         this._yPos = y * panelMinY;
@@ -668,6 +674,7 @@ class Panel {
         this._g = 0;
         this._b = 0;
         this._textLines = [];
+        this._inputPanels = [];
         this._currentLine = 0;
         this._shadow = false;
         this._outline = false;
@@ -701,6 +708,13 @@ class Panel {
                 this._textLines[i].draw();
             }
         }
+        // Only used if using input panels.
+        if (this._inputPanels.length > 0) {
+            for (var i = 0; i < this._inputPanels.length; i++) {
+                this._inputPanels[i].draw();
+            }
+        }
+        // Normal Panel Draws
         this.drawRectangles();
         this.isClicked();
         this.isHovered();
@@ -747,8 +761,6 @@ class Panel {
             this._functionArgs.push(value);
         }
     }
-
-
     // HOVER AUDIO
     /** Sets the hover audio library. Ex: "Cycle_Item" */
     set HoverAudioLib(value: string) {
@@ -951,6 +963,21 @@ class Panel {
         return textElement;
     }
 
+    /**
+     *
+     * @param x - Start position of X.
+     * @param y - Start Position of Y.
+     * @param width - How wide. Generally the width of your panel.
+     * @param height - How tall. 1 or 2 is pretty normal.
+     */
+    addInput(x: number, y: number, width: number, height: number) {
+        let inputPanel: InputPanel = new InputPanel(x, y, width, height);
+        this._inputPanels.push(inputPanel);
+        tabIndex.push(this._page);
+        tabIndex[this._page].push(inputPanel);
+        return inputPanel;
+    }
+
     // Hover Action
     isHovered() {
         if (!API.isCursorShown()) {
@@ -1033,119 +1060,271 @@ class Panel {
 }
 
 class InputPanel {
-    _xPos: number;
-    _yPos: number;
-    _width: number;
-    _height: number;
-    _input: string;
-    _protected: boolean;
-    _hovered: boolean;
-    _selected: boolean;
-    _numeric: boolean;
-    _isError: boolean;
-    _isTransparent: boolean;
+    private _xPos: number;
+    private _yPos: number;
+    private _width: number;
+    private _height: number;
+    private _input: string;
+    private _protected: boolean;
+    private _hovered: boolean;
+    private _selected: boolean;
+    private _numeric: boolean;
+    private _isError: boolean;
+    private _isTransparent: boolean;
+    private _r: number;
+    private _g: number;
+    private _b: number;
+    private _alpha: number;
+    private _hoverR: number;
+    private _hoverG: number;
+    private _hoverB: number;
+    private _hoverAlpha: number;
+    private _selectR: number;
+    private _selectG: number;
+    private _selectB: number;
+    private _selectAlpha: number;
 
-    constructor(x, y, width, height, isPasswordProtected, isSelected) {
-        this._xPos = x * panelMinX;
-        this._yPos = y * panelMinY;
+    constructor(x, y, width, height) {
+        this._xPos = x;
+        this._yPos = y;
         this._width = width * panelMinX;
         this._height = height * panelMinY;
-        this._protected = isPasswordProtected;
+        this._protected = false;
         this._input = "";
         this._hovered = false;
-        this._selected = isSelected;
+        this._selected = false;
         this._numeric = false;
         this._isError = false;
         this._isTransparent = false;
+        this._r = 255;
+        this._g = 255;
+        this._b = 255;
+        this._alpha = 100;
+        this._hoverR = 255;
+        this._hoverG = 255;
+        this._hoverB = 255;
+        this._hoverAlpha = 125;
+        this._selectR = 255;
+        this._selectG = 255;
+        this._selectB = 255;
+        this._selectAlpha = 125;
     }
-
-    draw() {
-        if (this._selected) {
-            if (!this._isTransparent) {
-                API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225); // Darker Black
-            }
-            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 200);
-            if (this._protected) {
-                if (this._input.length < 1) {
-                    return;
-                }
-                API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
-            } else {
-                API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
-            }
-            
-            return;
-        }
-
-        if (this._hovered) { // Hovered
-            if (!this._isTransparent) {
-                API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225); // Darker Black
-            }
-            if (this._isError) {
-                API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 0, 0, 100);
-            } else {
-                API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 150);
-            }
-            
-            if (this._protected) {
-                if (this._input.length < 1) {
-                    return;
-                }
-                API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
-            } else {
-                API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
-            }
-            //API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.5, this.r, this.g, this.b, 255, 4, 1, false, false, (panelMinX * this.Width));
-        } else { // Not Hovered
-            if (!this._isTransparent) {
-                API.drawRectangle(this._xPos, this._yPos, this._width, this._height, 0, 0, 0, 225); // Darker Black
-            }
-            if (this._isError) {
-                API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 0, 0, 100);
-            } else {
-                API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 255, 255, 100);
-            }
-            if (this._protected) {
-                if (this._input.length < 1) {
-                    return;
-                }
-                API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
-            } else {
-                API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
-            }
-            //API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.5, this.r, this.g, this.b, 50, 4, 1, false, false, (panelMinX * this.Width));
-        }
-    }
-
-    isHovered() {
-        if (API.isCursorShown()) {
-            let cursorPos = API.getCursorPositionMantainRatio();
-            if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
-                this._hovered = true;
-            } else {
-                this._hovered = false;
-            }
-        }
-    }
-
-    isError(value) {
+    /** Sets whether or not there is an error. */
+    set isError(value: boolean) {
         this._isError = value;
     }
 
-    setSelected() {
-        selectedInput = this;
-        this._selected = true;
+    /** Sets whether or not this input is selected. */
+    set Selected(value: boolean) {
+        this._selected = value;
+        if (value) {
+            selectedInput = this;
+        } else {
+            selectedInput = null;
+        }
     }
 
-    setUnselected() {
-        this._selected = false;
+    get Selected(): boolean {
+        return this._selected;
     }
 
-    setTransparent() {
-        this._isTransparent = true;
+    // Hover BACKGROUND PARAMETERS
+    /** Set R of RGB on hover background. */
+    set HoverR(value: number) {
+        this._hoverR = value;
     }
 
-    isClicked() {
+    get HoverR(): number {
+        return this._hoverR;
+    }
+    /** Set G of RGB on hover background. */
+    set HoverG(value: number) {
+        this._hoverG = value;
+    }
+
+    get HoverG(): number {
+        return this._hoverG;
+    }
+    /** Set B of RGB on hover background. */
+    set HoverB(value: number) {
+        this._hoverB = value;
+    }
+
+    get HoverB(): number {
+        return this._hoverB;
+    }
+    /** Set Alpha of RGB on hover background. */
+    set HoverAlpha(value: number) {
+        this._hoverAlpha = value;
+    }
+    get HoverAlpha(): number {
+        return this._hoverAlpha;
+    }
+    // Main BACKGROUND PARAMETERS
+    /** Set R of RGB on main background. */
+    set R(value: number) {
+        this._r = value;
+    }
+
+    get R(): number {
+        return this._r;
+    }
+    /** Set G of RGB on main background. */
+    set G(value: number) {
+        this._g = value;
+    }
+
+    get G(): number {
+        return this._g;
+    }
+    /** Set B of RGB on main background. */
+    set B(value: number) {
+        this._b = value;
+    }
+
+    get B(): number {
+        return this._b;
+    }
+    /** Set Alpha of RGB on main background. */
+    set Alpha(value: number) {
+        this._alpha = value;
+    }
+    get Alpha(): number {
+        return this._alpha;
+    }
+    // SELECTION BACKGROUND PARAMETERS
+    /** Set R of RGB on main background. */
+    set SelectR(value: number) {
+        this._selectR = value;
+    }
+
+    get SelectR(): number {
+        return this._selectR;
+    }
+    /** Set G of RGB on main background. */
+    set SelectG(value: number) {
+        this._selectG = value;
+    }
+
+    get SelectG(): number {
+        return this._selectG;
+    }
+    /** Set B of RGB on main background. */
+    set SelectB(value: number) {
+        this._selectB = value;
+    }
+
+    get SelectB(): number {
+        return this._selectB;
+    }
+    /** Set Alpha of RGB on main background. */
+    set SelectAlpha(value: number) {
+        this._selectAlpha = value;
+    }
+    get SelectAlpha(): number {
+        return this._selectAlpha;
+    }
+    /** Sets the input text. */
+    set Input(value: string) {
+        this._input = value;
+    }
+
+    /** Returns whatever the current input is. */
+    get Input(): string {
+        return this._input;
+    }
+
+    /** Removes the last character from the input. */
+    removeFromInput() {
+        this._input = this._input.substring(0, this._input.length - 1);
+    }
+
+    /** Set whether the input should be numeric only. */
+    set NumericOnly(value: boolean) {
+        this._numeric = value;
+    }
+
+    get NumericOnly(): boolean {
+        return this._numeric;
+    }
+    // Draw what we need to draw.
+    draw() {
+        if (this._selected) {
+            this.selectedDraw();
+        }
+
+        if (this._hovered) {
+            this.hoveredDraw();
+        }
+
+        if (!this._hovered && !this._selected) {
+            this.normalDraw();
+        }
+
+        this.isHovered();
+        this.isClicked();
+    }
+
+    private normalDraw() {
+        if (this._isError) {
+            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 0, 0, 100);
+        } else {
+            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, this._r, this._g, this._b, this._alpha);
+        }
+        if (this._protected) {
+            if (this._input.length < 1) {
+                return;
+            }
+            API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+        } else {
+            API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+        }
+    }
+
+    private selectedDraw() {
+        API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, this._selectR, this._selectG, this._selectB, this._selectAlpha);
+        if (this._protected) {
+            if (this._input.length < 1) {
+                return;
+            }
+            API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+        } else {
+            API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+        }
+        return;
+    }
+
+    private hoveredDraw() {
+        if (this._isError) {
+            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, 255, 0, 0, 100);
+        } else {
+            API.drawRectangle(this._xPos + 10, this._yPos + 10, this._width - 20, this._height - 20, this._hoverR, this._hoverG, this._hoverB, this._hoverAlpha);
+        }
+
+        if (this._protected) {
+            if (this._input.length < 1) {
+                return;
+            }
+            API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+        } else {
+            API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+        }
+    }
+
+    private isHovered() {
+        if (!API.isCursorShown()) {
+            return;
+        }
+
+        let cursorPos = API.getCursorPositionMantainRatio();
+        if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
+            this._hovered = true;
+        } else {
+            this._hovered = false;
+        }
+    }
+
+    private isClicked() {
         let cursorPos = API.getCursorPositionMantainRatio();
         if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
             this._selected = true;
@@ -1171,22 +1350,6 @@ class InputPanel {
                 return this._input;
             }
         }
-    }
-
-    setInput(value) {
-        this._input = value;
-    }
-
-    removeFromInput() {
-        this._input = this._input.substring(0, this._input.length - 1);
-    }
-
-    returnInput() {
-        return this._input;
-    }
-
-    setNumericOnly() {
-        this._numeric = true;
     }
 
     returnType() {
@@ -1623,24 +1786,7 @@ function setupMenu(numberOfPages: number) {
 }
 // Add a page to our pages array.
 function createPanel(page: number, xStart: number, yStart: number, xGridWidth: number, yGridHeight: number) {
-    panel = new Panel(xStart, yStart, xGridWidth, yGridHeight);
-    menuElements[page].push(panel);
-    return panel;
-}
-// Add a button to our pages array.
-function createButton(page: number, xStart: number, yStart: number, xGridWidth: number, yGridHeight: number, type: number, text: any) {
-    button = new Button(xStart, yStart, xGridWidth, yGridHeight, type, text);
-    menuElements[page].push(button);
-    return button;
-}
-// Add a static input to our pages array.
-function createInput(page: number, xStart: number, yStart: number, xGridWidth: number, yGridHeight: number, isPasswordProtected: boolean, isSelected: boolean) {
-    panel = new InputPanel(xStart, yStart, xGridWidth, yGridHeight, isPasswordProtected, isSelected);
-    menuElements[page].push(panel);
-    return panel;
-}
-function createImage(page: number, path: string, x: number, y: number, width: number, height: number) {
-    panel = new PanelImage(path, x, y, width, height);
+    panel = new Panel(page, xStart, yStart, xGridWidth, yGridHeight);
     menuElements[page].push(panel);
     return panel;
 }
