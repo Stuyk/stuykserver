@@ -17,12 +17,13 @@ var currentPage = 0;
 var padding = 10;
 // Set to True when your menu is ready.
 var menuIsReady = false;
-var selectedInput = null;
+var selectedInput: InputPanel = null;
 // Animation Stuff
 var animationFrames = 0;
 
 // Tab Indexing for Inputs
 var tabIndex: any = [[]];
+var currentTabIndex: number = 0;
 
 class PlayerTextNotification {
     _xPos: number;
@@ -309,7 +310,6 @@ API.onResourceStart.connect(function () {
     textElement.FontScale = 0.6;
     textElement.Font = 1;
     textElement.HoverAlpha = 100;
-    
     panel.HoverR = 113;
     panel.HoverG = 47;
     panel.HoverB = 38;
@@ -343,6 +343,11 @@ API.onResourceStart.connect(function () {
     textElement.Font = 7;
     textElement.FontScale = 0.3;
     textElement.Centered = true;
+
+    let inputPanel = panel.addInput(0, 12, 8, 1);
+    inputPanel.Input = "test";
+    inputPanel = panel.addInput(0, 13, 8, 1);
+    inputPanel.Input = "test2";
     // Panel 3
     panel = createPanel(0, 20, 3, 8, 5);
     panel.MainBackgroundImage = "clientside/resources/images/backgrounds/background_0.jpg";
@@ -355,6 +360,9 @@ API.onResourceStart.connect(function () {
     panel.FunctionAudioLib = "Enter_Capture_Zone";
     panel.FunctionAudioName = "DLC_Apartments_Drop_Zone_Sounds";
     resource.menu_builder.openMenu(true, false, false, true, false);
+
+    API.sendChatMessage(`Current Length: ${tabIndex.length}`);
+    API.sendChatMessage(`Current Length: ${tabIndex[currentPage].length}`);
 });
 
 
@@ -702,6 +710,7 @@ class Panel {
      * Do not call this. It's specifically used for the menu builder file.
      */
     draw() {
+        this.drawRectangles();
         // Only used if using text lines.
         if (this._textLines.length > 0) {
             for (var i = 0; i < this._textLines.length; i++) {
@@ -715,7 +724,7 @@ class Panel {
             }
         }
         // Normal Panel Draws
-        this.drawRectangles();
+        
         this.isClicked();
         this.isHovered();
     }
@@ -965,16 +974,14 @@ class Panel {
 
     /**
      *
-     * @param x - Start position of X.
-     * @param y - Start Position of Y.
+     * @param x - Start position of X inside the panel.
+     * @param y - Start Position of Y inside the panel.
      * @param width - How wide. Generally the width of your panel.
      * @param height - How tall. 1 or 2 is pretty normal.
      */
     addInput(x: number, y: number, width: number, height: number) {
-        let inputPanel: InputPanel = new InputPanel(x, y, width, height);
+        let inputPanel: InputPanel = new InputPanel(this._page, (x * panelMinX) + this._xPos, (y * panelMinY) + this._yPos, width, height);
         this._inputPanels.push(inputPanel);
-        tabIndex.push(this._page);
-        tabIndex[this._page].push(inputPanel);
         return inputPanel;
     }
 
@@ -1083,8 +1090,10 @@ class InputPanel {
     private _selectG: number;
     private _selectB: number;
     private _selectAlpha: number;
+    private _inputAudioLib: string;
+    private _inputAudioName: string;
 
-    constructor(x, y, width, height) {
+    constructor(page, x, y, width, height) {
         this._xPos = x;
         this._yPos = y;
         this._width = width * panelMinX;
@@ -1108,6 +1117,14 @@ class InputPanel {
         this._selectG = 255;
         this._selectB = 255;
         this._selectAlpha = 125;
+        this._inputAudioLib = "Click";
+        this._inputAudioName = "DLC_HEIST_HACKING_SNAKE_SOUNDS";
+        if (tabIndex[page].length < 1) {
+            tabIndex[page].push(this);
+        } else {
+            tabIndex[page].unshift(this);
+        }
+        
     }
     /** Sets whether or not there is an error. */
     set isError(value: boolean) {
@@ -1318,6 +1335,10 @@ class InputPanel {
 
         let cursorPos = API.getCursorPositionMantainRatio();
         if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
+            if (this._selected) {
+                this._hovered = false;
+                return;
+            }
             this._hovered = true;
         } else {
             this._hovered = false;
@@ -1325,14 +1346,18 @@ class InputPanel {
     }
 
     private isClicked() {
-        let cursorPos = API.getCursorPositionMantainRatio();
-        if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
-            this._selected = true;
-            selectedInput = this;
-            return;
-        } else {
-            this._selected = false;
-            return;
+        if (API.isControlJustPressed(Enums.Controls.CursorAccept)) {
+            let cursorPos = API.getCursorPositionMantainRatio();
+            if (cursorPos.X > this._xPos && cursorPos.X < (this._xPos + this._width) && cursorPos.Y > this._yPos && cursorPos.Y < (this._yPos + this._height)) {
+                if (!this._selected) {
+                    API.playSoundFrontEnd(this._inputAudioLib, this._inputAudioName);
+                    this._selected = true;
+                }
+                selectedInput = this;
+            } else {
+                this._selected = false;
+                selectedInput = null;
+            }
         }
     }
 
@@ -1381,6 +1406,20 @@ API.onUpdate.connect(function () {
 // On-Keydown Event
 API.onKeyDown.connect(function (sender, e) {
     if (!menuIsReady) {
+        return;
+    }
+
+    // Shift between Input Boxes.
+    if (e.KeyCode == Keys.Tab) {
+        currentTabIndex += 1;
+        if (selectedInput !== null) {
+            selectedInput.Selected = false;
+        }
+        if (currentTabIndex > tabIndex[currentPage].length - 1) {
+            currentTabIndex = 0;
+        }
+        selectedInput = tabIndex[currentPage][currentTabIndex];
+        selectedInput.Selected = true;
         return;
     }
 
@@ -1782,6 +1821,7 @@ function setupMenu(numberOfPages: number) {
     for (var i = 0; i < numberOfPages; i++) {
         let emptyArray = [];
         menuElements.push(emptyArray);
+        tabIndex.push(i);
     }
 }
 // Add a page to our pages array.
