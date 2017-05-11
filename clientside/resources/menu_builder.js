@@ -9,16 +9,11 @@ var notification = null;
 var notifications = [];
 var textnotification = null;
 var textnotifications = [];
-var currentMenu = 0;
 var padding = 10;
-// Set to True when your menu is ready.
 var selectedInput = null;
-// Animation Stuff
-var animationFrames = 0;
-// Tab Indexing for Inputs
-//var tabIndex = [];
-//var currentTabIndex: number = 0;
 // Menu Properties
+var tabIndex = [];
+var tab = 0;
 var menuElements = [];
 var isReady = false;
 var currentPage = 0;
@@ -71,6 +66,7 @@ class Menu {
             let emptyArray = [];
             menuElements.push(emptyArray);
         }
+        this._blur = false;
     }
     /** Start drawing our menu. */
     set Ready(value) {
@@ -78,6 +74,32 @@ class Menu {
     }
     get Ready() {
         return isReady;
+    }
+    /** Used to blur the background behind the menu. */
+    set Blur(value) {
+        this._blur = value;
+        if (value) {
+            API.callNative("_TRANSITION_TO_BLURRED", 3000);
+        }
+        else {
+            API.callNative("_TRANSITION_FROM_BLURRED", 3000);
+        }
+    }
+    get Blur() {
+        return this._blur;
+    }
+    set DisableOverlays(value) {
+        this._overlays = value;
+        if (value) {
+            API.setHudVisible(false);
+            API.setChatVisible(false);
+            API.setCanOpenChat(false);
+        }
+        else {
+            API.setHudVisible(true);
+            API.setChatVisible(true);
+            API.setCanOpenChat(true);
+        }
     }
     nextPage() {
         if (currentPage + 1 > menuElements.length - 1) {
@@ -273,7 +295,6 @@ class Notification {
         return;
     }
     cleanUpNotification() {
-        animationFrames = 0;
         notification = null;
     }
     setText(value) {
@@ -863,7 +884,8 @@ class InputPanel {
         this._selectAlpha = 125;
         this._inputAudioLib = "Click";
         this._inputAudioName = "DLC_HEIST_HACKING_SNAKE_SOUNDS";
-        // Tab Indezx
+        this._page = page;
+        tabIndex.push(this);
     }
     /** Sets whether or not there is an error. */
     set isError(value) {
@@ -1120,30 +1142,73 @@ class InputPanel {
         return "InputPanel";
     }
 }
+function drawTextNotification() {
+    if (textnotification !== null) {
+        textnotification.draw();
+        return;
+    }
+    if (textnotifications.length <= 0) {
+        return;
+    }
+    textnotification = textnotifications.shift();
+    return;
+}
+function drawNotification() {
+    if (notification !== null) {
+        notification.draw();
+        return;
+    }
+    if (notifications.length <= 0) {
+        return;
+    }
+    notification = notifications.shift();
+    return;
+}
+function createNotification(page, text, displayTime) {
+    // Add to queue.
+    let notify = new Notification(text, displayTime);
+    notifications.push(notify);
+    return notify;
+}
+function createPlayerTextNotification(text) {
+    let notify = new PlayerTextNotification(text);
+    textnotifications.push(notify);
+    return notify;
+}
+function createProgressBar(page, x, y, width, height, currentProgress) {
+    let bar = new ProgressBar(x, y, width, height, currentProgress);
+    menuElements[page].push(bar);
+    return bar;
+}
+function killMenu() {
+    isReady = false;
+    selectedInput = null;
+    API.showCursor(false);
+    API.setHudVisible(true);
+    API.setChatVisible(true);
+    API.setCanOpenChat(true);
+    API.callNative("_TRANSITION_FROM_BLURRED", 3000);
+    menuElements = [[]];
+    currentPage = 0;
+}
 // On-Keydown Event
 API.onKeyDown.connect(function (sender, e) {
     if (!isReady) {
         return;
     }
     // Shift between Input Boxes.
-    /*
     if (e.KeyCode == Keys.Tab) {
-        if (selectedInput !== null) {
-            selectedInput.Selected = false;
+        if (tabIndex[0].Selected) {
+            tabIndex[0].Selected = false;
         }
-        if (currentTabIndex + 1 >= tabIndex[currentPage].length - 1) {
-            
-            currentTabIndex = 0;
-            selectedInput = tabIndex[currentPage][currentTabIndex];
-            selectedInput.Selected = true;
+        else {
+            tabIndex[0].Selected = true;
             return;
         }
-        currentTabIndex++
-        selectedInput = tabIndex[currentPage][currentTabIndex];
-        selectedInput.Selected = true;
-        //API.sendChatMessage(`Less Than 1: ${currentTabIndex}`);
-        return;
-    }*/
+        let removeItem = tabIndex.shift();
+        tabIndex.push(removeItem);
+        tabIndex[0].Selected = true;
+    }
     if (selectedInput === null) {
         return;
     }
@@ -1468,117 +1533,3 @@ API.onKeyDown.connect(function (sender, e) {
         return;
     }
 });
-function drawTextNotification() {
-    if (textnotification !== null) {
-        textnotification.draw();
-        return;
-    }
-    if (textnotifications.length <= 0) {
-        return;
-    }
-    textnotification = textnotifications.shift();
-    return;
-}
-function drawNotification() {
-    if (notification !== null) {
-        notification.draw();
-        return;
-    }
-    if (notifications.length <= 0) {
-        return;
-    }
-    notification = notifications.shift();
-    return;
-}
-function createNotification(page, text, displayTime) {
-    // Add to queue.
-    let notify = new Notification(text, displayTime);
-    notifications.push(notify);
-    return notify;
-}
-function createPlayerTextNotification(text) {
-    let notify = new PlayerTextNotification(text);
-    textnotifications.push(notify);
-    return notify;
-}
-function createProgressBar(page, x, y, width, height, currentProgress) {
-    let bar = new ProgressBar(x, y, width, height, currentProgress);
-    menuElements[page].push(bar);
-    return bar;
-}
-// Clears the menu entirely.
-function exitMenu(cursor, hud, chat, blur, canOpenChat) {
-    isReady = false;
-    if (cursor) {
-        API.showCursor(true);
-    }
-    else {
-        API.showCursor(false);
-    }
-    if (hud) {
-        API.setHudVisible(true);
-    }
-    else {
-        API.setHudVisible(false);
-    }
-    if (chat) {
-        API.setChatVisible(true);
-    }
-    else {
-        API.setChatVisible(false);
-    }
-    if (blur) {
-        API.callNative("_TRANSITION_FROM_BLURRED", 3000);
-    }
-    if (canOpenChat) {
-        API.setCanOpenChat(true);
-    }
-    else {
-        API.setCanOpenChat(false);
-    }
-    menuElements = [[]];
-    selectedInput = null;
-    currentPage = 0;
-}
-function killMenu() {
-    isReady = false;
-    selectedInput = null;
-    API.showCursor(false);
-    API.setHudVisible(true);
-    API.setChatVisible(true);
-    API.setCanOpenChat(true);
-    API.callNative("_TRANSITION_FROM_BLURRED", 3000);
-    menuElements = [[]];
-    currentPage = 0;
-}
-function openMenu(cursor, hud, chat, blur, canOpenChat) {
-    if (blur === true) {
-        API.callNative("_TRANSITION_TO_BLURRED", 3000);
-    }
-    currentPage = 0;
-    isReady = true;
-    if (cursor) {
-        API.showCursor(true);
-    }
-    else {
-        API.showCursor(false);
-    }
-    if (hud) {
-        API.setHudVisible(true);
-    }
-    else {
-        API.setHudVisible(false);
-    }
-    if (chat) {
-        API.setChatVisible(true);
-    }
-    else {
-        API.setChatVisible(false);
-    }
-    if (canOpenChat) {
-        API.setCanOpenChat(true);
-    }
-    else {
-        API.setCanOpenChat(false);
-    }
-}

@@ -9,23 +9,15 @@ var notification = null;
 var notifications = [];
 var textnotification = null;
 var textnotifications = [];
-var currentMenu = 0;
 var padding = 10;
-// Set to True when your menu is ready.
-
 var selectedInput: InputPanel = null;
-// Animation Stuff
-var animationFrames = 0;
-
-// Tab Indexing for Inputs
-//var tabIndex = [];
-//var currentTabIndex: number = 0;
 
 // Menu Properties
+var tabIndex = [];
+var tab: number = 0;
 var menuElements = [];
 var isReady = false;
 var currentPage = 0;
-
 var clickDelay = new Date().getTime();
 
 // On-Update Event -- Draws all of our stuff.
@@ -77,15 +69,19 @@ function createMenu(pages: number) {
 }
 
 class Menu {
+    private _blur: boolean;
+    private _overlays: boolean;
+
     constructor(pages: number) {
         if (Array.isArray(menuElements[0])) {
             return;
         }
+
         for (var i = 0; i < pages; i++) {
             let emptyArray = [];
             menuElements.push(emptyArray);
-            //tabIndex.push(i);
         }
+        this._blur = false;
     }
 
     /** Start drawing our menu. */
@@ -95,6 +91,33 @@ class Menu {
 
     get Ready(): boolean {
         return isReady;
+    }
+
+    /** Used to blur the background behind the menu. */
+    set Blur(value: boolean) {
+        this._blur = value;
+        if (value) {
+            API.callNative("_TRANSITION_TO_BLURRED", 3000);
+        } else {
+            API.callNative("_TRANSITION_FROM_BLURRED", 3000);
+        }
+    }
+
+    get Blur(): boolean {
+        return this._blur;
+    }
+
+    set DisableOverlays(value: boolean) {
+        this._overlays = value;
+        if (value) {
+            API.setHudVisible(false);
+            API.setChatVisible(false);
+            API.setCanOpenChat(false);
+        } else {
+            API.setHudVisible(true);
+            API.setChatVisible(true);
+            API.setCanOpenChat(true);
+        }
     }
 
     public nextPage() {
@@ -363,7 +386,6 @@ class Notification {
     }
 
     cleanUpNotification() {
-        animationFrames = 0;
         notification = null;
     }
 
@@ -1121,6 +1143,8 @@ class InputPanel {
     private _selectAlpha: number;
     private _inputAudioLib: string;
     private _inputAudioName: string;
+    private _page: number;
+    private _tabIndex: number;
 
     constructor(page, x, y, width, height) {
         this._xPos = x;
@@ -1148,7 +1172,8 @@ class InputPanel {
         this._selectAlpha = 125;
         this._inputAudioLib = "Click";
         this._inputAudioName = "DLC_HEIST_HACKING_SNAKE_SOUNDS";
-        // Tab Indezx
+        this._page = page;
+        tabIndex.push(this);
     }
     /** Sets whether or not there is an error. */
     set isError(value: boolean) {
@@ -1429,6 +1454,63 @@ class InputPanel {
     }
 }
 
+function drawTextNotification() {
+    if (textnotification !== null) {
+        textnotification.draw();
+        return;
+    }
+
+    if (textnotifications.length <= 0) {
+        return;
+    }
+
+    textnotification = textnotifications.shift();
+    return;
+}
+
+function drawNotification() {
+    if (notification !== null) {
+        notification.draw();
+        return;
+    }
+
+    if (notifications.length <= 0) {
+        return;
+    }
+
+    notification = notifications.shift();
+    return;
+}
+
+function createNotification(page: number, text: string, displayTime: number) {
+    // Add to queue.
+    let notify = new Notification(text, displayTime);
+    notifications.push(notify);
+    return notify;
+}
+function createPlayerTextNotification(text: string) {
+    let notify = new PlayerTextNotification(text);
+    textnotifications.push(notify);
+    return notify;
+}
+function createProgressBar(page: number, x: number, y: number, width: number, height: number, currentProgress: number) {
+    let bar = new ProgressBar(x, y, width, height, currentProgress);
+    menuElements[page].push(bar);
+    return bar;
+}
+
+function killMenu() {
+    isReady = false;
+    selectedInput = null;
+    API.showCursor(false);
+    API.setHudVisible(true);
+    API.setChatVisible(true);
+    API.setCanOpenChat(true);
+    API.callNative("_TRANSITION_FROM_BLURRED", 3000);
+    menuElements = [[]];
+    currentPage = 0;
+}
+
 // On-Keydown Event
 API.onKeyDown.connect(function (sender, e) {
     if (!isReady) {
@@ -1436,24 +1518,17 @@ API.onKeyDown.connect(function (sender, e) {
     }
 
     // Shift between Input Boxes.
-    /*
     if (e.KeyCode == Keys.Tab) {
-        if (selectedInput !== null) {
-            selectedInput.Selected = false;
-        }
-        if (currentTabIndex + 1 >= tabIndex[currentPage].length - 1) {
-            
-            currentTabIndex = 0;
-            selectedInput = tabIndex[currentPage][currentTabIndex];
-            selectedInput.Selected = true;
+        if (tabIndex[0].Selected) {
+            tabIndex[0].Selected = false;
+        } else {
+            tabIndex[0].Selected = true;
             return;
         }
-        currentTabIndex++
-        selectedInput = tabIndex[currentPage][currentTabIndex];
-        selectedInput.Selected = true;
-        //API.sendChatMessage(`Less Than 1: ${currentTabIndex}`);
-        return;
-    }*/
+        let removeItem = tabIndex.shift();
+        tabIndex.push(removeItem);
+        tabIndex[0].Selected = true;
+    }
 
     if (selectedInput === null) {
         return;
@@ -1783,128 +1858,3 @@ API.onKeyDown.connect(function (sender, e) {
         return;
     }
 });
-
-function drawTextNotification() {
-    if (textnotification !== null) {
-        textnotification.draw();
-        return;
-    }
-
-    if (textnotifications.length <= 0) {
-        return;
-    }
-
-    textnotification = textnotifications.shift();
-    return;
-}
-function drawNotification() {
-    if (notification !== null) {
-        notification.draw();
-        return;
-    }
-
-    if (notifications.length <= 0) {
-        return;
-    }
-
-    notification = notifications.shift();
-    return;
-}
-
-function createNotification(page: number, text: string, displayTime: number) {
-    // Add to queue.
-    let notify = new Notification(text, displayTime);
-    notifications.push(notify);
-    return notify;
-}
-function createPlayerTextNotification(text: string) {
-    let notify = new PlayerTextNotification(text);
-    textnotifications.push(notify);
-    return notify;
-}
-function createProgressBar(page: number, x: number, y: number, width: number, height: number, currentProgress: number) {
-    let bar = new ProgressBar(x, y, width, height, currentProgress);
-    menuElements[page].push(bar);
-    return bar;
-}   
-// Clears the menu entirely.
-function exitMenu(cursor: boolean, hud: boolean, chat: boolean, blur: boolean, canOpenChat: boolean) {
-    isReady = false;
-    
-    if (cursor) {
-        API.showCursor(true);
-    } else {
-        API.showCursor(false);
-    }
-
-    if (hud) {
-        API.setHudVisible(true);
-    } else {
-        API.setHudVisible(false);
-    }
-    
-    if (chat) {
-        API.setChatVisible(true);
-    } else {
-        API.setChatVisible(false);
-    }
-
-    if (blur) {
-        API.callNative("_TRANSITION_FROM_BLURRED", 3000);
-    }
-
-    if (canOpenChat) {
-        API.setCanOpenChat(true);
-    } else {
-        API.setCanOpenChat(false);
-    }
-
-    menuElements = [[]];
-    selectedInput = null;
-    currentPage = 0;
-}
-
-function killMenu() {
-    isReady = false;
-    selectedInput = null;
-    API.showCursor(false);
-    API.setHudVisible(true);
-    API.setChatVisible(true);
-    API.setCanOpenChat(true);
-    API.callNative("_TRANSITION_FROM_BLURRED", 3000);
-    menuElements = [[]];
-    currentPage = 0;
-}
-
-function openMenu(cursor: boolean, hud: boolean, chat: boolean, blur: boolean, canOpenChat: boolean) {
-    if (blur === true) {
-        API.callNative("_TRANSITION_TO_BLURRED", 3000);
-    }
-
-    currentPage = 0;
-    isReady = true;
-
-    if (cursor) {
-        API.showCursor(true);
-    } else {
-        API.showCursor(false);
-    }
-
-    if (hud) {
-        API.setHudVisible(true);
-    } else {
-        API.setHudVisible(false);
-    }
-
-    if (chat) {
-        API.setChatVisible(true);
-    } else {
-        API.setChatVisible(false);
-    }
-
-    if (canOpenChat) {
-        API.setCanOpenChat(true);
-    } else {
-        API.setCanOpenChat(false);
-    }
-}
