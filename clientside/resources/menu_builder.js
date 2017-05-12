@@ -469,6 +469,12 @@ class TextElement {
     get Centered() {
         return this._centered;
     }
+    /**
+     *  Set Offset
+     */
+    set Offset(value) {
+        this._offset = value;
+    }
     drawAsCenteredAll() {
         if (this._hovered) {
             API.drawText(this._text, this._offset + this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 20, this._fontScale, this._hoverTextR, this._hoverTextG, this._hoverTextB, this._hoverTextAlpha, this._font, 1, this._shadow, this._outline, this._width);
@@ -597,12 +603,7 @@ class Panel {
     }
     /** Add an array or a single value as a function. IMPORTANT! Any function you write must be able to take an array of arguments. */
     addFunctionArgs(value) {
-        if (Array.isArray(value)) {
-            this._functionArgs = value;
-        }
-        else {
-            this._functionArgs.push(value);
-        }
+        this._functionArgs = value;
     }
     // HOVER AUDIO
     /** Sets the hover audio library. Ex: "Cycle_Item" */
@@ -842,7 +843,12 @@ class Panel {
                 if (this._functionClickAudio) {
                     API.playSoundFrontEnd(this._functionAudioLib, this._functionAudioName);
                 }
-                this._function();
+                if (this._functionArgs !== null || this._functionArgs.length > 1) {
+                    this._function(this._functionArgs);
+                }
+                else {
+                    this._function();
+                }
                 return;
             }
         }
@@ -1027,6 +1033,11 @@ class InputPanel {
     }
     get NumericOnly() {
         return this._numeric;
+    }
+    /**
+     *  Sets whether the input should be protected or not. */
+    set Protected(value) {
+        this._protected = value;
     }
     // Draw what we need to draw.
     draw() {
