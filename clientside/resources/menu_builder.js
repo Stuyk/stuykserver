@@ -918,10 +918,15 @@ class InputPanel {
         this._selectR = 255;
         this._selectG = 255;
         this._selectB = 255;
+        this._inputTextR = 0;
+        this._inputTextG = 0;
+        this._inputTextB = 0;
+        this._inputTextAlpha = 255;
         this._selectAlpha = 125;
         this._inputAudioLib = "Click";
         this._inputAudioName = "DLC_HEIST_HACKING_SNAKE_SOUNDS";
         this._page = page;
+        this._inputTextScale = 0.45;
         tabIndex.push(this);
     }
     /** Sets whether or not there is an error. */
@@ -1046,6 +1051,54 @@ class InputPanel {
     get SelectAlpha() {
         return this._selectAlpha;
     }
+    /**
+     *  Sets the RGB Parameter for the INPUT Text;
+     * @param r
+     * @param g
+     * @param b
+     * @param alpha
+     */
+    InputTextColor(r, g, b, alpha) {
+        this._inputTextR = r;
+        this._inputTextG = g;
+        this._inputTextB = b;
+        this._inputTextAlpha = alpha;
+    }
+    /** Set R of RGB on input text. */
+    set TextR(value) {
+        this._inputTextR = value;
+    }
+    get TextR() {
+        return this._inputTextR;
+    }
+    /** Set G of RGB on input text. */
+    set TextG(value) {
+        this._inputTextG = value;
+    }
+    get TextG() {
+        return this._inputTextG;
+    }
+    /** Set B of RGB on input text. */
+    set TextB(value) {
+        this._inputTextB = value;
+    }
+    get InputB() {
+        return this._inputTextB;
+    }
+    /** Set Alpha of RGB on input text. */
+    set InputAlpha(value) {
+        this._inputTextAlpha = value;
+    }
+    get InputAlpha() {
+        return this._inputTextAlpha;
+    }
+    /** Input Text Size */
+    set InputTextScale(value) {
+        this._inputTextScale = value;
+    }
+    get InputTextScale() {
+        return this._inputTextScale;
+    }
     /** Sets the input text. */
     set Input(value) {
         this._input = value;
@@ -1095,10 +1148,10 @@ class InputPanel {
             if (this._input.length < 1) {
                 return;
             }
-            API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, this._inputTextScale, this._inputTextR, this._inputTextG, this._inputTextB, this._inputTextAlpha, 4, 1, false, false, (panelMinX * this._width));
         }
         else {
-            API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, this._inputTextScale, this._inputTextR, this._inputTextG, this._inputTextB, this._inputTextAlpha, 4, 1, false, false, (panelMinX * this._width));
         }
     }
     selectedDraw() {
@@ -1107,10 +1160,10 @@ class InputPanel {
             if (this._input.length < 1) {
                 return;
             }
-            API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, this._inputTextScale, this._inputTextR, this._inputTextG, this._inputTextB, this._inputTextAlpha, 4, 1, false, false, (panelMinX * this._width));
         }
         else {
-            API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, this._inputTextScale, this._inputTextR, this._inputTextG, this._inputTextB, this._inputTextAlpha, 4, 1, false, false, (panelMinX * this._width));
         }
         return;
     }
@@ -1125,10 +1178,10 @@ class InputPanel {
             if (this._input.length < 1) {
                 return;
             }
-            API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            API.drawText("*".repeat(this._input.length), this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, this._inputTextScale, this._inputTextR, this._inputTextG, this._inputTextB, this._inputTextAlpha, 4, 1, false, false, (panelMinX * this._width));
         }
         else {
-            API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, 0.4, 0, 0, 0, 255, 4, 1, false, false, (panelMinX * this._width));
+            API.drawText(this._input, this._xPos + (this._width / 2), this._yPos + (this._height / 2) - 14, this._inputTextScale, this._inputTextR, this._inputTextG, this._inputTextB, this._inputTextAlpha, 4, 1, false, false, (panelMinX * this._width));
         }
     }
     isHovered() {
