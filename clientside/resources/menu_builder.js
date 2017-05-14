@@ -88,17 +88,28 @@ class Menu {
     get Blur() {
         return this._blur;
     }
-    set DisableOverlays(value) {
+    /** Get the current menu page number or set the current menu page number */
+    set Page(value) {
+        currentPage = value;
+    }
+    get Page() {
+        return currentPage;
+    }
+    DisableOverlays(value) {
         this._overlays = value;
         if (value) {
             API.setHudVisible(false);
             API.setChatVisible(false);
             API.setCanOpenChat(false);
+            API.showCursor(true);
+            return;
         }
-        else {
+        if (!value) {
             API.setHudVisible(true);
             API.setChatVisible(true);
             API.setCanOpenChat(true);
+            API.showCursor(false);
+            return;
         }
     }
     nextPage() {
@@ -372,6 +383,12 @@ class TextElement {
         this._fontG = g;
         this._fontB = b;
         this._fontAlpha = a;
+    }
+    HoverColor(r, g, b, a) {
+        this._hoverTextR = r;
+        this._hoverTextG = g;
+        this._hoverTextB = b;
+        this._hoverTextAlpha = a;
     }
     /** Sets the color for RGB of R type. Max of 255 */
     set R(value) {
@@ -1190,6 +1207,13 @@ function createProgressBar(page, x, y, width, height, currentProgress) {
     let bar = new ProgressBar(x, y, width, height, currentProgress);
     menuElements[page].push(bar);
     return bar;
+}
+/**
+ * Set the page number for whatever current menu is open.
+ * @param value
+ */
+function setPage(value) {
+    currentPage = value;
 }
 function killMenu() {
     isReady = false;

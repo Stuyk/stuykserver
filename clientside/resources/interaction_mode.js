@@ -11,6 +11,9 @@ API.onUpdate.connect(function () {
     if (API.isChatOpen()) {
         return;
     }
+    if (API.isCursorShown()) {
+        return;
+    }
     var playerPOS = API.getEntityPosition(API.getLocalPlayer());
     if (target !== null) {
         if (playerPOS.DistanceTo(API.getEntityPosition(target)) >= 10) {

@@ -19,6 +19,9 @@ API.onUpdate.connect(function () {
         return;
     }
     // Display all of our shit.
+    if (API.isCursorShown()) {
+        return;
+    }
     cashDisplay();
     karmaDisplay();
     fuelDisplay();

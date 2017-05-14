@@ -123,7 +123,9 @@ function setupCamera() {
 // Handle Barber HUD
 function drawBarberShopHud() {
     // Black Background
-    API.drawRectangle(0, 0, (resX / 4), resY, 0, 0, 0, 150);
+    API.
+        
+        (0, 0, (resX / 4), resY, 0, 0, 0, 150);
     // Blue Header + Text
     API.drawRectangle(0, 0, (resX / 4), (resY / 16), 54, 117, 219, 255);
     API.drawText("Barbershop", (resX / 4) / 2, 0, 1, 255, 255, 255, 255, 1, 1, false, false, 500);

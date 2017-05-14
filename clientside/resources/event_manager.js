@@ -61,11 +61,7 @@ API.onServerEventTrigger.connect(function (event, args) {
         // CEF BROWSER EVENTS - browser_manager.js
         //=========================================
         case "showLogin":
-            API.setHudVisible(true);
-            API.setChatVisible(true);
-            //API.startAudio("clientside/resources/audio/trulyyours.mp3", true);
-            //API.setGameVolume(0.1);
-            //resource.menu_eula.menuEULA();
+            resource.menu_login.menuLoginPanel();
             return;
         case "showInvalidName":
             resource.browser_manager.showCEF("clientside/resources/invalidname.html");
@@ -185,7 +181,6 @@ API.onServerEventTrigger.connect(function (event, args) {
             API.sleep(4000);
             resource.menu_builder.killMenu();
             // Panel Message
-            resource.menu_login.loginStopActivity();
             panel = resource.menu_builder.createNotification(0, "~g~Successfully Logged In", 3000);
             panel.setColor(0, 255, 0);
             // Transition In
