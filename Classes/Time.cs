@@ -5,7 +5,7 @@ namespace stuykserver.Classes
 {
     public class Time : Script
     {
-        static TimeSpan addOnTime = new TimeSpan(0, 5, 0);
+        static TimeSpan addOnTime = new TimeSpan(0, 2, 0);
         private TimeSpan serverTime = new TimeSpan(11, 55, 0);
         private int tick;
 
@@ -31,7 +31,6 @@ namespace stuykserver.Classes
             serverTime = API.getTime();
             serverTime = serverTime.Add(addOnTime);
             API.setTime(serverTime.Hours, serverTime.Minutes);
-            API.consoleOutput("In-Game Time is now: {0}", serverTime);
         }
 
         private void API_onResourceStart()
