@@ -26,7 +26,6 @@
   <script src="clientside/resources/sandbox.js" type="client" lang="javascript" />
   
   <script src="clientside/resources/menu_builder.js" type="client" lang="javascript" />
-  <script src="clientside/resources/menu_eula.js" type="client" lang="javascript" />
   <script src="clientside/resources/menu_login.js" type="client" lang="javascript" />
   <script src="clientside/resources/menu_atm.js" type="client" lang="javascript" />
 

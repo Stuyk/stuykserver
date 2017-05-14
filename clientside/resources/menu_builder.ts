@@ -20,6 +20,9 @@ var isReady = false;
 var currentPage = 0;
 var clickDelay = new Date().getTime();
 
+// Current Menu
+var menu: Menu = null;
+
 // On-Update Event -- Draws all of our stuff.
 API.onUpdate.connect(function () {
     // Notifications can be global.
@@ -30,33 +33,14 @@ API.onUpdate.connect(function () {
         return;
     }
 
-    if (menuElements.length < 1) {
-        return;
-    }
-
-    if (currentPage === null) {
-        return;
-    }
-
-    if (!Array.isArray(menuElements[currentPage])) {
-        return;
-    }
-
-    if (menuElements[currentPage].length < 1) {
-        return;
-    }
-
     for (var i = 0; i < menuElements[currentPage].length; i++) {
+        if (!isReady) {
+            break;
+        }
         menuElements[currentPage][i].draw();
         menuElements[currentPage][i].isHovered();
         menuElements[currentPage][i].isClicked();
     }
-
-    // 0 - 1
-    // Page - Page
-    // Panel - Panel
-    // Panel - Panel
-    // Panel - Panel
 });
 
 /**
@@ -64,7 +48,14 @@ API.onUpdate.connect(function () {
  * @param pages - Number of pages.
  */
 function createMenu(pages: number) {
-    let menu = new Menu(pages);
+    if (menu !== null) {
+        isReady = false;
+        currentPage = 0;
+        selectedInput = null;
+        tabIndex = [];
+        menuElements = [];
+    }
+    menu = new Menu(pages);
     return menu;
 }
 
@@ -87,6 +78,7 @@ class Menu {
     /** Start drawing our menu. */
     set Ready(value: boolean) {
         isReady = value;
+        currentPage = 0;
     }
 
     get Ready(): boolean {
@@ -133,6 +125,18 @@ class Menu {
             API.showCursor(false);
             return;
         }
+    }
+
+    /**
+     *  Delete any open menu instances.
+     */
+    public killMenu() {
+        isReady = false;
+        API.showCursor(false);
+        API.setHudVisible(true);
+        API.setChatVisible(true);
+        API.setCanOpenChat(true);
+        API.callNative("_TRANSITION_FROM_BLURRED", 3000);
     }
 
     public nextPage() {
@@ -504,6 +508,11 @@ class TextElement {
         this.drawAsNormal();
     }
 
+    //** Sets the text */
+    set Text(value: string) {
+        this._text = value;
+    }
+
     //** Is this text element in a hover state? */
     set Hovered(value: boolean) {
         this._hovered = value;
@@ -778,7 +787,11 @@ class Panel {
         }
 
         this.drawRectangles();
-        
+
+        if (!isReady) {
+            return;
+        }
+
         // Only used if using text lines.
         if (this._textLines.length > 0) {
             for (var i = 0; i < this._textLines.length; i++) {
@@ -1547,14 +1560,15 @@ function setPage(value: number) {
 
 function killMenu() {
     isReady = false;
+    currentPage = -1;
     selectedInput = null;
+    tabIndex = [];
     API.showCursor(false);
     API.setHudVisible(true);
     API.setChatVisible(true);
     API.setCanOpenChat(true);
     API.callNative("_TRANSITION_FROM_BLURRED", 3000);
-    menuElements = [[]];
-    currentPage = 0;
+    menuElements = [];
 }
 
 // On-Keydown Event
