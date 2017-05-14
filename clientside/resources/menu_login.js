@@ -15,6 +15,7 @@ function menuLoginPanel() {
     // EULA Header Panel
     panel = menu.createPanel(0, 12, 4, 8, 1);
     panel.MainBackgroundColor(0, 0, 0, 175);
+    panel.Header = true;
     textElement = panel.addText("EULA");
     textElement.Color(255, 255, 255, 255);
     textElement.Centered = true;
@@ -45,6 +46,7 @@ function menuLoginPanel() {
     // Login Header Panel
     panel = menu.createPanel(1, 12, 4, 7, 1);
     panel.MainBackgroundColor(0, 0, 0, 175);
+    panel.Header = true;
     textElement = panel.addText("Login");
     textElement.Color(255, 255, 255, 255);
     textElement.Centered = false;
@@ -58,6 +60,7 @@ function menuLoginPanel() {
     panel.Function = menu.nextPage;
     panel.HoverBackgroundColor(25, 25, 25, 160);
     panel.Hoverable = true;
+    panel.Header = true;
     textElement = panel.addText(">");
     textElement.Color(255, 255, 255, 255);
     textElement.Centered = true;
@@ -91,6 +94,7 @@ function menuLoginPanel() {
     // Login Header Panel
     panel = menu.createPanel(2, 12, 4, 7, 1);
     panel.MainBackgroundColor(0, 0, 0, 175);
+    panel.Header = true;
     textElement = panel.addText("Registration");
     textElement.Color(255, 255, 255, 255);
     textElement.Centered = false;
@@ -104,6 +108,7 @@ function menuLoginPanel() {
     panel.Function = menu.prevPage;
     panel.HoverBackgroundColor(25, 25, 25, 160);
     panel.Hoverable = true;
+    panel.Header = true;
     textElement = panel.addText("<");
     textElement.Color(255, 255, 255, 255);
     textElement.Centered = true;

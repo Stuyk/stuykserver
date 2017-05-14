@@ -42,6 +42,7 @@ function menuATMPanel() {
     // Page 0 - Landing ========================
     panel = menu.createPanel(0, 12, 4, 7, 1);
     panel.MainBackgroundColor(0, 0, 0, 175);
+    panel.Header = true;
     textElement = panel.addText("ATM");
     textElement.Color(255, 255, 255, 255);
     textElement.VerticalCentered = true;
@@ -56,6 +57,7 @@ function menuATMPanel() {
         panel.Function = exitAtm;
         panel.HoverBackgroundColor(25, 25, 25, 160);
         panel.Hoverable = true;
+        panel.Header = true;
         textElement = panel.addText("X");
         textElement.Color(255, 255, 255, 255);
         textElement.Centered = true;
@@ -69,6 +71,7 @@ function menuATMPanel() {
             panel.Function = goToLanding;
             panel.HoverBackgroundColor(25, 25, 25, 160);
             panel.Hoverable = true;
+            panel.Header = true;
             textElement = panel.addText("<");
             textElement.Color(255, 255, 255, 255);
             textElement.Centered = true;
@@ -113,6 +116,7 @@ function menuATMPanel() {
     // Withdraw
     panel = menu.createPanel(1, 13, 4, 6, 1);
     panel.MainBackgroundColor(0, 0, 0, 175);
+    panel.Header = true;
     textElement = panel.addText("Withdraw");
     textElement.Color(255, 255, 255, 255);
     textElement.VerticalCentered = true;
@@ -151,6 +155,7 @@ function menuATMPanel() {
     // Deposit
     panel = menu.createPanel(2, 13, 4, 6, 1);
     panel.MainBackgroundColor(0, 0, 0, 175);
+    panel.Header = true;
     textElement = panel.addText("Deposit");
     textElement.Color(255, 255, 255, 255);
     textElement.VerticalCentered = true;

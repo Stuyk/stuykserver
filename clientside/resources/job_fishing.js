@@ -20,6 +20,7 @@ var notificationSentBoat = false;
 var posX = API.getScreenResolutionMantainRatio().Width;
 var posY = API.getScreenResolutionMantainRatio().Height;
 var fishingBugOutTimer = new Date().getTime(); // Used to cancel the event if something isn't happening.
+var menu;
 API.onUpdate.connect(function () {
     if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
         return;
@@ -79,19 +80,19 @@ API.onUpdate.connect(function () {
                     }
                     return;
                 case 2:
-                    let currentInput = inputBox.returnInput();
+                    let currentInput = inputBox.Input;
                     if (currentInput.length < 1) {
                         return;
                     }
                     if (currentInput === word.substring(0, currentInput.length)) {
-                        wordPanel.setText(`Type: ~g~${word.substring(0, currentInput.length)}~w~${word.substring(currentInput.length, word.length)}`);
+                        wordPanel.Text = `Type: ~g~${word.substring(0, currentInput.length)}~w~${word.substring(currentInput.length, word.length)}`;
                     }
                     else {
                         API.triggerServerEvent("FishingFail");
                     }
                     if (currentInput.length === word.length) {
                         phase = 4;
-                        API.triggerServerEvent("FishingVerify", inputBox.returnInput());
+                        API.triggerServerEvent("FishingVerify", inputBox.Input);
                     }
                     return;
             }
@@ -197,31 +198,45 @@ function wordIsReady(value) {
 }
 function drawFishingMenus() {
     phase = 1;
-    resource.menu_builder.setupMenu(2);
     // Page 1
-    let panel = resource.menu_builder.createPanel(0, 12, 4, 7, 1, true, "Fishing");
-    panel.Centered = true;
-    panel.TextScale = 0.8;
-    panel.Font = 7;
-    panel = resource.menu_builder.createPanel(0, 12, 5, 7, 2, false, "Press ~b~F ~w~when your progress bar is maxed out.");
-    panel.Centered = true;
-    panel.TextScale = 0.6;
-    progressBar = resource.menu_builder.createProgressBar(0, 12, 6, 7, 1, 0);
-    progressBar.setColor(0, 153, 255);
-    // Page 2
-    panel = resource.menu_builder.createPanel(1, 12, 4, 7, 1, true, "Fishing");
-    panel.Centered = true;
+    menu = resource.menu_builder.createMenu(3);
+    let panel;
+    let inputPanel;
+    let textElement;
+    panel = menu.createPanel(0, 12, 4, 7, 1);
     panel.Header = true;
-    panel.Font = 7;
-    wordPanel = resource.menu_builder.createPanel(1, 12, 5, 7, 1, false, "Type: " + word);
-    wordPanel.setCentered();
-    wordPanel.setFontScale(0.6);
-    inputBox = resource.menu_builder.createInput(1, 12, 6, 7, 1, false, false);
-    resource.menu_builder.openMenu(true, false, false, true, false);
+    panel.MainBackgroundColor(0, 0, 0, 175);
+    textElement = panel.addText("Fishing");
+    textElement.Centered = true;
+    textElement.FontScale = 0.6;
+    textElement.Font = 7;
+    panel = menu.createPanel(0, 12, 5, 7, 2);
+    panel.MainBackgroundColor(0, 0, 0, 160);
+    textElement = panel.addText("Press ~b~F ~w~when your progress bar is maxed out.");
+    textElement.Centered = true;
+    textElement.FontScale = 0.45;
+    progressBar = panel.addProgressBar(12, 6, 7, 1, 1);
+    progressBar.setColor(0, 153, 255);
+    progressBar.Alpha = 255;
+    progressBar.DrawText = true;
+    // Page 2
+    panel = menu.createPanel(1, 12, 4, 7, 3);
+    panel.MainBackgroundColor(0, 0, 0, 175);
+    panel.Header = true;
+    textElement = panel.addText("Fishing");
+    textElement.Centered = true;
+    textElement.Font = 7;
+    textElement.FontScale = 0.6;
+    wordPanel = panel.addText("Type: " + word);
+    wordPanel.Centered = true;
+    wordPanel.FontScale = 0.5;
+    inputBox = panel.addInput(0, 2, 7, 1);
+    menu.Ready = true;
+    //menu.DisableOverlays(true);
 }
 function wordMode() {
     resource.menu_builder.setPage(1);
-    inputBox.setSelected();
+    inputBox.Selected = true;
 }
 function stopFishing() {
     if (isFishing) {
