@@ -1,7 +1,7 @@
 ﻿var screenX = API.getScreenResolutionMantainRatio().Width;
 var screenY = API.getScreenResolutionMantainRatio().Height;
-var panelMinX = (screenX / 32);
-var panelMinY = (screenY / 18);
+var panelMinX = Math.round(screenX / 32);
+var panelMinY = Math.round(screenY / 18);
 var button = null;
 var panel = null;
 var image = null;

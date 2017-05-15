@@ -22,6 +22,7 @@
   <script src="clientside/resources/job_fishing.js" type="client" lang="javascript" />
   <script src="clientside/resources/missionhandler.js" type="client" lang="javascript" />
   <script src="clientside/resources/sprite_loader.js" type="client" lang="javascript" />
+  <script src="clientside/resources/Timer.js" type="client" lang="javascript" />
 
   <script src="clientside/resources/sandbox.js" type="client" lang="javascript" />
   
@@ -29,27 +30,6 @@
   <script src="clientside/resources/menu_login.js" type="client" lang="javascript" />
   <script src="clientside/resources/menu_atm.js" type="client" lang="javascript" />
 
-  <file src="clientside/resources/images/effect/effect_00.png" />
-  <file src="clientside/resources/images/effect/effect_01.png" />
-  <file src="clientside/resources/images/effect/effect_02.png" />
-  <file src="clientside/resources/images/effect/effect_03.png" />
-  <file src="clientside/resources/images/effect/effect_04.png" />
-  <file src="clientside/resources/images/effect/effect_05.png" />
-  <file src="clientside/resources/images/effect/effect_06.png" />
-  <file src="clientside/resources/images/effect/effect_07.png" />
-  <file src="clientside/resources/images/effect/effect_08.png" />
-  <file src="clientside/resources/images/effect/effect_09.png" />
-  <file src="clientside/resources/images/effect/effect_10.png" />
-  <file src="clientside/resources/images/effect/effect_11.png" />
-  <file src="clientside/resources/images/effect/effect_12.png" />
-  <file src="clientside/resources/images/effect/effect_13.png" />
-
-  <file src="clientside/resources/images/backgrounds/login_left.jpg" />
-  <file src="clientside/resources/images/backgrounds/background_0.jpg" />
-  <file src="clientside/resources/images/backgrounds/background_1.jpg" />
-  <file src="clientside/resources/images/backgrounds/background_2.jpg" />
-  <file src="clientside/resources/images/backgrounds/background_3.jpg" />
-  
 	<include resource="database"/>
 	<include resource="gtaocharacter" />
 

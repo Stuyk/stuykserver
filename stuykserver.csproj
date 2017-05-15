@@ -128,6 +128,7 @@
     <TypeScriptCompile Include="clientside\resources\camera_manager.ts" />
     <TypeScriptCompile Include="clientside\resources\clothing_mode.ts" />
     <TypeScriptCompile Include="clientside\resources\event_manager.ts" />
+    <TypeScriptCompile Include="clientside\resources\Timer.ts" />
     <TypeScriptCompile Include="clientside\resources\job_fishing.ts" />
     <TypeScriptCompile Include="clientside\resources\menu_atm.ts" />
     <TypeScriptCompile Include="clientside\resources\menu_builder.ts" />

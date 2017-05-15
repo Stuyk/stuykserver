@@ -1,9 +1,11 @@
 stuykserver.dll
 *.pdb
+*.dll
 /obj/*
 /Properties/*
 obj/Debug/stuykserver.dll
 obj/Debug/stuykserver.pdb
+/bin/*
 *.zip
 *.exe
 <<<<<<< HEAD
